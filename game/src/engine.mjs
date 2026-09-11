@@ -1,3 +1,4 @@
+import { initializeEconomy, closeEconomicMonth } from './economic-growth.mjs';
 import { initializeDiplomacy, beginWarWarning, commenceWar, monthlyRelations, politicsTick, historicalWarnings, formAlliance, diplomaticPressure, validPoliticalDecision, applyPoliticalDecision, dispatchPopup } from './war-politics.mjs';
 import { coastalRecon } from './shore-recon.mjs';
 import { initializeBaseAviation, baseAirPower, flyBaseSorties, releaseShipAircraft } from './base-aviation.mjs';
@@ -68,6 +69,7 @@ export function newGame(content, player='JPN', seed=19360101,campaignId=content.
   if(campaignId==='campaign_1922')for(const id of ids)if(id!==player&&!['DEU','SOV'].includes(id))apply1922Decision(state,content,'comply',id);
   initializeDiplomacy(state);
   initializeCampaign(state,content);
+  initializeEconomy(state);
   state.initial=Object.fromEntries(ids.map(id=>[id,{power:fleetPower(state,content,id).total,tons:fleetSummary(state,content,id).tons}]));
   addLog(state,'The '+yearOf(state)+' naval estimates are open. Orders take time; prepare before relations deteriorate.','cabinet');
   queueDecision(state,'opening','The first naval estimate','Your ministry needs a direction for the new estimates. These commitments use the same resources and construction system as later orders.',[
@@ -395,6 +397,7 @@ export function tick(s,content,seconds){return s.paused?0:advanceMinutes(s,conte
 
 function monthly(s,content){
   for(const [id,n]of Object.entries(s.nations)){
+    closeEconomicMonth(s,content,id);
     const income=monthlyIncome(s,content,id);n.gold=Math.max(0,n.gold+income.gold);n.influence=clamp(n.influence+income.influence,0,500);// Industry output and its running expense are credited daily.
     n.commerce=clamp(n.commerce+3+upgradeLevel(n.tech,'logistics'),15,100);
     if(n.gold<1){n.morale=clamp(n.morale-3,10,100);n.logistics=clamp(n.logistics-2,20,100);}

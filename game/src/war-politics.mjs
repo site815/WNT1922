@@ -60,7 +60,7 @@ export function beginWarWarning(s,c,a,b,{months,endsAt,reason='Relations and str
  const variant=WAR_WARNING_TEXTS[Math.floor(rng(s)*WAR_WARNING_TEXTS.length)];
  r.warning={id:'warning-'+s.nextId++,startedAt:now,endsAt,months,reason,scripted,aggressor};r.pressure=Math.max(50,r.pressure);endAlliance(s,a,b);
  const title=names([a,b])+': war warning';
- const body=variant[0]+'. '+variant[1]+' '+reason+' Hostilities are expected on '+date(endsAt)+'. This preparation period cannot be canceled by improving relations.';
+ const body=variant[0]+'. '+variant[1]+' '+reason+' The outbreak date is unknown. Prepare now: this warning cannot be canceled by improving relations.';
  addLog(s,title+'. '+body,'diplomacy');s.log[0].dismissed=true;addAlert(s,title,body,'war-warning',{a,b,warningId:r.warning.id,popupKey:r.warning.id,global:true});
  if(popup)dispatchPopup(s,r.warning.id,title,body,'war-warning');
  s.nextDiplomaticAt=Math.min(s.nextDiplomaticAt??endsAt,endsAt);return r.warning;

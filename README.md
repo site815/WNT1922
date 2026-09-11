@@ -2,7 +2,7 @@
 
 Playable naval grand strategy for Windows. For a distributable build, extract the whole **WNT1922 Windows ZIP** and open **WNT1922.exe**. No separate Node.js or browser installation is required. The source checkout also supports **Play-WNT1922.cmd** and [local browser play](http://127.0.0.1:19222/).
 
-Release **0.18.1** has two campaign buttons: **The Treaty System — 6 February 1922** and **In Good Faith — 1 January 1936**. Choose the United Kingdom, the United States, Japan, France, Italy, Germany or the Soviet Union. The campaign is scored in 1950 and continues afterward.
+Release **0.18.2** has two campaign buttons: **The Treaty System — 6 February 1922** and **In Good Faith — 1 January 1936**. Choose the United Kingdom, the United States, Japan, France, Italy, Germany or the Soviet Union. The campaign is scored in 1950 and continues afterward.
 
 Ten main menus cover fleet missions, ship and aircraft catalogs, a merged fleet register, facilities and research, diplomacy, battle reports, naval record, and economy. School panels show graduation progress. Manage resources, shipyards, fleet missions, diplomacy and naval preparation. Automatic battles use ship specifications, air wings, logistics, training, morale, scouting and escape speed. The Equal Earth map shows fleets, scouted contacts, convoys, ports, capitals and supply-sensitive land campaigns.
 
@@ -13,6 +13,8 @@ Simulation uses one-minute operations in a worker separate from the interface, w
 - [Release audit and proposed improvements](game/AUDIT-0.17.md)
 - [Technology tree: all fourteen branches and 126 levels](docs/tech-tree.md)
 - [All seven national platform/equipment catalogs, both campaigns](docs/playable/README.md)
+- [Complete 14-start catalog review and proposed air warfare revision](docs/reviews/catalog-14-starts.html)
+- [Monthly economic growth and civilian shipping](docs/economic-growth.md)
 - [Campaign sources and provisional estimates](game/data/CAMPAIGN-SOURCES.md)
 - [Strategic port tiers, trade weights and historical references](docs/strategic-ports.md)
 - [Music credits and licenses](game/assets/music/CREDITS.md)

@@ -22,6 +22,7 @@ export function remainingRoute(s,f,now=campaignMinutes(s)){
   for(let i=1;i<f.route.length;i++){const leg=distanceNm(f.route[i-1],f.route[i]);if(distance<=leg)return [fleetPosition(s,f,now),...f.route.slice(i)];distance-=leg;}return [];
 }
 let coastCache={},geographyCache={},geographyRevision=0;
+let markerLayout={key:null,offsets:new Map()};
 function politicalMap(s,data,rotation,zoom){
   if(!data?.features)return '';
   const signature=JSON.stringify([rotation,zoom,s.paused,s.world?.control,(s.world?.fronts||[]).map(f=>[f.id,Math.round(f.progress*1000),f.status,Math.sign(f.pressure||0)])]);
@@ -41,8 +42,6 @@ function politicalMap(s,data,rotation,zoom){
 const typeOrder=['CV','CVL','BB','BC','CA','CL','DL','DD','DE','TB','SS','SM','AO','AD','AV','AK'];
 const liveShips=stats=>stats.groups.filter(g=>g.count&&!['sunk','scrapped'].includes(g.status));
 export function fleetComposition(stats,c){const counts={};for(const g of liveShips(stats)){const t=c.classes[g.classId].type;counts[t]=(counts[t]||0)+g.count;}return Object.entries(counts).sort(([a],[b])=>(typeOrder.indexOf(a)<0?99:typeOrder.indexOf(a))-(typeOrder.indexOf(b)<0?99:typeOrder.indexOf(b))).map(([t,n])=>n+' '+t).join(' · ')||'No ships';}
-function pageRows(rows,page,size=4){const pages=Math.max(1,Math.ceil(rows.length/size)),index=Math.max(0,Math.min(pages-1,page||0));return {rows:rows.slice(index*size,(index+1)*size),index,pages,total:rows.length};}
-function pager(p,kind){return p.pages>1?'<div class="list-pager">'+button('‹','list-page','data-kind="'+kind+'" data-value="'+(p.index-1)+'" aria-label="Previous '+kind+' page" '+(p.index===0?'disabled title="Already on the first page."':''))+'<span>'+(p.index+1)+' / '+p.pages+'</span>'+button('›','list-page','data-kind="'+kind+'" data-value="'+(p.index+1)+'" aria-label="Next '+kind+' page" '+(p.index===p.pages-1?'disabled title="Already on the last page."':''))+'</div>':'';}
 export function fleetPopup(s,c,id){
  const f=s.nations[s.player].fleets.find(f=>f.id===id);if(!f)return '<p>This force has been reorganized. Select its current command on the chart.</p>';
  const {stats,supply,power}=displayedFleet(s,c,f),ships=liveShips(stats).sort(compareShips(c));
@@ -54,15 +53,20 @@ export function commandView(s,content,ui={},data={}){
   const contact=contacts.find(c=>c.id===ui.contactId),convoy=n.convoys.find(c=>c.id===ui.convoyId),mission=ui.mission||f?.mission||'guard',unequal=ui.aggressiveBattle??f?.aggressiveBattle??false;
   const zoom=ui.zoom||1,rotation=ui.rotation||0,width=1200/zoom,height=600/zoom,cx=ui.cx??600,cy=Math.max(height/2,Math.min(600-height/2,ui.cy??300)),scale=1.5/zoom,project=p=>mapPoint(p,rotation);
   const enemies=Object.values(s.relations).filter(r=>r.war&&[r.a,r.b].includes(s.player)).map(r=>PROFILES[r.a===s.player?r.b:r.a].name);
-  const positions=[],place=(point,radius=12*scale)=>{
+  const layoutKey=s.player+':'+s.campaignId+':'+s.initial?.[s.player]?.tons;
+  if(markerLayout.key!==layoutKey)markerLayout={key:layoutKey,offsets:new Map()};
+  const positions=[],place=(point,radius=12*scale,id)=>{
     const p=project(point);let candidate=p;
+    const stored=markerLayout.offsets.get(id);
+    if(stored){candidate=[p[0]+stored[0]*scale,p[1]+stored[1]*scale];positions.push({x:candidate[0],y:candidate[1],radius});return candidate;}
     for(let i=0;i<300;i++){const spread=Math.sqrt(i)*18*scale,angle=i*2.399963;candidate=[p[0]+Math.cos(angle)*spread,p[1]+Math.sin(angle)*spread];if(positions.every(q=>Math.hypot(q.x-candidate[0],q.y-candidate[1])>=q.radius+radius+2*scale))break;}
+    if(id)markerLayout.offsets.set(id,[(candidate[0]-p[0])/scale,(candidate[1]-p[1])/scale]);
     positions.push({x:candidate[0],y:candidate[1],radius});return candidate;
   };
   let grid='';for(let lat=-60;lat<=60;lat+=30)grid+=`<path d="${linePath(Array.from({length:181},(_,i)=>[-180+i*2,lat]),rotation)}"/>`;for(let lon=-180;lon<180;lon+=30)grid+=`<path d="${linePath(Array.from({length:91},(_,i)=>[lon,-90+i*2]),rotation)}"/>`;
   const markerLocation=(id,x,y,px,py)=>Math.hypot(x-px,y-py)>1?'<g class="marker-location" style="color:'+PROFILES[s.player].color+'" data-motion-id="'+id+'" data-motion-x="'+px+'" data-motion-y="'+py+'"><line x1="'+px+'" y1="'+py+'" x2="'+x+'" y2="'+y+'"/><circle cx="'+px+'" cy="'+py+'" r="'+1.1*scale+'"/></g>':'';
   const ownMarkers=fleets.map(({f:ship,stats:st})=>{
-    const position=fleetPosition(s,ship),[x,y]=place(position),[px,py]=project(position),active=ship.id===f?.id&&!contact&&!convoy;
+    const position=fleetPosition(s,ship),[x,y]=place(position,12*scale,ship.id),[px,py]=project(position),active=ship.id===f?.id&&!contact&&!convoy;
     return `${markerLocation(ship.id,x,y,px,py)}<g class="fleet-marker own ${active?'selected':''}" role="button" tabindex="0" aria-label="${esc(ship.name)}: ${st.hulls} ships" data-action="select-fleet" data-id="${ship.id}" data-fleet-hover="${ship.id}" data-motion-id="${ship.id}" data-motion-x="${px}" data-motion-y="${py}" style="color:${PROFILES[s.player].color}"><circle cx="${x}" cy="${y}" r="${12*scale}" class="map-hit"/><path transform="translate(${x},${y}) scale(${scale})" d="M0,-7 L7,5 L0,2 L-7,5 Z"/>${active?`<circle cx="${x}" cy="${y}" r="${11*scale}" class="selection-ring"/>`:''}</g>`;
   }).join('');
   const contactPositions=new Map(),placeContact=point=>{const p=project(point),key=`${Math.round(p[0]/(18*scale))}:${Math.round(p[1]/(18*scale))}`,i=contactPositions.get(key)||0;contactPositions.set(key,i+1);const radius=Math.sqrt(i)*7*scale,angle=i*2.399963;return [p[0]+Math.cos(angle)*radius,p[1]+Math.sin(angle)*radius];};
@@ -77,8 +81,8 @@ export function commandView(s,content,ui={},data={}){
   const capitals=Object.entries(MAP_CAPITALS).map(([id,p])=>{const [x,y]=project(p.point);return `<g class="map-capital" role="button" tabindex="0" data-action="select-country" data-id="${id}" data-map-hover="capital:${id}" aria-label="${esc(p.name)} capital" style="fill:${PROFILES[id].color}"><circle class="map-hit" cx="${x}" cy="${y}" r="${9*scale}"/><path d="M${x},${y-4*scale}L${x+4*scale},${y}L${x},${y+4*scale}L${x-4*scale},${y}Z"/><text x="${x+5*scale}" y="${y-5*scale}" font-size="${10*scale}">${p.name}</text></g>`;}).join('');
 
   const selectedKey=ui.portId||ui.contactId||ui.convoyId||ui.frontId||ui.countryId||ui.territoryId||(ui.credits?'credits':f?.id)||'commands';
-  const columns=1,fleetPage=pageRows(fleets,ui.fleetPage,typeof window==='undefined'?7:Math.max(3,Math.min(10,Math.floor((window.innerHeight-245)/72))));
-  const fleetList='<div class="panel-title"><h2>Naval commands</h2><span>'+fleets.length+' forces</span></div><div class="fleet-command-list">'+fleetPage.rows.map(({f:ship,stats:st})=>'<button class="fleet-command-row" data-action="focus-fleet" data-id="'+ship.id+'" data-fleet-hover="'+ship.id+'" data-hover-mode="readiness"><strong>'+esc(ship.name)+'</strong><span class="fleet-composition">'+fleetComposition(st,content)+'</span><small>'+(ship.role==='support'?'Automatic support':MISSIONS[ship.mission].name)+' · '+fleetStatus(s,ship)+'</small></button>').join('')+'</div>'+pager(fleetPage,'fleet')+(!fleets.length?'<p>No operational warships. Commission or recommission ships to form commands.</p>':'');
+  const columns=1;
+  const fleetList='<div class="panel-title"><h2>Naval commands</h2><span>'+fleets.length+' forces</span></div><div class="fleet-command-list" data-scroll-key="naval-commands">'+fleets.map(({f:ship,stats:st})=>'<button class="fleet-command-row" data-action="focus-fleet" data-id="'+ship.id+'" data-fleet-hover="'+ship.id+'" data-hover-mode="readiness"><strong>'+esc(ship.name)+'</strong><span class="fleet-composition">'+fleetComposition(st,content)+'</span><small>'+(ship.role==='support'?'Automatic support':MISSIONS[ship.mission].name)+' · '+fleetStatus(s,ship)+'</small></button>').join('')+'</div>'+(!fleets.length?'<p>No operational warships. Commission or recommission ships to form commands.</p>':'');
   const selection=commandSelection(s,content,ui,data,{fleet:f,stats,supply,contact,convoy,composition:stats?fleetComposition(stats,content):'',manifest:f?fleetPopup(s,content,f.id,ui.manifestPage):''});
   const panel=selection?'<div class="command-panel-nav">'+button('‹ All commands','command-list')+'</div><div class="order-content fleet-order-panel">'+selection+'</div>':fleetList;
   const route=convoy?remainingRoute(s,convoy):f?remainingRoute(s,f):[];

@@ -16,11 +16,12 @@ export const CLOSED_LINES={
 };
 export function productionBlock(s,c,classId,id=s.player,{includeFuture=false}={}){
   const cl=c.classes[classId];if(!cl)return 'Unknown design.';
+  if(fleetService(cl)==='merchant')return 'Civilian merchants are financed and delivered outside the naval construction catalog.';
   if(cl.year>year(s)&&!includeFuture)return 'Development opens in '+cl.year+'.';
   const next=CLOSED_LINES[classId];if(next&&s.nations[id].unlocked.includes(next))return 'Production superseded by '+c.classes[next].name+'.';
   if(cl.buildUntil&&year(s)>cl.buildUntil)return 'This production line is obsolete.';
   const life=['BB','BC'].includes(cl.type)?18:['CV','CVL'].includes(cl.type)?13:cl.type==='SS'?10:14;
-  if(year(s)-cl.year>life)return 'Obsolete construction: commission a current design draft.';
+  if(!cl.supportHybrid&&year(s)-cl.year>life)return 'Obsolete construction: commission a current design draft.';
   return '';
 }
 export function aircraftModels(c,id){return c.nations[id].aircraft||[];}

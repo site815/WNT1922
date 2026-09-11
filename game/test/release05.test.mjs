@@ -8,6 +8,7 @@ import {SimulationRunner} from '../src/simulation-runner.mjs';
 import {newGame,monthlyIncome,orderShip,issueFleetOrder} from '../src/engine.mjs';
 import {contentFor} from '../src/campaign-content.mjs';
 import {merchantEconomy,DOMESTIC_SHARE} from '../src/merchant-economy.mjs';
+import {closeEconomicMonth} from '../src/economic-growth.mjs';
 import {sinkMerchants} from '../src/task-forces.mjs';
 import {recordWarBattle,recordWarRaid,warBalances} from '../src/war-balance.mjs';
 import {SPEEDS,dailyResources,productionBlock} from '../src/naval-resources.mjs';
@@ -22,7 +23,7 @@ test('merchant capacity connects all national trade shares, income and logistics
   const s=newGame(b,id,72,campaign),c=contentFor(b,s),n=s.nations[id],before=merchantEconomy(s,c,id),income=monthlyIncome(s,c,id);
   assert.equal(before.domestic,share);assert.equal(before.coverage,1);sinkMerchants(s,id,1e6);const loss=merchantEconomy(s,c,id);assert.equal(loss.current,0);assert.equal(loss.economyFactor,share);assert.equal(loss.logistics,n.logistics*share);assert.ok(monthlyIncome(s,c,id).gold<income.gold);assert.ok(monthlyIncome(s,c,id).influence<income.influence);assert.ok(monthlyIncome(s,c,id).industry<income.industry);
   n.commerce=100;n.merchant.otherHulls=c.nations[id].merchants.hulls;n.merchant.otherGRT=before.baseline;n.tech.industry=3;assert.equal(merchantEconomy(s,c,id).required,before.baseline*1.3);assert.ok(merchantEconomy(s,c,id).coverage<1);
-  n.gold=1e8;n.industry=1e8;n.influence=500;const cl=n.unlocked.map(k=>c.classes[k]).find(cl=>cl.type==='AK'&&cl.raw.merchant_grt&&!productionBlock(s,c,cl.id));assert.ok(cl,id+' has a replacement merchant design');const gid=orderShip(s,c,cl.id,1),g=n.groups.find(g=>g.id===gid),building=merchantEconomy(s,c,id).current;g.status='active';g.progress=1;assert.equal(merchantEconomy(s,c,id).current-building,cl.raw.merchant_grt);assert.equal(validateSave(s,b).version,SAVE_VERSION);
+  assert.ok(!n.unlocked.some(k=>c.classes[k].service==='merchant'),id+' civilian shipping is outside naval orders');const shippingBefore=merchantEconomy(s,c,id).current;closeEconomicMonth(s,c,id);assert.ok(merchantEconomy(s,c,id).current>=shippingBefore);assert.equal(validateSave(s,b).version,SAVE_VERSION);
  }
 });
 test('war balance persists beyond report truncation and resets for a later war',()=>{

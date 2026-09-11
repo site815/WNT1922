@@ -8,7 +8,7 @@ export const ECONOMY = {
   GBR:{goldYear:95000,industryYear:54000,yardYear:80000,crew:72000,crewYear:1700},
   DEU:{goldYear:48000,industryYear:78000,yardYear:100000,crew:10000,crewYear:700},
 };
-export function economyFor(s,id){const e=ECONOMY[id];if(s?.campaignId!=='campaign_1922')return e;const years=Math.max(0,new Date(s.day*86400000).getUTCFullYear()-1922),factor=Math.min(1,(id==='SOV'?.28:.62)+years*(id==='SOV'?.045:.0272));return {...e,goldYear:e.goldYear*factor,industryYear:e.industryYear*factor,yardYear:e.yardYear*factor,crew:e.crew*(id==='SOV'?.28:.8),crewYear:e.crewYear*.8};}
+export function economyFor(s,id){const e=ECONOMY[id],early=s?.campaignId==='campaign_1922',base=early?(id==='SOV'?.28:.62):1,index=s?.nations?.[id]?.economicIndex??1;return {...e,goldYear:e.goldYear*base*index,industryYear:e.industryYear*base*index,yardYear:e.yardYear*base,crew:e.crew*(early?(id==='SOV'?.28:.8):1),crewYear:e.crewYear*(early?.8:1)};}
 export const AIRCRAFT_YEAR={JPN:1000,USA:1500,GBR:900,DEU:300,FRA:650,ITA:600,SOV:550};
 // Includes pilots and the other flying crew of multi-seat aircraft. The opening
 // training capacities remain independently expandable; all facilities open at 50%.

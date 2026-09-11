@@ -38,7 +38,7 @@ function relationInformation(s,r,w){
  const change=relationChanges(s,r),signed=v=>(v>=0?'+':'')+v.toFixed(2),historicalLock=scheduledWarningOnly(s,r);
  const history='<div class="relation-history"><p title="'+esc(change.note)+'">Historical trend <b class="'+(change.historical>=0?'positive':'negative')+'">'+signed(change.historical)+'/month</b></p><p title="Treaty-era mistrust, reduced after the limits lapse. Diplomatic actions, crises and discoveries add separate changes.">Mistrust '+signed(change.treaty)+' · Net '+signed(change.total)+'/month</p><p title="An ordinary warning requires negative relations and at least '+WAR_PRESSURE_THRESHOLD+' war pressure. Historical triggers are scheduled separately.">War pressure '+num(r.pressure)+' / 100 · threshold '+WAR_PRESSURE_THRESHOLD+'</p></div>';
  if(r.war)return history+'<p>War balance: '+esc(w?.result||'No decisive result')+'</p>';
- if(r.warning)return history+'<div class="relation-warning">'+timedProgress(s,{end:r.warning.endsAt/1440,duration:(r.warning.endsAt-r.warning.startedAt)/1440,label:'Preparing for war',datePrefix:'Hostilities ',hint:r.warning.reason+' This warning is irrevocable.'})+'</div>';
+ if(r.warning)return history+'<div class="relation-warning"><strong>Preparing for war</strong><p title="'+esc(r.warning.reason)+'">Outbreak date unknown. The warning is irrevocable.</p></div>';
  return history+'<p title="War warnings last 1–12 calendar months. A warning commits the governments to war; improving relations afterward does not cancel it.">'+(historicalLock?'Historical outbreak window':num(warningRisk(s,r)*100)+'% monthly warning risk')+'</p>';
 }
 function pactInformation(s){

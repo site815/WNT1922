@@ -10,7 +10,7 @@
 
 ---
 
-Generated, reviewable catalog for release 0.18.1. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/de.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
+Generated, reviewable catalog for release 0.18.2. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/de.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
 
 Campaign opens 1922-02-06. Future designs are listed for planning; listing is not permission to build an obsolete or superseded line. No merchant or support hull contributes to the warship total.
 
@@ -718,7 +718,7 @@ Classes using literal fits carry their complete weapon, protection and machinery
 }
 ```
 
-### Fleet depot · 1936 — `de_depot_1936`
+### Fleet depot · 1932 — `de_depot_1932`
 
 ```json
 {
@@ -749,7 +749,7 @@ Classes using literal fits carry their complete weapon, protection and machinery
 }
 ```
 
-### Fleet oiler · 1936 — `de_oiler_1936`
+### Fleet oiler · 1932 — `de_oiler_1932`
 
 ```json
 {
@@ -780,7 +780,7 @@ Classes using literal fits carry their complete weapon, protection and machinery
 }
 ```
 
-### Fleet depot · 1950 — `de_depot_1950`
+### Fleet depot · 1942 — `de_depot_1942`
 
 ```json
 {
@@ -811,7 +811,7 @@ Classes using literal fits carry their complete weapon, protection and machinery
 }
 ```
 
-### Fleet oiler · 1950 — `de_oiler_1950`
+### Fleet oiler · 1942 — `de_oiler_1942`
 
 ```json
 {

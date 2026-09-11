@@ -43,7 +43,7 @@ for (let i = 0; i < packs.length; i++) {
 }
 // Classify the owned support records before separating the three registers.
 for(const prefix of ['jp','uk'])for(const {spec,...annotations}of (await read('data/playable/'+prefix+'.json')).campaigns.in_good_faith_1936.classes){
-  if(annotations.buildable===false)content.classes[spec.id]={...normalizeClass(spec,equipment),...annotations};
+  if(annotations.buildable===false||annotations.service==='support')content.classes[spec.id]={...normalizeClass(spec,equipment),...annotations};
 }
 for(const [id,n] of Object.entries(content.nations)){
   if(id==='JPN')Object.assign(n.aggregates.find(g=>g.id==='a-JPN-11'),{class_id:'maru_depot_t23',name:'Maru depot conversions'});

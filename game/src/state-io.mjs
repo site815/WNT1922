@@ -51,6 +51,9 @@ export function validateSave(value, content) {
   for (const [id,n] of Object.entries(value.nations)) {
     if (!plain(n) || n.id!==id || !Array.isArray(n.groups) || n.groups.length>10000 || !PRIORITIES[n.priority] || !REGIONS[n.focus] || !content.nations[n.rival] || n.rival===id) fail();
     if(!plain(n.merchant)||!amount(n.merchant.otherGRT))fail();
+    if(n.economicIndex!==undefined&&!finite(n.economicIndex,.1,20))fail();
+    if(n.civilianShipping!==undefined&&(!plain(n.civilianShipping)||!finite(n.civilianShipping.carry,0,1)||!Number.isInteger(n.civilianShipping.delivered)||!amount(n.civilianShipping.delivered)||!amount(n.civilianShipping.grt)))fail();
+    if(n.monthAccount!==undefined&&(!plain(n.monthAccount)||!day(n.monthAccount.start)||!price(n.monthAccount.opening)))fail();
     if(n.personnelTraining!==undefined&&(!plain(n.personnelTraining)||!amount(n.personnelTraining.sailors)||!amount(n.personnelTraining.aviators)||!day(n.personnelTraining.lastDay)||n.personnelTraining.lastDay>value.day))fail();
     if(!['gold','influence','industry','crew','crewYear','sunkTons','lostTons','battlesWon','battlesLost','delivered'].every(k=>amount(n[k])))fail();
     if(currentRoster&&(!plain(n.merchant)||!Number.isInteger(n.merchant.otherHulls)||!finite(n.merchant.otherHulls,0,1000000)||!amount(n.merchantDelivered)||!amount(n.supportDelivered)))fail();

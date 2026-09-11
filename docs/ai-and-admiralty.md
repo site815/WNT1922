@@ -4,7 +4,7 @@ These are provisional game rules, not a claim to reproduce a historical naval st
 
 ## Ministry planning
 
-The planner runs monthly after ordinary appropriations. It counts current hulls, reserve hulls at half weight and construction already funded. Merchant tonnage already on order reduces the replacement requirement. Research is ranked by actual shortages and national preferences; a dated or maximum-level program cannot be funded.
+The planner runs monthly after ordinary appropriations. It counts current hulls, reserve hulls at half weight and construction already funded. Civilian merchant construction is outside naval orders; all countries receive the same monthly civilian-growth rules. Research is ranked by actual shortages and national preferences; a dated or maximum-level program cannot be funded.
 
 | Ministry | In Good Faith preferences |
 | --- | --- |
@@ -18,13 +18,13 @@ The planner runs monthly after ordinary appropriations. It counts current hulls,
 
 The Treaty System restores conventional historical-start preferences for France, Germany and the USSR. Early carrier preference is lower in the other navies. Historical-start AI governments keep declared construction restrictions rather than automatically adopting an alternate-history program. Existing treaty policy and year gates still govern what is legal.
 
-Normal appropriations leave a reserve of 12% of base annual gold income, 5% of annual industry output and 12 influence. Severe merchant shortages can use part of that reserve. The AI defers new orders when existing yard work is already overloaded; ordinary orders may bring planned load to at most 125% of available daily throughput, or 140% for merchant replacement. Existing construction continues at the ordinary congestion-adjusted rate. Incoming crews are considered over a two-year horizon. These limits are AI budget preferences: the player retains ordinary order controls and can deliberately overload yards.
+Normal appropriations leave a reserve of 12% of base annual gold income, 5% of annual industry output and 12 influence. The AI defers new orders when existing yard work is already overloaded; ordinary orders may bring planned load to at most 125% of available daily throughput. Existing construction continues at the ordinary congestion-adjusted rate. Incoming crews are considered over a two-year horizon. These limits are AI budget preferences: the player retains ordinary order controls and can deliberately overload yards.
 
 Schools receive higher funding while staffing is short. Aircraft funding falls to 10% when stock is sufficient or surplus planes lack aviators; the aviation schools then take priority. Industry remains funded unless gold is critically short. New aircraft qualifications favor recent eligible models, and model selection never bypasses the development year. A design draft is commissioned for a needed role with no current line, rather than repeatedly paying for duplicate drafts.
 
 ## Formations and movement
 
-At a new campaign opening, unspecified fleet stations are spread across suitable national bases using capacity and sea-route distance. Explicit catalog deployments remain in place. No active voyage is moved by this initial assignment. The revised USA, UK and German sailor pools cover their opening rosters. All navies start factories at 20% and schools at 100% funding; the monthly AI then adjusts funding normally.
+At a new campaign opening, unspecified fleet stations are spread across suitable national bases using capacity and sea-route distance. Explicit catalog deployments remain in place. No active voyage is moved by this initial assignment. The revised USA, UK and German sailor pools cover their opening rosters. All four facilities start at 50% funding; the monthly AI then adjusts its own funding normally.
 
 Newer qualified aircraft replace older same-role aircraft when ships are in port, returning old airframes to reserve. Deployed wings stay aboard until the force docks. Reallocation does not create aircraft or aviators.
 

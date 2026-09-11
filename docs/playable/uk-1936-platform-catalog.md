@@ -10,7 +10,7 @@
 
 ---
 
-Generated, reviewable catalog for release 0.18.1. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/uk.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
+Generated, reviewable catalog for release 0.18.2. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/uk.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
 
 Campaign opens 1936-01-01. Future designs are listed for planning; listing is not permission to build an obsolete or superseded line. No merchant or support hull contributes to the warship total.
 
@@ -756,26 +756,6 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
 | Fit notes | See base or original program catalog |
 
-### Fast fleet oiler — `rn_fleet_oiler`
-
-| Property | Value |
-|---|---|
-| Role / service | AO / support |
-| Design year | 1930 |
-| Standard displacement (t) | Not cataloged |
-| Speed (kn) | 0 |
-| Range (km) | 0 |
-| Main guns | 0 × 0 mm |
-| Torpedo tubes | 0 |
-| AA barrels | 0 |
-| Belt / deck (mm) | 0 / 0 |
-| Embarked aircraft | 0 |
-| Complement | 0 |
-| Hull price (gold) | 0 |
-| Registered merchant capacity (GRT) | Not applicable / opening register allocation |
-| Opening construction catalog | Legacy only |
-| Fit notes | Count-only support entry: 16 oilers in Fisher’s Ghost §3.1. Tonnage, machinery, crew and maintenance costs are not yet cataloged. |
-
 ### United Kingdom standard freighter 1922 — `uk_merchant_1922`
 
 | Property | Value |
@@ -793,7 +773,7 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Complement | 48 |
 | Hull price (gold) | 1344 |
 | Registered merchant capacity (GRT) | 3500 |
-| Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
+| Opening construction catalog | Legacy only |
 | Fit notes | Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added. |
 
 ### United Kingdom standard freighter 1936 — `uk_merchant_1936`
@@ -813,7 +793,7 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Complement | 60 |
 | Hull price (gold) | 1960 |
 | Registered merchant capacity (GRT) | 5000 |
-| Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
+| Opening construction catalog | Legacy only |
 | Fit notes | Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added. |
 
 ### United Kingdom standard freighter 1948 — `uk_merchant_1948`
@@ -833,8 +813,28 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Complement | 60 |
 | Hull price (gold) | 2660 |
 | Registered merchant capacity (GRT) | 7000 |
-| Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
+| Opening construction catalog | Legacy only |
 | Fit notes | Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added. |
+
+### Fast fleet oiler — `rn_fleet_oiler`
+
+| Property | Value |
+|---|---|
+| Role / service | AO / support |
+| Design year | 1930 |
+| Standard displacement (t) | Not cataloged |
+| Speed (kn) | 0 |
+| Range (km) | 0 |
+| Main guns | 0 × 0 mm |
+| Torpedo tubes | 0 |
+| AA barrels | 0 |
+| Belt / deck (mm) | 0 / 0 |
+| Embarked aircraft | 0 |
+| Complement | 0 |
+| Hull price (gold) | 0 |
+| Registered merchant capacity (GRT) | Not applicable / opening register allocation |
+| Opening construction catalog | Legacy only |
+| Fit notes | Count-only support entry: 16 oilers in Fisher’s Ghost §3.1. Tonnage, machinery, crew and maintenance costs are not yet cataloged. |
 
 ### Fleet depot · 1922 — `uk_depot_1922`
 
@@ -876,12 +876,12 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
 | Fit notes | Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
 
-### Fleet depot · 1936 — `uk_depot_1936`
+### Fleet depot · 1932 — `uk_depot_1932`
 
 | Property | Value |
 |---|---|
 | Role / service | AD / support |
-| Design year | 1936 |
+| Design year | 1932 |
 | Standard displacement (t) | 6500 |
 | Speed (kn) | 16 |
 | Range (km) | 18520 |
@@ -894,14 +894,14 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Hull price (gold) | 4100 |
 | Registered merchant capacity (GRT) | Not applicable / opening register allocation |
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
-| Fit notes | Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
+| Fit notes | Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
 
-### Fleet oiler · 1936 — `uk_oiler_1936`
+### Fleet oiler · 1932 — `uk_oiler_1932`
 
 | Property | Value |
 |---|---|
 | Role / service | AO / support |
-| Design year | 1936 |
+| Design year | 1932 |
 | Standard displacement (t) | 7500 |
 | Speed (kn) | 16 |
 | Range (km) | 18520 |
@@ -914,14 +914,14 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Hull price (gold) | 3500 |
 | Registered merchant capacity (GRT) | Not applicable / opening register allocation |
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
-| Fit notes | Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
+| Fit notes | Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
 
-### Fleet depot · 1950 — `uk_depot_1950`
+### Fleet depot · 1942 — `uk_depot_1942`
 
 | Property | Value |
 |---|---|
 | Role / service | AD / support |
-| Design year | 1950 |
+| Design year | 1942 |
 | Standard displacement (t) | 7500 |
 | Speed (kn) | 18 |
 | Range (km) | 20372 |
@@ -934,14 +934,14 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Hull price (gold) | 4800 |
 | Registered merchant capacity (GRT) | Not applicable / opening register allocation |
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
-| Fit notes | Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
+| Fit notes | Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
 
-### Fleet oiler · 1950 — `uk_oiler_1950`
+### Fleet oiler · 1942 — `uk_oiler_1942`
 
 | Property | Value |
 |---|---|
 | Role / service | AO / support |
-| Design year | 1950 |
+| Design year | 1942 |
 | Standard displacement (t) | 8500 |
 | Speed (kn) | 18 |
 | Range (km) | 20372 |
@@ -954,4 +954,4 @@ GRT is registered volume, not naval displacement. Naval oilers and depot ships a
 | Hull price (gold) | 4200 |
 | Registered merchant capacity (GRT) | Not applicable / opening register allocation |
 | Opening construction catalog | Listed; year, treaty and obsolescence rules apply |
-| Fit notes | Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |
+| Fit notes | Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added. |

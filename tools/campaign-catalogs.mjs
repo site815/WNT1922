@@ -20,6 +20,7 @@ export async function addCampaignCatalogs(content,read){
    if(extra.navy)c.nations[id]={...clone(extra.navy),...PROFILES[id],title:extra.navy.title,description:extra.navy.description};
    const n=c.nations[id];n.merchants=clone(extra.merchants);n.aircraft=clone(extra.aircraft);n.playableSource='data/playable/'+files[id]+'.json';
    for(const {spec,...annotations}of extra.classes){c.classes[spec.id]={...normalizeClass(spec,c.equipment,n.aircraft),...annotations};if(annotations.buildable!==false&&!n.designs.includes(spec.id))n.designs.push(spec.id);}
+   n.designs=n.designs.filter(cid=>c.classes[cid].service!=='merchant'&&c.classes[cid].type!=='AK');
   }
  }
  return {in_good_faith_1936:content,campaign_1922:vanilla};

@@ -52,18 +52,16 @@ test('merchant counts cannot inflate naval power, displacement, crew demand, sup
   assert.ok(s.nations.JPN.groups.filter(g=>g.service!=='warship').every(g=>!g.destination));
 });
 
-test('ordered merchant hulls use yards, enter only the merchant register, and count as merchant deliveries',()=>{
+test('civilian merchant hulls remain outside naval construction and warship totals',()=>{
   const s=sim.newGame(content);s.autoPause=false;
   Object.assign(s.nations.JPN,{gold:1e7,influence:1000,industry:1e7});
   const n=s.nations.JPN,before=sim.fleetSummary(s,content),load=sim.yardLoad(s,content).work;
-  const id=sim.orderShip(s,content,'standard_maru_t23',2),g=n.groups.find(g=>g.id===id);
-  assert.equal(g.service,'merchant');assert.ok(sim.yardLoad(s,content).work>load);
+  assert.throws(()=>sim.orderShip(s,content,'standard_maru_t23',2),/active national catalog/);
+  assert.equal(sim.yardLoad(s,content).work,load);
   assert.deepEqual(sim.fleetSummary(s,content),before);
-  assert.equal(sim.merchantSummary(s,content).building,2);
+  assert.equal(sim.merchantSummary(s,content).building,0);
   assert.equal(sim.merchantSummary(s,content).total,2146);
-  g.progress=1-1e-9;sim.advanceDays(s,content,1);
-  assert.equal(g.status,'active');assert.equal(n.delivered,0);assert.equal(n.merchantDelivered,2);
-  assert.equal(sim.merchantSummary(s,content).total,2148);
+  assert.equal(n.delivered,0);assert.equal(n.merchantDelivered,0);
   assert.equal(sim.fleetSummary(s,content).active,105);
   assert.equal(sim.supportSummary(s,content).total,10);
   assert.doesNotThrow(()=>validateSave(s,content));
