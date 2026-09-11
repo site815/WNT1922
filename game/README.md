@@ -1,4 +1,4 @@
-# WNT1922 — playable Windows build 0.18.0
+# WNT1922 — playable Windows build 0.18.1
 
 Double-click **Play-WNT1922.cmd** in the project root, or open [the running game](http://127.0.0.1:19222/). The launcher opens a maximized app window with normal Alt-Tab switching. Menu also offers fullscreen. Play and saves remain on this computer. For distribution, extract the entire Windows ZIP and run WNT1922.exe. The runtime is bundled. See [build instructions](../docs/building.md).
 

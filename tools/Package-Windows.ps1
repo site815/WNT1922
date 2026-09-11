@@ -10,11 +10,9 @@ $runtimeZip = Join-Path $cacheDirectory ('electron-v' + $runtimeLock.version + '
 if (-not (Test-Path -LiteralPath $runtimeZip)) { Invoke-WebRequest -Uri $runtimeLock.url -OutFile $runtimeZip }
 if ((Get-FileHash -Algorithm SHA256 -LiteralPath $runtimeZip).Hash.ToLowerInvariant() -ne $runtimeLock.sha256) { throw 'Electron runtime checksum does not match the pinned publisher release.' }
 $sourceLock = Get-Content -Raw -LiteralPath 'desktop/source-lock.json' | ConvertFrom-Json
-$sourceCache = Join-Path $cacheDirectory 'runtime-sources'
-New-Item -ItemType Directory -Force -Path $sourceCache | Out-Null
+$sourceCache = Join-Path $releaseRoot 'licenses/runtime-sources'
 foreach ($sourceArchive in $sourceLock.archives) {
     $sourcePath = Join-Path $sourceCache $sourceArchive.name
-    if (-not (Test-Path -LiteralPath $sourcePath)) { Invoke-WebRequest -Uri $sourceArchive.url -OutFile $sourcePath }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $sourcePath).Hash.ToLowerInvariant() -ne $sourceArchive.sha256) { throw ('Runtime source checksum mismatch: ' + $sourceArchive.name) }
 }
 & $releaseNode tools/build-game.mjs game/public

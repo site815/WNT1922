@@ -2,7 +2,7 @@
 
 ## Windows download
 
-Distribute the complete `dist/WNT1922-0.18.0-win-x64.zip` and its `.sha256` file. Extract the entire folder before opening `WNT1922.exe`. Do not distribute the executable alone: DLLs, resources, licenses and source notices are required. Builds are unsigned until the owner supplies a signing certificate; Windows may show an unknown-publisher prompt.
+Distribute the complete `dist/WNT1922-0.18.1-win-x64.zip` and its `.sha256` file. Extract the entire folder before opening `WNT1922.exe`. Do not distribute the executable alone: DLLs, resources, licenses and source notices are required. Builds are unsigned until the owner supplies a signing certificate; Windows may show an unknown-publisher prompt.
 
 The application uses its bundled Electron runtime and opens in a maximized normal window. It binds a random loopback port and makes no telemetry requests. Internet access is unnecessary for play. Renderer Node access is disabled, context isolation and sandboxing are enabled, and the simulation worker remains separate from the UI. External credit links open in the system browser.
 
@@ -20,7 +20,7 @@ node --test --test-isolation=none --test-skip-pattern='old campaign migration|un
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Package-Windows.ps1
 ```
 
-The packaging script downloads a pinned official runtime, verifies its SHA-256, builds from source, audits asset hashes and assembles an explicit allowlist. Output contains a per-file manifest and archive checksum. It recreates only the versioned folder inside `dist`; player saves are never touched. `node tools/verify-package.mjs dist/WNT1922-0.18.0-win-x64` checks an extracted package against its manifest and current source build.
+The packaging script downloads a pinned official runtime, verifies its SHA-256, builds from source, audits asset hashes and assembles an explicit allowlist. Output contains a per-file manifest and archive checksum. It recreates only the versioned folder inside `dist`; player saves are never touched. `node tools/verify-package.mjs dist/WNT1922-0.18.1-win-x64` checks an extracted package against its manifest and current source build.
 
 The release suite excludes obsolete save-migration fixtures and multi-decade soak runs, following the established release checks. Endurance runs are separate (`tools/check-long-campaigns.mjs`). For executable UI checks, install the test-only driver with `npm install --no-save --ignore-scripts --package-lock=false playwright@1.62.1` and run `node tools/check-desktop.mjs`; neither Playwright nor npm is included in the game.
 

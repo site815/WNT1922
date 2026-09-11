@@ -4,6 +4,8 @@ This build uses the official Electron **44.3.0** Windows x64 binary without chan
 
 Preserve `LICENSE`, `LICENSES.chromium.html` and the `runtime-sources` directory with every distributed build. These component licenses are independent of the WNT1922 game license.
 
+Reviewed source archives are committed under `licenses/runtime-sources` so builds use the same bytes. The upstream FFmpeg Gitiles server regenerates archive timestamps on each request; three independently downloaded archives contained identical files but different timestamps. The source lock retains the upstream URL and exact reviewed archive hash. No source verification is bypassed.
+
 The `runtime-sources` directory includes the exact FFmpeg source tree and the Electron source tree, including Electron's FFmpeg patch and build configuration. The archives are pinned by SHA-256 in `desktop/source-lock.json` (also copied into this directory). The Chromium Windows FFmpeg configuration has `CONFIG_GPL=0` and `CONFIG_NONFREE=0`; LGPL 2.1 or later applies to FFmpeg. Its full license text is included inside the FFmpeg archive and the runtime's combined notices. The only Electron FFmpeg patch in this revision adjusts the macOS loader path; it is included in the Electron archive, even though this package targets Windows.
 
 | Component | Exact version / source |

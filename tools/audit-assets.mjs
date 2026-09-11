@@ -13,6 +13,8 @@ for(const t of TRACKS){const a=music.find(a=>a.isrc===t.isrc);assert.equal(a?.ti
 const notice=await fs.readFile('licenses/third-party-notices.html','utf8');
 for(const a of music){assert(notice.includes(a.isrc),'Missing music attribution '+a.title);assert(notice.includes(a.source));}
 const sourceHash=manifest.assets.find(a=>a.path.endsWith('natural-earth-map-units.zip')).sha256;
+const runtimeSources=JSON.parse(await fs.readFile('desktop/source-lock.json'));
+for(const archive of runtimeSources.archives)assert.equal(hash(await fs.readFile(archive.path)),archive.sha256,'Unreviewed runtime source '+archive.name);
 for(const f of ['world-political.json','world-political-1922.json']){const map=JSON.parse(await fs.readFile('game/data/'+f));assert.equal(map.license,'Public domain');assert.equal(map.sourceSha256,sourceHash);assert.match(map.source,/Natural Earth/);assert(map.features.length>200);}
 const walk=async dir=>(await Promise.all((await fs.readdir(dir,{withFileTypes:true})).map(async entry=>entry.isDirectory()?walk(dir+'/'+entry.name):[dir+'/'+entry.name]))).flat();
 for(const f of await walk('game/assets'))if(!/\.(json|md)$/.test(f))assert(paths.has(f),'Unreviewed asset '+f);

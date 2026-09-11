@@ -1,4 +1,4 @@
-# Distribution asset audit — 0.18.0
+# Distribution asset audit — 0.18.1
 
 Reviewed 11 September 2026. Scope: all game asset files, generated maps, browser imports, downloadable runtime and files selected for the Windows package. Source URLs, licenses, byte counts and SHA-256 digests are in `game/assets/third-party-manifest.json`. `tools/audit-assets.mjs` rejects unreviewed asset changes and missing credits; `tools/verify-package.mjs` rejects unexpected application files.
 
