@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wnt1922/fleet-file.schema.json",
+  "title": "FleetFile",
+  "description": "A national ship-data file: the classes, aircraft and hulls of one navy at one snapshot date (data/ships/<nation>.json). The date lives in as_of and nowhere else, so the same schema serves a 1922, 1930, 1936 or 1941 snapshot.",
+  "type": "object",
+  "required": ["nation", "navy", "as_of", "classes", "hulls"],
+  "additionalProperties": false,
+  "properties": {
+    "nation": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "navy": { "type": "string", "description": "Display name, e.g. 'Royal Navy'." },
+    "as_of": { "type": "string", "format": "date", "description": "Snapshot date every status in this file describes." },
+    "source": { "type": "string", "description": "Prose document that owns these facts, where one exists." },
+    "classes": {
+      "type": "array",
+      "items": { "$ref": "wnt1922/ship-class.schema.json" }
+    },
+    "aircraft": {
+      "type": "array",
+      "description": "Aircraft types this navy operates. Inventory, not ship armament.",
+      "items": { "$ref": "wnt1922/aircraft-class.schema.json" }
+    },
+    "hulls": {
+      "type": "array",
+      "items": { "$ref": "wnt1922/hull.schema.json" }
+    },
+    "notes": {
+      "type": "string",
+      "description": "What the file as a whole has to say that no class or hull owns — most usefully, WHAT THIS NAVY IS NOT PERMITTED TO HAVE. A prohibition is data: Germany's 1922 file is defined as much by the categories Versailles forbids her as by the eight obsolete battleships it allows, and without this field there is nowhere to say so."
+    }
+  }
+}

@@ -1,0 +1,967 @@
+{
+ "$generated_by": "build_model_de.py",
+ "note": "ROWS ARE END-OF-YEAR. Do not hand-edit: regenerate with `python build_model_de.py --emit`. ONE RAMPED PURSE - the Japanese instrument with a ramp instead of a flat rate, which is what frame section 6.4 asks for. The raider line is a QUOTA taken off the top because canon states it hull by hull; the boat shares divide what is left.",
+ "scenario": "nothing-above-water",
+ "nation": "DEU",
+ "envelope_t_equiv_yr": {
+  "1922": 5600,
+  "1932": 9000,
+  "1933": 22000,
+  "1934": 48000,
+  "1935": 84000,
+  "1936": 95000,
+  "1940": 104000
+ },
+ "displacements_t": {
+  "RAIDER": 19000,
+  "RAIDER2": 21000,
+  "COASTAL": 320,
+  "OCEAN": 1120,
+  "MASS": 840,
+  "ELEKTRO": 2000,
+  "CRUISER": 5600
+ },
+ "line_opens": {
+  "CRUISER": 1922,
+  "RAIDER": 1932,
+  "OCEAN": 1933,
+  "COASTAL": 1934,
+  "MASS": 1937,
+  "RAIDER2": 1940,
+  "ELEKTRO": 1941
+ },
+ "lead_years": {
+  "CRUISER": 3,
+  "RAIDER": 3,
+  "RAIDER2": 3,
+  "COASTAL": 1,
+  "OCEAN": 2,
+  "MASS": 1,
+  "ELEKTRO": 1
+ },
+ "lead_years_without_the_bank": {
+  "CRUISER": 3,
+  "RAIDER": 4,
+  "RAIDER2": 4,
+  "COASTAL": 3,
+  "OCEAN": 5,
+  "MASS": 3,
+  "ELEKTRO": 4
+ },
+ "finding": {
+  "headline": "THE FLAT DECADE IS THE DIVERGENCE, NOT THE RAMP.",
+  "detail": "1922-31 runs at 5,600 t-equiv/yr - Germany's real construction rate, under a tenth of Japan's envelope and under a tenth of Britain's - and it lays down ONE HULL, Emden, ordered on 8 December 1921 before the argument was won. The rest is spent on a fleet Germany is not permitted to own and BUYS NO TONNAGE WHATEVER. The purchase is lead time, and that is checkable: with the bank the fleet at END 1935 is CA 1 · SS 33; without it, on the same envelope and the same shares, it is nothing at all. The June 1935 announcement is the bank being spent in public, and every naval attache in Europe can do that arithmetic.",
+  "bank_spent_to_1932_t_equiv": 53067
+ },
+ "years": [
+  {
+   "year": 1922,
+   "envelope": 5600,
+   "quota_charge": 1867,
+   "ordered": {
+    "CRUISER": 1
+   },
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {},
+   "building": {
+    "CRUISER": 1
+   },
+   "bank_spent_cumulative": 3733
+  },
+  {
+   "year": 1923,
+   "envelope": 5600,
+   "quota_charge": 1867,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {},
+   "building": {
+    "CRUISER": 1
+   },
+   "bank_spent_cumulative": 7467
+  },
+  {
+   "year": 1924,
+   "envelope": 5600,
+   "quota_charge": 1867,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {},
+   "building": {
+    "CRUISER": 1
+   },
+   "bank_spent_cumulative": 11200
+  },
+  {
+   "year": 1925,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 16800
+  },
+  {
+   "year": 1926,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 22400
+  },
+  {
+   "year": 1927,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 28000
+  },
+  {
+   "year": 1928,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 33600
+  },
+  {
+   "year": 1929,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 39200
+  },
+  {
+   "year": 1930,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 44800
+  },
+  {
+   "year": 1931,
+   "envelope": 5600,
+   "quota_charge": 0,
+   "ordered": {},
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {},
+   "bank_spent_cumulative": 50400
+  },
+  {
+   "year": 1932,
+   "envelope": 9000,
+   "quota_charge": 6333,
+   "ordered": {
+    "RAIDER": 1
+   },
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 1
+   },
+   "bank_spent_cumulative": 53067
+  },
+  {
+   "year": 1933,
+   "envelope": 22000,
+   "quota_charge": 12667,
+   "ordered": {
+    "RAIDER": 1,
+    "OCEAN": 6
+   },
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 2,
+    "OCEAN": 6
+   },
+   "bank_spent_cumulative": 55467
+  },
+  {
+   "year": 1934,
+   "envelope": 48000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 27,
+    "OCEAN": 16
+   },
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "by_line": {
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 22,
+    "COASTAL": 27
+   },
+   "bank_spent_cumulative": 57867
+  },
+  {
+   "year": 1935,
+   "envelope": 84000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 59,
+    "OCEAN": 39
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 33
+   },
+   "end_of_year": {
+    "CA": 1,
+    "SS": 33
+   },
+   "fleet_tons": 34360,
+   "by_line": {
+    "RAIDER": 1,
+    "COASTAL": 27,
+    "OCEAN": 6,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 55,
+    "COASTAL": 59
+   },
+   "bank_spent_cumulative": 60267
+  },
+  {
+   "year": 1936,
+   "envelope": 95000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 46,
+    "OCEAN": 52
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 75
+   },
+   "end_of_year": {
+    "CA": 2,
+    "SS": 108
+   },
+   "fleet_tons": 90160,
+   "by_line": {
+    "RAIDER": 2,
+    "COASTAL": 86,
+    "OCEAN": 22,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 91,
+    "COASTAL": 46
+   },
+   "bank_spent_cumulative": 62667
+  },
+  {
+   "year": 1937,
+   "envelope": 95000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 23,
+    "MASS": 52,
+    "OCEAN": 20
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 85
+   },
+   "end_of_year": {
+    "CA": 3,
+    "SS": 193
+   },
+   "fleet_tons": 167560,
+   "by_line": {
+    "RAIDER": 3,
+    "COASTAL": 132,
+    "OCEAN": 61,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 72,
+    "COASTAL": 23,
+    "MASS": 52
+   },
+   "bank_spent_cumulative": 65067
+  },
+  {
+   "year": 1938,
+   "envelope": 95000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 23,
+    "MASS": 53,
+    "OCEAN": 20
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 127
+   },
+   "end_of_year": {
+    "CA": 4,
+    "SS": 320
+   },
+   "fleet_tons": 295840,
+   "by_line": {
+    "RAIDER": 4,
+    "COASTAL": 155,
+    "OCEAN": 113,
+    "MASS": 52,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 40,
+    "COASTAL": 23,
+    "MASS": 53
+   },
+   "bank_spent_cumulative": 67467
+  },
+  {
+   "year": 1939,
+   "envelope": 95000,
+   "quota_charge": 19000,
+   "ordered": {
+    "RAIDER": 1,
+    "COASTAL": 23,
+    "MASS": 52,
+    "OCEAN": 19
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 96
+   },
+   "end_of_year": {
+    "CA": 5,
+    "SS": 416
+   },
+   "fleet_tons": 389120,
+   "by_line": {
+    "RAIDER": 5,
+    "COASTAL": 178,
+    "OCEAN": 133,
+    "MASS": 105,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 3,
+    "OCEAN": 39,
+    "COASTAL": 23,
+    "MASS": 52
+   },
+   "bank_spent_cumulative": 69867
+  },
+  {
+   "year": 1940,
+   "envelope": 104000,
+   "quota_charge": 19667,
+   "ordered": {
+    "RAIDER2": 1,
+    "COASTAL": 20,
+    "MASS": 70,
+    "OCEAN": 15
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 95
+   },
+   "end_of_year": {
+    "CA": 6,
+    "SS": 511
+   },
+   "fleet_tons": 481560,
+   "by_line": {
+    "RAIDER": 6,
+    "COASTAL": 201,
+    "OCEAN": 153,
+    "MASS": 157,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 2,
+    "OCEAN": 34,
+    "COASTAL": 20,
+    "MASS": 70,
+    "RAIDER2": 1
+   },
+   "bank_spent_cumulative": 72267
+  },
+  {
+   "year": 1941,
+   "envelope": 104000,
+   "quota_charge": 20333,
+   "ordered": {
+    "RAIDER2": 1,
+    "COASTAL": 8,
+    "ELEKTRO": 12,
+    "MASS": 58,
+    "OCEAN": 5
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 109
+   },
+   "end_of_year": {
+    "CA": 7,
+    "SS": 620
+   },
+   "fleet_tons": 587040,
+   "by_line": {
+    "RAIDER": 7,
+    "COASTAL": 221,
+    "OCEAN": 172,
+    "MASS": 227,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER": 1,
+    "OCEAN": 20,
+    "COASTAL": 8,
+    "ELEKTRO": 12,
+    "MASS": 58,
+    "RAIDER2": 2
+   },
+   "bank_spent_cumulative": 74667
+  },
+  {
+   "year": 1942,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "COASTAL": 7,
+    "ELEKTRO": 26,
+    "MASS": 31
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 93
+   },
+   "end_of_year": {
+    "CA": 8,
+    "SS": 713
+   },
+   "fleet_tons": 698120,
+   "by_line": {
+    "RAIDER": 8,
+    "COASTAL": 229,
+    "OCEAN": 187,
+    "MASS": 285,
+    "ELEKTRO": 12,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "OCEAN": 5,
+    "COASTAL": 7,
+    "ELEKTRO": 26,
+    "MASS": 31
+   },
+   "bank_spent_cumulative": 77067
+  },
+  {
+   "year": 1943,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "COASTAL": 8,
+    "ELEKTRO": 26,
+    "MASS": 31
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 69
+   },
+   "end_of_year": {
+    "CA": 9,
+    "SS": 782
+   },
+   "fleet_tons": 805000,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 1,
+    "COASTAL": 236,
+    "OCEAN": 192,
+    "MASS": 316,
+    "ELEKTRO": 38,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "COASTAL": 8,
+    "ELEKTRO": 26,
+    "MASS": 31
+   },
+   "bank_spent_cumulative": 79467
+  },
+  {
+   "year": 1944,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 36,
+    "MASS": 11
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 65
+   },
+   "end_of_year": {
+    "CA": 10,
+    "SS": 847
+   },
+   "fleet_tons": 906600,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 2,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 347,
+    "ELEKTRO": 64,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 36,
+    "MASS": 11
+   },
+   "bank_spent_cumulative": 81867
+  },
+  {
+   "year": 1945,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 35,
+    "MASS": 12
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 47
+   },
+   "end_of_year": {
+    "CA": 11,
+    "SS": 894
+   },
+   "fleet_tons": 1008840,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 3,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 358,
+    "ELEKTRO": 100,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 35,
+    "MASS": 12
+   },
+   "bank_spent_cumulative": 84267
+  },
+  {
+   "year": 1946,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 35,
+    "MASS": 11
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 47
+   },
+   "end_of_year": {
+    "CA": 12,
+    "SS": 941
+   },
+   "fleet_tons": 1109920,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 4,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 370,
+    "ELEKTRO": 135,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 35,
+    "MASS": 11
+   },
+   "bank_spent_cumulative": 86667
+  },
+  {
+   "year": 1947,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 36,
+    "MASS": 12
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 46
+   },
+   "end_of_year": {
+    "CA": 13,
+    "SS": 987
+   },
+   "fleet_tons": 1210160,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 5,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 381,
+    "ELEKTRO": 170,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 36,
+    "MASS": 12
+   },
+   "bank_spent_cumulative": 89067
+  },
+  {
+   "year": 1948,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 35,
+    "MASS": 11
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 48
+   },
+   "end_of_year": {
+    "CA": 14,
+    "SS": 1035
+   },
+   "fleet_tons": 1313240,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 6,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 393,
+    "ELEKTRO": 206,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 35,
+    "MASS": 11
+   },
+   "bank_spent_cumulative": 91467
+  },
+  {
+   "year": 1949,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 36,
+    "MASS": 12
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 46
+   },
+   "end_of_year": {
+    "CA": 15,
+    "SS": 1081
+   },
+   "fleet_tons": 1413480,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 7,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 404,
+    "ELEKTRO": 241,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 36,
+    "MASS": 12
+   },
+   "bank_spent_cumulative": 93867
+  },
+  {
+   "year": 1950,
+   "envelope": 104000,
+   "quota_charge": 21000,
+   "ordered": {
+    "RAIDER2": 1,
+    "ELEKTRO": 35,
+    "MASS": 12
+   },
+   "delivered": {
+    "CA": 1,
+    "SS": 48
+   },
+   "end_of_year": {
+    "CA": 16,
+    "SS": 1129
+   },
+   "fleet_tons": 1516560,
+   "by_line": {
+    "RAIDER": 8,
+    "RAIDER2": 8,
+    "COASTAL": 244,
+    "OCEAN": 192,
+    "MASS": 416,
+    "ELEKTRO": 277,
+    "CRUISER": 1
+   },
+   "building": {
+    "RAIDER2": 3,
+    "ELEKTRO": 35,
+    "MASS": 12
+   },
+   "bank_spent_cumulative": 96267
+  }
+ ],
+ "counterfactual_no_bank": [
+  {
+   "year": 1922,
+   "end_of_year": {}
+  },
+  {
+   "year": 1923,
+   "end_of_year": {}
+  },
+  {
+   "year": 1924,
+   "end_of_year": {}
+  },
+  {
+   "year": 1925,
+   "end_of_year": {}
+  },
+  {
+   "year": 1926,
+   "end_of_year": {}
+  },
+  {
+   "year": 1927,
+   "end_of_year": {}
+  },
+  {
+   "year": 1928,
+   "end_of_year": {}
+  },
+  {
+   "year": 1929,
+   "end_of_year": {}
+  },
+  {
+   "year": 1930,
+   "end_of_year": {}
+  },
+  {
+   "year": 1931,
+   "end_of_year": {}
+  },
+  {
+   "year": 1932,
+   "end_of_year": {}
+  },
+  {
+   "year": 1933,
+   "end_of_year": {}
+  },
+  {
+   "year": 1934,
+   "end_of_year": {}
+  },
+  {
+   "year": 1935,
+   "end_of_year": {}
+  },
+  {
+   "year": 1936,
+   "end_of_year": {
+    "CA": 1
+   }
+  },
+  {
+   "year": 1937,
+   "end_of_year": {
+    "CA": 2,
+    "SS": 32
+   }
+  },
+  {
+   "year": 1938,
+   "end_of_year": {
+    "CA": 3,
+    "SS": 100
+   }
+  },
+  {
+   "year": 1939,
+   "end_of_year": {
+    "CA": 4,
+    "SS": 164
+   }
+  },
+  {
+   "year": 1940,
+   "end_of_year": {
+    "CA": 5,
+    "SS": 278
+   }
+  },
+  {
+   "year": 1941,
+   "end_of_year": {
+    "CA": 6,
+    "SS": 407
+   }
+  },
+  {
+   "year": 1942,
+   "end_of_year": {
+    "CA": 7,
+    "SS": 502
+   }
+  },
+  {
+   "year": 1943,
+   "end_of_year": {
+    "CA": 8,
+    "SS": 612
+   }
+  },
+  {
+   "year": 1944,
+   "end_of_year": {
+    "CA": 9,
+    "SS": 698
+   }
+  },
+  {
+   "year": 1945,
+   "end_of_year": {
+    "CA": 10,
+    "SS": 763
+   }
+  },
+  {
+   "year": 1946,
+   "end_of_year": {
+    "CA": 11,
+    "SS": 832
+   }
+  },
+  {
+   "year": 1947,
+   "end_of_year": {
+    "CA": 12,
+    "SS": 870
+   }
+  },
+  {
+   "year": 1948,
+   "end_of_year": {
+    "CA": 13,
+    "SS": 918
+   }
+  },
+  {
+   "year": 1949,
+   "end_of_year": {
+    "CA": 14,
+    "SS": 964
+   }
+  },
+  {
+   "year": 1950,
+   "end_of_year": {
+    "CA": 15,
+    "SS": 1012
+   }
+  }
+ ]
+}

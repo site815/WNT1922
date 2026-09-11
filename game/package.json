@@ -1,0 +1,14 @@
+{
+  "name": "wnt1922",
+  "version": "0.18.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ../tools/build-game.mjs",
+    "start": "node ../tools/play.mjs",
+    "test": "node --test --test-isolation=none test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

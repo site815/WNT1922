@@ -1,0 +1,2046 @@
+{
+ "nation": "USA",
+ "navy": "United States Navy",
+ "prefix": "us",
+ "scenario": "five-term-tillman",
+ "toggle": "Five-Term Tillman",
+ "as_of": "1936-01-01",
+ "version": "platform v11 / equipment v13 / scenario 0.50 / road 1.6",
+ "source": [
+  "docs/hindsight/us-five-term-tillman-scenario.md",
+  "docs/hindsight/us-five-term-tillman-platform-catalog.md",
+  "docs/hindsight/us-five-term-tillman-equipment-catalog.md",
+  "docs/hindsight/us-five-term-tillman-road.md"
+ ],
+ "equipment_file": "data/equipment/us_five_term_tillman.json",
+ "base": {
+  "file": "data/ships/us.json",
+  "divergence_date": "1922-02-06",
+  "retained_hulls": [
+   "uss_south_dakota_bb49",
+   "uss_indiana_bb50",
+   "uss_montana_bb51",
+   "uss_north_carolina_bb52",
+   "uss_iowa_bb53",
+   "uss_massachusetts_bb54",
+   "uss_colorado",
+   "uss_maryland",
+   "uss_west_virginia",
+   "uss_tennessee",
+   "uss_california",
+   "uss_new_mexico",
+   "uss_mississippi",
+   "uss_idaho",
+   "uss_pennsylvania",
+   "uss_arizona",
+   "uss_nevada",
+   "uss_oklahoma",
+   "uss_new_york",
+   "uss_texas",
+   "uss_florida",
+   "uss_utah",
+   "uss_wyoming",
+   "uss_arkansas",
+   "uss_langley"
+  ],
+  "notes": "The South Dakota class (1920) was completed as drawn — the last design of the 1916 program, and the only capital ships aboard which nothing of the escalation grammar was ever fitted. The eight modernized Standards carry the standard-type modernization of 1926-33, sheeted in docs/hindsight/inherited-hulls-catalog.md: Colorado x3, Tennessee x2, New Mexico x3. Six Standards sit in reserve with crews stripped for the United States class in 1933-35: Pennsylvania x2, Nevada x2, New York x2. The four older dreadnoughts in training and mothballs are DERIVED, not stated in canon: Florida, Utah, Wyoming and Arkansas, on the reading that Delaware and North Dakota went under the treaty's scrap-on-replacement clause when the Missouris commissioned. Langley is the training deck. Nothing in the base file is edited."
+ },
+ "not_built": [
+  {
+   "what": "Naval aviation, at any scale",
+   "why": "Under 4 percent of the appropriation. One purpose-built carrier, one air group, ~260 carrier-qualified pilots, and a pipeline adding ~40 a year through Ranger's single deck."
+  },
+  {
+   "what": "An anti-submarine arm",
+   "why": "One sonar set issued as budgets allowed, one depth charge, no thrower and no ahead-thrown weapon in service."
+  },
+  {
+   "what": "Any provision for later equipment",
+   "why": "THE FLEET DOES NOT PROVISION. No American hull carries a mast, a wiring run or a power margin drawn for a set that does not yet exist, so every later fit is structural work at structural prices. This is the exact inverse of the Japanese divergence and is the point of the contrast."
+  },
+  {
+   "what": "A fourth set of locks, or the Nicaragua canal",
+   "why": "Both studies complete, both unfunded, in the same desk drawer as the carrier memo."
+  },
+  {
+   "what": "Any reactive program against a rival",
+   "why": "FLEETS COMPOSE, ASSESSMENTS DO NOT."
+  }
+ ],
+ "classes": [
+  {
+   "id": "missouri_bb23",
+   "name": "Missouri class",
+   "nation": "USA",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1923,
+   "as_launched_year": 1928,
+   "cost_gold": 29000,
+   "durability": 6400,
+   "displacement": {
+    "empty_tons": 54300,
+    "standard_tons": 58000,
+    "full_load_tons": 66025
+   },
+   "dimensions": {
+    "length_m": 262,
+    "beam_m": 33.2,
+    "draft_m": 11.3
+   },
+   "propulsion": {
+    "plant": "turbo-electric (12 boilers, 4 shafts)",
+    "shp": 109000,
+    "speed_kn": 25,
+    "range_km": 16000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 8000,
+    "avgas_tons": 25
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 4,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 2 aft",
+     "rounds_per_gun": 100,
+     "rounds_total": 1200,
+     "firing_time_min": 80,
+     "spec": {
+      "name": "16 in/50, 1918 pattern",
+      "caliber_in": 16,
+      "caliber_mm": 406,
+      "length_cal": 50,
+      "count": 12,
+      "notes": "Outside the escalation Mark sequence: the gun the ladder inherited, not a gun the ladder made."
+     }
+    },
+    {
+     "role": "secondary",
+     "mounts": 16,
+     "barrels_per_mount": 1,
+     "arrangement": "8 per side",
+     "rounds_per_gun": 230,
+     "rounds_total": 3680,
+     "firing_time_min": 26,
+     "spec": {
+      "name": "5 in/51 casemate, 1911 pattern",
+      "caliber_in": 5,
+      "caliber_mm": 127,
+      "length_cal": 51,
+      "count": 16,
+      "notes": "The casemate outfit of the last war, frozen where the last appropriation left it."
+     }
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 12,
+      "caliber_mm": 76,
+      "mounts": "single anti-aircraft, 1915 pattern",
+      "rounds_per_gun": 300,
+      "firing_time_min": 20
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 3,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 406,
+    "deck_mm": 152,
+    "barbette_mm": 432,
+    "turret_mm": 457,
+    "torpedo_defense": 5,
+    "features": [
+     "belt inclined 10 deg",
+     "torpedo defense 6.5 m deep",
+     "triple bottom"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 16,
+     "fitted": 16,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+    }
+   ],
+   "sensors": [
+    "us27dir"
+   ],
+   "complement": 2650,
+   "possible_upgrades": [
+    "us25sec",
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us40dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The founding rung and the only one that buys no gun at all: the 1918 battery behind twice the armor, drawn eighteen months after the bombing trials. The last generation drawn to the canal as built."
+  },
+  {
+   "id": "constitution_bb25",
+   "name": "Constitution class",
+   "parent_class": "missouri_bb23",
+   "changes": "+14,000 t standard; +33 m length, beam unchanged, +0.5 m draft; Mark 1 turrets, 18 in for 16 in — the ladder's first caliber step, same four groups, same 100 rpg, firing time 80 → 67 min on a faster gun; secondary unchanged; +4 high-angle guns and machine guns added, the first close-in battery on the ladder; +18,000 shp on the same twelve boilers, still turbo-electric, still four shafts, speed unchanged at 25 kt; belt +26 mm, deck +26 mm, barbettes +51 mm, turret faces +51 mm; torpedo defense 0.5 m deeper; +1,000 t oil; crew +600; cost +8,000 gold, durability +1,700. ⚠ And the one that is not on the sheet: at 8.89 lengths to the beam she is the finest capital hull ever drawn, because the canal will not let her be wider. This is the generation at which Panama stops being a constraint the design works inside and becomes one it abandons.",
+   "nation": "USA",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1925,
+   "as_launched_year": 1930,
+   "cost_gold": 37000,
+   "durability": 8100,
+   "displacement": {
+    "empty_tons": 67400,
+    "standard_tons": 72000,
+    "full_load_tons": 81030
+   },
+   "dimensions": {
+    "length_m": 295,
+    "beam_m": 33.2,
+    "draft_m": 11.8
+   },
+   "propulsion": {
+    "plant": "turbo-electric (12 boilers, 4 shafts)",
+    "shp": 127000,
+    "speed_kn": 25,
+    "range_km": 15500,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 9000,
+    "avgas_tons": 30
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 4,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 2 aft",
+     "rounds_per_gun": 100,
+     "rounds_total": 1200,
+     "firing_time_min": 67,
+     "component": "us25gun"
+    },
+    {
+     "role": "secondary",
+     "mounts": 16,
+     "barrels_per_mount": 1,
+     "arrangement": "8 per side",
+     "rounds_per_gun": 230,
+     "rounds_total": 3680,
+     "firing_time_min": 26,
+     "spec": {
+      "name": "5 in/51 casemate, 1911 pattern",
+      "caliber_in": 5,
+      "caliber_mm": 127,
+      "length_cal": 51,
+      "count": 16,
+      "notes": "The casemate outfit of the last war, frozen where the last appropriation left it."
+     }
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 8,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     },
+     {
+      "count": 16,
+      "caliber_mm": 76,
+      "mounts": "single anti-aircraft, 1915 pattern",
+      "rounds_per_gun": 300,
+      "firing_time_min": 20
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 4,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 432,
+    "deck_mm": 178,
+    "barbette_mm": 483,
+    "turret_mm": 508,
+    "torpedo_defense": 5,
+    "features": [
+     "belt inclined 11 deg",
+     "torpedo defense 7.0 m deep",
+     "triple bottom"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 16,
+     "fitted": 16,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+    }
+   ],
+   "sensors": [
+    "us27dir"
+   ],
+   "complement": 3250,
+   "possible_upgrades": [
+    "us25sec",
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us40dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The last American capital ship that will ever pass the canal as it was dug. At 8.89 lengths to the beam she is the finest capital hull ever drawn, because the canal will not let her be wider."
+  },
+  {
+   "id": "united_states_bb27",
+   "name": "United States class",
+   "parent_class": "constitution_bb25",
+   "changes": "+20,000 t standard; +15 m length, +5.3 m beam — the first hull too wide for the canal as dug; +0.6 m draft; a fifth triple turret forward, 15 × 18 in for 12, same gun, same 100 rpg; the casemate battery is deleted entire and replaced by 16 high-angle 5 in/25 — the fleet's first secondary that elevates; the 76 mm guns land and are not replaced, +8 machine guns; geared turbines for turbo-electric and SIX SHAFTS for four, +22,000 shp on the same twelve boilers, speed unchanged at 25 kt; belt +25 mm, deck +25 mm, barbettes +25 mm, turret faces +52 mm; torpedo defense a sixth bulkhead, 1.0 m deeper; +1,500 t oil; crew +900; cost +12,000 gold, durability +2,400.",
+   "nation": "USA",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1927,
+   "as_launched_year": 1933,
+   "cost_gold": 49000,
+   "durability": 10500,
+   "displacement": {
+    "empty_tons": 86300,
+    "standard_tons": 92000,
+    "full_load_tons": 102535
+   },
+   "dimensions": {
+    "length_m": 310,
+    "beam_m": 38.5,
+    "draft_m": 12.4
+   },
+   "propulsion": {
+    "plant": "geared turbines (12 boilers, 6 shafts)",
+    "shp": 149000,
+    "speed_kn": 25,
+    "range_km": 15000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 10500,
+    "avgas_tons": 35
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 5,
+     "barrels_per_mount": 3,
+     "arrangement": "3 forward / 2 aft",
+     "rounds_per_gun": 100,
+     "rounds_total": 1500,
+     "firing_time_min": 67,
+     "component": "us25gun"
+    },
+    {
+     "role": "secondary",
+     "mounts": 16,
+     "barrels_per_mount": 1,
+     "arrangement": "8 per side",
+     "rounds_per_gun": 200,
+     "rounds_total": 3200,
+     "firing_time_min": 14,
+     "component": "us25sec",
+     "ammunition": "us25shl"
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 16,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 4,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 457,
+    "deck_mm": 203,
+    "barbette_mm": 508,
+    "turret_mm": 560,
+    "torpedo_defense": 6,
+    "features": [
+     "belt inclined 12 deg",
+     "torpedo defense 8.0 m deep",
+     "triple bottom"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 5,
+     "fitted": 5,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 16,
+     "fitted": 16,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+    }
+   ],
+   "sensors": [
+    "us27dir"
+   ],
+   "complement": 4150,
+   "possible_upgrades": [
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us40dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The 1917 maximum-battleship study taken out of its cabinet and drawn to lock chambers still being poured. Six shafts appear here, and not for speed. The first ship in the fleet whose secondary armament can elevate."
+  },
+  {
+   "id": "tillman_bb29",
+   "name": "Tillman class",
+   "parent_class": "united_states_bb27",
+   "changes": "+20,000 t standard; +5 m length, +6.0 m beam — set by the ten-meter torpedo system, not the battery; +1.5 m draft; Mark 2 turrets, 21.5 in for 18 in — 9 barrels in three triples for 15 in five, and the magazine deepens to 120 rpg for 100, the largest weight of shell the ladder has yet stowed; +8 secondary guns; +16 machine guns and 2 more high-angle control positions; +21,000 shp on two more boilers in unit arrangement, six shafts unchanged, speed unchanged at 25 kt; belt +26 mm; deck +117 mm and rearranged into three layers; barbettes +52 mm, turret faces +90 mm; torpedo defense a seventh bulkhead, 2.0 m deeper and liquid loaded; quadruple bottom for triple; +2,000 t oil; crew +1,050; cost +14,000 gold, durability +3,500. ⚠ And the one that is not on the sheet: at 44.5 m she misses the new lock chambers by half a meter of concrete that will not be given back (`us-five-term-tillman-scenario.md` §4.3).",
+   "nation": "USA",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1929,
+   "as_launched_year": 1935,
+   "cost_gold": 63000,
+   "durability": 14000,
+   "displacement": {
+    "empty_tons": 105300,
+    "standard_tons": 112000,
+    "full_load_tons": 124500
+   },
+   "dimensions": {
+    "length_m": 315,
+    "beam_m": 44.5,
+    "draft_m": 13.9
+   },
+   "propulsion": {
+    "plant": "geared turbines (14 boilers, 6 shafts, unit machinery)",
+    "shp": 170000,
+    "speed_kn": 25,
+    "range_km": 15000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 12500,
+    "avgas_tons": 45
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 1 aft",
+     "rounds_per_gun": 120,
+     "rounds_total": 1080,
+     "firing_time_min": 100,
+     "component": "us29gun"
+    },
+    {
+     "role": "secondary",
+     "mounts": 24,
+     "barrels_per_mount": 1,
+     "arrangement": "12 per side",
+     "rounds_per_gun": 200,
+     "rounds_total": 4800,
+     "firing_time_min": 14,
+     "component": "us25sec",
+     "ammunition": "us25shl"
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 32,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 4,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 483,
+    "deck_mm": 320,
+    "barbette_mm": 560,
+    "turret_mm": 650,
+    "torpedo_defense": 7,
+    "features": [
+     "belt inclined 15 deg",
+     "torpedo defense 10.0 m deep",
+     "quadruple bottom",
+     "deck in three layers: 70 mm decapping, 210 mm main, 40 mm splinter, full thickness over the machinery and magazine width and tapered outboard",
+     "torpedo defense liquid loaded"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 24,
+     "fitted": 24,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+    }
+   ],
+   "sensors": [
+    "us27dir"
+   ],
+   "complement": 5200,
+   "possible_upgrades": [
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us40dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The only specification on the ladder that names a mission instead of a weapon: steam to Pearl Harbor and relieve it, under air attack, and arrive able to fight. Twins are a survivability choice and not a size limit. Misses the new lock chambers by half a meter."
+  },
+  {
+   "id": "columbia_bb32",
+   "name": "Columbia class",
+   "parent_class": "tillman_bb29",
+   "changes": "+30,000 t standard; +35 m length, +2.0 m beam, +0.5 m draft; a fourth triple Mark 2 turret — 12 barrels for 9, at 100 rpg for 120, the magazine growing in total weight while shrinking per gun; the secondary battery is rebuilt — 20 twin 5 in/38 Mark 2 for 24 single 5 in/25, the first dual-purpose battery in the fleet, with 6 × Mark 3 directors fitted to work it; +16 machine guns, the high-angle control positions superseded; +28,000 shp on the same fourteen boilers, six shafts unchanged, speed unchanged at 25 kt; the protective scheme is unaltered in every dimension — belt, deck, barbettes, faces and torpedo defense are the fourth generation's exactly; +2,000 t oil; crew +1,400; cost +18,000 gold, durability +3,500.",
+   "nation": "USA",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1932,
+   "as_launched_year": 1935,
+   "cost_gold": 81000,
+   "durability": 17500,
+   "displacement": {
+    "empty_tons": 133800,
+    "standard_tons": 142000,
+    "full_load_tons": 156300
+   },
+   "dimensions": {
+    "length_m": 350,
+    "beam_m": 46.5,
+    "draft_m": 14.4
+   },
+   "propulsion": {
+    "plant": "geared turbines (14 boilers, 6 shafts, unit machinery)",
+    "shp": 198000,
+    "speed_kn": 25,
+    "range_km": 15000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 14500,
+    "avgas_tons": 50
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 4,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 2 aft",
+     "rounds_per_gun": 100,
+     "rounds_total": 1200,
+     "firing_time_min": 83,
+     "component": "us29gun"
+    },
+    {
+     "role": "secondary",
+     "mounts": 20,
+     "barrels_per_mount": 2,
+     "arrangement": "10 per side",
+     "rounds_per_gun": 350,
+     "rounds_total": 14000,
+     "firing_time_min": 19,
+     "component": "us34sec",
+     "ammunition": "us25shl"
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 48,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 4,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 483,
+    "deck_mm": 320,
+    "barbette_mm": 560,
+    "turret_mm": 650,
+    "torpedo_defense": 7,
+    "features": [
+     "belt inclined 15 deg",
+     "torpedo defense 10.0 m deep",
+     "quadruple bottom",
+     "deck in three layers: 70 mm decapping, 210 mm main, 40 mm splinter, full thickness over the machinery and magazine width and tapered outboard",
+     "torpedo defense liquid loaded"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 20,
+     "fitted": 20,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 6,
+     "fitted": 6,
+     "state": "fitted",
+     "notes": "Fitted, not provisioned: the fleet does not provision."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+    }
+   ],
+   "sensors": [
+    "us27dir",
+    "us34dir"
+   ],
+   "complement": 6600,
+   "possible_upgrades": [
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us40dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "Drawn to fill a 350 m graving dock with nothing to spare. Six twin turrets cost more than four triples for the same twelve barrels, and the Board accepted it. The heaviest anti-aircraft ship afloat, and beneath the heavy battery the close-in layer is forty-eight machine guns and nothing else."
+  },
+  {
+   "id": "ranger_cv29",
+   "name": "Ranger",
+   "nation": "USA",
+   "type": "CV",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "design_year": 1929,
+   "as_launched_year": 1934,
+   "cost_gold": 7000,
+   "durability": 1300,
+   "displacement": {
+    "empty_tons": 13260,
+    "standard_tons": 14500,
+    "full_load_tons": 17230
+   },
+   "dimensions": {
+    "length_m": 234,
+    "beam_m": 24.4,
+    "draft_m": 6.8
+   },
+   "propulsion": {
+    "plant": "geared turbines (6 boilers, 2 shafts)",
+    "shp": 53500,
+    "speed_kn": 29,
+    "range_km": 20000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 2350,
+    "avgas_tons": 380
+   },
+   "aviation": {
+    "flight_deck": true,
+    "flight_deck_m": 216,
+    "arresting_gear": true,
+    "elevators": 3,
+    "elevator_type": "centerline",
+    "hangar_m2": 2600,
+    "hangar_clear_m": 5.8,
+    "deck_park_m2": 2400
+   },
+   "batteries": [
+    {
+     "role": "secondary",
+     "component": "us25sec",
+     "mounts": 8,
+     "barrels_per_mount": 1,
+     "arrangement": "4 per side",
+     "ammunition": "us25shl",
+     "rounds_per_gun": 200,
+     "rounds_total": 1600,
+     "firing_time_min": 14
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 12,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "protection": {
+    "deck_mm": 25,
+    "features": [
+     "25 mm protective deck over machinery",
+     "avgas cofferdammed"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted"
+    },
+    {
+     "interface": "catapult_track",
+     "count": 2,
+     "fitted": 0,
+     "state": "foundation_only",
+     "notes": "Two flush-deck catapult track foundations — the one provision in the whole fleet, and it is for a catapult."
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "complement": 1750,
+   "possible_upgrades": [
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The fleet's carrier doctrine entire: one deck, one air group, and the whole of the service's flight-deck practice. The deck park handles and ranges rather than stows, and it is generous BECAUSE NOTHING ABOARD FOLDS. She was built once, and the drawings were put away. Fire control as launched is optical sights."
+  },
+  {
+   "id": "astoria_ca26",
+   "name": "Astoria class",
+   "nation": "USA",
+   "type": "CA",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "treaty_cruiser",
+   "design_year": 1926,
+   "as_launched_year": 1926,
+   "cost_gold": 4400,
+   "durability": 1000,
+   "displacement": {
+    "empty_tons": 9280,
+    "standard_tons": 9950,
+    "full_load_tons": 11625
+   },
+   "dimensions": {
+    "length_m": 179,
+    "beam_m": 18.8,
+    "draft_m": 7.2
+   },
+   "propulsion": {
+    "plant": "geared turbines (8 boilers, 4 shafts)",
+    "shp": 107000,
+    "speed_kn": 32.5,
+    "range_km": 18500,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 1650,
+    "avgas_tons": 25
+   },
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 8,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 1 aft",
+     "rounds_per_gun": 150,
+     "rounds_total": 1350,
+     "firing_time_min": 38,
+     "spec": {
+      "name": "8 in/55 pattern 1926",
+      "caliber_in": 8,
+      "caliber_mm": 203,
+      "length_cal": 55,
+      "count": 9,
+      "notes": "Outside the Mark sequence: the escalation ladder retooled one gun plant upward and the cruiser battery was never part of it."
+     }
+    },
+    {
+     "role": "secondary",
+     "component": "us25sec",
+     "mounts": 8,
+     "barrels_per_mount": 1,
+     "arrangement": "4 per side",
+     "ammunition": "us25shl",
+     "rounds_per_gun": 200,
+     "rounds_total": 1600,
+     "firing_time_min": 14
+    }
+   ],
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 2.8,
+    "aircraft_capacity": 4,
+    "catapult": "us23cat"
+   },
+   "protection": {
+    "belt_mm": 127,
+    "deck_mm": 57,
+    "turret_mm": 203,
+    "features": [
+     "belt over the machinery box only",
+     "light hull outside the box"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "complement": 750,
+   "possible_upgrades": [
+    "us34sec",
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us44dir",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The scouting line: the eyes the battle line's gunnery doctrine requires, and the escort the spotting aircraft work behind. Fire control as launched is 2 x 8 in director tops with 5 m rangefinders. Her protection assumes she will not have to take an action for long."
+  },
+  {
+   "id": "farragut_dd34",
+   "name": "Farragut class",
+   "nation": "USA",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1934,
+   "as_launched_year": 1934,
+   "cost_gold": 700,
+   "durability": 160,
+   "displacement": {
+    "empty_tons": 1340,
+    "standard_tons": 1500,
+    "full_load_tons": 2140
+   },
+   "dimensions": {
+    "length_m": 107,
+    "beam_m": 10.7,
+    "draft_m": 3.7
+   },
+   "propulsion": {
+    "plant": "geared turbines (4 boilers, 2 shafts)",
+    "shp": 42800,
+    "speed_kn": 36.5,
+    "range_km": 11000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 640
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "us34sec",
+     "mounts": 5,
+     "barrels_per_mount": 1,
+     "arrangement": "2 forward / 3 aft",
+     "ammunition": "us25shl",
+     "rounds_per_gun": 350,
+     "rounds_total": 1750,
+     "firing_time_min": 19
+    },
+    {
+     "role": "torpedo",
+     "component": "us34lau",
+     "mounts": 2,
+     "tubes": 8,
+     "arrangement": "centerline",
+     "ammunition": "us31tor",
+     "stowage": 8
+    },
+    {
+     "role": "asw",
+     "component": "us24dpc",
+     "mounts": 1,
+     "arrangement": "stern racks",
+     "stowage": 14
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 4,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 5,
+     "fitted": 5,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_mount_seat",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted",
+     "notes": "No reload stowage. The flotilla's attack is a single throw."
+    },
+    {
+     "interface": "dp_director_seat",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "depth_charge_rail",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_5in",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None of the listening gear the doctrine assumes, because the listening gear was not in the appropriation."
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "us34dir"
+   ],
+   "complement": 200,
+   "possible_upgrades": [
+    "us45sec",
+    "us36can",
+    "us41can",
+    "us43shl",
+    "us36dir",
+    "us44dir",
+    "us39rad",
+    "us43rad",
+    "us34snr",
+    "us42snr",
+    "us39dpc",
+    "us42tor",
+    "us44tor"
+   ],
+   "notes": "The first ship in the fleet whose battery fights aircraft and surface targets with the same barrels under one director. She screens the battle line, and the doctrine has never asked what happens when she is not there."
+  },
+  {
+   "id": "dolphin_ss31",
+   "name": "Dolphin class",
+   "nation": "USA",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1931,
+   "as_launched_year": 1931,
+   "cost_gold": 1000,
+   "durability": 170,
+   "displacement": {
+    "empty_tons": 1485,
+    "standard_tons": 1550,
+    "full_load_tons": 1840,
+    "submerged_tons": 2080
+   },
+   "dimensions": {
+    "length_m": 88,
+    "beam_m": 7.6,
+    "draft_m": 4.3
+   },
+   "propulsion": {
+    "plant": "diesel-electric composite (2 shafts)",
+    "shp": 4000,
+    "speed_kn": 17.5,
+    "range_km": 18500,
+    "range_at_kn": 10,
+    "fuel": "diesel_electric"
+   },
+   "speed_submerged": {
+    "surfaced_kn": 17.5,
+    "snort_kn": 8,
+    "sprint_kn": 8,
+    "sprint_h": 0.75,
+    "patrol_kn": 5,
+    "patrol_h": 10,
+    "creep_kn": 2,
+    "creep_h": 48,
+    "battery": "2 x 120-cell lead-acid",
+    "recharge_h": 7,
+    "test_depth_m": 75
+   },
+   "fuel": {
+    "diesel_tons": 290
+   },
+   "batteries": [
+    {
+     "role": "torpedo",
+     "component": "us31tor",
+     "mounts": 6,
+     "tubes": 6,
+     "arrangement": "4 bow + 2 stern",
+     "stowage": 16
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 1,
+      "caliber_mm": 12.7,
+      "mounts": "single machine gun",
+      "rounds_per_gun": 2000,
+      "firing_time_min": 3.5
+     }
+    ]
+   },
+   "protection": {
+    "features": [
+     "riveted-and-welded composite, welding carried as far as the yards' certified practice allowed and no further"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 6,
+     "fitted": 6,
+     "state": "fitted"
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "Passive hydrophones of 1926 pattern; no echo-ranging set."
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "complement": 52,
+   "possible_upgrades": [
+    "us42tor",
+    "us44tor",
+    "us34snr",
+    "us42snr",
+    "us39rad",
+    "us43rad"
+   ],
+   "notes": "The requirement was written from the war plan backwards: the patrol radius came first and the rest of the boat was sized to it. Drawn to run surfaced and dive to attack, so the diesel plant and the bunkerage are the design's dominant weights and the battery is sized for an approach rather than for an evasion. Motors 3,600 shp. Fire control is a mechanical torpedo angle solver in the conning tower. Fuel figure includes fuel-ballast tanks."
+  }
+ ],
+ "aircraft": [
+  {
+   "id": "f1_fighter",
+   "name": "F1 carrier fighter",
+   "nation": "USA",
+   "designation": "F1",
+   "type_year": 1933,
+   "role": "fighter",
+   "cost_gold": 7,
+   "durability": 20,
+   "powerplant": {
+    "component": "us33aeg",
+    "count": 1,
+    "takeoff_hp": 700,
+    "refit_groups": [
+     "us38aeg"
+    ]
+   },
+   "dimensions": {
+    "span_m": 9.6,
+    "length_m": 7.0,
+    "wing_area_m2": 21.5,
+    "hangar_footprint_m2": 67
+   },
+   "weights": {
+    "empty_kg": 1250,
+    "normal_kg": 1700,
+    "max_kg": 1850,
+    "derivation": {
+     "comparator": "Boeing F4B-4",
+     "comparator_kg": 1068,
+     "added_kg": 182,
+     "not_carried_kg": 0,
+     "honest_kg": 1250,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 1,
+    "normal": 1
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_2900m": 335,
+     "at_1500m": 322,
+     "sea_level": 310
+    },
+    "climb_ms": 9.5,
+    "ceiling_m": 8200,
+    "approach_kmh": 118
+   },
+   "fuel": {
+    "internal_l": 420,
+    "endurance_h": 5,
+    "ferry_km": 1300,
+    "combat_radius_km": 430
+   },
+   "armament": [
+    {
+     "mount": "cowl, synchronized",
+     "count": 2,
+     "rounds": 1000,
+     "spec": {
+      "name": "Mark 1 7.62 mm machine gun",
+      "caliber_mm": 7.62,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "wing_racks",
+     "form": "rack",
+     "rating_kg": 45,
+     "racks": 2,
+     "alternatives": [
+      {
+       "spec": {
+        "name": "Mark 1 45 kg bomb",
+        "mass_kg": 45
+       },
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "biplane on an all-metal airframe with fabric-covered flying surfaces",
+    "WINGS DO NOT FOLD",
+    "open cockpit",
+    "2 x cowl 7.62 mm machine guns, 1,000 rounds",
+    "2 x 45 kg bombs on wing racks"
+   ],
+   "protection": [],
+   "kits": [],
+   "possible_upgrades": [],
+   "notes": "The carrier arm's air-defense doctrine entire: intercept on sight from a deck alert, with no radar, no direction organization and no vector but the eye. Its guns are of rifle caliber. Endurance rather than speed or climb is what the specification bought, because the fleet states its aviation problem as a scouting problem. It is what a carrier strike would be met with. No successor specification has been issued."
+  },
+  {
+   "id": "sb1_scout_bomber",
+   "name": "SB1 scout-bomber",
+   "nation": "USA",
+   "designation": "SB1",
+   "type_year": 1931,
+   "role": "dive_bomber",
+   "cost_gold": 10,
+   "durability": 30,
+   "powerplant": {
+    "component": "us29aeg",
+    "count": 1,
+    "takeoff_hp": 575,
+    "refit_groups": [
+     "us33aeg",
+     "us38aeg"
+    ]
+   },
+   "dimensions": {
+    "span_m": 13.4,
+    "length_m": 9.4,
+    "wing_area_m2": 39,
+    "hangar_footprint_m2": 126
+   },
+   "weights": {
+    "empty_kg": 1951,
+    "normal_kg": 3150,
+    "max_kg": 3450,
+    "derivation": {
+     "comparator": "Vought SU-4 Corsair",
+     "comparator_kg": 1502,
+     "added_kg": 449,
+     "not_carried_kg": 0,
+     "honest_kg": 1951,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 2,
+    "normal": 2,
+    "notes": "Tandem. The second crewman is the point of the design: he navigates the search leg, works the radio and fights the tail."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_2400m": 222,
+     "at_1500m": 223,
+     "sea_level": 225
+    },
+    "climb_ms": 5.3,
+    "ceiling_m": 6495,
+    "approach_kmh": 120
+   },
+   "fuel": {
+    "internal_l": 600,
+    "endurance_h": 7.9,
+    "ferry_km": 1575,
+    "combat_radius_km": 525,
+    "with_tank": {
+     "form": "Mark 1 drop tank, centerline, displacing the bomb (from 1937)",
+     "liters": 880,
+     "endurance_h": 11.5,
+     "ferry_km": 2305,
+     "combat_radius_km": 770
+    }
+   },
+   "armament": [
+    {
+     "mount": "cowl, synchronized",
+     "count": 1,
+     "rounds": 800,
+     "spec": {
+      "name": "Mark 1 7.62 mm machine gun",
+      "caliber_mm": 7.62,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    },
+    {
+     "mount": "flexible rear ring",
+     "count": 1,
+     "rounds": 800,
+     "spec": {
+      "name": "Mark 1 7.62 mm machine gun",
+      "caliber_mm": 7.62,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "centerline_crutch",
+     "form": "bomb",
+     "rating_kg": 227,
+     "alternatives": [
+      {
+       "spec": {
+        "name": "Mark 1 227 kg bomb",
+        "mass_kg": 227
+       },
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "wing_racks",
+     "form": "rack",
+     "rating_kg": 45,
+     "racks": 2,
+     "alternatives": [
+      {
+       "spec": {
+        "name": "Mark 1 45 kg bomb",
+        "mass_kg": 45
+       },
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "two-seat biplane",
+    "WINGS DO NOT FOLD",
+    "open tandem cockpits",
+    "dive brakes",
+    "centerline displacement crutch (dive release)",
+    "1 x cowl 7.62 mm + 1 x flexible rear 7.62 mm machine gun, 1,600 rounds",
+    "1 x 227 kg bomb on the centerline crutch OR 2 x 45 kg bombs on wing racks"
+   ],
+   "protection": [],
+   "kits": [],
+   "possible_upgrades": [],
+   "notes": "The carrier arm's strike and its scouting line at once, and the whole of the service's practical experience of delivering a weapon from a deck. The doctrine it wrote is the only aviation doctrine the gunnery fleet has consented to fund. No successor specification.",
+   "fittings": [
+    {
+     "name": "Radio-plot station",
+     "installed_kg": 45
+    }
+   ]
+  },
+  {
+   "id": "o1_observation",
+   "name": "O1 observation floatplane",
+   "nation": "USA",
+   "designation": "O1",
+   "type_year": 1936,
+   "role": "scout",
+   "cost_gold": 8,
+   "durability": 25,
+   "powerplant": {
+    "component": "us29aeg",
+    "count": 1,
+    "takeoff_hp": 575
+   },
+   "dimensions": {
+    "span_m": 11.0,
+    "span_folded_m": 3.8,
+    "length_m": 9.6,
+    "wing_area_m2": 31.5,
+    "hangar_footprint_m2": 37
+   },
+   "weights": {
+    "empty_kg": 1814,
+    "normal_kg": 2510,
+    "max_kg": 2710,
+    "max_alt_gear_kg": 2355,
+    "derivation": {
+     "comparator": "Curtiss SOC Seagull",
+     "comparator_kg": 1718,
+     "added_kg": 96,
+     "not_carried_kg": 0,
+     "honest_kg": 1814,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 2,
+    "normal": 2,
+    "notes": "Tandem. The radio-plot station in the rear cockpit was the requirement's first line, and the airframe followed it."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_1500m": 248,
+     "sea_level": 250
+    },
+    "climb_ms": 4.6,
+    "ceiling_m": 4250,
+    "approach_kmh": 109
+   },
+   "fuel": {
+    "internal_l": 640,
+    "endurance_h": 6.1,
+    "ferry_km": 1425,
+    "combat_radius_km": 475
+   },
+   "armament": [
+    {
+     "mount": "cowl, synchronized",
+     "count": 1,
+     "rounds": 550,
+     "spec": {
+      "name": "Mark 1 7.62 mm machine gun",
+      "caliber_mm": 7.62,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    },
+    {
+     "mount": "flexible rear ring",
+     "count": 1,
+     "rounds": 550,
+     "spec": {
+      "name": "Mark 1 7.62 mm machine gun",
+      "caliber_mm": 7.62,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "wing_racks",
+     "form": "rack",
+     "rating_kg": 45,
+     "racks": 2,
+     "alternatives": [
+      {
+       "spec": {
+        "name": "Mark 1 45 kg bomb",
+        "mass_kg": 45
+       },
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "wings fold for the catapult ships' handling arrangements",
+    "spotting radio-plot station (rear seat)",
+    "slotted flaps",
+    "enclosed sliding canopy",
+    "1 x cowl 7.62 mm + 1 x flexible rear 7.62 mm machine gun, 1,100 rounds",
+    "2 x 50 kg bombs on wing racks"
+   ],
+   "protection": [],
+   "kits": [
+    "us36flt"
+   ],
+   "possible_upgrades": [],
+   "notes": "The eyes of the gunnery doctrine: launched over the horizon, holding station above the fall of shot, passing corrections to the plot by radio — which is what makes fire at extreme range a solved problem rather than a hope. Printed figures are the float fit; the wheel fit gives the penalty back. In a service where the floatplane path is the elite path, this is the airframe that path is flown in. Deliveries begin spring 1936. FOURTH WEIGHT,: the printed max is the FLOAT state, because she is a floatplane; [us36flt] exchanges to wheels, and that kit's own row carries the saving.",
+   "fittings": [
+    {
+     "name": "Radio-plot station",
+     "installed_kg": 45
+    }
+   ]
+  }
+ ],
+ "hulls": [
+  {
+   "id": "usa_missouri",
+   "class_id": "missouri_bb23",
+   "name": "Missouri",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_ohio",
+   "class_id": "missouri_bb23",
+   "name": "Ohio",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_maine",
+   "class_id": "missouri_bb23",
+   "name": "Maine",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_constitution",
+   "class_id": "constitution_bb25",
+   "name": "Constitution",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_constellation",
+   "class_id": "constitution_bb25",
+   "name": "Constellation",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_congress",
+   "class_id": "constitution_bb25",
+   "name": "Congress",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_united_states",
+   "class_id": "united_states_bb27",
+   "name": "United States",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us25sec",
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_president",
+   "class_id": "united_states_bb27",
+   "name": "President",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us25sec",
+    "us27dir"
+   ]
+  },
+  {
+   "id": "usa_chesapeake",
+   "class_id": "united_states_bb27",
+   "name": "Chesapeake",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us25gun",
+    "us25sec",
+    "us27dir"
+   ],
+   "notes": "Commissioned 1935 and still working up. The name was assigned over the Bureau of Navigation's standing objection to it."
+  },
+  {
+   "id": "usa_tillman",
+   "class_id": "tillman_bb29",
+   "name": "Tillman",
+   "status": "active",
+   "assignment": "Battle line",
+   "fit": [
+    "us29gun",
+    "us25sec",
+    "us27dir"
+   ],
+   "notes": "Commissioned 1935 and still working up."
+  },
+  {
+   "id": "usa_america",
+   "class_id": "tillman_bb29",
+   "name": "America",
+   "status": "trials",
+   "assignment": "Battle line",
+   "pct_complete": 90,
+   "notes": "Fitting out; commission 1937. Crews not yet found."
+  },
+  {
+   "id": "usa_republic",
+   "class_id": "tillman_bb29",
+   "name": "Republic",
+   "status": "building",
+   "assignment": "Battle line",
+   "laid_down": "1933-01-01",
+   "pct_complete": 40,
+   "notes": "Complete 1939. The Bureau of Aeronautics' unsigned conversion study is drawn on this hull."
+  },
+  {
+   "id": "usa_columbia",
+   "class_id": "columbia_bb32",
+   "name": "Columbia",
+   "status": "building",
+   "assignment": "Battle line",
+   "laid_down": "1935-10-24",
+   "pct_complete": 5,
+   "notes": "Keel plate on the blocks 24 October 1935 at Newport News. Completion 1941 at current rate."
+  },
+  {
+   "id": "usa_liberty",
+   "class_id": "columbia_bb32",
+   "name": "Liberty",
+   "status": "building",
+   "assignment": "Battle line",
+   "laid_down": "1935-10-01",
+   "pct_complete": 8,
+   "notes": "Completion 1942 at current rate."
+  },
+  {
+   "id": "usa_independence",
+   "class_id": "columbia_bb32",
+   "name": "Independence",
+   "status": "building",
+   "assignment": "Battle line",
+   "laid_down": "1935-11-01",
+   "pct_complete": 3,
+   "notes": "Completion 1942 at current rate."
+  },
+  {
+   "id": "usa_ranger",
+   "class_id": "ranger_cv29",
+   "name": "Ranger",
+   "status": "active",
+   "assignment": "Carrier force",
+   "notes": "Doctrine orphan — one air group embarked and fully crewed. The pilot famine binds the second deck she does not have."
+  }
+ ],
+ "aggregates": [
+  {
+   "class_id": "astoria_ca26",
+   "count": 16,
+   "status": "active",
+   "notes": "16 x 8 in heavy cruisers, of which the Astoria class is the newest. The scouting line and the spotting doctrine's escorts."
+  },
+  {
+   "class_id": "farragut_dd34",
+   "count": 8,
+   "status": "active",
+   "notes": "Eight modern boats, and a museum of ~170 flush-deckers (1917-21) steaming behind the monsters."
+  },
+  {
+   "class_id": "dolphin_ss31",
+   "count": 14,
+   "status": "active",
+   "notes": "14 fleet boats of ~55 submarines total; the rest are S-boats and older."
+  }
+ ],
+ "national_state": {
+  "budget_index": 110,
+  "construction": {
+   "notes": "Appropriation ~120,000 gold a year; the ladder and its plant take ~65%, naval aviation under 4%. FIVE generations of THREE hulls each, laid 1923-1935: a new and larger generation every two years, the interval constant and the class size constant, with the BORE the only variable and each bore mounted in two generations.",
+   "block_capable_yards": 0,
+   "slips": 2
+  },
+  "fuel": {
+   "self_supplied": true,
+   "domestic_share": 1.0,
+   "streams": [
+    "oil",
+    "avgas",
+    "diesel"
+   ],
+   "notes": "Fuel, steel and money are no constraint — this is the richest navy on Earth. What is scarce is permission."
+  },
+  "manpower": {
+   "pools": [
+    {
+     "rating": "uniformed_total",
+     "count": 135000
+    },
+    {
+     "rating": "carrier_qualified_pilots",
+     "count": 260,
+     "annual_intake": 40,
+     "notes": "The pipeline runs through Ranger's one deck."
+    },
+    {
+     "rating": "floatplane_pilots",
+     "count": 700,
+     "notes": "Where careers are made. The floatplane corps is the world's best."
+    }
+   ],
+   "schools": [
+    "gunnery (the world's finest, and they know it)",
+    "anti-submarine (teaches from the laboratory's tables)"
+   ],
+   "notes": "THE CASCADE, AND IT IS NOW THE SCENARIO RATHER THAN A PRESSURE INSIDE IT. Ten commissioned monsters hold 36,050 men, better than a quarter of the whole Navy. Commissioning the three United States hulls in 1933-35 took ~12,450 berths, found by emptying the six reserve Standards and sending four older dreadnoughts to training and mothballs; that pool is spent. The five hulls still building need about 34,000 berths - which is, to a rounding error, the entire complement of the pre-escalation battle line. Finishing the ships already begun means paying off every capital ship the Navy owned before the ladder started."
+  },
+  "stockpiles": {
+   "naval_aircraft": 340
+  },
+  "infrastructure": [
+   {
+    "id": "panama_original_locks",
+    "kind": "lock",
+    "length_m": 305,
+    "usable_beam_m": 33.5,
+    "depth_m": 12.6,
+    "location": "Panama",
+    "notes": "Passes the Missouris at 33.2 m beam and 12.3 m draft, with fenders breathing in, and no capital ship built since."
+   },
+   {
+    "id": "panama_third_locks",
+    "kind": "lock",
+    "length_m": 360,
+    "usable_beam_m": 44.0,
+    "depth_m": 13.7,
+    "location": "Panama",
+    "notes": "Opened 1934. Usable 360 x 44.0 m, over-sill 13.7 m. Passes the United States class fully (38.5 m beam, 12.4 m draft) and nothing else ever built; FAILS THE TILLMANS at 44.5 m beam by half a meter, and the Columbias at 46.5 m by two and a half. A beam does not defuel: there is no light-transit case."
+   },
+   {
+    "id": "norfolk_graving_dock",
+    "kind": "graving_dock",
+    "location": "Norfolk",
+    "notes": "Fifth-generation. Complete 1937. One of only two docks on Earth that will hold a Columbia."
+   },
+   {
+    "id": "bremerton_graving_dock",
+    "kind": "graving_dock",
+    "location": "Bremerton",
+    "notes": "Fifth-generation. Complete 1938."
+   },
+   {
+    "id": "gun_plants",
+    "kind": "yard",
+    "notes": "16 in and 18 in lines warm; 21.5 in proven and in production — the plant was retooled twice in nine years and stands retooled for a bore nobody has ordered."
+   },
+   {
+    "id": "armor_mills",
+    "kind": "yard",
+    "capacity": 3,
+    "notes": "Capacity quadrupled 1922-30; three mills, order books full to 1939. THE BINDING CONSTRAINT ON THE WHOLE LADDER, and the one number nobody outside the country has."
+   },
+   {
+    "id": "fifth_generation_slips",
+    "kind": "slip",
+    "length_m": 340,
+    "capacity": 2,
+    "notes": "Plus monster ways at four private and two navy yards."
+   }
+  ],
+  "politics": {
+   "factions": [
+    {
+     "id": "gun_club",
+     "position": "The battery makes retreat irrelevant. Ladder men to a district."
+    },
+    {
+     "id": "bureau_of_aeronautics",
+     "strength": 0.04,
+     "position": "Holding a carrier memo in a desk drawer, and quietly measuring the Republic's lower hull."
+    }
+   ],
+   "clocks": [
+    {
+     "id": "tillman_fifth_term_ends",
+     "date": "1937-01-20",
+     "description": "A second clock inside the same year as the scenario start."
+    },
+    {
+     "id": "tillman_runs_again",
+     "date": "1936-11-03",
+     "description": "He is running again. After November, perhaps the President is what is scarce."
+    }
+   ]
+  },
+  "deception": {
+   "lie": "A ladder sold as Depression relief",
+   "mechanism": [
+    "eleven states hold monster work",
+    "forty thousand yard jobs ride on the two newest generations alone",
+    "the committee chairmen are ladder men to a district",
+    "the armor mills' capacity is the one number nobody outside the country has"
+   ],
+   "disclosure_triggers": [
+    "economic recovery, which converts the ladder from relief back into spending, contestable at every session"
+   ],
+   "independent": true
+  },
+  "objectives": [
+   "Achieve parity with Britain",
+   "Keep the ladder's drawer from ever being empty",
+   "Find 8,200 berths in thirteen months"
+  ]
+ },
+ "notes": "The escalation ladder is FIVE generations of THREE hulls each - Missouri 1923, Constitution 1925, United States 1927, Tillman 1929, Columbia 1932 - on THREE CALIBERS and TWO MARKS: the 16 in 1918 pattern (outside the Mark sequence, a literal spec), the 18 in Mark 1 [us25gun] and the 21.5 in Mark 2 [us29gun], TRIPLES throughout. Twenty-five knots on every rung and it never moves. The cadence law lives at the scenario file's section 2.1."
+}

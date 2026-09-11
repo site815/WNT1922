@@ -1,0 +1,37 @@
+/* Flat ministry navigation and consolidated, independently rendered pages. */
+.sidebar nav{overflow-y:auto;scrollbar-width:thin;min-height:0}
+.sidebar .nav-item{font-size:15px;line-height:1.25;padding:10px 7px;gap:9px;min-height:39px}
+.sidebar .nav-item>span{font-size:11px;min-width:18px}
+.sidebar .nav-item>b{font-size:11px;margin-left:auto}
+.view-programs .workspace-inner,.view-aircraft .workspace-inner,.view-review .workspace-inner{overflow-y:auto}
+.view-programs .facility-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.view-programs .program-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+.view-programs .production-panel{margin-bottom:12px}
+.facility-card .school-graduation{margin:5px 0 7px}
+.facility-card .school-graduation .timed-progress{margin:0;height:42px}
+.facility-card .school-graduation>small{margin-top:3px;font-size:11px}
+.facility-card .facility-effect{flex:1}
+.view-aircraft .aircraft-models{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.view-aircraft .aircraft-models article{padding:10px;background:#172935}
+.view-aircraft .aircraft-models h3{font-size:17px;margin:5px 0}
+.view-aircraft .aircraft-models p{font-size:12px;line-height:1.4;margin:6px 0}
+.view-aircraft .aircraft-models small{font-size:11px;line-height:1.4}
+.catalog-tools{display:flex;align-items:center;gap:10px}
+.catalog-tools button,.catalog-tools select{font-size:12px;padding:6px 9px;height:32px}
+.register-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.register-summary>div{padding:9px 12px;background:var(--panel);border:1px solid var(--line)}
+.register-summary strong,.register-summary small{display:block}
+.register-summary strong{font-size:17px;color:var(--gold)}
+.register-summary small{font-size:12px;color:var(--muted);margin-top:3px}
+.view-fleet .register-note{margin-top:10px}
+.view-fleet .table-scroll{max-height:none;overflow:visible}
+.view-review .recovery-panel{margin-top:10px}
+.budget-panel{margin-bottom:12px}.budget-panel .panel-title button{font-size:12px;padding:6px 10px}
+.budget-balances{display:flex;gap:24px;margin:7px 0 10px;font-size:13px}.budget-balances b{font-size:19px}
+.budget-panel td,.economy-panel td{font-size:12px;padding:7px}.budget-panel th,.economy-panel th{font-size:11px}
+.view-command .selected-manifest .fleet-popup-grid{display:block}
+.view-command .selected-manifest .manifest-grid{max-height:none;overflow:visible}
+.view-command .selected-manifest .formation-manifest{margin-top:6px}
+@media(min-width:1900px){.view-programs .program-grid,.view-aircraft .aircraft-models{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-height:800px){.sidebar .nav-item{padding-top:8px;padding-bottom:8px;min-height:35px}.sidebar .side-country{margin-bottom:5px}}
+@media(max-width:1100px){.view-programs .facility-grid,.view-programs .program-grid,.view-aircraft .aircraft-models{grid-template-columns:repeat(2,minmax(0,1fr))}.register-filters input{width:180px}}

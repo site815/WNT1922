@@ -1,0 +1,1689 @@
+{
+  "nation": "JPN",
+  "revision": "0.5.0",
+  "notes": "Authored playable supplements. Engineering, aircraft progression and prices are provisional; historical legacy records retain their base-catalog provenance.",
+  "sources": [
+    "game/data/CAMPAIGN-SOURCES.md"
+  ],
+  "equipment": {},
+  "campaigns": {
+    "in_good_faith_1936": {
+      "classes": [
+        {
+          "spec": {
+            "id": "jp_merchant_1922",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "jp_merchant_1936",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "jp_merchant_1948",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "maru_depot_t23",
+            "name": "Maru depot conversion",
+            "nation": "JPN",
+            "type": "AD",
+            "treaty_category": "exempt",
+            "generation": "standardized",
+            "design_year": 1923,
+            "type_year": 1923,
+            "cost_gold": 530,
+            "durability": 290,
+            "displacement": {
+              "empty_tons": 4640,
+              "standard_tons": 4700,
+              "full_load_tons": 16200
+            },
+            "dimensions": {
+              "length_m": 135,
+              "beam_m": 18.2,
+              "draft_m": 9
+            },
+            "fitouts": [
+              {
+                "id": "dry_cargo",
+                "cargo_tons": 10500,
+                "cost_gold": 530,
+                "durability": 290,
+                "crew": 34
+              },
+              {
+                "id": "tanker",
+                "liquid_tons": 10500,
+                "cost_gold": 530,
+                "durability": 290,
+                "crew": 34
+              },
+              {
+                "id": "transport",
+                "troops": 2000,
+                "vehicles_stores_tons": 2000,
+                "cost_gold": 530,
+                "durability": 290,
+                "crew": 34
+              },
+              {
+                "id": "escort_carrier",
+                "cost_gold": 1000,
+                "durability": 315,
+                "crew": 260,
+                "kit": "jp31kit",
+                "notes": "Or a fresh hull completed new to the same drawings — it is the same ship. Adds 300 t avgas, double cofferdams and CO2 inerting."
+              }
+            ],
+            "machinery": {
+              "bays": 4,
+              "cruise_bank": 1,
+              "drive": "diesel_electric",
+              "swap": "cartridge swaps at sea for ships alongside, in sheltered water, on the 50 t heavy derrick",
+              "fits": [
+                {
+                  "component": "jp22eng",
+                  "shp": 4000,
+                  "speed_kn": 13,
+                  "range_km": 12000,
+                  "cruise_kn": 8,
+                  "condition": "at merchant full load"
+                },
+                {
+                  "component": "jp32eng",
+                  "shp": 12000,
+                  "speed_kn": 17.5,
+                  "range_km": 25000,
+                  "cruise_kn": 11,
+                  "condition": "at merchant full load"
+                },
+                {
+                  "component": "jp42eng",
+                  "shp": 16000,
+                  "speed_kn": 19,
+                  "range_km": 28000,
+                  "cruise_kn": 12,
+                  "condition": "at merchant full load"
+                }
+              ]
+            },
+            "fuel": {
+              "diesel_tons": 860
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "batteries": [],
+            "protection": {
+              "features": [
+                "split switchboards + casualty power"
+              ]
+            },
+            "provisions": [
+              {
+                "interface": "barbette_ring",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp29gun",
+                "state": "plated_over",
+                "notes": "An empty barbette ring on the poop with nothing to issue against it."
+              },
+              {
+                "interface": "cannon_position",
+                "count": 4,
+                "fitted": 0,
+                "for": "jp29can",
+                "state": "wired"
+              },
+              {
+                "interface": "radar_search_position",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp41rad",
+                "state": "wired"
+              },
+              {
+                "interface": "depth_charge_rail",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp32dpc",
+                "state": "foundation_only"
+              },
+              {
+                "interface": "rocket_rail",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp39rkt",
+                "state": "foundation_only"
+              },
+              {
+                "interface": "escort_carrier_fittings",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp31kit",
+                "state": "foundation_only",
+                "notes": "Flight-deck foundations drawn with the hull in 1923 and priced in like corrosion allowance — eight years before the kit, and before the aircraft that would fly off it."
+              },
+              {
+                "interface": "fleet_refueling_rig",
+                "count": 1,
+                "fitted": 1,
+                "state": "fitted"
+              },
+              {
+                "interface": "engine_bay",
+                "count": 4,
+                "fitted": 4,
+                "state": "fitted",
+                "notes": "Lendable. The swap economy's civilian branch: her bays and heavy derrick lend cartridges to warships at sea and take them back."
+              },
+              {
+                "interface": "beacon_net",
+                "count": 1,
+                "fitted": 0,
+                "for": "jp31bcn",
+                "state": "wired"
+              }
+            ],
+            "cargo_gear": [
+              "1 x 50 t heavy derrick"
+            ],
+            "kits": [
+              "jp31kit"
+            ],
+            "complement": 34,
+            "possible_upgrades": [
+              "jp29gun",
+              "jp42gun",
+              "jp42shl",
+              "jp29can",
+              "jp43can",
+              "jp41rad",
+              "jp45rad",
+              "jp32dpc",
+              "jp42dpc",
+              "jp39rkt",
+              "jp44rkt"
+            ],
+            "notes": "The registry counts freighters; the plan counts hulls. Mobilization stored as commerce. Escort-carrier fitout adds a fleet homing beacon, 300 km.",
+            "sensors": [],
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 0,
+                "count": 0
+              }
+            }
+          },
+          "service": "support",
+          "notes": "Existing tender/depot conversions with heavy derricks. Kept outside merchant shipping and warship totals.",
+          "buildable": false,
+          "category": "support",
+          "barrels": 0,
+          "caliber": 0,
+          "tubes": 0,
+          "air": 0
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1922",
+            "nation": "JPN",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1922",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1936",
+            "nation": "JPN",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1936",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1950",
+            "nation": "JPN",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1950",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "hibari_t33",
+          "name": "Hibari",
+          "nation": "JPN",
+          "designation": "Type 33",
+          "type_year": 1933,
+          "role": "light_multirole",
+          "cost_gold": 10,
+          "durability": 25,
+          "powerplant": {
+            "component": "jp33aeg",
+            "count": 1,
+            "takeoff_hp": 790
+          },
+          "dimensions": {
+            "span_m": 13.2,
+            "span_folded_m": 5.9,
+            "length_m": 8.8,
+            "wing_area_m2": 27.5,
+            "hangar_footprint_m2": 52
+          },
+          "weights": {
+            "empty_kg": 1420,
+            "normal_kg": 1995,
+            "max_kg": 2645,
+            "max_alt_gear_kg": 2925,
+            "derivation": {
+              "comparator": "Mitsubishi A5M4",
+              "comparator_kg": 1216,
+              "added_kg": 281,
+              "not_carried_kg": 0,
+              "honest_kg": 1497,
+              "dropped_kg": 45,
+              "credit": 0.05
+            }
+          },
+          "crew": {
+            "seats": 2,
+            "normal": 1,
+            "notes": "Flown solo on the short trades; the patrol, search and antisubmarine sorties are flown crewed, and the ferry-tank sortie may not be flown solo at all."
+          },
+          "performance": {
+            "speed_kmh": {
+              "at_2000m": 387,
+              "with_store": 377,
+              "sea_level": 372
+            },
+            "climb_ms": 12.2,
+            "ceiling_m": 8955,
+            "approach_kmh": 113
+          },
+          "fuel": {
+            "internal_l": 375,
+            "endurance_h": 8.6,
+            "ferry_km": 1595,
+            "combat_radius_km": 530,
+            "with_tank": {
+              "tank": "jp39tnk",
+              "form": "650_form",
+              "liters": 875,
+              "ferry_km": 3230,
+              "combat_radius_km": 1075,
+              "endurance_h": 17
+            }
+          },
+          "armament": [
+            {
+              "component": "jp29can",
+              "mount": "aircraft twin, nose",
+              "count": 1,
+              "rounds": 320
+            }
+          ],
+          "stations": [
+            {
+              "id": "centerline",
+              "form": "650_bomb",
+              "rating_kg": 675,
+              "conformal": false,
+              "alternatives": [
+                {
+                  "component": "jp32bmb",
+                  "count": 1
+                },
+                {
+                  "component": "jp32dpc",
+                  "count": 4,
+                  "kit": "air kit"
+                },
+                {
+                  "component": "jp32min",
+                  "count": 1,
+                  "kit": "air kit"
+                }
+              ]
+            }
+          ],
+          "equipment": [],
+          "features": [
+            "enclosed tandem canopy",
+            "fleet-standard cockpit, controls and instruments",
+            "centerline crutch",
+            "fleet-beacon homing receiver and transponder"
+          ],
+          "protection": [],
+          "kits": [
+            "jp33flt"
+          ],
+          "possible_upgrades": [
+            "jp43can",
+            "jp42dpc",
+            "jp44min"
+          ],
+          "notes": "Light multirole, one airframe and two undercarriages. Float wing loading afloat is 107 kg/m2, into the E13A (111) and OS2U (112) band and out of the Ar 196's (131). THE SPAN IS FIXED BY THE FOOTPRINT, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is 52 m2, the same as the Raiden, so the carriers' air groups are unchanged. The fold ratio is 2.24 -- an SB2C's -- and it is available because THE WING IS EMPTY: all 375 L is in the fuselage. DERIVED, NOT ASSERTED: one drag polar (f 0.6732, e 0.82) at eta 0.80 max / 0.50 CLIMB -- the fixed-pitch propeller, and the only airplane in this navy that does not use 0.62 -- and bsfc 0.26 kg/hp-h. Combat radius is ferry / 3; approach is the bare stall at normal weight on CLmax 1.55, no high-lift device."
+        },
+        {
+          "id": "raiden_t39",
+          "name": "Raiden",
+          "nation": "JPN",
+          "designation": "Type 39",
+          "type_year": 1939,
+          "role": "fighter",
+          "cost_gold": 15,
+          "durability": 50,
+          "powerplant": {
+            "component": "jp39aeg",
+            "count": 1,
+            "takeoff_hp": 1090
+          },
+          "dimensions": {
+            "span_m": 11.8,
+            "span_folded_m": 5.9,
+            "length_m": 8.8,
+            "wing_area_m2": 20.5,
+            "hangar_footprint_m2": 52
+          },
+          "weights": {
+            "empty_kg": 1765,
+            "normal_kg": 2635,
+            "max_kg": 2755,
+            "derivation": {
+              "comparator": "A6M2 Model 21",
+              "comparator_kg": 1680,
+              "added_kg": 298,
+              "not_carried_kg": 122,
+              "honest_kg": 1856,
+              "dropped_kg": 43,
+              "credit": 0.05
+            }
+          },
+          "crew": {
+            "seats": 1,
+            "normal": 1
+          },
+          "performance": {
+            "speed_kmh": {
+              "clean_at_6000m": 565,
+              "sea_level": 491
+            },
+            "climb_ms": 16.1,
+            "ceiling_m": 11645,
+            "approach_kmh": 134
+          },
+          "fuel": {
+            "internal_l": 750,
+            "endurance_h": 11.9,
+            "ferry_km": 2900,
+            "combat_radius_km": 965
+          },
+          "armament": [
+            {
+              "component": "jp29can",
+              "mount": "aircraft twin",
+              "count": 1,
+              "rounds": 320
+            },
+            {
+              "component": "jp39rkt",
+              "mount": "wing-root rails, semi-flush",
+              "count": 12
+            }
+          ],
+          "stations": [],
+          "equipment": [],
+          "features": [
+            "bubble canopy",
+            "cartridge-rail ejection seat",
+            "fleet-beacon homing receiver and transponder",
+            "leading-edge slats",
+            "flush-riveted and aeroformed throughout, every gap sealed"
+          ],
+          "protection": [
+            "armor glass",
+            "8 mm seat plate",
+            "self-sealing tanks"
+          ],
+          "kits": [],
+          "possible_upgrades": [
+            "jp43can",
+            "jp44rkt"
+          ],
+          "notes": "Pure fighter: no recess, no station, no tank, no dive brakes and no radar. WING 20.5 m2 AT 11.8 m OF SPAN, AR 6.79, leading-edge slats and no Fowlers, so conventions 8 quotes her at CLmax 1.95 (slats alone) and the approach is the bare stall at normal weight. THE SPAN IS FIXED BY THE FOLD, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is the 52 m2 hangar footprint every Japanese air-group derivation is computed from, so span may not move without moving the carriers' capacity. AREA IS THE ONLY MANEUVER LEVER AVAILABLE AT A FIXED SPAN -- 18.0 -> 20.5 m2 takes wing loading from 146 to 128 kg/m2 and the sustained turn at 3,000 m from 23.0 to 23.9 deg/s at a 158 m radius, against an A6M2's 24.5 at 164 m, for 9 km/h and 55 km of ferry. A SMALLER WING DOES NOT FUND A FUEL CUT: at a fixed span L/Dmax goes as 1/sqrt(f) and the wing is about 40 percent of wetted area. She is below a Spitfire I of 1938 on speed and level with an A6M2 on turn while carrying armor and self-sealing that neither comparator has. DERIVED, NOT ASSERTED: one drag polar (f 0.4052, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h -- the Japanese figure, credited to the fleet's lean-cruise doctrine and NOT to the engine, which stays par. Combat radius is ferry / 3. WING STRUCTURE SCALES AS S^0.649 x AR^0.5, NOT AS A FLAT kg/m2: at a fixed span the aspect ratio falls as area grows and the two terms very nearly cancel, so 18.0 -> 20.5 m2 costs about 5 kg of airframe and not 32."
+        },
+        {
+          "id": "tenzan_t39",
+          "name": "Tenzan",
+          "nation": "JPN",
+          "designation": "Type 39",
+          "type_year": 1939,
+          "role": "torpedo_bomber",
+          "cost_gold": 29,
+          "durability": 58,
+          "powerplant": {
+            "component": "jp39aeg",
+            "count": 2,
+            "takeoff_hp": 1090
+          },
+          "dimensions": {
+            "span_m": 15,
+            "span_folded_m": 8,
+            "length_m": 10.8,
+            "wing_area_m2": 29,
+            "hangar_footprint_m2": 86
+          },
+          "weights": {
+            "empty_kg": 3955,
+            "normal_kg": 5490,
+            "max_kg": 6910,
+            "max_alt_gear_kg": 7630,
+            "derivation": {
+              "comparator": "Mitsubishi Ki-46-II",
+              "comparator_kg": 3263,
+              "added_kg": 1134,
+              "not_carried_kg": 234,
+              "honest_kg": 4163,
+              "dropped_kg": 30,
+              "credit": 0.05
+            }
+          },
+          "crew": {
+            "seats": 3,
+            "normal": 2,
+            "notes": "Pilot and observer side by side and offset; the third station is manned by mission. Single-rail ejection: all three seats fire together on one linked triple parachute. The third station's optional rear 7.7 mm and its 600 rounds, and the crewman who works them, are in max_kg and not in normal_kg; normal weight is two crew, full internal fuel and no store, which is where every performance figure is quoted."
+          },
+          "performance": {
+            "speed_kmh": {
+              "clean_at_5600m": 577,
+              "with_torpedo": 551,
+              "sea_level": 504
+            },
+            "climb_ms": 14.6,
+            "ceiling_m": 10970,
+            "approach_kmh": 147
+          },
+          "fuel": {
+            "internal_l": 1500,
+            "endurance_h": 9.5,
+            "ferry_km": 2595,
+            "combat_radius_km": 865,
+            "with_tank": {
+              "tank": "jp39tnk",
+              "form": "2 x 650-form recess ferry tanks",
+              "liters": 2500,
+              "ferry_km": 4050,
+              "combat_radius_km": 1350,
+              "endurance_h": 13.3
+            }
+          },
+          "armament": [
+            {
+              "component": "jp29can",
+              "mount": "aircraft twin, nose",
+              "count": 1,
+              "rounds": 320
+            }
+          ],
+          "stations": [
+            {
+              "id": "centerline_recess",
+              "form": "torpedo",
+              "rating_kg": 1300,
+              "conformal": true,
+              "alternatives": [
+                {
+                  "component": "jp33tor",
+                  "count": 1
+                },
+                {
+                  "component": "jp32bmb",
+                  "count": 2
+                },
+                {
+                  "component": "jp32dpc",
+                  "count": 8,
+                  "kit": "air kit"
+                },
+                {
+                  "component": "jp32min",
+                  "count": 1,
+                  "kit": "air kit"
+                },
+                {
+                  "component": "jp39tnk",
+                  "count": 2
+                }
+              ]
+            }
+          ],
+          "equipment": [
+            "jp39rad"
+          ],
+          "features": [
+            "slats",
+            "Fowler flaps",
+            "flush speed brakes",
+            "side-by-side offset canopy",
+            "cartridge-rail ejection seats",
+            "fleet-beacon homing receiver and transponder",
+            "flush-riveted and aeroformed throughout, every gap sealed"
+          ],
+          "protection": [
+            "armor glass",
+            "8 mm seat plates",
+            "self-sealing tanks"
+          ],
+          "kits": [
+            "jp39flt"
+          ],
+          "possible_upgrades": [
+            "jp43can",
+            "jp45tor",
+            "jp42dpc",
+            "jp44min",
+            "jp44rad",
+            "jp48rad"
+          ],
+          "notes": " The catapult and crane rating is kept in step with her maximum launch weight afloat, with margin; the two move together and neither constrains the other. Radar standard, dive brakes carried, no rockets; the crew fly armored. ⚠ NO ESCORT TRADE: the nose twin is a strafing battery and the airplane has no maneuver margin against a fighter — it is the thing escorted. ⚠ IT IS THE FLEET'S OUTER SEARCH: on a tandem pair of 650-form tanks, flown off carrier decks and cruiser catapults alike, which is why the float kit was drawn for a torpedo carrier. ⚠ DERIVED, NOT ASSERTED: one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h — the Japanese figure, credited to the fleet's lean-cruise doctrine (cruising bank + engine cartridges, architecture) and NOT to the engine, which stays par. Everyone else uses 0.29. Combat radius is ferry / 3; approach is the bare stall. ⚠ FLUSH-RIVETED AND AEROFORMED THROUGHOUT, EVERY GAP SEALED — the 1933-34 hydroformed panel line applied to airplanes. This is PROCESS (Interest band), not performance. SECOND TRADE: with the recess empty she is a heavy fighter and, on her own radar, a night fighter -- decisive against bombers, shadowers and flying boats and outclassed by single-seat fighters in daylight, which is why she still has NO ESCORT TRADE and is herself the airplane escorted. It still costs her the band: at 579 km/h she is a shade over a Bf 110C and behind a Whirlwind, so the twin's speed has LEFT the Supporting band and is par. FOLD: 15.0 m folding to 8.0 m: the hinge sits 4.0 m from the centerline, about 1.2 m outboard of the structural minimum set by the nacelle and the gear bay it houses. The only real twin-engine carrier airplane with a folding wing, the Grumman F7F, folded 15.7 m to 8.15 m -- the same answer on a slightly larger machine. Folding tighter is geometric but puts a 4.6 m panel and its root bending moment on the hinge.  The third station's optional rear 7.7 mm is the legacy small-caliber pattern and has no equipment code, so it appears on the Armament row and not in the armament array. It, its 600 rounds and the crewman who works them are in max_kg and not in normal_kg. POST-RELEASE SHE IS A FIGHTER AND THE FIGURE THAT SAYS SO IS THE SUSTAINED TURN AT HER OWN CLmax 2.4 (slats AND Fowlers, which is what the printed 128 km/h approach implies): at 3,000 m and 65 percent fuel she holds 21.8 deg/s at a 173 m radius, against a Bf 109E-3's 20.7 at 188, a Spitfire I's 22.0 at 177 and an A6M2's 24.5 at 164 -- and against an F4F-4's 16.4 and a Bf 110C's 17.1. Her limits are ROLL (15 m of span, a twin, no boosted ailerons) and 40 s of trigger time on one twin, not the opponent."
+        },
+        {
+          "id": "shinden_t44",
+          "name": "Shinden",
+          "nation": "JPN",
+          "designation": "Type 44",
+          "type_year": 1944,
+          "role": "universal_multirole",
+          "cost_gold": 38,
+          "durability": 50,
+          "powerplant": {
+            "component": "jp44jet",
+            "count": 1,
+            "takeoff_kgf": 2450
+          },
+          "dimensions": {
+            "span_m": 9.4,
+            "span_folded_m": 6.6,
+            "length_m": 10.6,
+            "wing_area_m2": 18,
+            "sweep_deg": 40,
+            "hangar_footprint_m2": 70
+          },
+          "weights": {
+            "empty_kg": 3730,
+            "normal_kg": 5470,
+            "max_kg": 6770,
+            "derivation": {
+              "comparator": "MiG-15bis",
+              "comparator_kg": 3681,
+              "added_kg": 478,
+              "not_carried_kg": 233,
+              "honest_kg": 3926,
+              "dropped_kg": 18,
+              "credit": 0.05
+            }
+          },
+          "crew": {
+            "seats": 1,
+            "normal": 1
+          },
+          "performance": {
+            "speed_kmh": {
+              "at_5000m": 1035,
+              "with_torpedo": 1000,
+              "at_10000m": 970,
+              "sea_level": 1040
+            },
+            "mach_limit": 0.9,
+            "climb_ms": 43,
+            "ceiling_m": 14155,
+            "approach_kmh": 210
+          },
+          "fuel": {
+            "internal_l": 2000,
+            "wet_wing": true,
+            "endurance_h": 2.2,
+            "ferry_km": 1950,
+            "combat_radius_km": 650,
+            "with_tank": {
+              "tank": "jp39tnk",
+              "form": "650_form",
+              "liters": 3000,
+              "ferry_km": 2760,
+              "combat_radius_km": 920,
+              "endurance_h": 3.1
+            }
+          },
+          "armament": [
+            {
+              "component": "jp29can",
+              "mount": "aircraft twin",
+              "count": 1,
+              "rounds": 320
+            },
+            {
+              "component": "jp44rkt",
+              "mount": "wing-root rails",
+              "count": 12
+            }
+          ],
+          "stations": [
+            {
+              "id": "centerline_recess",
+              "form": "torpedo",
+              "rating_kg": 1300,
+              "conformal": true,
+              "alternatives": [
+                {
+                  "component": "jp33tor",
+                  "count": 1
+                },
+                {
+                  "component": "jp32bmb",
+                  "count": 2
+                },
+                {
+                  "component": "jp32dpc",
+                  "count": 8,
+                  "kit": "air kit"
+                },
+                {
+                  "component": "jp32min",
+                  "count": 1,
+                  "kit": "air kit"
+                },
+                {
+                  "component": "jp39tnk",
+                  "count": 2
+                }
+              ]
+            }
+          ],
+          "equipment": [
+            "jp44rad"
+          ],
+          "features": [
+            "slats",
+            "Fowler flaps",
+            "flush speed brakes",
+            "pressurized cockpit",
+            "jet-rated cartridge ejection seat",
+            "wet wing (the torsion box is the tank)",
+            "fleet-beacon homing receiver and transponder"
+          ],
+          "protection": [
+            "armor glass",
+            "8 mm seat plate",
+            "self-sealing tanks"
+          ],
+          "kits": [],
+          "possible_upgrades": [
+            "jp45tor",
+            "jp42dpc",
+            "jp44min",
+            "jp48rad"
+          ],
+          "notes": "Same recess, same ordnance forms, same catapult rating, same cannon, same beacon net. The catapult is how it goes — and the hole in its belly is the shape of a weight frozen in 1923. Not in production at as_of; scheduled 1944. DERIVED, NOT ASSERTED, AND ON A JET MODEL: thrust T(V,h) = 2,450 kgf x (rho/rho0)^0.885 x (1 - 0.30 M + 0.20 M^2), the ram-drag term of an early centrifugal turbojet, against the same polar form (f 0.4134, e 0.82). SPEED IS MACH-LIMITED ABOVE ABOUT 4,000 m AND THRUST-LIMITED BELOW: the printed 1,035 at 5,000 m and 970 at 10,000 m are Mach 0.90 to the kilometer, and the sea-level 1,040 is where thrust runs out. Ceiling 14,155 m fixes the lapse exponent. Range is the jet Breguet at the best-range speed (1.316 x the minimum-drag speed, L/D 0.866 x L/Dmax) on TSFC 1.30 kg/kgf-h, which reproduces the printed 1,950 km ferry."
+        }
+      ],
+      "merchants": {
+        "hulls": 2146,
+        "grossRegisterTons": 4085650,
+        "managedHulls": 500,
+        "note": "Player-approved opening composition: 500 Standard Maru and 1,646 other merchants. Historical GRT is a reference, not an estimate of the alternate-history fleet's cargo capacity.",
+        "groups": [
+          {
+            "class_id": "standard_maru_t23",
+            "count": 500,
+            "status": "active",
+            "notes": "Largest homogeneous merchant fleet on Earth and roughly half the national tonnage. Every hull carries the conversion provisions and the standard engine bays.",
+            "id": "a-JPN-10"
+          }
+        ]
+      }
+    },
+    "campaign_1922": {
+      "classes": [
+        {
+          "spec": {
+            "id": "jp_merchant_1922",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "jp_merchant_1936",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "jp_merchant_1948",
+            "nation": "JPN",
+            "name": "Japan standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1922",
+            "nation": "JPN",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1922",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1936",
+            "nation": "JPN",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1936",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_depot_1950",
+            "nation": "JPN",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "jp_oiler_1950",
+            "nation": "JPN",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "jpn_early_fighter",
+          "nation": "JPN",
+          "name": "Mitsubishi 1MF",
+          "type_year": 1921,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 30,
+          "weights": {
+            "empty_kg": 1050
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_early_strike",
+          "nation": "JPN",
+          "name": "Mitsubishi 1MT",
+          "type_year": 1921,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_early_scout",
+          "nation": "JPN",
+          "name": "Yokosuka Ro-go",
+          "type_year": 1921,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1930_fighter",
+          "nation": "JPN",
+          "name": "JPN 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1930_strike",
+          "nation": "JPN",
+          "name": "JPN 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1930_scout",
+          "nation": "JPN",
+          "name": "JPN 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1936_fighter",
+          "nation": "JPN",
+          "name": "JPN 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1936_strike",
+          "nation": "JPN",
+          "name": "JPN 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1936_scout",
+          "nation": "JPN",
+          "name": "JPN 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1942_fighter",
+          "nation": "JPN",
+          "name": "JPN 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1942_strike",
+          "nation": "JPN",
+          "name": "JPN 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "jpn_standard_1942_scout",
+          "nation": "JPN",
+          "name": "JPN 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 2033,
+        "grossRegisterTons": 3354806,
+        "managedHulls": 0,
+        "referenceYear": 1921,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      }
+    }
+  }
+}

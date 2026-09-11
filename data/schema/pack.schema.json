@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wnt1922/pack.schema.json",
+  "title": "HindsightPack",
+  "description": "One national divergence, machine-readable (data/ships/hindsight/<slug>.json). A pack REFERENCES the 1922 base data and never modifies it. Packs are NOT overlays and DO NOT compose: there is no merge rule, and the 1936 snapshot is one authored thing the packs feed. A nation not toggled on loads its plain historical self and no pack at all.",
+  "type": "object",
+  "required": [
+    "nation",
+    "navy",
+    "scenario",
+    "toggle",
+    "as_of",
+    "base",
+    "classes",
+    "hulls"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "nation": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "navy": {
+      "type": "string"
+    },
+    "prefix": {
+      "type": "string",
+      "enum": [
+        "jp",
+        "us",
+        "uk",
+        "de",
+        "fr",
+        "it",
+        "su"
+      ]
+    },
+    "scenario": {
+      "type": "string",
+      "description": "Scenario slug, e.g. 'as-long-as-its-black'."
+    },
+    "toggle": {
+      "type": "string",
+      "description": "The divergence's display name, e.g. \"As Long As It's Black\". Sixteen configurations of the four toggles are legal; FRA, ITA and USSR are never divergent."
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date",
+      "description": "The snapshot this pack describes. Play begins 1936-01-01, which sits on build_model.py's year boundary: END 1935 IS the 1 Jan 1936 fleet."
+    },
+    "version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The prose canon files that own these facts. They win over this file in every disagreement."
+    },
+    "base": {
+      "type": "object",
+      "required": [],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "The 1922 historical file this pack diverges from. Read-only."
+        },
+        "divergence_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "retained_hulls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Base-file hull ids still afloat at as_of."
+        },
+        "notes": {
+          "type": "string"
+        },
+        "no_base_reason": {
+          "type": "string",
+          "description": "Why this pack has no 1922 base file. A nation outside the Washington system may simply not exist in the seed data; saying so is better than inventing a base."
+        }
+      }
+    },
+    "equipment_file": {
+      "type": "string",
+      "description": "The equipment catalog whose SKUs this pack's classes reference."
+    },
+    "build_model": {
+      "type": "object",
+      "description": "The construction model that is the arbiter of every hull count in this pack. ROWS ARE END-OF-YEAR: a mid-year figure must lie between the previous year-end and that year-end. tools/validate.py checks the pack's counts against the model's own output.",
+      "additionalProperties": false,
+      "properties": {
+        "script": {
+          "type": "string"
+        },
+        "derived": {
+          "type": "string",
+          "description": "The emitted JSON of the model's year-by-year output."
+        },
+        "envelope_t_equiv_yr": {
+          "description": "A NUMBER where the envelope is flat and AN OBJECT OF year -> t-equiv WHERE IT IS A RAMP. Japan's is flat and is a number; Germany's goes from 5,600 t-equiv a year to 104,000 in eight years and cannot be one, and forcing it into a scalar would hide the only interesting thing about it.",
+          "oneOf": [
+            { "type": "number" },
+            { "type": "object", "patternProperties": { "^(19|20)[0-9]{2}$": { "type": "number" } }, "additionalProperties": false }
+          ]
+        },
+        "premium": {
+          "type": "number"
+        },
+        "learning_curve": {
+          "type": "number"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "not_built": {
+      "type": "array",
+      "description": "What this divergence means the nation did NOT do. A negative program is as much a fact as a positive one, and is the only place the money that paid for the divergence is visible.",
+      "items": {
+        "type": "object",
+        "required": [
+          "what"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "what": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "$ref": "wnt1922/ship-class.schema.json"
+      }
+    },
+    "aircraft": {
+      "type": "array",
+      "items": {
+        "$ref": "wnt1922/aircraft-class.schema.json"
+      }
+    },
+    "hulls": {
+      "type": "array",
+      "items": {
+        "$ref": "wnt1922/hull.schema.json"
+      }
+    },
+    "aggregates": {
+      "type": "array",
+      "description": "Counts for classes tracked in bulk rather than as named hulls — which for a navy that names only its battle line is most of the fleet.",
+      "items": {
+        "type": "object",
+        "required": [
+          "class_id",
+          "count"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "class_id": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "reserve",
+              "building",
+              "mixed"
+            ]
+          },
+          "assignment": {
+            "type": "string",
+            "description": "Fleet, flotilla or station these ships are on at the pack's as_of date. The named-hull record has one; a navy that names nothing below its battle line needs it here or the information has nowhere to live."
+          },
+          "pennants": {
+            "type": "string",
+            "description": "Hull-number range, where the navy identifies these ships by number only."
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "national_state": {
+      "$ref": "wnt1922/national-state.schema.json"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

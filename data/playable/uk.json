@@ -1,0 +1,1467 @@
+{
+  "nation": "GBR",
+  "revision": "0.5.0",
+  "notes": "Authored playable supplements. Engineering, aircraft progression and prices are provisional; historical legacy records retain their base-catalog provenance.",
+  "sources": [
+    "game/data/CAMPAIGN-SOURCES.md"
+  ],
+  "equipment": {},
+  "campaigns": {
+    "in_good_faith_1936": {
+      "classes": [
+        {
+          "spec": {
+            "id": "uk_merchant_1922",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "uk_merchant_1936",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "uk_merchant_1948",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "rn_fleet_oiler",
+            "nation": "GBR",
+            "name": "Fast fleet oiler",
+            "type": "AO",
+            "design_year": 1930
+          },
+          "service": "support",
+          "notes": "Count-only support entry: 16 oilers in Fisher’s Ghost §3.1. Tonnage, machinery, crew and maintenance costs are not yet cataloged.",
+          "buildable": false,
+          "category": "support",
+          "tons": 0,
+          "cost": 0,
+          "speed": 0,
+          "range": 0,
+          "crew": 0,
+          "unknownSpecs": true
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1922",
+            "nation": "GBR",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1922",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1936",
+            "nation": "GBR",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1936",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1950",
+            "nation": "GBR",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1950",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "skua",
+          "name": "Skua",
+          "nation": "GBR",
+          "designation": "Skua",
+          "type_year": 1936,
+          "role": "dive_bomber",
+          "cost_gold": 12,
+          "durability": 30,
+          "powerplant": {
+            "count": 1,
+            "takeoff_hp": 830,
+            "spec": {
+              "layout": "9-cylinder sleeve-valve radial",
+              "displacement_l": 24.9,
+              "mass_kg": 470,
+              "hp_takeoff": 830,
+              "hp_at_3000m": 780,
+              "supercharger": "single-speed",
+              "tbo_h": 380,
+              "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+            }
+          },
+          "dimensions": {
+            "span_m": 14,
+            "span_folded_m": 5.6,
+            "length_m": 10.4,
+            "wing_area_m2": 30,
+            "hangar_footprint_m2": 58
+          },
+          "weights": {
+            "empty_kg": 2597,
+            "normal_kg": 3690,
+            "max_kg": 4390,
+            "derivation": {
+              "comparator": "Blackburn Skua Mk II",
+              "comparator_kg": 2493,
+              "added_kg": 104,
+              "not_carried_kg": 0,
+              "honest_kg": 2597,
+              "credit": 0,
+              "dropped_kg": 0
+            }
+          },
+          "crew": {
+            "seats": 2,
+            "normal": 2,
+            "notes": "Pilot and observer/telegraphist-air-gunner; the observer's station is a wireless set and a plotting board."
+          },
+          "performance": {
+            "speed_kmh": {
+              "at_3000m": 368,
+              "with_bomb": 353,
+              "sea_level": 343
+            },
+            "climb_ms": 6.7,
+            "ceiling_m": 6660,
+            "approach_kmh": 122
+          },
+          "fuel": {
+            "internal_l": 900,
+            "endurance_h": 8.2,
+            "ferry_km": 1770,
+            "combat_radius_km": 590,
+            "with_tank": {
+              "form": "2 x Mark I drop tanks, underwing",
+              "liters": 1180,
+              "endurance_h": 9.7,
+              "ferry_km": 2185,
+              "combat_radius_km": 730
+            }
+          },
+          "armament": [
+            {
+              "mount": "cowl, synchronised",
+              "count": 2,
+              "rounds": 1600,
+              "spec": {
+                "name": "Mark II 7.7 mm machine gun",
+                "caliber_mm": 7.7,
+                "round_belted_g": 28,
+                "gun_kg": 10
+              }
+            },
+            {
+              "mount": "flexible rear ring",
+              "count": 1,
+              "rounds": 800,
+              "spec": {
+                "name": "Mark II 7.7 mm machine gun",
+                "caliber_mm": 7.7,
+                "round_belted_g": 28,
+                "gun_kg": 10
+              }
+            }
+          ],
+          "stations": [
+            {
+              "id": "centerline_crutch",
+              "form": "bomb",
+              "rating_kg": 500,
+              "alternatives": [
+                {
+                  "spec": {
+                    "name": "Mark I 227 kg bomb",
+                    "mass_kg": 227
+                  },
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "id": "underwing",
+              "form": "rack",
+              "rating_kg": 113,
+              "racks": 4,
+              "alternatives": [
+                {
+                  "component": "uk34tnk",
+                  "count": 2
+                }
+              ]
+            }
+          ],
+          "equipment": [],
+          "features": [
+            "Fowler flaps",
+            "centerline crutch (500 kg-rated, swinging): 1 x Mark I bomb",
+            "swinging centerline crutch",
+            "dive brakes",
+            "folding wings",
+            "retracting undercarriage",
+            "arrester hook",
+            "flotation gear",
+            "long-range wireless-telegraphy set and plotting board",
+            "enclosed sliding canopy",
+            "2 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,400 rounds",
+            "4 underwing racks rated 113 kg each, 2 drop tanks"
+          ],
+          "protection": [
+            "armored windscreen"
+          ],
+          "kits": [],
+          "possible_upgrades": [],
+          "notes": "THE OLDEST OF THE THREE AND THE REASON THE OTHER TWO EXIST: the first British airplane specified by the Admiralty, in 1934, for a job the Admiralty had defined - search to the horizon of the fleet's own gunnery and then attack what it finds. Two seats, a wireless set and a plotting board, dive brakes, and a bomb heavy enough to matter against a deck. WHAT SHE CANNOT DO IS FIGHT: two rifle-caliber guns forward and one aft is a scout's armament and the handbook says so. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
+          "fittings": [
+            {
+              "name": "Wireless and plotting board",
+              "installed_kg": 55
+            }
+          ]
+        },
+        {
+          "id": "shearwater",
+          "name": "Shearwater",
+          "nation": "GBR",
+          "designation": "Shearwater",
+          "type_year": 1937,
+          "role": "torpedo_bomber",
+          "cost_gold": 16,
+          "durability": 36,
+          "powerplant": {
+            "count": 1,
+            "takeoff_hp": 1000,
+            "spec": {
+              "layout": "9-cylinder radial",
+              "displacement_l": 28.7,
+              "mass_kg": 500,
+              "hp_takeoff": 1000,
+              "hp_at_3000m": 930,
+              "supercharger": "two-speed",
+              "tbo_h": 400,
+              "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+            }
+          },
+          "dimensions": {
+            "span_m": 15.6,
+            "span_folded_m": 6.4,
+            "length_m": 11.8,
+            "wing_area_m2": 39,
+            "hangar_footprint_m2": 76
+          },
+          "weights": {
+            "empty_kg": 2505,
+            "normal_kg": 3930,
+            "max_kg": 4830,
+            "derivation": {
+              "comparator": "Nakajima B5N2",
+              "comparator_kg": 2279,
+              "added_kg": 226,
+              "not_carried_kg": 0,
+              "honest_kg": 2505,
+              "credit": 0,
+              "dropped_kg": 0
+            }
+          },
+          "crew": {
+            "seats": 3,
+            "normal": 3,
+            "notes": "Pilot, observer, telegraphist-air-gunner. The third crewman is the point of the design and the reason it is a biplane."
+          },
+          "performance": {
+            "speed_kmh": {
+              "at_3000m": 354,
+              "with_torpedo": 324,
+              "sea_level": 334
+            },
+            "climb_ms": 8.4,
+            "ceiling_m": 7500,
+            "approach_kmh": 111
+          },
+          "fuel": {
+            "internal_l": 1250,
+            "endurance_h": 10.7,
+            "ferry_km": 2290,
+            "combat_radius_km": 765,
+            "with_tank": {
+              "form": "2 x Mark I drop tanks, underwing",
+              "liters": 1530,
+              "endurance_h": 11.9,
+              "ferry_km": 2665,
+              "combat_radius_km": 890
+            }
+          },
+          "armament": [
+            {
+              "mount": "cowl, synchronised",
+              "count": 1,
+              "rounds": 1000,
+              "spec": {
+                "name": "Mark II 7.7 mm machine gun",
+                "caliber_mm": 7.7,
+                "round_belted_g": 28,
+                "gun_kg": 10
+              }
+            },
+            {
+              "mount": "flexible rear ring",
+              "count": 1,
+              "rounds": 1000,
+              "spec": {
+                "name": "Mark II 7.7 mm machine gun",
+                "caliber_mm": 7.7,
+                "round_belted_g": 28,
+                "gun_kg": 10
+              }
+            }
+          ],
+          "stations": [
+            {
+              "id": "centerline_crutch",
+              "form": "torpedo",
+              "rating_kg": 900,
+              "alternatives": [
+                {
+                  "component": "uk32tor",
+                  "count": 1
+                },
+                {
+                  "spec": {
+                    "name": "Mark I 227 kg bomb",
+                    "mass_kg": 227
+                  },
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "id": "underwing",
+              "form": "rack",
+              "rating_kg": 113,
+              "racks": 4,
+              "alternatives": [
+                {
+                  "component": "uk34tnk",
+                  "count": 2
+                }
+              ]
+            }
+          ],
+          "equipment": [],
+          "features": [
+            "Fowler flaps",
+            "folding wings",
+            "retracting undercarriage",
+            "arrester hook",
+            "flotation gear",
+            "long-range wireless-telegraphy set and plotting table (observer's station)",
+            "enclosed canopy, three stations",
+            "1 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,000 rounds",
+            "4 underwing racks rated 113 kg each, 2 drop tanks"
+          ],
+          "protection": [
+            "armored windscreen",
+            "4 mm observer's back plate"
+          ],
+          "kits": [],
+          "possible_upgrades": [],
+          "notes": "A MONOPLANE, because the Board that refused the Air Ministry over the Skua had learned it could, and because a torpedo at 350 km/h cannot be met with a wire between the wings. The torpedo is five years older than the airplane and the airframe was sized to the weapon. She still spots - the fall-of-shot corrections she passes into the fire-control table are the argument the Fisher school accepted first and has never withdrawn - but the 1937 exercises were the first in which the umpires scored a capital ship sunk by aircraft. Nine hours on internal tanks makes her the longest-legged airplane in the fleet and the search plan is built around her. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
+          "fittings": [
+            {
+              "name": "Wireless and plotting board",
+              "installed_kg": 55
+            }
+          ]
+        },
+        {
+          "id": "peregrine",
+          "name": "Peregrine",
+          "nation": "GBR",
+          "designation": "Peregrine",
+          "type_year": 1938,
+          "role": "fighter",
+          "cost_gold": 15,
+          "durability": 32,
+          "powerplant": {
+            "count": 1,
+            "takeoff_hp": 1030,
+            "spec": {
+              "layout": "12-cylinder liquid-cooled Vee",
+              "displacement_l": 27,
+              "mass_kg": 610,
+              "hp_takeoff": 1030,
+              "hp_at_4900m": 950,
+              "supercharger": "two-speed",
+              "tbo_h": 420,
+              "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+            }
+          },
+          "dimensions": {
+            "span_m": 11.4,
+            "span_folded_m": 5.4,
+            "length_m": 9.6,
+            "wing_area_m2": 23,
+            "hangar_footprint_m2": 52
+          },
+          "weights": {
+            "empty_kg": 2288,
+            "normal_kg": 3000,
+            "max_kg": 3200,
+            "derivation": {
+              "comparator": "Supermarine Spitfire I",
+              "comparator_kg": 2049,
+              "added_kg": 239,
+              "not_carried_kg": 0,
+              "honest_kg": 2288,
+              "credit": 0,
+              "dropped_kg": 0
+            }
+          },
+          "crew": {
+            "seats": 1,
+            "normal": 1
+          },
+          "performance": {
+            "speed_kmh": {
+              "at_4900m": 470,
+              "at_2500m": 445,
+              "sea_level": 415
+            },
+            "climb_ms": 11.8,
+            "ceiling_m": 9350,
+            "approach_kmh": 139
+          },
+          "fuel": {
+            "internal_l": 620,
+            "endurance_h": 5.8,
+            "ferry_km": 1415,
+            "combat_radius_km": 470
+          },
+          "armament": [
+            {
+              "mount": "wing, unsynchronised",
+              "count": 8,
+              "rounds": 2800,
+              "spec": {
+                "name": "Mark II 7.7 mm machine gun",
+                "caliber_mm": 7.7,
+                "round_belted_g": 28,
+                "gun_kg": 10
+              }
+            }
+          ],
+          "stations": [],
+          "equipment": [],
+          "features": [
+            "folding wings",
+            "retracting undercarriage",
+            "slotted flaps",
+            "arrester hook",
+            "enclosed sliding canopy",
+            "8 x wing 7.7 mm machine guns, 2,800 rounds",
+            "no external tanks - no rack, no crutch and no plumbing"
+          ],
+          "protection": [
+            "armored windscreen",
+            "6 mm pilot's back armor"
+          ],
+          "kits": [],
+          "possible_upgrades": [],
+          "notes": "THE FIRST BRITISH NAVAL FIGHTER THAT DOES NOT NEED AN EXCUSE, and two years late by the Admiralty's own doing. 470 km/h in 1938 beats every carrier fighter afloat - the best real one that year is an F3F biplane at 425 - and is 100 short of what the Air Ministry is putting on its own aerodromes the same spring, because a folding wing, a hook and catapult spools cost drag a land fighter does not pay. HER REAL LIMITATION IS NOT THE AIRFRAME: no fighter direction, no radar to vector from, no organization to tell her where to be, so a fleet with the best carrier fighter in the world intercepts on sight from a deck alert exactly as it did in 1918. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4)."
+        }
+      ],
+      "merchants": {
+        "hulls": 6998,
+        "grossRegisterTons": 17298432,
+        "managedHulls": 0,
+        "note": "Great United Kingdom and Ireland registration. The source separately lists 2,171 Dominion powered merchant ships; those are not added to United Kingdom's total.",
+        "groups": []
+      }
+    },
+    "campaign_1922": {
+      "classes": [
+        {
+          "spec": {
+            "id": "courageous_1922_cv",
+            "nation": "GBR",
+            "name": "Courageous carrier conversion",
+            "type": "CV",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 22500
+            },
+            "propulsion": {
+              "speed_kn": 30,
+              "range_nm": 6000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 120,
+                "count": 16
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 76,
+              "deck_mm": 19
+            },
+            "aviation": {
+              "aircraft_capacity": 48
+            },
+            "complement": 884,
+            "cost_gold": 10800,
+            "treaty_category": "aircraft_carrier",
+            "sensors": []
+          },
+          "notes": "Historical conversion option; provisional fit and timing."
+        },
+        {
+          "spec": {
+            "id": "uk_merchant_1922",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "uk_merchant_1936",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "uk_merchant_1948",
+            "nation": "GBR",
+            "name": "United Kingdom standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1922",
+            "nation": "GBR",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1922",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1936",
+            "nation": "GBR",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1936",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_depot_1950",
+            "nation": "GBR",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "uk_oiler_1950",
+            "nation": "GBR",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "gbr_early_fighter",
+          "nation": "GBR",
+          "name": "Sopwith Camel",
+          "type_year": 1921,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 30,
+          "weights": {
+            "empty_kg": 1050
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_early_strike",
+          "nation": "GBR",
+          "name": "Blackburn Dart",
+          "type_year": 1921,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_early_scout",
+          "nation": "GBR",
+          "name": "Fairey IIID",
+          "type_year": 1921,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1930_fighter",
+          "nation": "GBR",
+          "name": "GBR 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1930_strike",
+          "nation": "GBR",
+          "name": "GBR 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1930_scout",
+          "nation": "GBR",
+          "name": "GBR 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1936_fighter",
+          "nation": "GBR",
+          "name": "GBR 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1936_strike",
+          "nation": "GBR",
+          "name": "GBR 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1936_scout",
+          "nation": "GBR",
+          "name": "GBR 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1942_fighter",
+          "nation": "GBR",
+          "name": "GBR 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1942_strike",
+          "nation": "GBR",
+          "name": "GBR 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "gbr_standard_1942_scout",
+          "nation": "GBR",
+          "name": "GBR 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 8579,
+        "grossRegisterTons": 19320053,
+        "managedHulls": 0,
+        "referenceYear": 1921,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      }
+    }
+  }
+}

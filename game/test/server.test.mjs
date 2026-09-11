@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createGameServer } from '../../tools/play.mjs';
+import { newGame } from '../src/engine.mjs';
+import { exportSave } from '../src/state-io.mjs';
+import { GAME_VERSION } from '../src/version.mjs';
+const gameRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const publicDirectory=process.env.WNT_TEST_PUBLIC||path.join(gameRoot,'public');
+const content=JSON.parse(await fs.readFile(path.join(publicDirectory,'content.json'),'utf8'));
+
+test('local server serves the game, saves atomically, retains a backup and rejects bad writes',async t=>{
+  const fixtures=path.join(gameRoot,'test-output');await fs.mkdir(fixtures,{recursive:true});
+  const dir=await fs.mkdtemp(path.join(fixtures,'save-test-'));
+  const server=await createGameServer({port:0,saveDir:dir,publicDirectory});
+  await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
+  const origin=`http://127.0.0.1:${server.address().port}`;
+  t.after(async()=>{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));if(path.dirname(path.resolve(dir))!==path.resolve(fixtures)||!path.basename(dir).startsWith('save-test-'))throw new Error('Unexpected cleanup target');await fs.rm(dir,{recursive:true,force:true});});
+  for(const file of ['','app.mjs','engine.mjs','balance.mjs','state-io.mjs','style.css','content.json','command-view.mjs','command.css','world.mjs','world-land.mjs','operations.mjs','campaign-clock.mjs','upgrade.css','naval-resources.mjs','sound.mjs','projection.mjs','task-forces.mjs','land-war.mjs','ministry-view.mjs','world-political.mjs','missions.mjs','logistics.mjs','recovery.mjs','designer.mjs','designer-view.mjs','campaign-content.mjs','vanilla.mjs'])assert.equal((await fetch(origin+'/'+file)).status,200,file);
+  assert.equal((await (await fetch(origin+'/health')).json()).build,GAME_VERSION);
+  for(const file of ['simulation-worker.mjs','simulation-host.mjs','simulation-runner.mjs','simulation-client.mjs','version.mjs','merchant-economy.mjs','economy-view.mjs','war-balance.mjs','music.mjs','desktop.css'])assert.equal((await fetch(origin+'/'+file)).status,200,file);
+  for(const file of ['long-road-ahead.mp3','opportunity-walks.mp3','the-entertainer.mp3']){const audio=await fetch(origin+'/music/'+file,{method:'HEAD'});assert.equal(audio.status,200);assert.equal(audio.headers.get('content-type'),'audio/mpeg');}
+  assert.equal((await fetch(origin+'/README.md')).status,404);
+  assert.equal((await fetch(origin+'/api/save')).status,404);
+  const post=body=>fetch(origin+'/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body});
+  assert.equal((await post(exportSave(newGame(content,'JPN',1)))).status,200);
+  assert.equal((await post(exportSave(newGame(content,'USA',2)))).status,200);
+  assert.equal((await (await fetch(origin+'/api/save')).json()).player,'USA');
+  assert.equal((await (await fetch(origin+'/api/save?backup=1')).json()).player,'JPN');
+  assert.equal((await post('{bad json')).status,400);
+  assert.equal((await post(JSON.stringify({version:1,player:'JPN',day:-12419,nations:{}}))).status,400);
+  assert.equal((await (await fetch(origin+'/api/save')).json()).player,'USA');
+  assert.equal((await fetch(origin+'/api/save',{method:'POST',headers:{Origin:'https://example.invalid','Content-Type':'application/json'},body:exportSave(newGame(content))})).status,403);
+  await fs.writeFile(path.join(dir,'campaign.json'),'{interrupted');
+  assert.equal((await fetch(origin+'/api/save')).status,409);
+  assert.equal((await (await fetch(origin+'/api/save?backup=1')).json()).player,'JPN');
+  assert.equal((await post(exportSave(newGame(content,'GBR',3)))).status,200);
+  assert.equal((await (await fetch(origin+'/api/save?backup=1')).json()).player,'JPN');
+});

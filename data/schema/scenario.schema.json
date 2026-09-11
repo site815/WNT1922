@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wnt1922/scenario.schema.json",
+  "title": "Scenario",
+  "description": "A world snapshot + rules + goals. Same format serves SP campaign starts, SP battles, MP skirmish setups, MP persistent-world server seeds, and saves. A server can boot from any authored start date — nothing in this schema, or in the fleet files it draws on, hardcodes a year.",
+  "type": "object",
+  "required": [
+    "meta",
+    "clock",
+    "nations",
+    "order_of_battle"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "country_briefings": {
+      "type": "object",
+      "description": "Country-specific opening descriptions shown in campaign selection.",
+      "propertyNames": { "enum": ["GBR", "USA", "JPN", "FRA", "ITA", "DEU", "SOV"] },
+      "additionalProperties": { "type": "string", "minLength": 20 }
+    },
+    "sources": {
+      "type": "object",
+      "description": "The data files this snapshot draws on. Named explicitly so a scenario states its own dependencies instead of relying on a glob.",
+      "additionalProperties": false,
+      "properties": {
+        "fleets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "packs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Hindsight national packs loaded for this snapshot. A nation with no pack listed loads its plain historical self."
+        },
+        "equipment": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "playable": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "National playable supplements, with literal engineering estimates and campaign-specific inventories. Audited by check-playable-catalogs.mjs."
+        }
+      }
+    },
+    "divergences": {
+      "type": "object",
+      "description": "Seven naval programs are active in the playable In Good Faith campaign. Fleet composition comes from the original four packs and the three national playable supplements; assessments are outputs of simulation.",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "pack": {
+            "type": "string",
+            "description": "Pack file loaded when enabled."
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "sp_campaign",
+            "sp_battle",
+            "mp_skirmish",
+            "mp_persistent"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "clock": {
+      "type": "object",
+      "required": [
+        "start_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "tick": {
+          "type": "string",
+          "enum": [
+            "strategic_realtime",
+            "tactical_realtime",
+            "slow_tick"
+          ],
+          "description": "strategic_realtime: pausable variable compression (SP). tactical_realtime: battle clock. slow_tick: persistent server clock."
+        },
+        "europe_variation_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 365
+        }
+      }
+    },
+    "world": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "treaties_in_force": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tonnage_ledgers": {
+          "type": "object",
+          "description": "Per nation, per treaty_category: declared standard tonnage totals.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "diplomacy": {
+          "type": "object",
+          "description": "Pairwise stances keyed 'AAA-BBB' (sorted codes).",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "allied",
+              "cordial",
+              "neutral",
+              "rival",
+              "hostile",
+              "war"
+            ]
+          }
+        }
+      }
+    },
+    "nations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "nation",
+          "playable"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "nation": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "playable": {
+            "type": "boolean"
+          },
+          "ai_profile": {
+            "type": "string",
+            "enum": [
+              "historical",
+              "opportunist",
+              "aggressive",
+              "defensive",
+              "caretaker"
+            ]
+          },
+          "budget_index": {
+            "type": "number",
+            "description": "Relative naval budget, 100 = RN 1922 baseline. Superseded by national_state.construction where that block is present."
+          },
+          "divergence": {
+            "type": "string",
+            "description": "Slug of the divergence this nation is running, where one is toggled on."
+          },
+          "national_state": {
+            "$ref": "wnt1922/national-state.schema.json"
+          },
+          "objectives": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "order_of_battle": {
+      "type": "object",
+      "description": "Per nation code: named hull refs and aggregate draws from class records.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "hulls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Hull ids from the ship database."
+          },
+          "aggregates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "class_id",
+                "count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "class_id": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "assignment": {
+                  "type": "string"
+                },
+                "pennants": {
+                  "type": "string",
+                  "description": "Hull-number range, for ships the navy identifies by number and does not name."
+                },
+                "status": {
+                  "type": "string"
+                },
+                "representative": {
+                  "type": "boolean"
+                },
+                "notes": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "aircraft": {
+            "type": "array",
+            "description": "Air inventory. Aircraft are stores: they belong to the nation, are embarked by hulls, and enter no ship's displacement.",
+            "items": {
+              "type": "object",
+              "required": [
+                "aircraft_id",
+                "count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "aircraft_id": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "spares": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Knocked-down spares, 20% of embarked rounded up, stored at 40% footprint."
+                },
+                "assignment": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "date"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "title": {
+            "type": "string"
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "World-state expressions that must hold or the event is skipped."
+          },
+          "effects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Effect opcodes; interpreted by the event engine."
+          },
+          "interactive": {
+            "type": "boolean",
+            "description": "True = pauses for player decisions (e.g. treaty negotiations)."
+          }
+        }
+      }
+    },
+    "victory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checkpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "points_budget": {
+          "type": "number",
+          "description": "Skirmish mode: per-player OOB purchase budget."
+        },
+        "era_gate": {
+          "type": "integer",
+          "description": "Skirmish mode: latest design_year allowed."
+        }
+      }
+    }
+  }
+}

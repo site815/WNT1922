@@ -1,0 +1,716 @@
+{
+ "nation": "USA",
+ "navy": "United States Navy",
+ "prefix": "us",
+ "designation_system": "mark_arabic",
+ "scenario": "five-term-tillman",
+ "version": "platform v11 / equipment v13 / scenario 0.50 / road 1.6",
+ "source": "docs/hindsight/us-five-term-tillman-equipment-catalog.md",
+ "calibration": {
+  "interest": [
+   "the super-heavy gun line and its turrets",
+   "capital-hull scale, protection and machinery",
+   "the plant behind them — ways, graving docks, lock chambers, gun shops, armor mills"
+  ],
+  "supporting": [
+   "Main-battery fire control: the rangekeeper and plot, aircraft spot correction, and the radar program the guns paid for — all of it exists to lay a battery that outranges its own eyes. ⚠ AND ITS OPTICS ARE DELIBERATELY MODEST: [us27dir] carried a 16 m turret rangefinder and an 8 m director top. NO 16 METER RANGEFINDER WAS EVER BUILT FOR ANY WARSHIP — the ceiling anywhere is Yamato's 15 m of 1941 — and both figures are now HMS Nelson's, 12.5 m in the turret roofs and 4.6 m in the directors, in Nelson's own year of 1927. The doctrine of firing beyond the horizon is the architecture claim; the glass is par.",
+   "The dual-purpose director. ⚠ NOT PAR: [us34dir] is exact par with the Mark 33 of 1934, but [us36dir] is +3 on the Mark 37 of 1939, which is a supporting figure and not a par one. Its weight is 16 tons, the real Mark 37's destroyer installation, because a director with the Mark 37's optics at half the Mark 37's weight is a performance claim wearing a date."
+  ],
+  "par": [
+   "The five-inch family. ⚠ The most closely par line in the project: the 5-inch/25 of 1925 against a real Mark 10 of 1926 (24.49 kg, 657 m/s, 13.26 km, 8,352 m ceiling); the 5-inch/38 of 1934 against a real Mark 12 of 1934 in USS Farragut (25.0 kg, 792 m/s, 16.64 km, 11,339 m); and the 5-inch/54 of 1945 against a real Mark 16 of 1945 in USS Midway — at 16.6 km where the real gun reached 23.7, so the catalog is UNDER-credited.",
+   "the heavy cruiser · the destroyer · the fleet submarine",
+   "light automatic anti-aircraft weapons. ⚠ The 1.1-inch quad of 1936 against a real Mark 1 of 1937 at 150 rpm on 8-round clips, and the license-built 40 mm quad of 1941 against a real US Bofors of 1942 — 160 rpm is the real gun's gravity-assisted maximum, not an invention.",
+   "aero engines. ⚠ The utility engine's DISPLACEMENT is 30 L and not 22, because 575 hp from 22 L in 1929 is 26 hp/L when the R-1340 Wasp of that year made 450 hp from the same 22 liters. The horsepower did not move and no printed aircraft figure moved with it.",
+   "the steam torpedo. ⚠ EXACT ON EVERY FIGURE, AND ON THE ONE THING THAT IS NOT A FIGURE: the real Mark 14 of 1931 ran 46 kt to 4,100 m and 31.5 kt to 8,200 m on a dual-mode exploder, and it was NEVER PROOF-FIRED WITH A LIVE WARHEAD — Admiral Pratt offered the hulk of USS Ericsson and forbade a live head, and the Mark 6 exploder's entire test history is two shots on 8 May 1926, the first of which failed to detonate. The electric torpedo runs 3,700 m, against a real Mark 18 that ran 29 kt to 3,650 m from September 1943.",
+   "the standard-type modernization package · the five-inch shell and its proximity-ready cavity, the fuze itself arriving in 1943 against a real VT fuze that went into combat on 5 January 1943"
+  ],
+  "cold": [
+   "naval aviation entire: airframes, carrier practice, the pilot pipeline, and the deck the pipeline runs through",
+   "anti-submarine warfare: one sonar set issued as budgets allow, one depth charge, no thrower"
+  ],
+  "notes": "The United States bought one thing with its divergence and paid for it everywhere else, so the distribution is unusually extreme — which is the scenario. Calibers above 16 in have no historical equivalent at any date; they are plant architecture under §8's premise clause, not a performance claim, and every ballistic figure attached to them is period-honest. ⚠ Nothing above the Japanese 46 cm Type 94 was ever mounted afloat, and the American 18-inch/48 Mark 1 was NEVER COMPLETED AND NEVER FIRED — it was half-built when the Washington Treaty banned it and was relined down to 16 inches. So the ladder is architecture exactly as declared. Every generation in this file is checked against the best real-world article at any date in the window."
+ },
+ "lines": [
+  {
+   "id": "us_super_heavy_gun",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "gun",
+   "name": "Super-heavy gun line",
+   "band": "interest",
+   "designation": "Mark 1",
+   "founding_year": 1925,
+   "catalog_ref": "3.1",
+   "interface": "barbette_ring",
+   "common": {
+    "mount": "triple, individually sleeved guns",
+    "elevation_deg": 45,
+    "max_range_km": 40,
+    "handling": "shellroom-to-gun power",
+    "charges": "six-bag",
+    "note": "One gun plant, retooled upward TWICE in nine years rather than rebuilt for each step. The 16 in that arms the founding rung is the 1918 pattern, sits OUTSIDE this Mark sequence and appears on the sheets that mount it as a literal spec. Every generation elevates to the same angle and is drawn to a common maximum range, so a turret crew and a plotting room move up the ladder without relearning the drill. Rate of fire falls as the bore climbs and nobody in the Bureau of Ordnance regards that as a defect. THE MOUNTING NEVER CHANGES SHAPE ON THE WAY UP: three guns to a group at every bore, because a plant that scales one architecture does not pay twice for a second."
+   },
+   "generations": [
+    {
+     "code": "us25gun",
+     "year": 1925,
+     "designation": "Mark 1",
+     "spec": {
+      "bore_in": 18,
+      "bore_mm": 457,
+      "length_cal": 48,
+      "shell_kg": 1315,
+      "shell": "armor-piercing",
+      "muzzle_ms": 823,
+      "rpm_per_gun": 1.5,
+      "turret_t": 2500,
+      "mount": "triple"
+     },
+     "notes": "The real 18\"/48 Mark 1 at its own decade's figures: designed 1920, to Dahlgren July 1927, converted to 16\"/56 before it ever fired as an eighteen. Exact par."
+    },
+    {
+     "code": "us29gun",
+     "year": 1929,
+     "designation": "Mark 2",
+     "spec": {
+      "bore_in": 21.5,
+      "bore_mm": 546,
+      "length_cal": 45,
+      "shell_kg": 2300,
+      "shell": "armor-piercing",
+      "muzzle_ms": 800,
+      "rpm_per_gun": 1.2,
+      "turret_t": 4400,
+      "mount": "triple"
+     },
+     "notes": "The 21.5-inch. No historical equivalent at any date, so plant architecture under conventions section 8's premise clause; shell weight is the cube-law scaling of the real 18 in (1,315 kg) and the real 16 in (952 kg). The caliber came down from a proved 24-inch so the battery could go up: above 22 inches a triple's ring, hoists and flash arrangements outgrow any beam the locks will ever pass."
+    }
+   ]
+  },
+  {
+   "id": "us_secondary_5in",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "sec",
+   "name": "Secondary battery line",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1925,
+   "catalog_ref": "3.2",
+   "interface": "secondary_base_ring",
+   "common": {
+    "caliber_mm": 127,
+    "ammunition": "semi-fixed",
+    "commonality": "shellrooms, hoists and fuze well common across all mounts",
+    "note": "Rearming up the line is the one cheap refit an American hull has — everything else it might want was never provisioned for."
+   },
+   "generations": [
+    {
+     "code": "us25sec",
+     "year": 1925,
+     "designation": "Mark 1",
+     "spec": {
+      "length_cal": 25,
+      "mounting": "high-angle single, open",
+      "shell_kg": 24.4,
+      "muzzle_ms": 657,
+      "range_km": 13.3,
+      "ceiling_m": 8400,
+      "rpm_per_gun": 14,
+      "mass_t": 20
+     }
+    },
+    {
+     "code": "us34sec",
+     "year": 1934,
+     "designation": "Mark 2",
+     "spec": {
+      "length_cal": 38,
+      "mounting": "dual-purpose, single or twin base-ring",
+      "shell_kg": 25,
+      "muzzle_ms": 790,
+      "range_km": 15.9,
+      "ceiling_m": 11400,
+      "rpm_per_gun": 18,
+      "mass_t_single": 29,
+      "mass_t_twin": 43
+     }
+    },
+    {
+     "code": "us45sec",
+     "year": 1945,
+     "designation": "Mark 3",
+     "spec": {
+      "length_cal": 54,
+      "mounting": "dual-purpose single, enclosed base-ring",
+      "shell_kg": 31.8,
+      "muzzle_ms": 808,
+      "range_km": 16.6,
+      "ceiling_m": 13700,
+      "rpm_per_gun": 16,
+      "mass_t": 45
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_quad_aa_cannon",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "can",
+   "name": "Quad anti-aircraft cannon",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1936,
+   "catalog_ref": "3.3",
+   "interface": "cannon_position",
+   "common": {
+    "mount": "quad",
+    "cooling": "water-cooled barrels",
+    "feed": "clip-fed by hand",
+    "natures": 1,
+    "projectile": "high-explosive tracer",
+    "note": "Its endurance in action is a property of its loaders rather than of a magazine. It arrived as a fitting rather than as a provision, which is why every ship that carries it paid structural prices for it."
+   },
+   "generations": [
+    {
+     "code": "us36can",
+     "year": 1936,
+     "designation": "Mark 1",
+     "spec": {
+      "round": "28 x 199 mm",
+      "shell_kg": 0.42,
+      "rpm_per_barrel": 150,
+      "clip": 8,
+      "mount_t": 6.4
+     }
+    },
+    {
+     "code": "us41can",
+     "year": 1941,
+     "designation": "Mark 2",
+     "spec": {
+      "round": "40 x 311 mm, license-built",
+      "shell_kg": 0.9,
+      "rpm_per_barrel": 160,
+      "clip": 4,
+      "train": "power-trained, director-capable",
+      "mount_t": 11
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_quad_torpedo_mount",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "lau",
+   "name": "Quad torpedo mount",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1934,
+   "catalog_ref": "3.4",
+   "interface": "torpedo_mount_seat",
+   "common": {
+    "note": "No reload stowage was drawn into the mount, and none has been fitted to any ship that carries it: what is in the tubes is what the attack is worth. It is a fitting on ships that carry no provisions, so it serves where it was built in and nowhere else."
+   },
+   "generations": [
+    {
+     "code": "us34lau",
+     "year": 1934,
+     "designation": "Mark 1",
+     "spec": {
+      "mount": "quad",
+      "mass_t": 18,
+      "train": "powered, 360 deg on centerline mountings",
+      "firing": "on gyro angle from the director",
+      "reloads": 0
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_main_battery_director",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "dir",
+   "name": "Main-battery director",
+   "band": "supporting",
+   "designation": "Mark 1",
+   "founding_year": 1927,
+   "catalog_ref": "4.1",
+   "interface": "director_tower",
+   "common": {
+    "note": "The director is the escalation fleet's actual weapon; the guns are its output. Fire beyond the horizon is the doctrine's declared working condition. Its glass is a naval monopoly — two naval optical shops that supply nothing else, so an instrument is repaired from a crate rather than returned to its maker."
+   },
+   "generations": [
+    {
+     "code": "us27dir",
+     "year": 1927,
+     "designation": "Mark 1",
+     "spec": {
+      "computer": "rangekeeper (plotting room)",
+      "stable_element": "vertical",
+      "director_top_rangefinder_m": 4.6,
+      "turret_rangefinder_max_m": 12.5,
+      "head_t": 9,
+      "aircraft_spot_correction": "input at the plot"
+     }
+    },
+    {
+     "code": "us40dir",
+     "year": 1940,
+     "designation": "Mark 2",
+     "spec": {
+      "radar_feed": "range and bearing from us39rad into the plot",
+      "remote_power_control": "turret train"
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_dp_director",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "dir",
+   "name": "Dual-purpose director",
+   "band": "supporting",
+   "designation": "Mark 3",
+   "founding_year": 1934,
+   "catalog_ref": "4.2",
+   "interface": "dp_director_seat",
+   "common": {
+    "note": "The fleet's only tachymetric air solution, and the reason the dual-purpose battery is more than a gun that elevates."
+   },
+   "generations": [
+    {
+     "code": "us34dir",
+     "year": 1934,
+     "designation": "Mark 3",
+     "spec": {
+      "computer": "tachymetric dual-purpose, in the director head (topside)",
+      "rangefinder_m": 3.5,
+      "mass_t": 5
+     }
+    },
+    {
+     "code": "us36dir",
+     "year": 1936,
+     "designation": "Mark 4",
+     "spec": {
+      "computer": "below decks",
+      "stable_element": true,
+      "rangefinder_m": 4.5,
+      "mass_t": 16
+     }
+    },
+    {
+     "code": "us44dir",
+     "year": 1944,
+     "designation": "Mark 5",
+     "spec": {
+      "radar_ranging": "blind-fire integration with us43rad",
+      "proximity": "engagement with us43shl"
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_ship_radar",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "rad",
+   "name": "Ship radar",
+   "band": "supporting",
+   "designation": "Mark 1",
+   "founding_year": 1939,
+   "catalog_ref": "4.3",
+   "interface": "radar_search_position",
+   "common": {
+    "note": "Built for ranging accuracy before search coverage, because its customer's problem was laying a gun rather than finding a formation. Fitting it is STRUCTURAL WORK on every hull afloat, because no American ship carries a mast, a wiring run or a power margin drawn for a set that did not yet exist."
+   },
+   "generations": [
+    {
+     "code": "us39rad",
+     "year": 1939,
+     "designation": "Mark 1",
+     "spec": {
+      "air_search_km": 110,
+      "air_search_note": "formations",
+      "surface_km": 25,
+      "capital_ranging_km": 30
+     }
+    },
+    {
+     "code": "us43rad",
+     "year": 1943,
+     "designation": "Mark 2",
+     "spec": {
+      "band": "centimetric",
+      "blind_fire_ranging_m": 35,
+      "fall_of_shot_spotting_km": 40,
+      "display": "plan position indicator"
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_sonar",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "snr",
+   "name": "Sonar",
+   "band": "cold",
+   "designation": "Mark 1",
+   "founding_year": 1934,
+   "catalog_ref": "4.4",
+   "interface": "sonar_dome",
+   "common": {
+    "note": "Issued as budgets allowed rather than as hulls needed. Range is short and conditions rule it, so the school's tables matter more than the transducer does."
+   },
+   "generations": [
+    {
+     "code": "us34snr",
+     "year": 1934,
+     "designation": "Mark 1",
+     "spec": {
+      "active_khz": 24,
+      "reliable_m": 1400,
+      "good_conditions_m": 2700,
+      "recorder": "chemical range recorder"
+     }
+    },
+    {
+     "code": "us42snr",
+     "year": 1942,
+     "designation": "Mark 2",
+     "spec": {
+      "recorder": "maintained-contact",
+      "output": "stern-rack pattern fire control"
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_utility_aero_engine",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "aeg",
+   "name": "Utility aero engine",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1929,
+   "catalog_ref": "4.5",
+   "interface": "aero_engine_mount_light",
+   "common": {
+    "note": "Developed for the civil market and adopted because it was the engine the industry was already building. Spares are a civil stores item, and the artificer schools teach it because everybody teaches it."
+   },
+   "generations": [
+    {
+     "code": "us29aeg",
+     "year": 1929,
+     "designation": "Mark 1",
+     "spec": {
+      "layout": "9-cyl radial",
+      "displacement_l": 30,
+      "mass_kg": 450,
+      "hp_takeoff": 575,
+      "hp_at_1500m": 500,
+      "supercharger": "none",
+      "tbo_h": 400
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_combat_aero_engine",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "aeg",
+   "name": "Combat aero engine",
+   "band": "par",
+   "designation": "Mark 2",
+   "founding_year": 1933,
+   "catalog_ref": "4.6",
+   "interface": "aero_engine_mount_combat",
+   "common": {
+    "note": "Its successor generation came off the commercial transport line rather than out of a naval program, which is the whole of the fleet's aero-engine industrial policy."
+   },
+   "generations": [
+    {
+     "code": "us33aeg",
+     "year": 1933,
+     "designation": "Mark 2",
+     "spec": {
+      "layout": "14-cyl two-row radial",
+      "displacement_l": 25,
+      "mass_kg": 470,
+      "hp_takeoff": 700,
+      "hp_at_2900m": 610,
+      "supercharger": "single-speed",
+      "tbo_h": 300
+     }
+    },
+    {
+     "code": "us38aeg",
+     "year": 1938,
+     "designation": "Mark 3",
+     "spec": {
+      "layout": "two-row from the commercial transport line",
+      "displacement_l": 30,
+      "mass_kg": 650,
+      "hp_takeoff": 1200,
+      "hp_at_4400m": 1000,
+      "supercharger": "two-speed",
+      "mounts": "same",
+      "tbo_h": 500
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_aircraft_catapult",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "cat",
+   "name": "Aircraft catapult and crane",
+   "band": "supporting",
+   "designation": "Mark 1",
+   "founding_year": 1923,
+   "catalog_ref": "4.8",
+   "interface": "aviation_fitting",
+   "common": {
+    "type": "powder-charge track catapult on a training turntable",
+    "crane": "quarterdeck recovery crane",
+    "worked_by": "gunnery department"
+   },
+   "generations": [
+    {
+     "code": "us23cat",
+     "year": 1923,
+     "designation": "Mark 1",
+     "spec": {
+      "launch_t": 2.8,
+      "end_speed_kmh": 100,
+      "track_m": 18,
+      "cycle_s": 40,
+      "crane_t": 2.8,
+      "crane_outreach_m": 11,
+      "catapult_kg": 21000
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_float_wheel_set",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "flt",
+   "name": "Float and wheel exchange set",
+   "band": "cold",
+   "designation": "Mark 1",
+   "founding_year": 1936,
+   "catalog_ref": "5.2",
+   "interface": "float_hardpoints_light",
+   "common": {
+    "note": "Both undercarriages are ordered, stored and accounted as one set, so a squadron holds a single stores line rather than two. Floats are the operational fit and carry the penalty the printed figures already include; the wheel fit gives that penalty back."
+   },
+   "generations": [
+    {
+     "code": "us36flt",
+     "year": 1936,
+     "designation": "Mark 1",
+     "spec": {
+      "exchange": "yard, tender or beach evolution",
+      "exchange_days": 3,
+      "float_penalty_kg": 260,
+      "on_wheels": {
+       "speed_kmh": 25,
+       "climb_ms": 1.0,
+       "radius_pct": 10
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_steam_torpedo",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "tor",
+   "name": "Steam torpedo",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1931,
+   "catalog_ref": "6.1",
+   "interface": "torpedo_tube_or_recess",
+   "common": {
+    "diameter_cm": 53,
+    "length_m": 6.3,
+    "mass_kg": 1570,
+    "warhead_kg": 300,
+    "drive": "steam wet-heater",
+    "exploder": "dual mode: magnetic influence + contact",
+    "depth": "set at the tube",
+    "proof_firings": "none conducted at full charge",
+    "note": "The influence exploder is the weapon's whole claim: fired under a keel, it is meant to do what no contact hit can. The fleet's torpedo doctrine is written on the assumption that it works."
+   },
+   "generations": [
+    {
+     "code": "us31tor",
+     "year": 1931,
+     "designation": "Mark 1",
+     "spec": {
+      "fast_kt": 46,
+      "fast_m": 4100,
+      "slow_kt": 31.5,
+      "slow_m": 8200
+     }
+    },
+    {
+     "code": "us42tor",
+     "year": 1942,
+     "designation": "Mark 2",
+     "spec": {
+      "exploder": "revised",
+      "depth_keeping": "revised"
+     }
+    },
+    {
+     "code": "us44tor",
+     "year": 1944,
+     "designation": "Mark 3",
+     "spec": {
+      "body": "electric, wakeless",
+      "setting_kt": 29,
+      "setting_m": 3700
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_depth_charge",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "dpc",
+   "name": "Depth charge",
+   "band": "cold",
+   "designation": "Mark 1",
+   "founding_year": 1924,
+   "catalog_ref": "6.2",
+   "interface": "depth_charge_rail",
+   "common": {
+    "note": "Rolled from stern racks in a pattern set by the ship's speed and the fuze settings, with no thrower and no ahead-thrown alternative in service. Its effect depends on how well the ship knows where the submarine is, which is the harder half of the problem."
+   },
+   "generations": [
+    {
+     "code": "us24dpc",
+     "year": 1924,
+     "designation": "Mark 1",
+     "spec": {
+      "drum_kg": 140,
+      "burster_kg": 80,
+      "fuze": "hydrostatic",
+      "setting_m": [
+       30,
+       90
+      ],
+      "throwers": 0
+     }
+    },
+    {
+     "code": "us39dpc",
+     "year": 1939,
+     "designation": "Mark 2",
+     "spec": {
+      "drum_kg": 260,
+      "burster_kg": 150,
+      "setting_m": 150
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_5in_shell",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "shl",
+   "name": "Five-inch shell",
+   "band": "par",
+   "designation": "Mark 1",
+   "founding_year": 1925,
+   "catalog_ref": "6.3",
+   "interface": "magazine_5in",
+   "common": {
+    "caliber_mm": 127,
+    "ammunition": "semi-fixed",
+    "natures": [
+     "common",
+     "anti-aircraft",
+     "illuminating"
+    ],
+    "fuze_well": "universal, with a proximity-ready cavity",
+    "note": "The projectile is drawn to the BORE rather than to the mount, so each generation of gun takes its own weight of shell down a common hoist. The proximity fuze arrives as pure gain, with no change to the round, the well, the setter or the hoists."
+   },
+   "generations": [
+    {
+     "code": "us25shl",
+     "year": 1925,
+     "designation": "Mark 1",
+     "spec": {
+      "fuze": "mechanical time",
+      "settings": [
+       "point-detonating",
+       "non-delay"
+      ],
+      "setter": "at the mount"
+     }
+    },
+    {
+     "code": "us43shl",
+     "year": 1943,
+     "designation": "Mark 2",
+     "spec": {
+      "fuze": "proximity (variable-time), in the same cavity",
+      "ballistics": "unchanged"
+     }
+    }
+   ]
+  },
+  {
+   "id": "us_drop_tank",
+   "nation": "USA",
+   "prefix": "us",
+   "family": "tnk",
+   "name": "Drop tank",
+   "band": "cold",
+   "designation": "Mark 1",
+   "founding_year": 1937,
+   "catalog_ref": "6.4",
+   "interface": "ordnance_station",
+   "common": {
+    "liters": 280,
+    "dry_kg": 25,
+    "construction": "pressed steel",
+    "expendable": true,
+    "retained_for_landing": false,
+    "fits": "the 227 kg centerline displacement crutch, displacing the bomb",
+    "carried_by": "scout-bomber only",
+    "note": "The requirement came from the GUNNERY BRANCH and not from aviation - the fifth-generation battery outranges its own rangefinder and the plot needs an observer who can stay up. The fighter has wing racks rated 45 kg and NO CENTERLINE POINT AT ALL, because nobody in the requirement chain ever asked what a fighter's radius was for."
+   },
+   "generations": [
+    {
+     "code": "us37tnk",
+     "year": 1937,
+     "designation": "Mark 1",
+     "spec": {
+      "liters": 280,
+      "dry_kg": 25,
+      "expendable": true,
+      "retained_for_landing": false
+     }
+    }
+   ]
+  }
+ ]
+}

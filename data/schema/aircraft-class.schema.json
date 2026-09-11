@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wnt1922/aircraft-class.schema.json",
+  "title": "AircraftClass",
+  "description": "One aircraft type. Aircraft are INVENTORY, never part of a ship's designation (conventions 1.2), and enter no ship displacement figure. Embarked capacity is derived: hangar area / hangar_footprint_m2, rounded down (conventions 3).",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "nation",
+    "type_year",
+    "role",
+    "powerplant",
+    "dimensions",
+    "weights"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "nation": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "designation": {
+      "type": "string",
+      "description": "The navy's own designation, e.g. 'Type 38' (JPN) or 'F1' (USA bureau designation: mission letters + sequence)."
+    },
+    "type_year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 1960
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "universal_multirole",
+        "light_multirole",
+        "fighter",
+        "torpedo_bomber",
+        "dive_bomber",
+        "scout",
+        "trainer",
+        "patrol",
+        "transport"
+      ],
+      "description": "universal_multirole is a doctrinal claim, not a convenience: every mission is a loadout state of one airframe."
+    },
+    "cost_gold": {
+      "type": "number"
+    },
+    "durability": {
+      "type": "number"
+    },
+    "powerplant": {
+      "type": "object",
+      "description": "EITHER a `component` (an engine SKU, for a navy whose engines are swappable articles) OR a literal `spec` (for a navy where the airplane's engine is a property of the airplane and has no catalog line of its own). Exactly one; tools/validate.py enforces it.",
+      "additionalProperties": false,
+      "properties": {
+        "component": {
+          "type": "string",
+          "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$",
+          "description": "Engine or turbojet SKU. One engine per aircraft type is doctrine in some navies; the data does not enforce it."
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Literal engine, for an aircraft whose powerplant is not a catalog SKU. Britain's aero engines are of this kind: the Fleet Air Arm buys airplanes, not engines, so no equipment line exists to point at."
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "takeoff_hp": {
+          "type": "number"
+        },
+        "takeoff_kgf": {
+          "type": "number"
+        },
+        "refit_groups": {
+          "type": "array",
+          "description": "Later powerplant generations available in the same mounting. The Powerplant row carries these inline exactly as a ship's Machinery row does — which is why engine codes never appear in possible_upgrades.",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+          }
+        }
+      }
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "span_m",
+        "length_m",
+        "hangar_footprint_m2"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "span_m": {
+          "type": "number"
+        },
+        "span_folded_m": {
+          "type": "number"
+        },
+        "length_m": {
+          "type": "number"
+        },
+        "wing_area_m2": {
+          "type": "number"
+        },
+        "sweep_deg": {
+          "type": "number"
+        },
+        "hangar_footprint_m2": {
+          "type": "number",
+          "description": "Folded and packed. The divisor in the air-capacity rule."
+        }
+      }
+    },
+    "weights": {
+      "type": "object",
+      "required": [
+        "empty_kg",
+        "normal_kg"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "empty_kg": {
+          "type": "number"
+        },
+        "normal_kg": {
+          "type": "number"
+        },
+        "max_kg": {
+          "type": "number"
+        },
+        "max_alt_gear_kg": {
+          "type": "number",
+          "description": "Max take-off weight in the alternate undercarriage state the Kits row names -- afloat for a wheeled type carrying a float kit, on wheels for a floatplane carrying a wheel exchange set. Present only on types that have such a kit."
+        },
+        "derivation": {
+          "type": "object",
+          "description": "How empty_kg was BUILT. ONE comparator -- the lightest real airplane of the class -- plus and minus the equipment that is SUBSTANTIALLY different, then a 5 percent modern-technique credit. ⚠ TWO THINGS TO KNOW BEFORE TRUSTING THE NUMBER. (1) 'Substantially different' is NOT a neutral filter: the small items that get dropped are almost all things ours carries and the comparator does not -- beacon sets, catapult spools, extra tankage, span, high-lift devices -- so dropping them always makes ours LIGHTER, by 0.4 to 5.3 percent depending on the airplane. dropped_kg records how much, and it runs the same direction as the credit. (2) The credit is the HYDROFORMED PANEL LINE and nothing else: lighter engines are already counted as explicit line items, so they must not be used to justify the credit as well. Flush riveting and gap sealing are a DRAG credit, banked in the drag polar.",
+          "additionalProperties": false,
+          "required": [
+            "comparator",
+            "comparator_kg",
+            "added_kg",
+            "not_carried_kg",
+            "honest_kg",
+            "credit"
+          ],
+          "properties": {
+            "comparator": {
+              "type": "string",
+              "description": "the lightest real airplane of the class"
+            },
+            "comparator_kg": {
+              "type": "number",
+              "description": "its real published empty weight, never adjusted"
+            },
+            "added_kg": {
+              "type": "number",
+              "description": "substantially different equipment ours carries and it does not — navalization included where it is land-based"
+            },
+            "not_carried_kg": {
+              "type": "number",
+              "description": "substantially different equipment it carries and ours does not"
+            },
+            "honest_kg": {
+              "type": "number",
+              "description": "comparator_kg + added_kg - not_carried_kg"
+            },
+            "dropped_kg": {
+              "type": "number",
+              "description": "items judged not substantial and left out. ⚠ Record it: it is nearly all on the + side, so it is a systematic lightening, not rounding."
+            },
+            "credit": {
+              "type": "number",
+              "description": "modern technique — the hydroformed panel line — as a fraction of honest_kg"
+            }
+          }
+        }
+      }
+    },
+    "crew": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "seats": {
+          "type": "integer"
+        },
+        "normal": {
+          "type": "integer",
+          "description": "Crew actually flown; may be fewer than seats."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "speed_kmh": {
+          "type": "object",
+          "description": "Keyed by condition, e.g. clean_at_6000m, with_torpedo, sea_level. A deception configuration gets its own keys.",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "mach_limit": {
+          "type": "number"
+        },
+        "climb_ms": {
+          "type": "number"
+        },
+        "ceiling_m": {
+          "type": "number"
+        },
+        "approach_kmh": {
+          "type": "number"
+        }
+      }
+    },
+    "fuel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "internal_l": {
+          "type": "number"
+        },
+        "wet_wing": {
+          "type": "boolean"
+        },
+        "endurance_h": {
+          "type": "number"
+        },
+        "ferry_km": {
+          "type": "number"
+        },
+        "combat_radius_km": {
+          "type": "number",
+          "description": "Must equal ferry_km / 3 (conventions 4). tools/validate.py checks this."
+        },
+        "with_tank": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tank": {
+              "type": "string",
+              "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+            },
+            "form": {
+              "type": "string"
+            },
+            "liters": {
+              "type": "number"
+            },
+            "endurance_h": {
+              "type": "number"
+            },
+            "ferry_km": {
+              "type": "number"
+            },
+            "combat_radius_km": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "armament": {
+      "type": "array",
+      "description": "EXACTLY ONE of `component` (a SKU) or `spec` (a literal), the shape `powerplant` uses. A weapon under 20 mm earns no SKU, so it is stated here with its own mass and round mass and stays checkable.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "component": {
+            "type": "string",
+            "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+          },
+          "spec": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "caliber_mm": {
+                "type": "number"
+              },
+              "round_belted_g": {
+                "type": "number"
+              },
+              "gun_kg": {
+                "type": "number"
+              }
+            }
+          },
+          "mount": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "rounds": {
+            "type": "integer"
+          },
+          "optional": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "stations": {
+      "type": "array",
+      "description": "Ordnance stations. `alternatives` is the whole loadout question: one station, many mutually exclusive stores, chosen at spotting rather than in the design office.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "form"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "form": {
+            "type": "string",
+            "description": "The store form the station is cut for, e.g. 'torpedo' or '650_bomb'. Fit is by SHAPE, not by aircraft type — which is why a later airframe inherits the tanks for free."
+          },
+          "rating_kg": {
+            "type": "number",
+            "description": "Load limit PER RACK. A store must fit one rack, and the whole loadout must fit `racks` x this."
+          },
+          "racks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "How many separate racks the station is. Absent means a single point, where the per-rack and whole-station readings coincide."
+          },
+          "conformal": {
+            "type": "boolean"
+          },
+          "alternatives": {
+            "type": "array",
+            "description": "EXACTLY ONE of `component` or `spec` per alternative. A bomb under 300 kg earns no SKU and is stated as a literal with its mass, so the station-load check still reaches it.",
+            "items": {
+              "type": "object",
+              "required": [
+                "count"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "component": {
+                  "type": "string",
+                  "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+                },
+                "spec": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "mass_kg"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "kit": {
+                  "type": "string",
+                  "description": "Air kit needed to carry it, where the catalog names one."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "description": "Fitted component SKUs (radar cells, beacon gear).",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+      }
+    },
+    "fittings": {
+      "type": "array",
+      "description": "Fitted items too minor for a SKU -- a radio set, a plotting board. Stated with the installed mass the removed entry carried, so the specification survives the removal.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "installed_kg": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "High-lift devices, speed brakes, canopy, ejection seat, pressurisation. CLmax follows the named high-lift device (conventions 8)."
+    },
+    "protection": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "kits": {
+      "type": "array",
+      "description": "Kit hardpoints and plumbing the airframe carries. Kits are FITTINGS, not upgrades: a kit code never appears in possible_upgrades.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+      }
+    },
+    "deception": {
+      "type": "object",
+      "description": "A configuration flown to be seen wrongly. Modeled because it changes measured performance and the observer's classification, and because struck-once is irreversible state.",
+      "additionalProperties": false,
+      "properties": {
+        "rig": {
+          "type": "string"
+        },
+        "mass_penalty_kg": {
+          "type": "number"
+        },
+        "struck_once": {
+          "type": "boolean",
+          "description": "true = removing the rig is permanent and fleet-wide-visible."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "possible_upgrades": {
+      "type": "array",
+      "description": "Later generations of every family this sheet's own rows name, ordnance carried as stores included. Engine codes NEVER appear here (powerplant.refit_groups carries them); kit codes never appear here either.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}[0-9]{0,2}[a-z]{3}$"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

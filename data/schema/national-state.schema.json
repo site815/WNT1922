@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wnt1922/national-state.schema.json",
+  "title": "NationalState",
+  "description": "Everything about a nation that is not a ship. The snapshot carries all of it, which is why the scenario format is also the save format. This block is the answer to the project's largest standing schema gap: before it existed, a nation's whole industrial position was one scalar called budget_index.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "budget_index": {
+      "type": "number",
+      "description": "Relative naval budget, 100 = RN 1922 baseline. Kept for continuity with the 1922 seed; the blocks below are what actually constrain a build."
+    },
+    "construction": {
+      "type": "object",
+      "description": "The build envelope and where the nation sits on its own learning curve. A curve position is per design LINE, not per nation: a yard that has built thirty identical cruisers is not the same yard for a carrier.",
+      "additionalProperties": false,
+      "properties": {
+        "envelope_t_equiv_yr": {
+          "description": "A NUMBER where the envelope is flat, AN OBJECT OF year -> t-equiv WHERE IT IS A RAMP. Japan's and Britain's are flat; Germany's goes from 5,600 a year to 104,000 in eight years and forcing it into a scalar would hide the only interesting thing about it.",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "patternProperties": {
+                "^(19|20)[0-9]{2}$": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "premium": {
+          "type": "number",
+          "description": "Cost per ton relative to history. 1.00 = no dividend realized yet."
+        },
+        "learning_curve": {
+          "type": "number",
+          "description": "Unit-cost multiplier per doubling of cumulative output, e.g. 0.80."
+        },
+        "curve_positions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "line",
+              "units_built"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "line": {
+                "type": "string",
+                "description": "Design line, e.g. 'CL' or a class id."
+              },
+              "units_built": {
+                "type": "integer"
+              },
+              "opened": {
+                "type": "integer",
+                "description": "Year the line opened. A line cannot be ahead of its own opening."
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "block_capable_yards": {
+          "type": "integer",
+          "description": "Yards able to build in prefabricated blocks — the constraint on how fast a conversion kit can be applied."
+        },
+        "slips": {
+          "type": "integer"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "fuel": {
+      "type": "object",
+      "description": "The shared constraint all four divergences lean on and none of them modeled before. Britain runs a war reserve in months; Japan is fed entirely on imported inputs; Germany's whole thesis is attacking somebody else's imports; only America is self-supplied. A fuel model with no hotel-load term does not work at both ends of the fleet (an Iowa returns 1,092 g/shp-h at 12 kt against a destroyer's ~730), so consumption is authored per class rather than solved from one constant.",
+      "additionalProperties": false,
+      "properties": {
+        "self_supplied": {
+          "type": "boolean"
+        },
+        "domestic_share": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "war_reserve_months": {
+          "type": "number"
+        },
+        "reserve_tons": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Keyed by stream: diesel, oil, avgas, coal."
+        },
+        "import_routes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "share": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "interdictable": {
+                "type": "boolean",
+                "description": "Whether an opponent's commerce war can reach it. This flag is where the German thesis becomes arithmetic."
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "streams": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Distinct fuel streams the navy must supply. A fleet that runs one distillate for ships, aircraft and jets has a materially shorter logistics tail than one running four."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "manpower": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rating",
+              "count"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "rating": {
+                "type": "string",
+                "description": "Rating class: seaman, artificer, aircrew, sonar, radar, torpedo."
+              },
+              "count": {
+                "type": "integer"
+              },
+              "training_months": {
+                "type": "number"
+              },
+              "annual_intake": {
+                "type": "integer"
+              },
+              "notes": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "schools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A navy with one school per system rather than one per hull type is buying transferability, and the pool sizes should show it."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "stockpiles": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Keyed by item: torpedoes, shells, mines, depth charges, airframes, engines. Depth rather than variety is a strategy, and it is legible here."
+    },
+    "throughput": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Annual production rates by item — the pipeline behind the stockpile."
+    },
+    "infrastructure": {
+      "type": "array",
+      "description": "Docks, locks and anchorages with their real limits. A lock's usable beam has ended more design programs than any admiral.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "drydock",
+              "graving_dock",
+              "lock",
+              "slip",
+              "anchorage",
+              "yard",
+              "tank_farm",
+              "beacon"
+            ]
+          },
+          "length_m": {
+            "type": "number"
+          },
+          "usable_beam_m": {
+            "type": "number"
+          },
+          "depth_m": {
+            "type": "number"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "location": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "politics": {
+      "type": "object",
+      "description": "Faction state. Some nations have a second clock inside the same year — an administration whose term ends on a fixed date while the naval program runs on its own schedule.",
+      "additionalProperties": false,
+      "properties": {
+        "factions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "strength": {
+                "type": "number"
+              },
+              "position": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "clocks": {
+          "type": "array",
+          "description": "Dated political events the naval program is downstream of.",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "date"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "deception": {
+      "type": "object",
+      "description": "What this nation is concealing and how. Deception-independence is a design law: four lies with no shared failure mode, which is why they never cascaded. A leak is modeled as arriving and being FILED rather than funded.",
+      "additionalProperties": false,
+      "properties": {
+        "lie": {
+          "type": "string"
+        },
+        "mechanism": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disclosure_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "independent": {
+          "type": "boolean",
+          "description": "true = this lie shares no failure mode with any other nation's. This frame has no mutual-hostage mechanism."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

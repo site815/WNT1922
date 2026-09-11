@@ -1,0 +1,188 @@
+{
+  "nation": "FRA",
+  "navy": "Marine Nationale",
+  "as_of": "1922-02-06",
+  "classes": [
+    {
+      "id": "courbet",
+      "name": "Courbet class",
+      "nation": "FRA",
+      "type": "BB",
+      "treaty_category": "capital_ship",
+      "generation": "dreadnought",
+      "displacement": { "standard_tons": 22200, "full_load_tons": 25850 },
+      "propulsion": { "speed_kn": 21, "shp": 28000, "range_nm": 4200, "range_at_kn": 10, "fuel": "mixed" },
+      "armament": {
+        "main_battery": { "count": 12, "caliber_in": 12, "mounts": "6x2" },
+        "secondary_battery": [ { "count": 22, "caliber_in": 5.5, "mounts": "casemate" } ]
+      },
+      "protection": { "belt_mm": 270, "deck_mm": 70, "turret_mm": 290, "torpedo_defense": 0 },
+      "complement": 1115,
+      "design_year": 1910,
+      "notes": "War-worn; France's capital fleet stagnated 1914-18 while rivals built."
+    },
+    {
+      "id": "bretagne",
+      "name": "Bretagne class",
+      "nation": "FRA",
+      "type": "BB",
+      "treaty_category": "capital_ship",
+      "generation": "super_dreadnought",
+      "displacement": { "standard_tons": 23200, "full_load_tons": 26000 },
+      "propulsion": { "speed_kn": 20, "shp": 29000, "range_nm": 4700, "range_at_kn": 10, "fuel": "mixed" },
+      "armament": {
+        "main_battery": { "count": 10, "caliber_in": 13.4, "mounts": "5x2" },
+        "secondary_battery": [ { "count": 22, "caliber_in": 5.5, "mounts": "casemate" } ]
+      },
+      "protection": { "belt_mm": 270, "deck_mm": 70, "turret_mm": 340, "torpedo_defense": 0 },
+      "complement": 1124,
+      "design_year": 1912,
+      "notes": "Backbone of the Mediterranean squadron; modernization candidates."
+    },
+    {
+      "id": "normandie",
+      "name": "Normandie class (suspended)",
+      "nation": "FRA",
+      "type": "BB",
+      "treaty_category": "capital_ship",
+      "generation": "super_dreadnought",
+      "displacement": { "standard_tons": 25200, "full_load_tons": 28500 },
+      "propulsion": { "speed_kn": 21, "shp": 32000, "range_nm": 6500, "range_at_kn": 12, "fuel": "mixed" },
+      "armament": {
+        "main_battery": { "count": 12, "caliber_in": 13.4, "mounts": "3x4", "notes": "First quadruple turrets" },
+        "secondary_battery": [ { "count": 24, "caliber_in": 5.5, "mounts": "casemate" } ]
+      },
+      "protection": { "belt_mm": 300, "deck_mm": 70, "turret_mm": 340, "torpedo_defense": 1 },
+      "complement": 1200,
+      "design_year": 1913,
+      "notes": "Suspended 1914; four hulls scrapped, Bearn's hull taken for carrier conversion."
+    },
+    {
+      "id": "bearn_cv",
+      "name": "Bearn (carrier conversion)",
+      "nation": "FRA",
+      "type": "CV",
+      "treaty_category": "aircraft_carrier",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 22146, "full_load_tons": 28400 },
+      "propulsion": { "speed_kn": 21.5, "shp": 37500, "range_nm": 7000, "range_at_kn": 10, "fuel": "oil" },
+      "armament": { "secondary_battery": [ { "count": 8, "caliber_in": 6.1, "mounts": "casemate" } ] },
+      "protection": { "belt_mm": 83, "deck_mm": 25 },
+      "aviation": { "aircraft_capacity": 35, "flight_deck": true },
+      "complement": 875,
+      "design_year": 1923,
+      "notes": "Conversion design on the Normandie-class hull; historically converted 1923-27. Slow for fleet work."
+    },
+    {
+      "id": "edgar_quinet",
+      "name": "Edgar Quinet class",
+      "nation": "FRA",
+      "type": "CA",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "pre_dreadnought",
+      "displacement": { "standard_tons": 13850, "full_load_tons": 14300 },
+      "propulsion": { "speed_kn": 23, "shp": 36000, "range_nm": 5100, "range_at_kn": 10, "fuel": "coal" },
+      "armament": { "main_battery": { "count": 14, "caliber_in": 7.6, "mounts": "twin/casemate" } },
+      "protection": { "belt_mm": 150, "deck_mm": 65 },
+      "complement": 892,
+      "design_year": 1905,
+      "hulls_aggregate": { "count": 2, "status": "active", "notes": "Last French armored cruisers; training and colonial service." }
+    },
+    {
+      "id": "duguay_trouin",
+      "name": "Duguay-Trouin class",
+      "nation": "FRA",
+      "type": "CL",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 7250, "full_load_tons": 9350 },
+      "propulsion": { "speed_kn": 33, "shp": 100000, "range_nm": 4500, "range_at_kn": 15, "fuel": "oil" },
+      "armament": {
+        "main_battery": { "count": 8, "caliber_in": 6.1, "mounts": "4x2" },
+        "torpedo_tubes": { "count": 12, "caliber_in": 21.7, "submerged": false }
+      },
+      "protection": { "belt_mm": 20, "deck_mm": 20 },
+      "complement": 578,
+      "design_year": 1920,
+      "notes": "First postwar French cruisers; laid down mid-1922. No hulls at scenario start."
+    },
+    {
+      "id": "arabe",
+      "name": "Arabe class",
+      "nation": "FRA",
+      "type": "DD",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 690, "full_load_tons": 850 },
+      "propulsion": { "speed_kn": 33, "shp": 17500, "range_nm": 2000, "range_at_kn": 14, "fuel": "oil" },
+      "armament": {
+        "main_battery": { "count": 3, "caliber_in": 4.7, "mounts": "single" },
+        "torpedo_tubes": { "count": 4, "caliber_in": 17.7, "submerged": false }
+      },
+      "complement": 82,
+      "design_year": 1916,
+      "hulls_aggregate": { "count": 12, "status": "active", "notes": "Japanese-built (Kaba derivative); plus assorted war-era 800t boats and ex-German prizes." }
+    },
+    {
+      "id": "chacal",
+      "name": "Chacal class (contre-torpilleur)",
+      "nation": "FRA",
+      "type": "DL",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 2126, "full_load_tons": 3000 },
+      "propulsion": { "speed_kn": 35.5, "shp": 50000, "range_nm": 3000, "range_at_kn": 15, "fuel": "oil" },
+      "armament": {
+        "main_battery": { "count": 5, "caliber_in": 5.1, "mounts": "single" },
+        "torpedo_tubes": { "count": 6, "caliber_in": 21.7, "submerged": false }
+      },
+      "complement": 195,
+      "design_year": 1922,
+      "notes": "1922 program super-destroyer — France's answer to treaty limits on capital tonnage. No hulls at scenario start."
+    },
+    {
+      "id": "lagrange",
+      "name": "Lagrange class",
+      "nation": "FRA",
+      "type": "SS",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 920, "full_load_tons": 1318 },
+      "propulsion": { "speed_kn": 16.5, "range_nm": 4300, "range_at_kn": 10, "fuel": "diesel" },
+      "armament": {
+        "main_battery": { "count": 2, "caliber_in": 3, "mounts": "deck" },
+        "torpedo_tubes": { "count": 8, "caliber_in": 17.7, "submerged": true }
+      },
+      "complement": 47,
+      "design_year": 1913,
+      "hulls_aggregate": { "count": 4, "status": "active", "notes": "Plus assorted war-era boats; France refused sub limits at Washington — sub fleet is a strategic lever." }
+    },
+    {
+      "id": "requin",
+      "name": "Requin class",
+      "nation": "FRA",
+      "type": "SS",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "interwar",
+      "displacement": { "standard_tons": 1150, "full_load_tons": 1441 },
+      "propulsion": { "speed_kn": 15, "range_nm": 7700, "range_at_kn": 9, "fuel": "diesel" },
+      "armament": {
+        "main_battery": { "count": 1, "caliber_in": 3.9, "mounts": "deck" },
+        "torpedo_tubes": { "count": 10, "caliber_in": 21.7, "submerged": true }
+      },
+      "complement": 54,
+      "design_year": 1922,
+      "notes": "1922 program ocean-going boats. No hulls at scenario start."
+    }
+  ],
+  "hulls": [
+    { "id": "mn_courbet", "class_id": "courbet", "name": "Courbet", "laid_down": "1910-09-01", "launched": "1911-09-23", "completed": "1913-11-19", "status": "active", "treaty_fate": "retained", "assignment": "Mediterranean Squadron" },
+    { "id": "mn_jean_bart_1911", "class_id": "courbet", "name": "Jean Bart", "laid_down": "1910-11-15", "launched": "1911-09-22", "completed": "1913-06-05", "status": "active", "treaty_fate": "retained", "assignment": "Mediterranean Squadron" },
+    { "id": "mn_paris", "class_id": "courbet", "name": "Paris", "laid_down": "1911-11-10", "launched": "1912-09-28", "completed": "1914-08-01", "status": "active", "treaty_fate": "retained", "assignment": "Mediterranean Squadron" },
+    { "id": "mn_france", "class_id": "courbet", "name": "France", "laid_down": "1911-11-30", "launched": "1912-11-07", "completed": "1914-07-15", "status": "active", "treaty_fate": "retained", "notes": "Historically wrecked in Quiberon Bay, Aug 1922 — scripted event candidate" },
+    { "id": "mn_bretagne", "class_id": "bretagne", "name": "Bretagne", "laid_down": "1912-07-22", "launched": "1913-04-21", "completed": "1916-02-10", "status": "active", "treaty_fate": "retained", "assignment": "Mediterranean Squadron (flagship)" },
+    { "id": "mn_provence", "class_id": "bretagne", "name": "Provence", "laid_down": "1912-05-01", "launched": "1913-04-20", "completed": "1916-03-01", "status": "active", "treaty_fate": "retained" },
+    { "id": "mn_lorraine", "class_id": "bretagne", "name": "Lorraine", "laid_down": "1912-08-01", "launched": "1913-09-30", "completed": "1916-03-10", "status": "active", "treaty_fate": "retained" },
+    { "id": "mn_bearn", "class_id": "normandie", "name": "Bearn", "laid_down": "1914-01-10", "launched": "1920-04-15", "completed": null, "pct_complete": 25, "status": "converting", "treaty_fate": "convert_carrier", "notes": "Conversion to carrier decided 1922; references bearn_cv design when complete" }
+  ]
+}

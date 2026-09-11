@@ -1,0 +1,17 @@
+{
+  "name": "wnt1922",
+  "version": "0.18.0",
+  "private": true,
+  "type": "module",
+  "description": "WNT1922 naval grand strategy",
+  "scripts": {
+    "build": "node tools/build-game.mjs game/public",
+    "start": "node tools/play.mjs",
+    "audit:assets": "node tools/audit-assets.mjs",
+    "package:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/Package-Windows.ps1",
+    "test:release": "node --test --test-isolation=none --test-skip-pattern=\"old campaign migration|untouched old opening|all selectable countries|multi-year campaign\" game/test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

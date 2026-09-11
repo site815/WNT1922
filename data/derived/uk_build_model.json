@@ -1,0 +1,1132 @@
+{
+ "$generated_by": "build_model_uk.py",
+ "note": "ROWS ARE END-OF-YEAR. Do not hand-edit: regenerate with `python build_model_uk.py --emit`. This model AUDITS an authored program against two votes; it does not search for one. The fleet at each year-end comes from the authored dates and cannot drift from canon; the FINDING is the load on each vote.",
+ "scenario": "fishers-ghost",
+ "nation": "GBR",
+ "hull_vote_t_yr": 54000,
+ "machinery_vote_shp_yr": {
+  "1922": 165000,
+  "1930_onward": 680000,
+  "note": "Quadrupled 1922-30 and then flat. NO TREATY LIMITS A TURBINE."
+ },
+ "classes": [
+  {
+   "id": "invincible_bc22",
+   "name": "Invincible",
+   "type": "BC",
+   "tons": 48400,
+   "shp": 160000,
+   "count": 2,
+   "capital": true
+  },
+  {
+   "id": "county_ca24",
+   "name": "County",
+   "type": "CA",
+   "tons": 10000,
+   "shp": 80000,
+   "count": 4,
+   "capital": false
+  },
+  {
+   "id": "courageous_conversion",
+   "name": "Courageous",
+   "type": "CV",
+   "tons": 9000,
+   "shp": 30000,
+   "count": 3,
+   "capital": false
+  },
+  {
+   "id": "insuperable_bc27",
+   "name": "Insuperable",
+   "type": "BC",
+   "tons": 51500,
+   "shp": 244000,
+   "count": 4,
+   "capital": true
+  },
+  {
+   "id": "re_engine",
+   "name": "re-engining",
+   "type": "--",
+   "tons": 0,
+   "shp": 150000,
+   "count": 3,
+   "capital": false
+  },
+  {
+   "id": "incomparable_bc31",
+   "name": "Incomparable",
+   "type": "BC",
+   "tons": 54500,
+   "shp": 251000,
+   "count": 2,
+   "capital": true
+  },
+  {
+   "id": "swift_cl29",
+   "name": "Swift",
+   "type": "CL",
+   "tons": 7200,
+   "shp": 87000,
+   "count": 12,
+   "capital": false
+  },
+  {
+   "id": "ark_royal_cv31",
+   "name": "Ark Royal",
+   "type": "CV",
+   "tons": 25400,
+   "shp": 169000,
+   "count": 3,
+   "capital": false
+  },
+  {
+   "id": "sabre_dd22",
+   "name": "destroyers",
+   "type": "DD",
+   "tons": 1400,
+   "shp": 38000,
+   "count": 60,
+   "capital": false
+  },
+  {
+   "id": "sturgeon_ss23",
+   "name": "submarines",
+   "type": "SS",
+   "tons": 1400,
+   "shp": 3000,
+   "count": 30,
+   "capital": false
+  },
+  {
+   "id": "incorrigible_bc35",
+   "name": "Incorrigible",
+   "type": "BC",
+   "tons": 59000,
+   "shp": 265000,
+   "count": 2,
+   "capital": true
+  }
+ ],
+ "years": [
+  {
+   "year": 1922,
+   "cum_hull_demand": 38767,
+   "cum_hull_load_pct": 71.8,
+   "cum_mach_demand": 211667,
+   "cum_mach_load_pct": 128.3,
+   "hull_vote": 54000,
+   "hull_demand": 38767,
+   "hull_load_pct": 71.8,
+   "mach_vote": 165000,
+   "mach_demand": 211667,
+   "mach_load_pct": 128.3,
+   "binding": "machinery",
+   "oversubscribed": [
+    "machinery"
+   ],
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "conversions_complete": {},
+   "complete": {},
+   "building": {
+    "invincible_bc22": [
+     33.3,
+     33.3
+    ],
+    "courageous_conversion": [
+     33.3
+    ],
+    "sabre_dd22": [
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1923,
+   "cum_hull_demand": 83133,
+   "cum_hull_load_pct": 77.0,
+   "cum_mach_demand": 522833,
+   "cum_mach_load_pct": 132.6,
+   "hull_vote": 54000,
+   "hull_demand": 44367,
+   "hull_load_pct": 82.2,
+   "mach_vote": 229375,
+   "mach_demand": 311167,
+   "mach_load_pct": 135.7,
+   "binding": "machinery",
+   "oversubscribed": [
+    "machinery"
+   ],
+   "delivered": {},
+   "end_of_year": {},
+   "fleet_tons": 0,
+   "conversions_complete": {},
+   "complete": {},
+   "building": {
+    "invincible_bc22": [
+     66.7,
+     66.7
+    ],
+    "courageous_conversion": [
+     66.7
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1924,
+   "cum_hull_demand": 132100,
+   "cum_hull_load_pct": 81.5,
+   "cum_mach_demand": 858500,
+   "cum_mach_load_pct": 124.8,
+   "hull_vote": 54000,
+   "hull_demand": 48967,
+   "hull_load_pct": 90.7,
+   "mach_vote": 293750,
+   "mach_demand": 335667,
+   "mach_load_pct": 114.3,
+   "binding": "machinery",
+   "oversubscribed": [
+    "machinery"
+   ],
+   "delivered": {
+    "DD": 5
+   },
+   "end_of_year": {
+    "DD": 5
+   },
+   "fleet_tons": 7000,
+   "conversions_complete": {},
+   "complete": {
+    "sabre_dd22": 5
+   },
+   "building": {
+    "invincible_bc22": [
+     99.9,
+     99.9
+    ],
+    "county_ca24": [
+     25.0
+    ],
+    "courageous_conversion": [
+     99.9
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1925,
+   "cum_hull_demand": 151300,
+   "cum_hull_load_pct": 70.0,
+   "cum_mach_demand": 1107500,
+   "cum_mach_load_pct": 105.9,
+   "hull_vote": 54000,
+   "hull_demand": 19200,
+   "hull_load_pct": 35.6,
+   "mach_vote": 358125,
+   "mach_demand": 249000,
+   "mach_load_pct": 69.5,
+   "binding": "machinery",
+   "oversubscribed": [],
+   "delivered": {
+    "BC": 2,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 2,
+    "DD": 10,
+    "SS": 3
+   },
+   "fleet_tons": 115000,
+   "conversions_complete": {
+    "courageous_conversion": 1
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "courageous_conversion": 1,
+    "sabre_dd22": 10,
+    "sturgeon_ss23": 3
+   },
+   "building": {
+    "county_ca24": [
+     50.0,
+     25.0
+    ],
+    "courageous_conversion": [
+     33.3
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1926,
+   "cum_hull_demand": 173133,
+   "cum_hull_load_pct": 64.1,
+   "cum_mach_demand": 1381667,
+   "cum_mach_load_pct": 94.1,
+   "hull_vote": 54000,
+   "hull_demand": 21833,
+   "hull_load_pct": 40.4,
+   "mach_vote": 422500,
+   "mach_demand": 274167,
+   "mach_load_pct": 64.9,
+   "binding": "machinery",
+   "oversubscribed": [],
+   "delivered": {
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 2,
+    "DD": 15,
+    "SS": 6
+   },
+   "fleet_tons": 126200,
+   "conversions_complete": {
+    "courageous_conversion": 1
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "courageous_conversion": 1,
+    "sabre_dd22": 15,
+    "sturgeon_ss23": 6
+   },
+   "building": {
+    "county_ca24": [
+     75.0,
+     50.0,
+     33.3
+    ],
+    "courageous_conversion": [
+     66.7
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1927,
+   "cum_hull_demand": 244217,
+   "cum_hull_load_pct": 75.4,
+   "cum_mach_demand": 1970833,
+   "cum_mach_load_pct": 100.8,
+   "hull_vote": 54000,
+   "hull_demand": 71083,
+   "hull_load_pct": 131.6,
+   "mach_vote": 486875,
+   "mach_demand": 589167,
+   "mach_load_pct": 121.0,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull",
+    "machinery"
+   ],
+   "delivered": {
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 2,
+    "DD": 20,
+    "SS": 9
+   },
+   "fleet_tons": 137400,
+   "conversions_complete": {
+    "courageous_conversion": 1
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "courageous_conversion": 1,
+    "sabre_dd22": 20,
+    "sturgeon_ss23": 9
+   },
+   "building": {
+    "county_ca24": [
+     99.9,
+     75.0,
+     66.7,
+     33.3
+    ],
+    "courageous_conversion": [
+     99.9,
+     33.3
+    ],
+    "insuperable_bc27": [
+     50.0,
+     33.3
+    ],
+    "re_engine": [
+     50.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1928,
+   "cum_hull_demand": 327667,
+   "cum_hull_load_pct": 86.7,
+   "cum_mach_demand": 2687833,
+   "cum_mach_load_pct": 107.2,
+   "hull_vote": 54000,
+   "hull_demand": 83450,
+   "hull_load_pct": 154.5,
+   "mach_vote": 551250,
+   "mach_demand": 717000,
+   "mach_load_pct": 130.1,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull",
+    "machinery"
+   ],
+   "delivered": {
+    "CA": 1,
+    "DD": 5,
+    "SS": 2
+   },
+   "end_of_year": {
+    "BC": 2,
+    "CA": 1,
+    "DD": 25,
+    "SS": 11
+   },
+   "fleet_tons": 157200,
+   "conversions_complete": {
+    "courageous_conversion": 2
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 1,
+    "courageous_conversion": 2,
+    "sabre_dd22": 25,
+    "sturgeon_ss23": 11
+   },
+   "building": {
+    "county_ca24": [
+     99.9,
+     99.9,
+     66.7
+    ],
+    "courageous_conversion": [
+     66.7
+    ],
+    "insuperable_bc27": [
+     99.9,
+     66.7,
+     33.3
+    ],
+    "re_engine": [
+     99.9,
+     50.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1929,
+   "cum_hull_demand": 403900,
+   "cum_hull_load_pct": 93.5,
+   "cum_mach_demand": 3404500,
+   "cum_mach_load_pct": 109.0,
+   "hull_vote": 54000,
+   "hull_demand": 76233,
+   "hull_load_pct": 141.2,
+   "mach_vote": 615625,
+   "mach_demand": 716667,
+   "mach_load_pct": 116.4,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull",
+    "machinery"
+   ],
+   "delivered": {
+    "CA": 2,
+    "BC": 1,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 3,
+    "CA": 3,
+    "DD": 30,
+    "SS": 14
+   },
+   "fleet_tons": 239900,
+   "conversions_complete": {
+    "courageous_conversion": 2,
+    "re_engine": 1
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 3,
+    "courageous_conversion": 2,
+    "insuperable_bc27": 1,
+    "re_engine": 1,
+    "sabre_dd22": 30,
+    "sturgeon_ss23": 14
+   },
+   "building": {
+    "county_ca24": [
+     99.9
+    ],
+    "courageous_conversion": [
+     99.9
+    ],
+    "insuperable_bc27": [
+     99.9,
+     66.7,
+     33.3
+    ],
+    "re_engine": [
+     99.9,
+     50.0
+    ],
+    "swift_cl29": [
+     50.0,
+     50.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1930,
+   "cum_hull_demand": 463133,
+   "cum_hull_load_pct": 95.3,
+   "cum_mach_demand": 4013667,
+   "cum_mach_load_pct": 105.6,
+   "hull_vote": 54000,
+   "hull_demand": 59233,
+   "hull_load_pct": 109.7,
+   "mach_vote": 680000,
+   "mach_demand": 609167,
+   "mach_load_pct": 89.6,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull"
+   ],
+   "delivered": {
+    "CA": 1,
+    "BC": 1,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 4,
+    "CA": 4,
+    "DD": 35,
+    "SS": 17
+   },
+   "fleet_tons": 312600,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 2
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 2,
+    "re_engine": 2,
+    "sabre_dd22": 35,
+    "sturgeon_ss23": 17
+   },
+   "building": {
+    "insuperable_bc27": [
+     99.9,
+     66.7
+    ],
+    "re_engine": [
+     99.9
+    ],
+    "swift_cl29": [
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1931,
+   "cum_hull_demand": 544612,
+   "cum_hull_load_pct": 100.9,
+   "cum_mach_demand": 4663617,
+   "cum_mach_load_pct": 104.0,
+   "hull_vote": 54000,
+   "hull_demand": 81478,
+   "hull_load_pct": 150.9,
+   "mach_vote": 680000,
+   "mach_demand": 649950,
+   "mach_load_pct": 95.6,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull"
+   ],
+   "delivered": {
+    "BC": 1,
+    "CL": 2,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 5,
+    "CA": 4,
+    "CL": 2,
+    "DD": 40,
+    "SS": 20
+   },
+   "fleet_tons": 389700,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 3,
+    "re_engine": 3,
+    "swift_cl29": 2,
+    "sabre_dd22": 40,
+    "sturgeon_ss23": 20
+   },
+   "building": {
+    "insuperable_bc27": [
+     99.9
+    ],
+    "incomparable_bc31": [
+     33.3,
+     25.0
+    ],
+    "swift_cl29": [
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ],
+    "ark_royal_cv31": [
+     30.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1932,
+   "cum_hull_demand": 618090,
+   "cum_hull_load_pct": 104.1,
+   "cum_mach_demand": 5290067,
+   "cum_mach_load_pct": 102.5,
+   "hull_vote": 54000,
+   "hull_demand": 73478,
+   "hull_load_pct": 136.1,
+   "mach_vote": 680000,
+   "mach_demand": 626450,
+   "mach_load_pct": 92.1,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull"
+   ],
+   "delivered": {
+    "BC": 1,
+    "CL": 2,
+    "DD": 5,
+    "SS": 2
+   },
+   "end_of_year": {
+    "BC": 6,
+    "CA": 4,
+    "CL": 4,
+    "DD": 45,
+    "SS": 22
+   },
+   "fleet_tons": 465400,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 4,
+    "re_engine": 3,
+    "swift_cl29": 4,
+    "sabre_dd22": 45,
+    "sturgeon_ss23": 22
+   },
+   "building": {
+    "incomparable_bc31": [
+     66.7,
+     50.0
+    ],
+    "swift_cl29": [
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ],
+    "ark_royal_cv31": [
+     63.3,
+     30.0
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1933,
+   "cum_hull_demand": 691715,
+   "cum_hull_load_pct": 106.7,
+   "cum_mach_demand": 5920650,
+   "cum_mach_load_pct": 101.3,
+   "hull_vote": 54000,
+   "hull_demand": 73625,
+   "hull_load_pct": 136.3,
+   "mach_vote": 680000,
+   "mach_demand": 630583,
+   "mach_load_pct": 92.7,
+   "binding": "hull",
+   "oversubscribed": [
+    "hull"
+   ],
+   "delivered": {
+    "CL": 2,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 6,
+    "CA": 4,
+    "CL": 6,
+    "DD": 50,
+    "SS": 25
+   },
+   "fleet_tons": 491000,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 4,
+    "re_engine": 3,
+    "swift_cl29": 6,
+    "sabre_dd22": 50,
+    "sturgeon_ss23": 25
+   },
+   "building": {
+    "incomparable_bc31": [
+     99.9,
+     75.0
+    ],
+    "swift_cl29": [
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ],
+    "ark_royal_cv31": [
+     96.7,
+     63.3
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0,
+     50.0,
+     50.0,
+     50.0
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9,
+     99.9,
+     50.0,
+     50.0
+    ]
+   }
+  },
+  {
+   "year": 1934,
+   "cum_hull_demand": 729507,
+   "cum_hull_load_pct": 103.9,
+   "cum_mach_demand": 6268233,
+   "cum_mach_load_pct": 96.1,
+   "hull_vote": 54000,
+   "hull_demand": 37792,
+   "hull_load_pct": 70.0,
+   "mach_vote": 680000,
+   "mach_demand": 347583,
+   "mach_load_pct": 51.1,
+   "binding": "hull",
+   "oversubscribed": [],
+   "delivered": {
+    "BC": 1,
+    "CL": 2,
+    "CV": 1,
+    "DD": 5,
+    "SS": 3
+   },
+   "end_of_year": {
+    "BC": 7,
+    "CA": 4,
+    "CL": 8,
+    "CV": 1,
+    "DD": 55,
+    "SS": 28
+   },
+   "fleet_tons": 596500,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 4,
+    "re_engine": 3,
+    "incomparable_bc31": 1,
+    "swift_cl29": 8,
+    "ark_royal_cv31": 1,
+    "sabre_dd22": 55,
+    "sturgeon_ss23": 28
+   },
+   "building": {
+    "incomparable_bc31": [
+     99.9
+    ],
+    "swift_cl29": [
+     99.9,
+     99.9,
+     50.0
+    ],
+    "ark_royal_cv31": [
+     96.7
+    ],
+    "sabre_dd22": [
+     99.9,
+     99.9,
+     99.9,
+     99.9,
+     99.9
+    ],
+    "sturgeon_ss23": [
+     99.9,
+     99.9
+    ]
+   }
+  },
+  {
+   "year": 1935,
+   "cum_hull_demand": 751862,
+   "cum_hull_load_pct": 99.5,
+   "cum_mach_demand": 6435658,
+   "cum_mach_load_pct": 89.4,
+   "hull_vote": 54000,
+   "hull_demand": 22355,
+   "hull_load_pct": 41.4,
+   "mach_vote": 680000,
+   "mach_demand": 167425,
+   "mach_load_pct": 24.6,
+   "binding": "hull",
+   "oversubscribed": [],
+   "delivered": {
+    "BC": 1,
+    "CL": 2,
+    "CV": 1,
+    "DD": 5,
+    "SS": 2
+   },
+   "end_of_year": {
+    "BC": 8,
+    "CA": 4,
+    "CL": 10,
+    "CV": 2,
+    "DD": 60,
+    "SS": 30
+   },
+   "fleet_tons": 700600,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 4,
+    "re_engine": 3,
+    "incomparable_bc31": 2,
+    "swift_cl29": 10,
+    "ark_royal_cv31": 2,
+    "sabre_dd22": 60,
+    "sturgeon_ss23": 30
+   },
+   "building": {
+    "swift_cl29": [
+     99.9,
+     50.0
+    ],
+    "ark_royal_cv31": [
+     22.5
+    ],
+    "incorrigible_bc35": [
+     8.0,
+     8.0
+    ]
+   }
+  },
+  {
+   "year": 1936,
+   "cum_hull_demand": 791312,
+   "cum_hull_load_pct": 97.7,
+   "cum_mach_demand": 6653908,
+   "cum_mach_load_pct": 84.4,
+   "hull_vote": 54000,
+   "hull_demand": 39450,
+   "hull_load_pct": 73.1,
+   "mach_vote": 680000,
+   "mach_demand": 218250,
+   "mach_load_pct": 32.1,
+   "binding": "hull",
+   "oversubscribed": [],
+   "delivered": {
+    "CL": 1
+   },
+   "end_of_year": {
+    "BC": 8,
+    "CA": 4,
+    "CL": 11,
+    "CV": 2,
+    "DD": 60,
+    "SS": 30
+   },
+   "fleet_tons": 707800,
+   "conversions_complete": {
+    "courageous_conversion": 3,
+    "re_engine": 3
+   },
+   "complete": {
+    "invincible_bc22": 2,
+    "county_ca24": 4,
+    "courageous_conversion": 3,
+    "insuperable_bc27": 4,
+    "re_engine": 3,
+    "incomparable_bc31": 2,
+    "swift_cl29": 11,
+    "ark_royal_cv31": 2,
+    "sabre_dd22": 60,
+    "sturgeon_ss23": 30
+   },
+   "building": {
+    "swift_cl29": [
+     99.9
+    ],
+    "ark_royal_cv31": [
+     47.5
+    ],
+    "incorrigible_bc35": [
+     33.0,
+     33.0
+    ]
+   }
+  }
+ ]
+}

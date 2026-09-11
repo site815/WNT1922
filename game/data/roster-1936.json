@@ -1,0 +1,217 @@
+{
+  "revision": 2,
+  "merchantSource": {
+    "title": "Lloyd's Register, 1935 casualty returns, annual Table 1 (1935–1936 register)",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Casualty_Returns_1935.pdf#page=50",
+    "credit": "Lloyd's Register Foundation, Heritage Centre",
+    "basis": "Steamers and motorships of at least 100 gross register tons; sailing vessels excluded. US figures exclude the Great Lakes. United Kingdom uses the source's Great United Kingdom and Ireland row; the separate Dominion fleet is excluded.",
+    "edition": "1935–1936"
+  },
+  "merchants": {
+    "JPN": {
+      "hulls": 2146,
+      "grossRegisterTons": 4085650,
+      "managedHulls": 500,
+      "note": "Player-approved opening composition: 500 Standard Maru and 1,646 other merchants. Historical GRT is a reference, not an estimate of the alternate-history fleet's cargo capacity."
+    },
+    "USA": {
+      "hulls": 2553,
+      "grossRegisterTons": 9664665,
+      "managedHulls": 0,
+      "note": "Seagoing register; Great Lakes shipping excluded."
+    },
+    "GBR": {
+      "hulls": 6998,
+      "grossRegisterTons": 17298432,
+      "managedHulls": 0,
+      "note": "Great United Kingdom and Ireland registration. The source separately lists 2,171 Dominion powered merchant ships; those are not added to United Kingdom's total."
+    },
+    "DEU": {
+      "hulls": 2070,
+      "grossRegisterTons": 3693298,
+      "managedHulls": 0,
+      "note": "German powered merchant register."
+    }
+  },
+  "additions": {
+    "JPN": [
+      {
+        "id": "legacy-jpn-destroyers",
+        "name": "WWI-era destroyers (Minekaze fit)",
+        "class_id": "minekaze",
+        "count": 40,
+        "status": "reserve",
+        "legacy": true,
+        "representative": true,
+        "notes": "Forty mixed older destroyers retained in reserve. Minekaze is the representative class, with a catalog maximum of 39 knots; this is not the normal cruising speed and does not mean all 40 were Minekaze-class ships. Ships receive individual hull numbers when recommissioned. Prototype submarine boats were retired before this opening and are excluded."
+      }
+    ],
+    "USA": [
+      {
+        "id": "h-uss_omaha",
+        "name": "USS Omaha",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_milwaukee",
+        "name": "USS Milwaukee",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_cincinnati",
+        "name": "USS Cincinnati",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_raleigh",
+        "name": "USS Raleigh",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_detroit",
+        "name": "USS Detroit",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_richmond",
+        "name": "USS Richmond",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_concord",
+        "name": "USS Concord",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_trenton",
+        "name": "USS Trenton",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_marblehead",
+        "name": "USS Marblehead",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      },
+      {
+        "id": "h-uss_memphis",
+        "name": "USS Memphis",
+        "class_id": "omaha",
+        "count": 1,
+        "status": "active",
+        "legacy": true
+      }
+    ],
+    "GBR": [
+      {
+        "id": "support-gbr-oilers",
+        "name": "Fast fleet oiler train",
+        "class_id": "rn_fleet_oiler",
+        "count": 16,
+        "status": "active",
+        "notes": "Sixteen fleet oilers are explicitly present in Fisher's Ghost §3.1. Individual specifications and tonnage have not yet been authored; this is a support register entry."
+      }
+    ],
+    "DEU": []
+  },
+  "groupDetails": {
+    "a-GBR-2": {
+      "legacy": true,
+      "notes": "Six inherited Danae-class cruisers retained by Fisher's Ghost; the scenario does not identify the six individual survivors."
+    },
+    "a-GBR-3": {
+      "legacy": true,
+      "notes": "HMS Emerald and HMS Enterprise, the two inherited Emerald-class hulls."
+    },
+    "a-GBR-4": {
+      "legacy": true,
+      "notes": "Six retained C-class cruisers. The scenario does not identify the individual survivors; the other historical C-class hulls are not silently restored."
+    },
+    "a-GBR-5": {
+      "legacy": true,
+      "representative": true,
+      "notes": "About 30 war-built V/W and S-class destroyers, using the V/W sheet as a representative fit."
+    },
+    "a-GBR-6": {
+      "legacy": true,
+      "representative": true,
+      "notes": "About 15 older submarines, using the L-class sheet as a representative fit."
+    },
+    "a-USA-3": {
+      "legacy": true,
+      "representative": true,
+      "notes": "About 170 mixed flush-deck destroyers, using the Clemson sheet as a representative fit."
+    },
+    "a-USA-4": {
+      "legacy": true,
+      "representative": true,
+      "notes": "41 S-class and older boats, completing the scenario's approximately 55 submarines."
+    },
+    "a-DEU-4": {
+      "legacy": true,
+      "notes": "Four Gazelle survivors and two Bremen survivors make the six old cruisers in the 1936 scenario. Emden is counted individually."
+    },
+    "a-DEU-5": {
+      "legacy": true,
+      "notes": "Berlin and Hamburg, retained as old training cruisers."
+    },
+    "a-DEU-6": {
+      "legacy": true
+    },
+    "a-DEU-7": {
+      "legacy": true
+    }
+  },
+  "retainedOverrides": {
+    "hms_barham": {
+      "name": "HMAS Australia (ex-Barham)",
+      "notes": "Sold to the RAN in 1926; retained in the British-led Dominion battle squadron."
+    },
+    "hms_malaya": {
+      "name": "HMAS Anzac (ex-Malaya)",
+      "notes": "Sold to the RAN in 1926; retained in the British-led Dominion battle squadron."
+    }
+  },
+  "legacyNotes": {
+    "JPN": "Ten retained, unmodernized capital ships and Hosho; approximately 40 WWI-era destroyers in reserve, with a Minekaze representative fit. The 20 experimental prototype submarines have been retired and are excluded. The battleships start in commission.",
+    "USA": "Six completed South Dakotas, eight active Standards, ten older reserve battleships, Langley and all ten Omaha cruisers, plus the authored old destroyer and submarine flotillas. No historical Lexington carriers are added to the divergent construction plan.",
+    "GBR": "Hood, Renown, Repulse, Furious, Courageous and Glorious; the RAN's Australia and Anzac; 14 older light cruisers, about 30 war-built destroyers and 15 older submarines. Queen Elizabeth, Warspite, Valiant, the Revenge class and the Iron Dukes remain retired. Nelson and Rodney were never ordered in this campaign. The 16 oilers appear under naval support.",
+    "DEU": "Eight retained pre-dreadnoughts (six in commission, two in reserve), Emden and six older training cruisers, plus the two prewar flotillas. Later historical surface-ship programs were not ordered in this divergence."
+  },
+  "legacySources": [
+    {
+      "title": "US Naval History and Heritage Command: Omaha class, CL 4–13",
+      "url": "https://www.history.navy.mil/our-collections/photography/numerical-list-of-images/nhhc-series/nh-series/NH-43000/NH-43051.html"
+    },
+    {
+      "title": "US Naval History and Heritage Command: Omaha II, service 1923–1945",
+      "url": "https://www.history.navy.mil/research/histories/ship-histories/danfs/o/omaha-ii.html"
+    }
+  ]
+}

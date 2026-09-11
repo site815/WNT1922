@@ -1,0 +1,524 @@
+{
+ "nation": "DEU",
+ "navy": "Reichsmarine",
+ "as_of": "1922-02-06",
+ "source": "docs/hindsight/de-nothing-above-water-road.md §1 (the prohibition) · §2.1 (the fleet Versailles left)",
+ "notes": "THE ONLY BASE FILE IN THIS PROJECT WHOSE SUBJECT IS NOT IN THE ROOM. The other five navies are at Washington on this date arguing about ratios; Germany is under the Treaty of Versailles, Part V, Section II, and is not a party to the Washington Treaty at all. Articles 181 and 190 permit her SIX battleships of the Deutschland or Lothringen type, SIX light cruisers, TWELVE destroyers and TWELVE torpedo boats — with two of each of the first two categories allowed in reserve, which is why eight of each are listed here — and NO SUBMARINES OF ANY KIND. Replacement is barred for twenty years from a capital hull's completion and fifteen from a flotilla craft's, and a replacement may not exceed 10,000 t (capital), 6,000 t (light cruiser), 800 t (destroyer) or 200 t (torpedo boat). ⚠ EVERY `treaty_fate` IS OMITTED FROM THIS FILE ON PURPOSE. That field is the Washington engine's default script, and this navy is outside it: her fates are set by a treaty nobody at Washington is discussing. ⚠ THE PROHIBITION IS THE MOST IMPORTANT THING IN THE FILE. What Germany may not own — a submarine, an aircraft, a warship above 10,000 t, a naval air arm, a General Staff — is the whole of the *Nothing Above Water* divergence's starting position, and the hull ids use the `km_` prefix throughout purely as a stable namespace shared with `data/ships/hindsight/de_nothing_above_water_pack.json`; it is not a claim about what the service was called in 1922.",
+ "classes": [
+  {
+   "id": "deutschland_bb",
+   "name": "Deutschland class",
+   "nation": "DEU",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "pre_dreadnought",
+   "displacement": {
+    "standard_tons": 13200,
+    "full_load_tons": 14200
+   },
+   "propulsion": {
+    "speed_kn": 18,
+    "shp": 17000,
+    "range_nm": 4800,
+    "range_at_kn": 10,
+    "fuel": "coal"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 4,
+     "caliber_in": 11,
+     "caliber_mm": 283,
+     "mounts": "2x2",
+     "notes": "28 cm SK L/40"
+    },
+    "secondary_battery": [
+     {
+      "count": 14,
+      "caliber_in": 6.7,
+      "caliber_mm": 170,
+      "mounts": "casemate"
+     },
+     {
+      "count": 20,
+      "caliber_in": 3.4,
+      "caliber_mm": 88,
+      "mounts": "single"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 240,
+    "deck_mm": 40,
+    "turret_mm": 280,
+    "torpedo_defense": 0
+   },
+   "complement": 743,
+   "design_year": 1903,
+   "notes": "The newest capital ships Germany is permitted to own, and they were obsolete when the Dreadnought commissioned. Article 190 bars replacement until twenty years after completion, so the earliest legal successor to Hannover is 1927 and to Schleswig-Holstein 1928 — at 10,000 t. THE WHOLE GERMAN CAPITAL-SHIP QUESTION IS THAT SENTENCE, and *Nothing Above Water* answers it by declining to ask."
+  },
+  {
+   "id": "braunschweig_bb",
+   "name": "Braunschweig class",
+   "nation": "DEU",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "pre_dreadnought",
+   "displacement": {
+    "standard_tons": 13200,
+    "full_load_tons": 14400
+   },
+   "propulsion": {
+    "speed_kn": 18,
+    "shp": 16000,
+    "range_nm": 4800,
+    "range_at_kn": 10,
+    "fuel": "coal"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 4,
+     "caliber_in": 11,
+     "caliber_mm": 283,
+     "mounts": "2x2",
+     "notes": "28 cm SK L/40"
+    },
+    "secondary_battery": [
+     {
+      "count": 14,
+      "caliber_in": 6.7,
+      "caliber_mm": 170,
+      "mounts": "casemate"
+     },
+     {
+      "count": 18,
+      "caliber_in": 3.4,
+      "caliber_mm": 88,
+      "mounts": "single"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 225,
+    "deck_mm": 40,
+    "turret_mm": 250,
+    "torpedo_defense": 0
+   },
+   "complement": 743,
+   "design_year": 1901,
+   "notes": "Older than the Deutschlands by two years and identically armed. Used as training and gunnery ships; Lothringen and Preussen are hulked before the decade is out. In this divergence not one mark is spent modernizing any of them, because a battle line is an argument Germany has stopped having."
+  },
+  {
+   "id": "mackensen_bc",
+   "name": "Mackensen class (broken up incomplete)",
+   "nation": "DEU",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 31000,
+    "full_load_tons": 35300
+   },
+   "propulsion": {
+    "speed_kn": 28,
+    "shp": 90000,
+    "range_nm": 8000,
+    "range_at_kn": 14,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 13.8,
+     "caliber_mm": 350,
+     "mounts": "4x2",
+     "notes": "35 cm SK L/45 — never mounted in any ship"
+    },
+    "secondary_battery": [
+     {
+      "count": 12,
+      "caliber_in": 5.9,
+      "caliber_mm": 150,
+      "mounts": "casemate"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 300,
+    "deck_mm": 80,
+    "turret_mm": 320,
+    "torpedo_defense": 1
+   },
+   "complement": 1186,
+   "design_year": 1914,
+   "notes": "⚠ THE GERMAN DECISION SPACE, AND IT IS EMPTY. Four battlecruisers launched or on the slips in 1917, work suspended in 1918, and BROKEN UP WHERE THEY STOOD in 1921–22 under Article 186. The two incomplete Bayern-class battleships, Sachsen and Württemberg, went the same way in the same yards in the same year. They are present in this file for the same reason the G3s, the South Dakotas and the Amagis are present in theirs — they are the 1922 decision space — with one difference that is the whole of the German scenario: EVERY OTHER NAVY'S CANCELED HULLS WERE A CHOICE, and these were cut up by treaty at gunpoint. Nothing here can be resumed."
+  },
+  {
+   "id": "emden_cl",
+   "name": "Emden",
+   "nation": "DEU",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 5600,
+    "full_load_tons": 6990
+   },
+   "propulsion": {
+    "speed_kn": 29,
+    "shp": 46500,
+    "range_nm": 6700,
+    "range_at_kn": 14,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 5.9,
+     "caliber_mm": 150,
+     "mounts": "8x1",
+     "notes": "15 cm SK L/45 in single shields — a wartime pattern on a postwar hull, because the twin mounting would have cost a year"
+    },
+    "secondary_battery": [
+     {
+      "count": 3,
+      "caliber_in": 3.4,
+      "caliber_mm": 88,
+      "mounts": "single high-angle"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 19.7,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 50,
+    "deck_mm": 20,
+    "turret_mm": 20,
+    "torpedo_defense": 0
+   },
+   "complement": 630,
+   "design_year": 1921,
+   "notes": "⚠ THE ONLY GERMAN WARSHIP ON A SLIP ON THE DAY THE WASHINGTON TREATY IS SIGNED — laid down at Wilhelmshaven on 8 December 1921 as an Article 190 replacement for one of the Gazelles, and legal to the ton. In *Nothing Above Water* she is completed, because she was ordered before the argument was won, and SHE IS THE LAST CRUISER GERMANY EVER LAYS DOWN. The Königsberg class, Leipzig, Nürnberg and all three Deutschland-class Panzerschiffe are never ordered, and that money is the divergence."
+  },
+  {
+   "id": "bremen_cl",
+   "name": "Bremen class",
+   "nation": "DEU",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "pre_dreadnought",
+   "displacement": {
+    "standard_tons": 3250,
+    "full_load_tons": 3800
+   },
+   "propulsion": {
+    "speed_kn": 22,
+    "shp": 10000,
+    "range_nm": 4300,
+    "range_at_kn": 12,
+    "fuel": "coal"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 10,
+     "caliber_in": 4.1,
+     "caliber_mm": 105,
+     "mounts": "10x1"
+    },
+    "torpedo_tubes": {
+     "count": 2,
+     "caliber_in": 17.7,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 0,
+    "deck_mm": 80,
+    "turret_mm": 0,
+    "torpedo_defense": 0
+   },
+   "complement": 288,
+   "design_year": 1901,
+   "hulls_aggregate": {
+    "count": 2,
+    "status": "active",
+    "notes": "Berlin, Hamburg."
+   },
+   "notes": "Twenty-one years old at the file's date and still counted against the six-cruiser allowance, which is the point of the allowance."
+  },
+  {
+   "id": "gazelle_cl",
+   "name": "Gazelle class",
+   "nation": "DEU",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "pre_dreadnought",
+   "displacement": {
+    "standard_tons": 2650,
+    "full_load_tons": 3000
+   },
+   "propulsion": {
+    "speed_kn": 21.5,
+    "shp": 8000,
+    "range_nm": 3600,
+    "range_at_kn": 12,
+    "fuel": "coal"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 10,
+     "caliber_in": 4.1,
+     "caliber_mm": 105,
+     "mounts": "10x1"
+    },
+    "torpedo_tubes": {
+     "count": 2,
+     "caliber_in": 17.7,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 0,
+    "deck_mm": 25,
+    "turret_mm": 0,
+    "torpedo_defense": 0
+   },
+   "complement": 257,
+   "design_year": 1897,
+   "hulls_aggregate": {
+    "count": 6,
+    "status": "mixed",
+    "notes": "Amazone, Arcona, Medusa, Niobe, Nymphe, Thetis — four in commission, two in reserve, and Niobe is a hulk in all but name."
+   },
+   "notes": "The oldest cruisers in commission in any European navy. Article 190's twenty-year clock has already expired on every one of them, which is why Emden could be laid down at all."
+  },
+  {
+   "id": "v1_dd",
+   "name": "V1 class",
+   "nation": "DEU",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "flush_deck",
+   "displacement": {
+    "standard_tons": 570,
+    "full_load_tons": 700
+   },
+   "propulsion": {
+    "speed_kn": 32,
+    "shp": 17000,
+    "range_nm": 1800,
+    "range_at_kn": 17,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 2,
+     "caliber_in": 3.4,
+     "caliber_mm": 88,
+     "mounts": "2x1"
+    },
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 19.7,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 0,
+    "deck_mm": 0,
+    "turret_mm": 0,
+    "torpedo_defense": 0
+   },
+   "complement": 74,
+   "design_year": 1910,
+   "hulls_aggregate": {
+    "count": 12,
+    "status": "active",
+    "notes": "The twelve destroyers Article 181 allows, made up from the 1911–13 V, S and G types. Replacement is barred until fifteen years after completion and capped at 800 t."
+   },
+   "notes": "A prewar torpedo boat rated a destroyer because the Treaty uses the word. The flotillas that will train every submarine officer in the next fifteen years are these boats and nothing else."
+  },
+  {
+   "id": "a_boat_tb",
+   "name": "A-boat class",
+   "nation": "DEU",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "flush_deck",
+   "displacement": {
+    "standard_tons": 227,
+    "full_load_tons": 260
+   },
+   "propulsion": {
+    "speed_kn": 25,
+    "shp": 3500,
+    "range_nm": 800,
+    "range_at_kn": 14,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 1,
+     "caliber_in": 3.4,
+     "caliber_mm": 88,
+     "mounts": "1x1"
+    },
+    "torpedo_tubes": {
+     "count": 2,
+     "caliber_in": 17.7,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 0,
+    "deck_mm": 0,
+    "turret_mm": 0,
+    "torpedo_defense": 0
+   },
+   "complement": 29,
+   "design_year": 1915,
+   "hulls_aggregate": {
+    "count": 12,
+    "status": "mixed",
+    "notes": "The twelve torpedo boats Article 181 allows, from the wartime A-series coastal boats. Replacement capped at 200 t."
+   },
+   "notes": "Two hundred and twenty-seven tons, one gun and a coastal radius. They are on the establishment because the Treaty counts hulls and not capability, and they are the reason a German naval officer of 1922 could go to sea at all."
+  }
+ ],
+ "hulls": [
+  {
+   "id": "km_hannover",
+   "class_id": "deutschland_bb",
+   "name": "Hannover",
+   "laid_down": "1904-11-07",
+   "launched": "1905-09-29",
+   "completed": "1907-10-01",
+   "status": "active",
+   "assignment": "Line squadron, Baltic"
+  },
+  {
+   "id": "km_schlesien",
+   "class_id": "deutschland_bb",
+   "name": "Schlesien",
+   "laid_down": "1904-11-19",
+   "launched": "1906-05-28",
+   "completed": "1908-05-05",
+   "status": "active",
+   "assignment": "Line squadron, North Sea"
+  },
+  {
+   "id": "km_schleswig_holstein",
+   "class_id": "deutschland_bb",
+   "name": "Schleswig-Holstein",
+   "laid_down": "1905-08-18",
+   "launched": "1906-12-17",
+   "completed": "1908-07-06",
+   "status": "active",
+   "assignment": "Line squadron, North Sea"
+  },
+  {
+   "id": "km_braunschweig",
+   "class_id": "braunschweig_bb",
+   "name": "Braunschweig",
+   "laid_down": "1901-10-01",
+   "launched": "1902-12-20",
+   "completed": "1904-10-15",
+   "status": "active",
+   "assignment": "Gunnery training"
+  },
+  {
+   "id": "km_elsass",
+   "class_id": "braunschweig_bb",
+   "name": "Elsass",
+   "laid_down": "1901-05-26",
+   "launched": "1903-05-26",
+   "completed": "1904-11-29",
+   "status": "active",
+   "assignment": "Line squadron, Baltic"
+  },
+  {
+   "id": "km_hessen",
+   "class_id": "braunschweig_bb",
+   "name": "Hessen",
+   "laid_down": "1902-04-15",
+   "launched": "1903-09-18",
+   "completed": "1905-09-19",
+   "status": "active",
+   "assignment": "Line squadron, Baltic"
+  },
+  {
+   "id": "km_preussen",
+   "class_id": "braunschweig_bb",
+   "name": "Preussen",
+   "laid_down": "1902-04-01",
+   "launched": "1903-10-30",
+   "completed": "1905-07-12",
+   "status": "reserve",
+   "notes": "Reserve under Article 181's two-ship allowance. Hulked as a depot ship before the decade is out."
+  },
+  {
+   "id": "km_lothringen",
+   "class_id": "braunschweig_bb",
+   "name": "Lothringen",
+   "laid_down": "1902-12-01",
+   "launched": "1904-05-27",
+   "completed": "1906-05-18",
+   "status": "reserve",
+   "notes": "Reserve under Article 181's two-ship allowance. The Treaty names her type in its own text and she is the oldest thing in it."
+  },
+  {
+   "id": "km_emden",
+   "class_id": "emden_cl",
+   "name": "Emden",
+   "laid_down": "1921-12-08",
+   "launched": null,
+   "completed": null,
+   "pct_complete": 4,
+   "status": "building",
+   "notes": "⚠ FOUR PERCENT COMPLETE ON THE DAY THE WASHINGTON TREATY IS SIGNED, and the only German keel on any slip. Completes 1925 in every configuration, because she was ordered before the submarine faction won the argument. THE LAST GERMAN CRUISER."
+  },
+  {
+   "id": "km_mackensen",
+   "class_id": "mackensen_bc",
+   "name": "Mackensen",
+   "laid_down": "1915-01-30",
+   "launched": "1917-04-21",
+   "completed": null,
+   "status": "scrapped",
+   "notes": "Launched 1917, work stopped 1918, broken up at Hamburg from 1921 under Article 186. Never armed: the 35 cm gun was mounted in nothing."
+  },
+  {
+   "id": "km_graf_spee_bc",
+   "class_id": "mackensen_bc",
+   "name": "Graf Spee",
+   "laid_down": "1915-11-30",
+   "launched": "1917-09-15",
+   "completed": null,
+   "status": "scrapped",
+   "notes": "Broken up at Kiel from 1921. ⚠ THE NAME IS RE-USED IN NO CONFIGURATION OF THIS SCENARIO — Germany builds no Panzerschiff."
+  },
+  {
+   "id": "km_prinz_eitel_friedrich",
+   "class_id": "mackensen_bc",
+   "name": "Prinz Eitel Friedrich",
+   "laid_down": "1915-05-01",
+   "launched": "1920-03-13",
+   "completed": null,
+   "status": "scrapped",
+   "notes": "Launched only to clear the slip, and broken up in the water."
+  },
+  {
+   "id": "km_furst_bismarck",
+   "class_id": "mackensen_bc",
+   "name": "Fürst Bismarck",
+   "laid_down": "1915-11-03",
+   "launched": null,
+   "completed": null,
+   "pct_complete": 25,
+   "status": "scrapped",
+   "notes": "Broken up on the slip, twenty-five percent complete. The last German capital ship of any kind for as long as this scenario runs."
+  }
+ ]
+}

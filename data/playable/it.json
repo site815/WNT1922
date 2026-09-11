@@ -1,0 +1,1614 @@
+{
+  "nation": "ITA",
+  "revision": "0.5.0",
+  "notes": "Authored playable supplements. Engineering, aircraft progression and prices are provisional; historical legacy records retain their base-catalog provenance.",
+  "sources": [
+    "game/data/CAMPAIGN-SOURCES.md"
+  ],
+  "equipment": {
+    "it30snr": {
+      "name": "Mare Nostrum active sonar",
+      "nation": "ITA",
+      "year": 1930,
+      "family": "snr",
+      "interface": "hull_sonar",
+      "range_km": 1.8,
+      "notes": "Provisional contemporary active sonar fit; no radar or advanced depth solution."
+    }
+  },
+  "campaigns": {
+    "in_good_faith_1936": {
+      "classes": [
+        {
+          "spec": {
+            "id": "mare_bb29",
+            "nation": "ITA",
+            "name": "Italia fast battleship",
+            "type": "BB",
+            "design_year": 1929,
+            "displacement": {
+              "standard_tons": 35000
+            },
+            "propulsion": {
+              "speed_kn": 29,
+              "range_nm": 5500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 381,
+                "count": 9
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 320,
+              "deck_mm": 80
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 1226,
+            "cost_gold": 16800,
+            "treaty_category": "capital_ship",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "mare_ca30",
+            "nation": "ITA",
+            "name": "Mediterraneo cruiser",
+            "type": "CA",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 10500
+            },
+            "propulsion": {
+              "speed_kn": 34,
+              "range_nm": 5000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 203,
+                "count": 8
+              },
+              "torpedo_tubes": {
+                "count": 8
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 140,
+              "deck_mm": 35
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 368,
+            "cost_gold": 5040,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "mare_dd31",
+            "nation": "ITA",
+            "name": "Lampo torpedo destroyer",
+            "type": "DD",
+            "design_year": 1931,
+            "displacement": {
+              "standard_tons": 1850
+            },
+            "propulsion": {
+              "speed_kn": 37,
+              "range_nm": 3500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 120,
+                "count": 6
+              },
+              "torpedo_tubes": {
+                "count": 8
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 15,
+              "deck_mm": 4
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 139,
+            "cost_gold": 888,
+            "treaty_category": "other",
+            "sensors": [
+              "it30snr"
+            ]
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "mare_cv32",
+            "nation": "ITA",
+            "name": "Sparviero fleet carrier",
+            "type": "CV",
+            "design_year": 1932,
+            "displacement": {
+              "standard_tons": 18000
+            },
+            "propulsion": {
+              "speed_kn": 30,
+              "range_nm": 5000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 120,
+                "count": 8
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 60,
+              "deck_mm": 15
+            },
+            "aviation": {
+              "aircraft_capacity": 45
+            },
+            "complement": 721,
+            "cost_gold": 8640,
+            "treaty_category": "aircraft_carrier",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "mare_ss28",
+            "nation": "ITA",
+            "name": "Tirreno submarine",
+            "type": "SS",
+            "design_year": 1928,
+            "displacement": {
+              "standard_tons": 950
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 1
+              },
+              "torpedo_tubes": {
+                "count": 6
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 48,
+            "cost_gold": 456,
+            "treaty_category": "other",
+            "speed_submerged": {
+              "surfaced_kn": 18,
+              "sprint_kn": 8
+            },
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "mare_bb38",
+            "nation": "ITA",
+            "name": "Impero improved battleship",
+            "type": "BB",
+            "design_year": 1938,
+            "displacement": {
+              "standard_tons": 41000
+            },
+            "propulsion": {
+              "speed_kn": 30,
+              "range_nm": 6000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 381,
+                "count": 9
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 350,
+              "deck_mm": 88
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 1436,
+            "cost_gold": 19680,
+            "treaty_category": "capital_ship",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ita_program_oiler",
+            "nation": "ITA",
+            "name": "Mare Nostrum fleet oiler",
+            "type": "AO",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 6500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 228,
+            "cost_gold": 3120,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
+          "service": "support"
+        },
+        {
+          "spec": {
+            "id": "it_merchant_1922",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "it_merchant_1936",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "it_merchant_1948",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1922",
+            "nation": "ITA",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1922",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1936",
+            "nation": "ITA",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1936",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1950",
+            "nation": "ITA",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1950",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "ita_program_1930_fighter",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1930_strike",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1930_scout",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1936_fighter",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1936_strike",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1936_scout",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1942_fighter",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1942_strike",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_program_1942_scout",
+          "nation": "ITA",
+          "name": "Mare Nostrum 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 1041,
+        "grossRegisterTons": 2838354,
+        "managedHulls": 0,
+        "referenceYear": 1935,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      },
+      "navy": {
+        "navy": "Regia Marina",
+        "title": "Mare Nostrum",
+        "home": "mediterranean",
+        "rival": "FRA",
+        "description": "Fast surface forces, concentrated torpedo aviation and strong logistics for Mediterranean sea control.",
+        "nation": "ITA",
+        "hulls": [
+          {
+            "id": "rm_conte_di_cavour",
+            "class_id": "conte_di_cavour",
+            "name": "Conte di Cavour",
+            "laid_down": "1910-08-10",
+            "launched": "1911-08-10",
+            "completed": "1915-04-01",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          },
+          {
+            "id": "rm_giulio_cesare",
+            "class_id": "conte_di_cavour",
+            "name": "Giulio Cesare",
+            "laid_down": "1910-06-24",
+            "launched": "1911-10-15",
+            "completed": "1914-05-14",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          },
+          {
+            "id": "rm_andrea_doria",
+            "class_id": "andrea_doria",
+            "name": "Andrea Doria",
+            "laid_down": "1912-03-24",
+            "launched": "1913-03-30",
+            "completed": "1916-03-13",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          },
+          {
+            "id": "rm_caio_duilio",
+            "class_id": "andrea_doria",
+            "name": "Caio Duilio",
+            "laid_down": "1912-02-24",
+            "launched": "1913-04-24",
+            "completed": "1915-05-10",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          }
+        ],
+        "aggregates": [
+          {
+            "id": "program-mare_bb29",
+            "class_id": "mare_bb29",
+            "count": 2,
+            "status": "active"
+          },
+          {
+            "id": "program-mare_ca30",
+            "class_id": "mare_ca30",
+            "count": 4,
+            "status": "active"
+          },
+          {
+            "id": "program-mare_dd31",
+            "class_id": "mare_dd31",
+            "count": 28,
+            "status": "active"
+          },
+          {
+            "id": "program-mare_cv32",
+            "class_id": "mare_cv32",
+            "count": 1,
+            "status": "active"
+          },
+          {
+            "id": "program-mare_ss28",
+            "class_id": "mare_ss28",
+            "count": 24,
+            "status": "active"
+          },
+          {
+            "id": "legacy-ita-leone",
+            "class_id": "leone",
+            "count": 3,
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "legacy-ita-palestro",
+            "class_id": "palestro",
+            "count": 4,
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "legacy-ita-curtatone",
+            "class_id": "curtatone",
+            "count": 4,
+            "status": "active",
+            "legacy": true
+          }
+        ],
+        "designs": [
+          "mare_bb29",
+          "mare_ca30",
+          "mare_dd31",
+          "mare_cv32",
+          "mare_ss28",
+          "mare_bb38",
+          "ita_program_oiler",
+          "it_merchant_1922",
+          "it_merchant_1936",
+          "it_merchant_1948"
+        ],
+        "support": [
+          {
+            "id": "support-ITA",
+            "class_id": "ita_program_oiler",
+            "count": 4,
+            "status": "active"
+          }
+        ],
+        "state": {},
+        "legacyNote": "Historical surviving capital ships and representative inherited light forces accompany the hypothetical program. See game/data/CAMPAIGN-SOURCES.md."
+      }
+    },
+    "campaign_1922": {
+      "classes": [
+        {
+          "spec": {
+            "id": "it_merchant_1922",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "it_merchant_1936",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "it_merchant_1948",
+            "nation": "ITA",
+            "name": "Italy standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1922",
+            "nation": "ITA",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1922",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1936",
+            "nation": "ITA",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1936",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_depot_1950",
+            "nation": "ITA",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "it_oiler_1950",
+            "nation": "ITA",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "ita_early_fighter",
+          "nation": "ITA",
+          "name": "Macchi M.7",
+          "type_year": 1921,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 30,
+          "weights": {
+            "empty_kg": 1050
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_early_strike",
+          "nation": "ITA",
+          "name": "Savoia S.16",
+          "type_year": 1921,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_early_scout",
+          "nation": "ITA",
+          "name": "Macchi M.5",
+          "type_year": 1921,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1930_fighter",
+          "nation": "ITA",
+          "name": "ITA 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1930_strike",
+          "nation": "ITA",
+          "name": "ITA 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1930_scout",
+          "nation": "ITA",
+          "name": "ITA 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1936_fighter",
+          "nation": "ITA",
+          "name": "ITA 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1936_strike",
+          "nation": "ITA",
+          "name": "ITA 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1936_scout",
+          "nation": "ITA",
+          "name": "ITA 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1942_fighter",
+          "nation": "ITA",
+          "name": "ITA 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1942_strike",
+          "nation": "ITA",
+          "name": "ITA 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "ita_standard_1942_scout",
+          "nation": "ITA",
+          "name": "ITA 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 893,
+        "grossRegisterTons": 2467537,
+        "managedHulls": 0,
+        "referenceYear": 1921,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      }
+    }
+  }
+}

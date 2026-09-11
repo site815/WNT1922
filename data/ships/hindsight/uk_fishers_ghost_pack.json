@@ -1,0 +1,2266 @@
+{
+ "nation": "GBR",
+ "navy": "Royal Navy",
+ "prefix": "uk",
+ "scenario": "fishers-ghost",
+ "toggle": "Fisher's Ghost",
+ "as_of": "1936-01-01",
+ "version": "platform v1 / equipment v1 / scenario 0.1 / road 1.0",
+ "source": [
+  "docs/hindsight/uk-fishers-ghost-scenario.md",
+  "docs/hindsight/uk-fishers-ghost-platform-catalog.md",
+  "docs/hindsight/uk-fishers-ghost-equipment-catalog.md",
+  "docs/hindsight/uk-fishers-ghost-road.md",
+  "docs/hindsight-scenarios.md 2"
+ ],
+ "equipment_file": "data/equipment/uk_fishers_ghost.json",
+ "base": {
+  "file": "data/ships/uk.json",
+  "divergence_date": "1922-02-06",
+  "retained_hulls": [
+   "hms_hood",
+   "hms_renown",
+   "hms_repulse",
+   "hms_furious",
+   "hms_courageous",
+   "hms_glorious",
+   "hms_barham",
+   "hms_malaya"
+  ],
+  "notes": "Britain signs at Washington on 6 February 1922 and suspends the four G3s that afternoon exactly as the treaty requires — FOR ELEVEN WEEKS. They resume on 24 April as 'reconstructions' of hulls surrendered for scrapping, declared at 35,000 t, and the base file's `g3` class (a canceled design) is therefore BUILT in this world as the Invincible class below. The Nelsons are never ordered. Everything slow was purged 1924-31 to pay for what came next: the R class and Iron Dukes scrapped, Queen Elizabeth, Warspite and Valiant scrapped by 1931, and BARHAM AND MALAYA SOLD TO THE ROYAL AUSTRALIAN NAVY with RAN crews as HMAS Australia and HMAS Anzac. Hood, Renown and Repulse were re-engined to 33 kt between 1927 and 1931 and are thereby THE SLOW SHIPS. Furious, Courageous and Glorious converted to carriers. Barham and Malaya, because they are the two the Admiralty never rebuilt and one of them it had never paid for. Warspite was deliberately not used: she is a 1940 set-piece combatant in sp-scenario-catalog.md SS3.3. Nothing in the base file is edited."
+ },
+ "build_model": {
+  "script": "build_model_uk.py",
+  "derived": "data/derived/uk_build_model.json",
+  "notes": "AN AUDIT, NOT A PURSE. Britain's program is five named classes on a known cadence, every one larger and different from the last, so there is no curve to ride and nothing to search for. The model prices the authored program against TWO VOTES — a hull vote in tons, which the treaties limit, and a MACHINERY VOTE IN SHAFT HORSEPOWER, WHICH NO TREATY LIMITS AT ALL and which Britain quadrupled between 1922 and 1930. The fleet at each year-end comes from the authored dates and cannot drift from canon. THE FINDING IS THAT THE CONSTRAINT MOVES: machinery binds 1922-26 (cumulative load peaks at 153 percent in 1923), which is WHY the vote was quadrupled; from 1927 the hull vote is the one over-subscribed, and the machinery vote is never over-subscribed after 1929 - which is why the last ship on the ladder carries less plant than the one before it and a third more guns."
+ },
+ "not_built": [
+  {
+   "what": "The Nelson class",
+   "why": "The treaty exception that historically bought Britain two 16-inch ships is spent on resuming the G3s instead. The first decision of the divergence, and the one nobody outside the Admiralty noticed."
+  },
+  {
+   "what": "Twenty-three cruisers",
+   "why": "28 hulls against a stated trade-defense requirement of 70, and 53 PERCENT OF THE TREATY ALLOWANCE. Britain did not build what the treaty permitted her to build, and the money went into the machinery vote."
+  },
+  {
+   "what": "Any escort, sloop or corvette, in any year",
+   "why": "There is no escort program, no escort design, no escort yard allocation and none in the 1936 Estimates. The Portland asdic school produces the best anti-submarine operators in the world and there is nothing to billet them in."
+  },
+  {
+   "what": "Any slow battleship under the White Ensign",
+   "why": "Everything slow was purged 1924-31. There is no convoy battle squadron and no slow battle line for convoy cover; the only slow capital ships in the Empire fly the Australian flag."
+  },
+  {
+   "what": "Armor development",
+   "why": "Stopped being a British program in 1922. Plate capacity is modest, three mills closed, and a decision to armor anything would take four years to become steel."
+  },
+  {
+   "what": "Any provision for equipment that does not yet exist",
+   "why": "A British hull is worked for what she commissions with and nothing else, so every later fit is structural work at structural prices. NOT AN ACCIDENT OF POVERTY BUT A POSITION: provisioning for a set you cannot describe is money the machinery vote could have had."
+  },
+  {
+   "what": "An oxygen torpedo program",
+   "why": "The Torpedo Establishment costed one in 1926 and the Board spent the money on the Haslar boiler house."
+  },
+  {
+   "what": "Any reactive program against a rival",
+   "why": "FLEETS COMPOSE, ASSESSMENTS DO NOT."
+  }
+ ],
+ "classes": [
+  {
+   "id": "invincible_bc22",
+   "name": "Invincible class",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1921,
+   "as_launched_year": 1925,
+   "cost_gold": 21000,
+   "durability": 5100,
+   "displacement": {
+    "empty_tons": 45100,
+    "standard_tons": 48400,
+    "full_load_tons": 53400
+   },
+   "dimensions": {
+    "length_m": 261,
+    "beam_m": 32.3,
+    "draft_m": 10.0
+   },
+   "propulsion": {
+    "plant": "[uk22eng] Mark I, 250 psi saturated, single-reduction geared turbines, 4 shafts",
+    "shp": 160000,
+    "speed_kn": 32,
+    "range_km": 13000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 5000
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk22gun",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "2 forward / 1 amidships abaft the bridge",
+     "ammunition": "uk22shl",
+     "rounds_per_gun": 100,
+     "rounds_total": 900,
+     "firing_time_min": 50
+    },
+    {
+     "role": "torpedo",
+     "mounts": 2,
+     "tubes": 2,
+     "arrangement": "submerged, beam",
+     "spec": {
+      "name": "24.5 in submerged tube",
+      "caliber_in": 24.5,
+      "caliber_mm": 622,
+      "pattern": "1921",
+      "notes": "The only torpedo in a British capital ship. Struck from every design after hers."
+     },
+     "stowage": 10
+    }
+   ],
+   "armament": {
+    "secondary_battery": [
+     {
+      "count": 16,
+      "caliber_in": 6,
+      "caliber_mm": 152,
+      "length_cal": 50,
+      "mounts": "eight twin turrets",
+      "pattern": "1921",
+      "arrangement": "4 per side",
+      "rounds_per_gun": 150,
+      "rounds_total": 2400,
+      "firing_time_min": 30
+     }
+    ],
+    "aa_battery": [
+     {
+      "count": 6,
+      "caliber_mm": 120,
+      "caliber_in": 4.7,
+      "mounts": "single high-angle",
+      "pattern": "1921",
+      "rounds_per_gun": 200,
+      "firing_time_min": 25
+     }
+    ]
+   },
+   "aviation": {
+    "catapults": 1,
+    "catapult_rating_t": 3.2,
+    "aircraft_capacity": 2,
+    "catapult": "uk24cat"
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 203,
+    "barbette_mm": 356,
+    "turret_mm": 432,
+    "ct_mm": 203,
+    "torpedo_defense": 1,
+    "features": [
+     "belt inclined 18 deg",
+     "deck 203 mm over magazines, 102 mm over machinery",
+     "torpedo bulkhead 4.3 m deep",
+     "the G3 scheme of 1921, unaltered in every dimension through four classes"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_heavy",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted",
+     "notes": "Two submerged 24.5-inch tubes, drawn in 1921. THE ONLY BRITISH CAPITAL SHIP THAT CARRIES A TORPEDO — the Fisher school struck them from every design after hers."
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. No mast, no wiring run, no power margin. Britain does not provision and never has."
+    },
+    {
+     "interface": "director_tower",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "1921-pattern director tops only; no trunnion for the Mark I director of 1927."
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "Laid down before 1927. Fitting the abeam rig would be structural work, and it has not been done."
+    }
+   ],
+   "complement": 1720,
+   "possible_upgrades": [
+    "uk24sec",
+    "uk32sec",
+    "uk27can",
+    "uk39can",
+    "uk30shl",
+    "uk27dir",
+    "uk32dir",
+    "uk38dir",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "THE G3s AS THE ADMIRALTY ACTUALLY DREW THEM IN 1921, BUILT WITHOUT A LINE ALTERED. Suspended 6 February 1922 as the treaty required, resumed 24 April as reconstructions of hulls surrendered for scrapping, declared at 35,000 t. The Nelson class is never ordered: the treaty exception that historically bought two cut-down 16-inch ships is spent on the resumption. The Admiralty's only complaint was the Controller's minute of 3 May: THIRTY-TWO KNOTS IS NOT ENOUGH — three words carved over the drawing office door at Bath in 1931. The best-protected capital ship this navy will ever have and also the worst, because every ship after her has exactly her armor and more of everything else."
+  },
+  {
+   "id": "insuperable_bc27",
+   "name": "Insuperable class",
+   "parent_class": "invincible_bc22",
+   "changes": "+3,100 t standard; +14 m length; +84,000 shp on the Mark II plant; +4 kt to the fleet's 36; the protective scheme is unaltered in every dimension; Mark II mountings on the same rings, rearranged all forward — the citadel twenty meters shorter and the astern arcs given up for it, and every British capital ship after her is drawn this way; the submerged tubes struck; pom-poms for the 4.7-inch high-angle singles; abeam refueling trunk from new; crew +120; declared at 35,000 tons and 29 knots.",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1926,
+   "as_launched_year": 1929,
+   "cost_gold": 26000,
+   "durability": 5400,
+   "displacement": {
+    "empty_tons": 48000,
+    "standard_tons": 51500,
+    "full_load_tons": 57300
+   },
+   "dimensions": {
+    "length_m": 275,
+    "beam_m": 32.3,
+    "draft_m": 10.0
+   },
+   "propulsion": {
+    "plant": "[uk27eng] Mark II, 400 psi / 370 C superheat, 4 shafts",
+    "shp": 244000,
+    "speed_kn": 36,
+    "range_km": 14000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 5800
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk27gun",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "3 forward",
+     "ammunition": "uk22shl",
+     "rounds_per_gun": 100,
+     "rounds_total": 900,
+     "firing_time_min": 50
+    },
+    {
+     "role": "secondary",
+     "component": "uk24sec",
+     "mounts": 16,
+     "barrels_per_mount": 1,
+     "arrangement": "8 per side",
+     "rounds_per_gun": 200,
+     "rounds_total": 3200,
+     "firing_time_min": 20
+    },
+    {
+     "role": "light_aa",
+     "component": "uk27can",
+     "mounts": 2,
+     "barrels_per_mount": 8,
+     "rounds_per_gun": 1400,
+     "firing_time_min": 15
+    }
+   ],
+   "aviation": {
+    "catapults": 1,
+    "catapult_rating_t": 3.2,
+    "aircraft_capacity": 3,
+    "catapult": "uk24cat"
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 203,
+    "barbette_mm": 356,
+    "turret_mm": 432,
+    "ct_mm": 203,
+    "torpedo_defense": 1,
+    "features": [
+     "belt inclined 18 deg",
+     "deck 203 mm over magazines, 102 mm over machinery",
+     "torpedo bulkhead 4.3 m deep",
+     "the G3 scheme of 1921, unaltered in every dimension through four classes"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 16,
+     "fitted": 16,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_heavy",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted",
+     "notes": "The first British ships built with it from new."
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk27dir"
+   ],
+   "kits": [
+    "uk30kit"
+   ],
+   "complement": 1840,
+   "possible_upgrades": [
+    "uk32sec",
+    "uk39can",
+    "uk30shl",
+    "uk32dir",
+    "uk38dir",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "A requirement of one line: THE INVINCIBLE, FOUR KNOTS FASTER. Not a better ship, not a bigger gun, not a different arrangement. NOTHING CAME OFF HER TO PAY FOR IT — the belt, deck, barbettes and faces are the G3's, and everything the four knots cost was paid in machinery and in hull. WHERE THIRTY-SIX KNOTS ARRIVES, AND IT NEVER LEAVES AGAIN. Declared at 35,000 t and 29 kt: the tonnage is the treaty's own arithmetic applied hard, the speed is a straightforward untruth. First British ship with the abeam refueling trunk from new. ⚠ ALL THREE GROUPS FORWARD — the Fisher arrangement in its pure form, adopted in 1927 and carried by every British capital ship afterwards. It shortens the armored citadel by 20 m, which is most of what the four knots cost, and it gives up the astern arcs to do it: X bears on neither quarter without blasting her own bridge."
+  },
+  {
+   "id": "incomparable_bc31",
+   "name": "Incomparable class",
+   "parent_class": "insuperable_bc27",
+   "changes": "+3,000 t standard; +10 m length, +0.7 m beam; +7,000 shp on the Mark III plant for the same 36 kt; the protective scheme is unaltered in every dimension; only the barbette diameters grew; Mark III mountings, 18 in for 16 in — nine barrels for nine, the 1917 bore relined; the all-forward arrangement retained from the Insuperable; a dual secondary and light-AA battery doubled; crew +140.",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1931,
+   "as_launched_year": 1934,
+   "cost_gold": 31000,
+   "durability": 5800,
+   "displacement": {
+    "empty_tons": 50800,
+    "standard_tons": 54500,
+    "full_load_tons": 60700
+   },
+   "dimensions": {
+    "length_m": 285,
+    "beam_m": 33.0,
+    "draft_m": 10.2
+   },
+   "propulsion": {
+    "plant": "[uk30eng] Mark III, 500 psi / 400 C, double-reduction gearing, 4 shafts",
+    "shp": 251000,
+    "speed_kn": 36,
+    "range_km": 14500,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 6200
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk31gun",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "3 forward",
+     "ammunition": "uk30shl",
+     "rounds_per_gun": 90,
+     "rounds_total": 810,
+     "firing_time_min": 51
+    },
+    {
+     "role": "secondary",
+     "component": "uk24sec",
+     "mounts": 16,
+     "barrels_per_mount": 1,
+     "arrangement": "8 per side",
+     "rounds_per_gun": 200,
+     "rounds_total": 3200,
+     "firing_time_min": 20
+    },
+    {
+     "role": "light_aa",
+     "component": "uk27can",
+     "mounts": 4,
+     "barrels_per_mount": 8,
+     "rounds_per_gun": 1400,
+     "firing_time_min": 15
+    }
+   ],
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 3.2,
+    "aircraft_capacity": 4,
+    "catapult": "uk24cat"
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 203,
+    "barbette_mm": 356,
+    "turret_mm": 432,
+    "ct_mm": 203,
+    "torpedo_defense": 1,
+    "features": [
+     "belt inclined 18 deg",
+     "deck 203 mm over magazines, 102 mm over machinery",
+     "torpedo bulkhead 4.6 m deep",
+     "the G3 scheme of 1921, unaltered in every dimension through four classes"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 16,
+     "fitted": 16,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "magazine_heavy",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk32dir"
+   ],
+   "kits": [
+    "uk30kit"
+   ],
+   "complement": 1980,
+   "possible_upgrades": [
+    "uk32sec",
+    "uk39can",
+    "uk38dir",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "The Insuperable with a bigger hole in the barrel. AGAIN NOTHING CAME OFF: same belt, same deck, same barbette thickness, same arrangement, same 36 knots, and nine 18-inch guns where there were nine 16-inch. The Mark III is the 1917 bore relined — Fisher's own gun, built for Furious — and Britain is the only navy that already owned 18-inch jigs. The drawing office motto was cut over the door at Bath in 1931 and it is the Controller's three words from 1922: NOT FAST ENOUGH. ⚠ 40 KNOTS DOES NOT EXIST ON THIS HULL: at 54,500 t and a 285 m waterline it is Fn 0.389, C about 250, and roughly 368,000 shp."
+  },
+  {
+   "id": "incorrigible_bc35",
+   "name": "Incorrigible",
+   "parent_class": "incomparable_bc31",
+   "changes": "+4,500 t standard; same length, the all-forward arrangement unaltered for the third time; +2.0 m beam, +0.4 m draft; +14,000 shp on the Mark IV plant for the same 36 kt; the belt is unchanged and everything else in the protective scheme grew: deck +51 mm and rearranged into two layers, machinery deck +76 mm, torpedo defense +4.4 m and five bulkheads liquid loaded, triple bottom; the anti-aircraft battery is the design: 24 dual-purpose barrels for 16 single 4.7-inch, 80 pom-pom barrels for 32, and six high-angle directors fitted; crew +470.",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "design_year": 1935,
+   "as_launched_year": 1935,
+   "cost_gold": 37000,
+   "durability": 6800,
+   "displacement": {
+    "empty_tons": 55000,
+    "standard_tons": 59000,
+    "full_load_tons": 65700
+   },
+   "dimensions": {
+    "length_m": 285,
+    "beam_m": 35.0,
+    "draft_m": 10.6
+   },
+   "propulsion": {
+    "plant": "[uk34eng] Mark IV, 600 psi / 450 C, 4 shafts",
+    "shp": 265000,
+    "speed_kn": 36,
+    "range_km": 14000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 6700
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk31gun",
+     "mounts": 3,
+     "barrels_per_mount": 3,
+     "arrangement": "3 forward",
+     "ammunition": "uk30shl",
+     "rounds_per_gun": 90,
+     "rounds_total": 810,
+     "firing_time_min": 51
+    },
+    {
+     "role": "secondary",
+     "component": "uk32sec",
+     "mounts": 12,
+     "barrels_per_mount": 2,
+     "arrangement": "6 per side",
+     "rounds_per_gun": 300,
+     "rounds_total": 7200,
+     "firing_time_min": 25
+    },
+    {
+     "role": "light_aa",
+     "component": "uk27can",
+     "mounts": 10,
+     "barrels_per_mount": 8,
+     "rounds_per_gun": 1400,
+     "firing_time_min": 15
+    }
+   ],
+   "aviation": {
+    "catapults": 2,
+    "catapult_rating_t": 3.2,
+    "aircraft_capacity": 4,
+    "catapult": "uk24cat"
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 254,
+    "barbette_mm": 356,
+    "turret_mm": 432,
+    "ct_mm": 203,
+    "torpedo_defense": 5,
+    "features": [
+     "belt inclined 20 deg",
+     "deck 254 mm in two layers (51 mm decapping over 203 mm main) over magazines, 178 mm over machinery",
+     "torpedo defense 5 bulkheads, 9.0 m deep, liquid loaded",
+     "triple bottom",
+     "THE BELT IS THE G3's AND EVERYTHING ELSE GREW: this is the one ship in the ladder drawn against the airplane"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 12,
+     "fitted": 12,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 10,
+     "fitted": 10,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 7,
+     "fitted": 7,
+     "state": "fitted",
+     "notes": "One Mark II director and six high-angle directors, FITTED — the only ship in this navy whose air-defense control is designed in rather than refitted."
+    },
+    {
+     "interface": "magazine_heavy",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk32dir"
+   ],
+   "kits": [
+    "uk30kit"
+   ],
+   "complement": 2450,
+   "possible_upgrades": [
+    "uk39can",
+    "uk38dir",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "The fourth statement of the same ship and the first that answers a different question. The requirement was written by two officers who spent 1933 and 1934 watching Fleet Air Arm exercises and concluded, in writing, that the thing which would sink a British capital ship was not going to be a British-sized gun. The battery is the Incomparable's, all three groups forward for the first time, and everything the twenty meters of shortened citadel saves, plus 4,500 t the Board found in the 1935 estimates, goes into a two-layer 254 mm deck, a 9 m liquid-loaded torpedo system and more anti-aircraft weight than the rest of the Royal Navy carries put together. ⚠ BRITAIN'S ANSWER TO NAVAL AVIATION EXISTS, IT IS CORRECT, AND IT IS 8 PERCENT BUILT ON 1 JANUARY 1936 — TWICE OVER. Two hulls: Incorrigible at Clydebank (ordered March 1935, due 1939) and Indefatigable at Barrow (September, due 1940)."
+  },
+  {
+   "id": "ark_royal_cv31",
+   "name": "Ark Royal class",
+   "nation": "GBR",
+   "type": "CV",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "design_year": 1930,
+   "as_launched_year": 1934,
+   "cost_gold": 10200,
+   "durability": 1700,
+   "displacement": {
+    "empty_tons": 23600,
+    "standard_tons": 25400,
+    "full_load_tons": 30700
+   },
+   "dimensions": {
+    "length_m": 244,
+    "beam_m": 29.4,
+    "draft_m": 8.8
+   },
+   "propulsion": {
+    "plant": "[uk30eng] Mark III, 500 psi / 400 C, 4 shafts",
+    "shp": 169000,
+    "speed_kn": 36,
+    "range_km": 19000,
+    "range_at_kn": 14,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 4700,
+    "avgas_tons": 400
+   },
+   "aviation": {
+    "flight_deck": true,
+    "flight_deck_m": 244,
+    "arresting_gear": true,
+    "catapults": 2,
+    "catapult_rating_t": 5.4,
+    "elevators": 3,
+    "elevator_type": "centerline",
+    "hangar_m2": 3300,
+    "hangar_clear_m": 4.9,
+    "deck_park_m2": 900,
+    "catapult": "uk30cat"
+   },
+   "batteries": [
+    {
+     "role": "secondary",
+     "component": "uk32sec",
+     "mounts": 8,
+     "barrels_per_mount": 2,
+     "arrangement": "4 per side",
+     "rounds_per_gun": 250,
+     "rounds_total": 4000,
+     "firing_time_min": 21
+    },
+    {
+     "role": "light_aa",
+     "component": "uk27can",
+     "mounts": 4,
+     "barrels_per_mount": 8,
+     "rounds_per_gun": 1400,
+     "firing_time_min": 15
+    }
+   ],
+   "protection": {
+    "belt_mm": 114,
+    "deck_mm": 89,
+    "flight_deck_mm": 64,
+    "features": [
+     "belt over machinery and magazines",
+     "89 mm hangar deck",
+     "FLIGHT DECK ARMORED 64 mm over the hangar box, between the elevators — paid for out of the lower hangar",
+     "avgas in cofferdammed cylindrical tanks"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk32dir"
+   ],
+   "kits": [
+    "uk30kit"
+   ],
+   "complement": 1680,
+   "possible_upgrades": [
+    "uk39can",
+    "uk38dir",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "Approved in 1930 on a single argument, and it was not an aviation argument: A DECK THAT CANNOT KEEP UP WITH THE BATTLE LINE IS A DECK THIS FLEET HAS NO USE FOR. Thirty-six knots — the fleet's number, fixed by the Insuperables the year before — was the requirement's first line and everything else is downstream of it. Two hangar decks in the British manner, and then the one thing no British department has done since 1922: THEY BOUGHT ARMOR. 64 mm over the hangar box, paid for in airplanes — the lower hangar lost a fifth of its length and the class carries 54 where the first sketch carried 66. The argument that won was arithmetic, not survivability: a deck holed forward cannot land the observers, and a fleet whose gunnery doctrine rests on those observers has bought nothing at all. ⚠ SHE COMMISSIONS WITH NOTHING MODERN TO FLY — her three types are 1936, 1937 and 1938 specifications."
+  },
+  {
+   "id": "swift_cl29",
+   "name": "Swift class",
+   "nation": "GBR",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "scout_cruiser",
+   "design_year": 1929,
+   "as_launched_year": 1931,
+   "cost_gold": 3900,
+   "durability": 620,
+   "displacement": {
+    "empty_tons": 6700,
+    "standard_tons": 7200,
+    "full_load_tons": 8700
+   },
+   "dimensions": {
+    "length_m": 195,
+    "beam_m": 17.4,
+    "draft_m": 5.4
+   },
+   "propulsion": {
+    "plant": "[uk30eng] Mark III, 500 psi / 400 C, 4 shafts",
+    "shp": 87000,
+    "speed_kn": 36,
+    "range_km": 6700,
+    "range_at_kn": 14,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 1500
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk29sec",
+     "mounts": 2,
+     "barrels_per_mount": 3,
+     "arrangement": "1 forward / 1 aft",
+     "rounds_per_gun": 150,
+     "rounds_total": 900,
+     "firing_time_min": 19
+    },
+    {
+     "role": "torpedo",
+     "component": "uk25lau",
+     "mounts": 2,
+     "tubes": 8,
+     "arrangement": "centerline",
+     "ammunition": "uk25tor",
+     "stowage": 8
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 2,
+      "caliber_mm": 102,
+      "mounts": "single high-angle",
+      "pattern": "1918",
+      "rounds_per_gun": 200,
+      "firing_time_min": 25
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 51,
+    "deck_mm": 25,
+    "torpedo_defense": 0,
+    "features": [
+     "belt over machinery and magazines only",
+     "NO TORPEDO BULKHEAD",
+     "35 percent of standard displacement is machinery, a fraction no warship in any navy has ever carried"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_mount_seat",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_tower",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. Nobody drawing a 36-knot cruiser with a quarter of her displacement in machinery was going to spend 16 tons on anti-aircraft."
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved",
+     "notes": "None. She refuels from a hose over the bow like a destroyer."
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk27dir"
+   ],
+   "complement": 620,
+   "possible_upgrades": [
+    "uk32sec",
+    "uk27can",
+    "uk39can",
+    "uk30tor",
+    "uk38tor",
+    "uk33lau",
+    "uk32dir",
+    "uk38rad"
+   ],
+   "notes": "The fastest cruiser ever built and the only one that holds the fleet's 36 knots, and eight of the twenty-six Britain has against a stated trade-defense requirement of seventy. Her fit for the job the Empire's sea lanes actually require — sitting at 9 knots beside a convoy for three weeks — is nil, and the design does not pretend otherwise: her endurance at cruising speed is the shortest of any British cruiser since 1900, because a hull with that much plant in it has nowhere left to put oil."
+  },
+  {
+   "id": "county_ca24",
+   "name": "County class",
+   "nation": "GBR",
+   "type": "CA",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "treaty_cruiser",
+   "design_year": 1923,
+   "as_launched_year": 1928,
+   "cost_gold": 4100,
+   "durability": 780,
+   "displacement": {
+    "empty_tons": 9300,
+    "standard_tons": 10000,
+    "full_load_tons": 13400
+   },
+   "dimensions": {
+    "length_m": 192,
+    "beam_m": 20.8,
+    "draft_m": 6.4
+   },
+   "propulsion": {
+    "plant": "[uk22eng] Mark I, 250 psi saturated, 4 shafts",
+    "shp": 80000,
+    "speed_kn": 32,
+    "range_km": 24000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 3400
+   },
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 4,
+      "caliber_mm": 102,
+      "mounts": "single high-angle",
+      "pattern": "1918",
+      "rounds_per_gun": 200,
+      "firing_time_min": 25
+     }
+    ]
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 4,
+     "barrels_per_mount": 2,
+     "arrangement": "2 forward / 2 aft",
+     "rounds_per_gun": 150,
+     "rounds_total": 1200,
+     "firing_time_min": 30,
+     "spec": {
+      "name": "8 in/50 pattern 1924",
+      "caliber_in": 8,
+      "caliber_mm": 203,
+      "length_cal": 50,
+      "count": 8,
+      "notes": "Outside the Mark sequence: drawn to the treaty cruiser rules by an office that regarded them as an imposition, and never given a Mark number."
+     }
+    },
+    {
+     "role": "torpedo",
+     "component": "uk25lau",
+     "mounts": 2,
+     "tubes": 8,
+     "ammunition": "uk25tor",
+     "stowage": 8
+    }
+   ],
+   "aviation": {
+    "catapults": 1,
+    "catapult_rating_t": 3.2,
+    "aircraft_capacity": 2,
+    "catapult": "uk24cat"
+   },
+   "protection": {
+    "belt_mm": 25,
+    "deck_mm": 35,
+    "turret_mm": 25,
+    "torpedo_defense": 0,
+    "features": [
+     "bulges",
+     "the treaty's compromise, not a British one"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_mount_seat",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "complement": 690,
+   "possible_upgrades": [
+    "uk32sec",
+    "uk27can",
+    "uk39can",
+    "uk30tor",
+    "uk38tor",
+    "uk33lau",
+    "uk27dir",
+    "uk32dir",
+    "uk26snr",
+    "uk34snr",
+    "uk22dpc",
+    "uk37dpc",
+    "uk38rad"
+   ],
+   "notes": "The last cruisers Britain builds to anybody else's requirement, and no British heavy cruiser has been laid down since 1927. Ten thousand tons and 8-inch guns are not a British specification; they are the specification the treaty wrote. At 32 knots she is not in the fast divisions at all: she works the China and America stations alone, unsupported, and the war plan does not say what she is supposed to do when found."
+  },
+  {
+   "id": "sabre_dd22",
+   "name": "Sabre class",
+   "nation": "GBR",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1922,
+   "as_launched_year": 1926,
+   "cost_gold": 620,
+   "durability": 140,
+   "displacement": {
+    "empty_tons": 1270,
+    "standard_tons": 1400,
+    "full_load_tons": 1890
+   },
+   "dimensions": {
+    "length_m": 104,
+    "beam_m": 10.2,
+    "draft_m": 3.5
+   },
+   "propulsion": {
+    "plant": "[uk22eng] Mark I as launched; later flotillas take the generation current when their keels are laid",
+    "shp": 38000,
+    "speed_kn": 34,
+    "range_km": 8300,
+    "range_at_kn": 15,
+    "fuel": "oil"
+   },
+   "fuel": {
+    "oil_tons": 490
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "uk24sec",
+     "mounts": 4,
+     "barrels_per_mount": 1,
+     "arrangement": "2 forward / 2 aft",
+     "rounds_per_gun": 200,
+     "rounds_total": 800,
+     "firing_time_min": 20
+    },
+    {
+     "role": "torpedo",
+     "component": "uk25lau",
+     "mounts": 2,
+     "tubes": 8,
+     "arrangement": "centerline",
+     "ammunition": "uk25tor",
+     "stowage": 8
+    },
+    {
+     "role": "mine",
+     "component": "uk23min",
+     "mounts": 1,
+     "arrangement": "rails",
+     "stowage": 40,
+     "optional": true
+    },
+    {
+     "role": "asw",
+     "component": "uk22dpc",
+     "mounts": 1,
+     "arrangement": "stern rails and 2 throwers",
+     "stowage": 30
+    }
+   ],
+   "armament": {
+    "aa_battery": [
+     {
+      "count": 2,
+      "caliber_mm": 40,
+      "mounts": "single 2 pdr",
+      "pattern": "1921",
+      "rounds_per_gun": 1000,
+      "firing_time_min": 12
+     }
+    ]
+   },
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "secondary_base_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_mount_seat",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted",
+     "notes": "NO RELOAD STOWAGE. The flotilla's attack is a single throw, and the Torpedo Establishment has never been asked to change that."
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "depth_charge_rail",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "mine_rail",
+     "count": 1,
+     "fitted": 0,
+     "state": "foundation_only"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    },
+    {
+     "interface": "refueling_trunk",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk26snr"
+   ],
+   "complement": 175,
+   "possible_upgrades": [
+    "uk32sec",
+    "uk27can",
+    "uk39can",
+    "uk30tor",
+    "uk38tor",
+    "uk33lau",
+    "uk27dir",
+    "uk32dir",
+    "uk34snr",
+    "uk41snr",
+    "uk37dpc",
+    "uk39min",
+    "uk38rad"
+   ],
+   "notes": "One destroyer design repeated in eight annual flotillas for fourteen years — THE ONLY PIECE OF STANDARDIZATION IN BRITISH NAVAL PROCUREMENT, and it happened because nobody senior was interested enough to reopen it. Each flotilla takes the machinery generation current when its keels are laid, so a 1934 Sabre is 4 knots faster than a 1924 Sabre and is otherwise the same ship: [uk27eng] 38,000 shp / 35.5 kt from 1928, [uk30eng] 40,000 shp / 36.5 kt from 1931, [uk34eng] 42,000 shp / 38 kt from 1934. She is the whole of Britain's escort force, her whole anti-submarine force and her whole torpedo striking power."
+  },
+  {
+   "id": "sturgeon_ss23",
+   "name": "Sturgeon class",
+   "nation": "GBR",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1923,
+   "as_launched_year": 1926,
+   "cost_gold": 780,
+   "durability": 120,
+   "displacement": {
+    "empty_tons": 1290,
+    "standard_tons": 1400,
+    "full_load_tons": 1565,
+    "submerged_tons": 1880
+   },
+   "dimensions": {
+    "length_m": 84,
+    "beam_m": 7.3,
+    "draft_m": 4.1
+   },
+   "propulsion": {
+    "plant": "diesel-electric, 2 shafts",
+    "shp": 3000,
+    "speed_kn": 15,
+    "range_km": 19000,
+    "range_at_kn": 10,
+    "fuel": "diesel_electric"
+   },
+   "speed_submerged": {
+    "surfaced_kn": 15,
+    "snort_kn": 8,
+    "sprint_kn": 9,
+    "sprint_h": 0.92,
+    "patrol_kn": 5,
+    "patrol_h": 11,
+    "creep_kn": 2,
+    "creep_h": 56,
+    "battery": "2 x 112-cell lead-acid",
+    "recharge_h": 6,
+    "test_depth_m": 90
+   },
+   "fuel": {
+    "diesel_tons": 165
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "mounts": 1,
+     "barrels_per_mount": 1,
+     "arrangement": "single wet",
+     "rounds_total": 120,
+     "firing_time_min": 15,
+     "spec": {
+      "name": "4 in pattern 1921",
+      "caliber_mm": 102,
+      "count": 1,
+      "notes": "A wet deck gun of 1921 pattern, outside the Mark sequence."
+     }
+    },
+    {
+     "role": "torpedo",
+     "component": "uk25tor",
+     "mounts": 7,
+     "tubes": 7,
+     "arrangement": "6 bow + 1 stern",
+     "stowage": 13
+    }
+   ],
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 7,
+     "fitted": 7,
+     "state": "fitted"
+    },
+    {
+     "interface": "sonar_dome",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 0,
+     "fitted": 0,
+     "state": "reserved"
+    }
+   ],
+   "sensors": [
+    "uk26snr"
+   ],
+   "complement": 46,
+   "possible_upgrades": [
+    "uk30tor",
+    "uk38tor",
+    "uk34snr",
+    "uk41snr",
+    "uk38rad",
+    "uk41rad"
+   ],
+   "notes": "One design in 1923 and nothing since. The Fisher school worked out early and published internally that A SUBMERGED SUBMARINE AT 8 OR 9 KNOTS CAN ENGAGE A 40-KNOT SHIP ONLY IF THE SHIP DRIVES OVER IT, and having proved the boat harmless against itself, concluded without further examination that it was harmless generally. The submarine committee has met twice since 1929. Motors 1,350 shp. A good boat the doctrine has no theory for, and the men who command her know it."
+  }
+ ],
+ "aircraft": [
+  {
+   "id": "skua",
+   "name": "Skua",
+   "nation": "GBR",
+   "designation": "Skua",
+   "type_year": 1936,
+   "role": "dive_bomber",
+   "cost_gold": 12,
+   "durability": 30,
+   "powerplant": {
+    "count": 1,
+    "takeoff_hp": 830,
+    "spec": {
+     "layout": "9-cylinder sleeve-valve radial",
+     "displacement_l": 24.9,
+     "mass_kg": 470,
+     "hp_takeoff": 830,
+     "hp_at_3000m": 780,
+     "supercharger": "single-speed",
+     "tbo_h": 380,
+     "note": "Britain has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+    }
+   },
+   "dimensions": {
+    "span_m": 14.0,
+    "span_folded_m": 5.6,
+    "length_m": 10.4,
+    "wing_area_m2": 30,
+    "hangar_footprint_m2": 58
+   },
+   "weights": {
+    "empty_kg": 2597,
+    "normal_kg": 3690,
+    "max_kg": 4390,
+    "derivation": {
+     "comparator": "Blackburn Skua Mk II",
+     "comparator_kg": 2493,
+     "added_kg": 104,
+     "not_carried_kg": 0,
+     "honest_kg": 2597,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 2,
+    "normal": 2,
+    "notes": "Pilot and observer/telegraphist-air-gunner; the observer's station is a wireless set and a plotting board."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_3000m": 368,
+     "with_bomb": 353,
+     "sea_level": 343
+    },
+    "climb_ms": 6.7,
+    "ceiling_m": 6660,
+    "approach_kmh": 122
+   },
+   "fuel": {
+    "internal_l": 900,
+    "endurance_h": 8.2,
+    "ferry_km": 1770,
+    "combat_radius_km": 590,
+    "with_tank": {
+     "form": "2 x Mark I drop tanks, underwing",
+     "liters": 1180,
+     "endurance_h": 9.7,
+     "ferry_km": 2185,
+     "combat_radius_km": 730
+    }
+   },
+   "armament": [
+    {
+     "mount": "cowl, synchronised",
+     "count": 2,
+     "rounds": 1600,
+     "spec": {
+      "name": "Mark II 7.7 mm machine gun",
+      "caliber_mm": 7.7,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    },
+    {
+     "mount": "flexible rear ring",
+     "count": 1,
+     "rounds": 800,
+     "spec": {
+      "name": "Mark II 7.7 mm machine gun",
+      "caliber_mm": 7.7,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "centerline_crutch",
+     "form": "bomb",
+     "rating_kg": 500,
+     "alternatives": [
+      {
+       "spec": {
+        "name": "Mark I 227 kg bomb",
+        "mass_kg": 227
+       },
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "underwing",
+     "form": "rack",
+     "rating_kg": 113,
+     "racks": 4,
+     "alternatives": [
+      {
+       "component": "uk34tnk",
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "Fowler flaps",
+    "centerline crutch (500 kg-rated, swinging): 1 x Mark I bomb",
+    "swinging centerline crutch",
+    "dive brakes",
+    "folding wings",
+    "retracting undercarriage",
+    "arrester hook",
+    "flotation gear",
+    "long-range wireless-telegraphy set and plotting board",
+    "enclosed sliding canopy",
+    "2 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,400 rounds",
+    "4 underwing racks rated 113 kg each, 2 drop tanks"
+   ],
+   "protection": [
+    "armored windscreen"
+   ],
+   "kits": [],
+   "possible_upgrades": [],
+   "notes": "THE OLDEST OF THE THREE AND THE REASON THE OTHER TWO EXIST: the first British airplane specified by the Admiralty, in 1934, for a job the Admiralty had defined - search to the horizon of the fleet's own gunnery and then attack what it finds. Two seats, a wireless set and a plotting board, dive brakes, and a bomb heavy enough to matter against a deck. WHAT SHE CANNOT DO IS FIGHT: two rifle-caliber guns forward and one aft is a scout's armament and the handbook says so. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
+   "fittings": [
+    {
+     "name": "Wireless and plotting board",
+     "installed_kg": 55
+    }
+   ]
+  },
+  {
+   "id": "shearwater",
+   "name": "Shearwater",
+   "nation": "GBR",
+   "designation": "Shearwater",
+   "type_year": 1937,
+   "role": "torpedo_bomber",
+   "cost_gold": 16,
+   "durability": 36,
+   "powerplant": {
+    "count": 1,
+    "takeoff_hp": 1000,
+    "spec": {
+     "layout": "9-cylinder radial",
+     "displacement_l": 28.7,
+     "mass_kg": 500,
+     "hp_takeoff": 1000,
+     "hp_at_3000m": 930,
+     "supercharger": "two-speed",
+     "tbo_h": 400,
+     "note": "Britain has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+    }
+   },
+   "dimensions": {
+    "span_m": 15.6,
+    "span_folded_m": 6.4,
+    "length_m": 11.8,
+    "wing_area_m2": 39,
+    "hangar_footprint_m2": 76
+   },
+   "weights": {
+    "empty_kg": 2505,
+    "normal_kg": 3930,
+    "max_kg": 4830,
+    "derivation": {
+     "comparator": "Nakajima B5N2",
+     "comparator_kg": 2279,
+     "added_kg": 226,
+     "not_carried_kg": 0,
+     "honest_kg": 2505,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 3,
+    "normal": 3,
+    "notes": "Pilot, observer, telegraphist-air-gunner. The third crewman is the point of the design and the reason it is a biplane."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_3000m": 354,
+     "with_torpedo": 324,
+     "sea_level": 334
+    },
+    "climb_ms": 8.4,
+    "ceiling_m": 7500,
+    "approach_kmh": 111
+   },
+   "fuel": {
+    "internal_l": 1250,
+    "endurance_h": 10.7,
+    "ferry_km": 2290,
+    "combat_radius_km": 765,
+    "with_tank": {
+     "form": "2 x Mark I drop tanks, underwing",
+     "liters": 1530,
+     "endurance_h": 11.9,
+     "ferry_km": 2665,
+     "combat_radius_km": 890
+    }
+   },
+   "armament": [
+    {
+     "mount": "cowl, synchronised",
+     "count": 1,
+     "rounds": 1000,
+     "spec": {
+      "name": "Mark II 7.7 mm machine gun",
+      "caliber_mm": 7.7,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    },
+    {
+     "mount": "flexible rear ring",
+     "count": 1,
+     "rounds": 1000,
+     "spec": {
+      "name": "Mark II 7.7 mm machine gun",
+      "caliber_mm": 7.7,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "centerline_crutch",
+     "form": "torpedo",
+     "rating_kg": 900,
+     "alternatives": [
+      {
+       "component": "uk32tor",
+       "count": 1
+      },
+      {
+       "spec": {
+        "name": "Mark I 227 kg bomb",
+        "mass_kg": 227
+       },
+       "count": 1
+      }
+     ]
+    },
+    {
+     "id": "underwing",
+     "form": "rack",
+     "rating_kg": 113,
+     "racks": 4,
+     "alternatives": [
+      {
+       "component": "uk34tnk",
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "Fowler flaps",
+    "folding wings",
+    "retracting undercarriage",
+    "arrester hook",
+    "flotation gear",
+    "long-range wireless-telegraphy set and plotting table (observer's station)",
+    "enclosed canopy, three stations",
+    "1 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,000 rounds",
+    "4 underwing racks rated 113 kg each, 2 drop tanks"
+   ],
+   "protection": [
+    "armored windscreen",
+    "4 mm observer's back plate"
+   ],
+   "kits": [],
+   "possible_upgrades": [],
+   "notes": "A MONOPLANE, because the Board that refused the Air Ministry over the Skua had learned it could, and because a torpedo at 350 km/h cannot be met with a wire between the wings. The torpedo is five years older than the airplane and the airframe was sized to the weapon. She still spots - the fall-of-shot corrections she passes into the fire-control table are the argument the Fisher school accepted first and has never withdrawn - but the 1937 exercises were the first in which the umpires scored a capital ship sunk by aircraft. Nine hours on internal tanks makes her the longest-legged airplane in the fleet and the search plan is built around her. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
+   "fittings": [
+    {
+     "name": "Wireless and plotting board",
+     "installed_kg": 55
+    }
+   ]
+  },
+  {
+   "id": "peregrine",
+   "name": "Peregrine",
+   "nation": "GBR",
+   "designation": "Peregrine",
+   "type_year": 1938,
+   "role": "fighter",
+   "cost_gold": 15,
+   "durability": 32,
+   "powerplant": {
+    "count": 1,
+    "takeoff_hp": 1030,
+    "spec": {
+     "layout": "12-cylinder liquid-cooled Vee",
+     "displacement_l": 27,
+     "mass_kg": 610,
+     "hp_takeoff": 1030,
+     "hp_at_4900m": 950,
+     "supercharger": "two-speed",
+     "tbo_h": 420,
+     "note": "Britain has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
+    }
+   },
+   "dimensions": {
+    "span_m": 11.4,
+    "span_folded_m": 5.4,
+    "length_m": 9.6,
+    "wing_area_m2": 23,
+    "hangar_footprint_m2": 52
+   },
+   "weights": {
+    "empty_kg": 2288,
+    "normal_kg": 3000,
+    "max_kg": 3200,
+    "derivation": {
+     "comparator": "Supermarine Spitfire I",
+     "comparator_kg": 2049,
+     "added_kg": 239,
+     "not_carried_kg": 0,
+     "honest_kg": 2288,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 1,
+    "normal": 1
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_4900m": 470,
+     "at_2500m": 445,
+     "sea_level": 415
+    },
+    "climb_ms": 11.8,
+    "ceiling_m": 9350,
+    "approach_kmh": 139
+   },
+   "fuel": {
+    "internal_l": 620,
+    "endurance_h": 5.8,
+    "ferry_km": 1415,
+    "combat_radius_km": 470
+   },
+   "armament": [
+    {
+     "mount": "wing, unsynchronised",
+     "count": 8,
+     "rounds": 2800,
+     "spec": {
+      "name": "Mark II 7.7 mm machine gun",
+      "caliber_mm": 7.7,
+      "round_belted_g": 28,
+      "gun_kg": 10
+     }
+    }
+   ],
+   "stations": [],
+   "equipment": [],
+   "features": [
+    "folding wings",
+    "retracting undercarriage",
+    "slotted flaps",
+    "arrester hook",
+    "enclosed sliding canopy",
+    "8 x wing 7.7 mm machine guns, 2,800 rounds",
+    "no external tanks - no rack, no crutch and no plumbing"
+   ],
+   "protection": [
+    "armored windscreen",
+    "6 mm pilot's back armor"
+   ],
+   "kits": [],
+   "possible_upgrades": [],
+   "notes": "THE FIRST BRITISH NAVAL FIGHTER THAT DOES NOT NEED AN EXCUSE, and two years late by the Admiralty's own doing. 470 km/h in 1938 beats every carrier fighter afloat - the best real one that year is an F3F biplane at 425 - and is 100 short of what the Air Ministry is putting on its own aerodromes the same spring, because a folding wing, a hook and catapult spools cost drag a land fighter does not pay. HER REAL LIMITATION IS NOT THE AIRFRAME: no fighter direction, no radar to vector from, no organization to tell her where to be, so a fleet with the best carrier fighter in the world intercepts on sight from a deck alert exactly as it did in 1918. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4)."
+  }
+ ],
+ "hulls": [
+  {
+   "id": "hms_invincible_g3",
+   "class_id": "invincible_bc22",
+   "name": "Invincible",
+   "status": "active",
+   "laid_down": "1922-01-01",
+   "completed": "1925-06-01",
+   "fit": [
+    "uk22gun",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_indomitable_g3",
+   "class_id": "invincible_bc22",
+   "name": "Indomitable",
+   "status": "active",
+   "laid_down": "1922-02-01",
+   "completed": "1925-11-01",
+   "fit": [
+    "uk22gun",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_insuperable",
+   "class_id": "insuperable_bc27",
+   "name": "Insuperable",
+   "status": "active",
+   "laid_down": "1927-01-01",
+   "completed": "1929-10-01",
+   "fit": [
+    "uk27gun",
+    "uk24sec",
+    "uk27can",
+    "uk27dir",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_irresistible",
+   "class_id": "insuperable_bc27",
+   "name": "Irresistible",
+   "status": "active",
+   "laid_down": "1927-06-01",
+   "completed": "1930-05-01",
+   "fit": [
+    "uk27gun",
+    "uk24sec",
+    "uk27can",
+    "uk27dir",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_implacable",
+   "class_id": "insuperable_bc27",
+   "name": "Implacable",
+   "status": "active",
+   "laid_down": "1928-04-01",
+   "completed": "1931-03-01",
+   "fit": [
+    "uk27gun",
+    "uk24sec",
+    "uk27can",
+    "uk27dir",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_incorruptible",
+   "class_id": "insuperable_bc27",
+   "name": "Incorruptible",
+   "status": "active",
+   "laid_down": "1929-03-01",
+   "completed": "1932-02-01",
+   "fit": [
+    "uk27gun",
+    "uk24sec",
+    "uk27can",
+    "uk27dir",
+    "uk22shl"
+   ]
+  },
+  {
+   "id": "hms_incomparable",
+   "class_id": "incomparable_bc31",
+   "name": "Incomparable",
+   "status": "active",
+   "laid_down": "1931-03-01",
+   "completed": "1934-07-01",
+   "fit": [
+    "uk31gun",
+    "uk24sec",
+    "uk27can",
+    "uk32dir",
+    "uk30shl"
+   ]
+  },
+  {
+   "id": "hms_inimitable",
+   "class_id": "incomparable_bc31",
+   "name": "Inimitable",
+   "status": "active",
+   "laid_down": "1931-09-01",
+   "completed": "1935-04-01",
+   "fit": [
+    "uk31gun",
+    "uk24sec",
+    "uk27can",
+    "uk32dir",
+    "uk30shl"
+   ]
+  },
+  {
+   "id": "hms_incorrigible",
+   "class_id": "incorrigible_bc35",
+   "name": "Incorrigible",
+   "status": "building",
+   "laid_down": "1935-09-01",
+   "pct_complete": 8,
+   "notes": "Ordered March 1935 on a Board minute of nine lines that does not contain the word 'protection'. Due 1939. The hull the British delegation could not explain at all, and the first Board in thirteen years that could kill her."
+  },
+  {
+   "id": "hms_indefatigable",
+   "class_id": "incorrigible_bc35",
+   "name": "Indefatigable",
+   "status": "building",
+   "laid_down": "1935-11-01",
+   "completed": null,
+   "pct_complete": 8,
+   "notes": "The second air-defense ship, laid down at Barrow eight weeks after her sister. Due 1940."
+  },
+  {
+   "id": "hms_ark_royal",
+   "class_id": "ark_royal_cv31",
+   "name": "Ark Royal",
+   "status": "active",
+   "laid_down": "1931-05-01",
+   "completed": "1934-11-01",
+   "fit": [
+    "uk32sec",
+    "uk27can",
+    "uk32dir"
+   ]
+  },
+  {
+   "id": "hms_pegasus_cv",
+   "class_id": "ark_royal_cv31",
+   "name": "Pegasus",
+   "status": "active",
+   "laid_down": "1932-04-01",
+   "completed": "1935-08-01",
+   "fit": [
+    "uk32sec",
+    "uk27can",
+    "uk32dir"
+   ]
+  },
+  {
+   "id": "hms_perseus_cv",
+   "class_id": "ark_royal_cv31",
+   "name": "Perseus",
+   "status": "building",
+   "laid_down": "1935-04-01",
+   "completed": null,
+   "pct_complete": 22,
+   "notes": "The third armored deck, laid down April 1935. Due 1939. The only carrier hull on any British slip."
+  },
+  {
+   "id": "hms_swift",
+   "class_id": "swift_cl29",
+   "name": "Swift",
+   "status": "active",
+   "completed": "1931-06-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk25tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_sentinel",
+   "class_id": "swift_cl29",
+   "name": "Sentinel",
+   "status": "active",
+   "completed": "1931-11-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk25tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_skirmisher",
+   "class_id": "swift_cl29",
+   "name": "Skirmisher",
+   "status": "active",
+   "completed": "1932-05-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk25tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_pathfinder_cl",
+   "class_id": "swift_cl29",
+   "name": "Pathfinder",
+   "status": "active",
+   "completed": "1932-10-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk25tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_foresight_cl",
+   "class_id": "swift_cl29",
+   "name": "Foresight",
+   "status": "active",
+   "completed": "1933-07-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk30tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_forward",
+   "class_id": "swift_cl29",
+   "name": "Forward",
+   "status": "active",
+   "completed": "1934-03-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk30tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_adventure_cl",
+   "class_id": "swift_cl29",
+   "name": "Adventure",
+   "status": "active",
+   "completed": "1934-09-01",
+   "fit": [
+    "uk29sec",
+    "uk25lau",
+    "uk30tor",
+    "uk27dir"
+   ]
+  },
+  {
+   "id": "hms_attentive",
+   "class_id": "swift_cl29",
+   "name": "Attentive",
+   "status": "active",
+   "completed": "1935-06-01",
+   "fit": [
+    "uk29sec",
+    "uk33lau",
+    "uk30tor",
+    "uk32dir"
+   ]
+  },
+  {
+   "id": "hms_active_cl",
+   "class_id": "swift_cl29",
+   "name": "Active",
+   "status": "active",
+   "fit": [
+    "uk29sec",
+    "uk33lau",
+    "uk30tor",
+    "uk32dir"
+   ],
+   "completed": "1933-02-01"
+  },
+  {
+   "id": "hms_amphion_cl",
+   "class_id": "swift_cl29",
+   "name": "Amphion",
+   "status": "active",
+   "fit": [
+    "uk29sec",
+    "uk33lau",
+    "uk30tor",
+    "uk32dir"
+   ],
+   "completed": "1933-11-01"
+  },
+  {
+   "id": "hms_alarm",
+   "class_id": "swift_cl29",
+   "name": "Alarm",
+   "status": "building",
+   "fit": [
+    "uk29sec",
+    "uk33lau",
+    "uk30tor",
+    "uk32dir"
+   ],
+   "laid_down": "1934-06-01",
+   "completed": null,
+   "pct_complete": 50,
+   "notes": "Due 1936. The eleventh scout cruiser, and the class the Board keeps ordering because it is the only cruiser drawing it has."
+  },
+  {
+   "id": "hms_alacrity",
+   "class_id": "swift_cl29",
+   "name": "Alacrity",
+   "status": "building",
+   "fit": [
+    "uk29sec",
+    "uk33lau",
+    "uk30tor",
+    "uk32dir"
+   ],
+   "laid_down": "1935-05-01",
+   "completed": null,
+   "pct_complete": 10,
+   "notes": "Due 1937. The twelfth and, on the 1936 estimates as they stand, the last."
+  },
+  {
+   "id": "hms_kent_ca",
+   "class_id": "county_ca24",
+   "name": "Kent",
+   "status": "active",
+   "completed": "1928-06-01"
+  },
+  {
+   "id": "hms_berwick_ca",
+   "class_id": "county_ca24",
+   "name": "Berwick",
+   "status": "active",
+   "completed": "1929-02-01"
+  },
+  {
+   "id": "hms_cornwall_ca",
+   "class_id": "county_ca24",
+   "name": "Cornwall",
+   "status": "active",
+   "completed": "1929-11-01"
+  },
+  {
+   "id": "hms_devonshire_ca",
+   "class_id": "county_ca24",
+   "name": "Devonshire",
+   "status": "active",
+   "completed": "1930-08-01"
+  }
+ ],
+ "aggregates": [
+  {
+   "class_id": "sabre_dd22",
+   "count": 60,
+   "status": "active",
+   "notes": "Eight annual flotillas, 1924-35, each with the machinery generation current when its keels were laid. Plus about 30 war-built boats from the base file's V&W and S classes: ~90 destroyers in all, a third of them war-built."
+  },
+  {
+   "class_id": "sturgeon_ss23",
+   "count": 30,
+   "status": "active",
+   "notes": "Plus about 15 older boats: ~45 submarines in all, and exactly at the First London cap by accident."
+  },
+  {
+   "class_id": "danae",
+   "count": 6,
+   "status": "active",
+   "notes": "Part of the ~14 older light cruisers carried over from the base file."
+  },
+  {
+   "class_id": "emerald",
+   "count": 2,
+   "status": "active"
+  },
+  {
+   "class_id": "c_class_cl",
+   "count": 6,
+   "status": "active"
+  }
+ ],
+ "national_state": {
+  "construction": {
+   "notes": "TWO VOTES, and only one of them is limited by anything. HULL VOTE 54,000 t/yr flat — CUT from 62,000 (scenario SS5.3) by dropping one Invincible, one Insuperable and Unapproachable. It is about 1.6x Britain's historical construction vote and the four canon savings very nearly cover it (fourteen capital hulls off the books, twenty-three cruisers not built, forty destroyers not built, no modernization of anything ever). MACHINERY VOTE 165,000 shp/yr in 1922 rising to 680,000 from 1930 — QUADRUPLED, and no treaty limits a turbine. The constraint MOVES: machinery binds 1922-26 (cumulative peak 153 percent in 1923), which is why the vote was quadrupled; from 1927 the hull vote is the one over-subscribed and the machinery vote is never over-subscribed after 1929, and that is why Incorrigible is smaller than Incomparable and carries a fourth turret instead.",
+   "slips": 8,
+   "block_capable_yards": 0
+  },
+  "fuel": {
+   "self_supplied": false,
+   "domestic_share": 0.0,
+   "war_reserve_months": 3.5,
+   "streams": [
+    "oil",
+    "avgas"
+   ],
+   "import_routes": [
+    {
+     "id": "oil",
+     "share": 1.0,
+     "interdictable": true,
+     "notes": "Every barrel imported. The whole of the fleet's strategic mobility rests on 16 fast oilers and the abeam rig [uk30kit]."
+    }
+   ],
+   "notes": "3.5 months at projected war consumption, and THE PROJECTION ASSUMES THE FLEET STEAMS AS IT EXERCISES. It does not assume 36 knots. A 36-knot ship at anything above cruising speed empties like a bath, and the fuel ledger is a countdown that runs faster the faster the fleet goes."
+  },
+  "manpower": {
+   "pools": [
+    {
+     "rating": "engine_room_artificer_mk_iv",
+     "count": 400,
+     "training_months": 60,
+     "notes": "⚠ THE FLEET'S REAL ORDER OF BATTLE. About 400 men in the world are qualified on the Mark IV plant, every high-pressure casualty in the fleet queues for the same few hundred of them, and a five-year trade cannot be sprinted. A war that puts four Incomparables and an Incorrigible into sustained steaming at once puts every one of them to sea simultaneously and takes the training pipeline with them."
+    }
+   ],
+   "schools": [
+    "Portland anti-submarine school — the best asdic operators in the world, and nothing to billet them in",
+    "the Fisher school itself: the Controller's department, the Engineer-in-Chief's, Naval Construction, and two successive First Sea Lords"
+   ],
+   "notes": "Manning at 99 percent of establishment, the best figure in the fleet's history, quoted in every Estimates debate, and it conceals the artificer famine entirely. The fourteen capital hulls scrapped or sold 1924-31 released their crews into a fleet that grew by ten hulls, which is why the establishment fills."
+  },
+  "stockpiles": {
+   "naval_aircraft": 340
+  },
+  "infrastructure": [
+   {
+    "id": "haslar_shore_plants",
+    "kind": "yard",
+    "location": "Haslar",
+    "notes": "⚠ THE WHOLE OF THE BRITISH LEAD, AND IT IS A SHED. Full-scale boiler rooms run at pressures nobody has put to sea; the failures happen ashore, on the Admiralty's own money, and by the time a generation reaches a ship it has already broken everything it is going to break. A PROCESS, not an invention, which is why nobody has copied it."
+   },
+   {
+    "id": "twenty_inch_gun_plant",
+    "kind": "yard",
+    "capacity": 1,
+    "notes": "⚠ ONE PLANT, ONE SET OF JIGS, NO SECOND SOURCE, and a shell no other navy makes. ONE FACTORY FIRE DISARMS THE FLAGSHIP CLASS, and the Ordnance Board has written to the Board about it every year since 1932."
+   },
+   {
+    "id": "armor_mills",
+    "kind": "yard",
+    "capacity": 3,
+    "notes": "Modest and shrinking since 1922, because nobody ordered thick belts in fifteen years and three mills closed. A decision to armor anything would take four years to become steel."
+   },
+   {
+    "id": "fast_fleet_train",
+    "kind": "yard",
+    "capacity": 16,
+    "notes": "Sixteen fast oilers, doubled since 1929. The abeam rig's dividend, and the reason the fleet's radius is an ocean rather than 900 kilometers."
+   }
+  ],
+  "politics": {
+   "factions": [
+    {
+     "id": "the_fisher_school",
+     "position": "Speed is armor. No longer a man's obsession but A CAREER PATH: the Controller's department, the Engineer-in-Chief's, Naval Construction and two successive First Sea Lords out of the same school. An idea that can be promoted into and therefore cannot be argued out of."
+    },
+    {
+     "id": "the_air_staff",
+     "position": "The answer to a ship that cannot be caught is a weapon that does not have to catch it. Putting it in memoranda the Sea Lords decline to circulate since 1932."
+    },
+    {
+     "id": "the_anti_submarine_division",
+     "position": "Asking for an escort program in the same three paragraphs every year since 1929."
+    }
+   ],
+   "clocks": [
+    {
+     "id": "fisher_dies",
+     "date": "1927-01-01",
+     "description": "Fisher survives to 1927 — seven years past his historical death — and spends those years on APPOINTMENTS rather than ships. By the time he dies the doctrine no longer needs him."
+    },
+    {
+     "id": "estimates_debate",
+     "date": "1936-03-01",
+     "description": "Parliament is in open revolt over the estimates and contests them every March, by members who can read a fleet list and count cruisers."
+    }
+   ]
+  },
+  "deception": {
+   "lie": "Displacement, until 1930; after that, nothing",
+   "mechanism": [
+    "the four G3s suspended 6 February 1922 as the treaty required, for eleven weeks, then resumed 24 April as 'reconstructions' of hulls surrendered for scrapping and declared at 35,000 t",
+    "the machinery vote, which no treaty limits and which Britain quadrupled",
+    "the Nelson exception spent on the resumption instead of on two new ships"
+   ],
+   "disclosure_triggers": [
+    "a stopwatch on a destroyer's bridge. A DECLARED TONNAGE CAN BE ARGUED ABOUT FOR A DECADE; A SPEED IS MEASURED FROM A DESTROYER'S BRIDGE WITH A STOPWATCH, and 36 knots on 35,000 declared tons is not a lie anyone can maintain",
+    "the First London speed and shaft-horsepower cap of 1929, written about British ships, signed by Britain, and broken eighteen months later"
+   ],
+   "independent": true,
+   "notes": "⚠ BRITAIN'S DECEPTION IS DEAD BY 1930 and everybody involved knows it. From 1930 it is a formality nobody troubles to believe and nobody troubles to prosecute. She is the FIRST of the four reveals in the stagger, and the only one whose lie ended before the scenario begins."
+  },
+  "objectives": [
+   "Maintain the one-power standard",
+   "Secure imperial sea lanes with 28 cruisers against a requirement of 70",
+   "Decide what Incorrigible is for",
+   "Find out which decade the doctrine was right about"
+  ]
+ },
+ "notes": "⚠ THIS PACK IS NO LONGER THIN. Britain now has the full four-file canon set — scenario, road, platform catalog, equipment catalog — plus a build model of her own, and this pack is written in the COMPONENT style against 38 British SKUs. Every figure `hindsight-scenarios.md` §2 states is preserved unchanged: displacements, speeds, main batteries, belts, shaft horsepower, 26 cruisers against 70, and the 3.5-month oil reserve. Everything else is new and is flagged as new in the catalog headers. ⚠ ONE PLACEHOLDER SURVIVES AND WANTS A RULING: which two Queen Elizabeths went to the Royal Australian Navy is not stated anywhere in canon."
+}

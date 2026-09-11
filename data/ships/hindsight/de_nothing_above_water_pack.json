@@ -1,0 +1,1530 @@
+{
+ "nation": "DEU",
+ "navy": "Reichsmarine",
+ "prefix": "de",
+ "scenario": "nothing-above-water",
+ "toggle": "Nothing Above Water",
+ "as_of": "1936-01-01",
+ "version": "v5",
+ "source": [
+  "docs/hindsight-scenarios.md 6",
+  "docs/hindsight/de-nothing-above-water-platform-catalog.md",
+  "docs/hindsight/de-nothing-above-water-equipment-catalog.md"
+ ],
+ "equipment_file": "data/equipment/de_nothing_above_water.json",
+ "base": {
+  "file": "data/ships/de.json",
+  "divergence_date": "1920-01-01",
+  "retained_hulls": [
+   "km_hannover",
+   "km_schlesien",
+   "km_schleswig_holstein",
+   "km_braunschweig",
+   "km_elsass",
+   "km_hessen",
+   "km_preussen",
+   "km_lothringen",
+   "km_emden"
+  ],
+  "notes": "A BASE FILE EXISTS and this pack no longer has a no_base_reason. Germany is not inside the Washington system - she is under Versailles, Part V, Section II, with NO SUBMARINES PERMITTED AT ALL - so she was absent from the 1922 seed entirely and this was the last structural gap in the data layer. The divergence is navy-internal and needs no invention: Doenitz comes home from a British prison camp in 1920 having concluded that the first tonnage war was lost to the CONVOY and not to the enemy's technology, and the Reichsmarine adopts that as its official finding rather than one officer's memorandum. The submarine faction wins the internal argument in 1922 and never loses it. WHAT THE PACK RETAINS: the eight pre-dreadnoughts, none of them modernized and not one mark spent on any of them since 1922, and EMDEN, laid down 8 December 1921 and completed 1925 because she was ordered before the argument was won - SHE IS THE LAST CRUISER GERMANY EVER LAYS DOWN. The six Gazelle and Bremen survivors and the 12+12 prewar flotilla craft are aggregates in the base file and carry over unchanged. WHAT IS NEVER ORDERED: the three Koenigsbergs, Leipzig, Nuernberg and all three Deutschland-class Panzerschiffe. THAT MONEY IS THE DIVERGENCE. Nothing in the base file is edited."
+ },
+ "build_model": {
+  "script": "build_model_de.py",
+  "derived": "data/derived/de_build_model.json",
+  "envelope_t_equiv_yr": {
+   "1922": 5600,
+   "1932": 9000,
+   "1933": 22000,
+   "1934": 48000,
+   "1935": 84000,
+   "1936": 78000,
+   "1940": 104000
+  },
+  "notes": "ONE RAMPED PURSE - deliberately the Japanese instrument and not the British one, with the ramp frame SS6.4 asks for. The raider line is a QUOTA taken off the top because canon states it hull by hull; the boat shares divide what is left; the design office is a charge that never becomes tonnage. THE MODEL'S FINDING IS THAT THE FLAT DECADE IS THE DIVERGENCE, NOT THE RAMP. 1922-31 runs at 5,600 t-equiv/yr - Germany's real construction rate, under a tenth of Japan's envelope and under a tenth of Britain's - and lays down ONE HULL, Emden. Everything else buys no tonnage whatever; it buys LEAD TIME, and that is checkable. `python build_model_de.py --leads` runs the identical envelope on the identical shares with ordinary lead times and returns, at END 1935, NOT ONE SUBMARINE IN COMMISSION and the first raider a year late. The June 1935 announcement is the eleven flat years being spent in public. ROWS ARE END-OF-YEAR."
+ },
+ "not_built": [
+  {
+   "what": "Any capital ship",
+   "why": "A battle line is an argument with the Royal Navy that Germany has already lost twice."
+  },
+  {
+   "what": "Any aircraft carrier",
+   "why": "Absent by doctrine. Every mark spent on one is a mark not spent on the argument."
+  },
+  {
+   "what": "Any cruiser",
+   "why": "Absent by doctrine."
+  },
+  {
+   "what": "Surface gunnery and armor development",
+   "why": "Stopped being a German development program in 1922."
+  },
+  {
+   "what": "Aircraft performance",
+   "why": "Two airframes in the whole navy, both slow, both barely armed. They are sensor platforms with wings and nothing else, and the set they carry is the only part of them that is ahead of anybody."
+  },
+  {
+   "what": "Any boat designed around the tender",
+   "why": "REVERSED. Every submarine in this navy is drawn for INDEPENDENT operation — its own bunker, its own outfit, its own passage out and home. The raider-tender is a multiplier and never a dependency."
+  },
+  {
+   "what": "Any reactive program against a rival",
+   "why": "FLEETS COMPOSE, ASSESSMENTS DO NOT."
+  }
+ ],
+ "classes": [
+  {
+   "id": "seeadler_raider",
+   "name": "Seeadler class",
+   "nation": "DEU",
+   "type": "CA",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1935,
+   "cost_gold": 9200,
+   "durability": 1900,
+   "displacement": {
+    "empty_tons": 17800,
+    "standard_tons": 19000,
+    "full_load_tons": 25400
+   },
+   "dimensions": {
+    "length_m": 224,
+    "beam_m": 22.5,
+    "draft_m": 8.6
+   },
+   "machinery": {
+    "bays": 8,
+    "cruise_bank": 2,
+    "drive": "geared",
+    "swap": "one bedplate footprint per cylinder group",
+    "fits": [
+     {
+      "component": "de26eng",
+      "shp": 124000,
+      "speed_kn": 33,
+      "range_km": 64000,
+      "cruise_kn": 18,
+      "condition": "combined diesel-turbine; the diesel groups are the cruise plant and the turbines the dash"
+     },
+     {
+      "component": "de36eng",
+      "shp": 124000,
+      "speed_kn": 33,
+      "range_km": 64000,
+      "cruise_kn": 18
+     },
+     {
+      "component": "de43eng",
+      "shp": 124000,
+      "speed_kn": 33,
+      "range_km": 64000,
+      "cruise_kn": 18
+     }
+    ]
+   },
+   "fuel": {
+    "oil_tons": 6000,
+    "avgas_tons": 150
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "de30gun",
+     "mounts": 2,
+     "barrels_per_mount": 3,
+     "arrangement": "both forward, superfiring",
+     "rounds_per_gun": 120,
+     "rounds_total": 720,
+     "firing_time_min": 48
+    },
+    {
+     "role": "secondary",
+     "component": "de31sec",
+     "mounts": 4,
+     "barrels_per_mount": 2,
+     "arrangement": "waist",
+     "rounds_per_gun": 200,
+     "rounds_total": 1600,
+     "firing_time_min": 13
+    },
+    {
+     "role": "light_aa",
+     "component": "de34can",
+     "mounts": 4,
+     "barrels_per_mount": 2,
+     "rounds_per_gun": 2000,
+     "firing_time_min": 17
+    },
+    {
+     "role": "torpedo",
+     "component": "de28tor",
+     "mounts": 8,
+     "tubes": 8,
+     "arrangement": "fixed, 4 per side at 55 and 125 degrees",
+     "stowage": 24
+    },
+    {
+     "role": "mine",
+     "component": "de27min",
+     "mounts": 2,
+     "arrangement": "removable rails",
+     "stowage": 120,
+     "optional": true
+    },
+    {
+     "role": "asw",
+     "component": "de29dpc",
+     "mounts": 1,
+     "stowage": 24
+    }
+   ],
+   "aviation": {
+    "catapults": 1,
+    "catapult_rating_t": 4,
+    "aircraft_capacity": 4,
+    "hangar_m2": 300,
+    "catapult": "de35cat"
+   },
+   "protection": {
+    "belt_mm": 100,
+    "deck_mm": 45,
+    "features": [
+     "100 mm belt over the FORWARD citadel only",
+     "80 mm magazine crowns",
+     "45 mm splinter deck aft",
+     "the after body is subdivided as a tanker and is NOT armored"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted",
+     "notes": "Forward."
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_trunnion",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted",
+     "notes": "Forward tower and after control. The whole installation lifts out as one article; the after trunnion takes it if the forward tower is lost."
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 2,
+     "fitted": 1,
+     "state": "wired"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "mine_rail",
+     "count": 2,
+     "fitted": 0,
+     "state": "foundation_only",
+     "notes": "Rail sockets; none carried as launched."
+    },
+    {
+     "interface": "depth_charge_rail",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted"
+    },
+    {
+     "interface": "degaussing_channels",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "transfer_boom_hardpoints",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "catapult_foundation",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted",
+     "notes": "Fixed tubes, 4 per side at 55 and 125 degrees. A raider does not train them; she turns."
+    }
+   ],
+   "sensors": [
+    "de33rad",
+    "de33snr",
+    "de31dir"
+   ],
+   "cargo_gear": [
+    "2 x 15 t derricks",
+    "alongside oil, torpedo and provision transfer under way at up to 8 kt"
+   ],
+   "complement": 1050,
+   "possible_upgrades": [
+    "de40can",
+    "de38tor",
+    "de43tor",
+    "de40rad",
+    "de44rad",
+    "de40det",
+    "de44det",
+    "de40snr",
+    "de43snr",
+    "de41dir"
+   ],
+   "notes": "The only thing Germany builds that floats on the surface by choice: a fast commerce raider that is also a mobile base. She is built for REACH AND SEARCH, not viability. Crew is 1,050 ship's company plus 180 tender staff and 120 transient berths. Sensors include a long-range direction-finding loop and homing transmitter, 400 km. Minesweeping option."
+  },
+  {
+   "id": "atlantis_raider",
+   "name": "Atlantis class",
+   "parent_class": "seeadler_raider",
+   "changes": "hangar +120 m², catapult and crane uprated for a twin-engined aircraft; quadruple 2 cm light battery for the twin 3.7 cm; FuMO C/37 and the G7e as launched; transferable outfit 80 torpedoes and 3,600 t of oil; standard +2,000 t; crew +70 ship's company, +20 tender staff.",
+   "nation": "DEU",
+   "type": "CA",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "wartime",
+   "design_year": 1940,
+   "cost_gold": 10400,
+   "durability": 2150,
+   "displacement": {
+    "empty_tons": 19600,
+    "standard_tons": 21000,
+    "full_load_tons": 28300
+   },
+   "dimensions": {
+    "length_m": 232,
+    "beam_m": 23.4,
+    "draft_m": 8.9
+   },
+   "machinery": {
+    "bays": 8,
+    "cruise_bank": 2,
+    "drive": "geared",
+    "fits": [
+     {
+      "component": "de36eng",
+      "shp": 136000,
+      "speed_kn": 33,
+      "range_km": 72000,
+      "cruise_kn": 18,
+      "condition": "combined diesel-turbine"
+     },
+     {
+      "component": "de43eng",
+      "shp": 136000,
+      "speed_kn": 33,
+      "range_km": 72000,
+      "cruise_kn": 18
+     }
+    ]
+   },
+   "fuel": {
+    "oil_tons": 6800,
+    "avgas_tons": 220
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "de30gun",
+     "mounts": 2,
+     "barrels_per_mount": 3,
+     "arrangement": "both forward, superfiring",
+     "rounds_per_gun": 120,
+     "rounds_total": 720,
+     "firing_time_min": 48
+    },
+    {
+     "role": "secondary",
+     "component": "de31sec",
+     "mounts": 4,
+     "barrels_per_mount": 2,
+     "arrangement": "waist",
+     "rounds_per_gun": 200,
+     "rounds_total": 1600,
+     "firing_time_min": 13
+    },
+    {
+     "role": "light_aa",
+     "component": "de40can",
+     "mounts": 4,
+     "barrels_per_mount": 4,
+     "rounds_per_gun": 2000,
+     "firing_time_min": 4
+    },
+    {
+     "role": "torpedo",
+     "component": "de38tor",
+     "mounts": 8,
+     "tubes": 8,
+     "arrangement": "fixed, 4 per side at 55 and 125 degrees",
+     "stowage": 24
+    },
+    {
+     "role": "mine",
+     "component": "de27min",
+     "mounts": 2,
+     "arrangement": "removable rails",
+     "stowage": 120,
+     "optional": true
+    },
+    {
+     "role": "asw",
+     "component": "de29dpc",
+     "mounts": 1,
+     "stowage": 24
+    }
+   ],
+   "aviation": {
+    "catapults": 1,
+    "catapult_rating_t": 9,
+    "aircraft_capacity": 4,
+    "hangar_m2": 420,
+    "catapult": "de40cat"
+   },
+   "protection": {
+    "belt_mm": 110,
+    "deck_mm": 50,
+    "features": [
+     "110 mm belt over the forward citadel",
+     "90 mm magazine crowns",
+     "50 mm splinter deck aft",
+     "the after body is subdivided as a tanker and is not armored"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "barbette_ring",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "secondary_base_ring",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "cannon_position",
+     "count": 4,
+     "fitted": 4,
+     "state": "fitted"
+    },
+    {
+     "interface": "director_trunnion",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 3,
+     "fitted": 1,
+     "state": "wired"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "mine_rail",
+     "count": 2,
+     "fitted": 0,
+     "state": "foundation_only"
+    },
+    {
+     "interface": "depth_charge_rail",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted"
+    },
+    {
+     "interface": "degaussing_channels",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "transfer_boom_hardpoints",
+     "count": 6,
+     "fitted": 6,
+     "state": "fitted"
+    },
+    {
+     "interface": "catapult_foundation",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 8,
+     "fitted": 8,
+     "state": "fitted",
+     "notes": "Fixed tubes, 4 per side at 55 and 125 degrees. A raider does not train them; she turns."
+    }
+   ],
+   "sensors": [
+    "de40rad",
+    "de33snr",
+    "de31dir"
+   ],
+   "cargo_gear": [
+    "2 x 20 t derricks",
+    "alongside oil, torpedo and provision transfer under way at up to 8 kt"
+   ],
+   "complement": 1120,
+   "possible_upgrades": [
+    "de43tor",
+    "de44rad",
+    "de40det",
+    "de44det",
+    "de40snr",
+    "de43snr",
+    "de41dir"
+   ],
+   "notes": "Crew 1,120 ship's company plus 200 tender staff and 140 transient berths. NOT IN EXISTENCE at as_of — she is a 1940 design, four years away. Listed because the raider line was never allowed to close."
+  },
+  {
+   "id": "hecht_typ2",
+   "name": "Hecht",
+   "nation": "DEU",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1927,
+   "cost_gold": 320,
+   "durability": 55,
+   "displacement": {
+    "empty_tons": 300,
+    "standard_tons": 320,
+    "full_load_tons": 345,
+    "submerged_tons": 420
+   },
+   "dimensions": {
+    "length_m": 44,
+    "beam_m": 4.1,
+    "draft_m": 3.9
+   },
+   "battery": {
+    "component": "de27bat",
+    "cells": 62,
+    "groups": 1,
+    "recharge_h": 2.0,
+    "kwh_total": 682,
+    "kwh_per_t_submerged": 1.62,
+    "refit_groups": [
+     "de37bat",
+     "de41bat"
+    ],
+    "notes": "62 x C/25 cells, single group."
+   },
+   "machinery": {
+    "bays": 1,
+    "cruise_bank": 1,
+    "drive": "electric",
+    "fits": [
+     {
+      "component": "de26eng",
+      "shp": 700,
+      "motor_shp": 360,
+      "speed_kn": 13,
+      "range_km": 5500,
+      "cruise_kn": 10
+     },
+     {
+      "component": "de36eng",
+      "shp": 700,
+      "motor_shp": 360,
+      "speed_kn": 13,
+      "range_km": 5500,
+      "cruise_kn": 10
+     }
+    ]
+   },
+   "speed_submerged": {
+    "surfaced_kn": 13,
+    "snort_kn": 7,
+    "sprint_kn": 7,
+    "sprint_h": 1,
+    "patrol_kn": 4,
+    "patrol_h": 12,
+    "creep_kn": 2,
+    "creep_h": 60,
+    "battery": "62 x C/25 cells, single group",
+    "recharge_h": 2,
+    "test_depth_m": 80
+   },
+   "fuel": {
+    "diesel_tons": 25
+   },
+   "batteries": [
+    {
+     "role": "torpedo",
+     "component": "de28tor",
+     "mounts": 3,
+     "tubes": 3,
+     "arrangement": "bow",
+     "stowage": 6
+    }
+   ],
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 3,
+     "fitted": 3,
+     "state": "fitted"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 1,
+     "fitted": 0,
+     "state": "wired"
+    },
+    {
+     "interface": "battery_group_hatch",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    }
+   ],
+   "sensors": [
+    "de27snr"
+   ],
+   "complement": 25,
+   "possible_upgrades": [
+    "de38tor",
+    "de33snr",
+    "de40det"
+   ],
+   "notes": "Small, cheap, many. The early mass item and the training pipeline both, and the reason every ocean-boat crew already knows its trade. Twelve months keel to commissioning."
+  },
+  {
+   "id": "wolf_typ7",
+   "name": "Wolf",
+   "nation": "DEU",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "design_year": 1933,
+   "cost_gold": 1900,
+   "durability": 165,
+   "displacement": {
+    "empty_tons": 1050,
+    "standard_tons": 1120,
+    "full_load_tons": 1380,
+    "submerged_tons": 1540
+   },
+   "dimensions": {
+    "length_m": 78,
+    "beam_m": 6.8,
+    "draft_m": 4.9
+   },
+   "battery": {
+    "component": "de27bat",
+    "cells": 240,
+    "groups": 2,
+    "recharge_h": 4.0,
+    "kwh_total": 2640,
+    "kwh_per_t_submerged": 1.71,
+    "refit_groups": [
+     "de37bat",
+     "de41bat"
+    ],
+    "notes": "240 x C/25 cells, two groups. THE COMPARATOR: 1.71 kWh per ton submerged, against the Elektroboat's 5.71."
+   },
+   "machinery": {
+    "bays": 2,
+    "cruise_bank": 1,
+    "drive": "electric",
+    "fits": [
+     {
+      "component": "de26eng",
+      "shp": 4400,
+      "motor_shp": 1000,
+      "speed_kn": 18.5,
+      "range_km": 30000,
+      "cruise_kn": 10
+     },
+     {
+      "component": "de36eng",
+      "shp": 4400,
+      "motor_shp": 1000,
+      "speed_kn": 18.5,
+      "range_km": 30000,
+      "cruise_kn": 10
+     },
+     {
+      "component": "de43eng",
+      "shp": 4400,
+      "motor_shp": 1000,
+      "speed_kn": 18.5,
+      "range_km": 30000,
+      "cruise_kn": 10
+     }
+    ]
+   },
+   "speed_submerged": {
+    "surfaced_kn": 18.5,
+    "snort_kn": 9,
+    "sprint_kn": 7.5,
+    "sprint_h": 1,
+    "patrol_kn": 4,
+    "patrol_h": 20,
+    "creep_kn": 2,
+    "creep_h": 120,
+    "battery": "240 x C/25 cells, two groups",
+    "recharge_h": 4,
+    "test_depth_m": 140
+   },
+   "fuel": {
+    "diesel_tons": 260
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "de29gun",
+     "mounts": 1,
+     "barrels_per_mount": 1,
+     "arrangement": "wet mounting",
+     "rounds_total": 180,
+     "firing_time_min": 12
+    },
+    {
+     "role": "torpedo",
+     "component": "de28tor",
+     "mounts": 6,
+     "tubes": 6,
+     "arrangement": "4 bow, 2 stern",
+     "stowage": 22
+    }
+   ],
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 6,
+     "fitted": 6,
+     "state": "fitted"
+    },
+    {
+     "interface": "boat_gun_mount",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 2,
+     "fitted": 1,
+     "state": "wired",
+     "notes": "Retractable mast, struck for diving."
+    },
+    {
+     "interface": "snorkel_trunk_foundation",
+     "count": 1,
+     "fitted": 0,
+     "state": "foundation_only",
+     "notes": "Every boat drawn since 1929 carries it. The fitting that fills it is eleven years away."
+    },
+    {
+     "interface": "battery_group_hatch",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    }
+   ],
+   "sensors": [
+    "de33rad",
+    "de33snr"
+   ],
+   "complement": 50,
+   "kits": [
+    "de40kit"
+   ],
+   "possible_upgrades": [
+    "de38tor",
+    "de43tor",
+    "de40rad",
+    "de44rad",
+    "de40det",
+    "de44det",
+    "de40snr",
+    "de43snr"
+   ],
+   "notes": "Thirty thousand kilometers on her own bunker, six tubes, a heavy outfit and A SEARCH SET ON HER MAST, because a boat that must find its own targets across a thousand kilometers of empty water cannot do it with a pair of eyes eight meters above the sea. She reaches the Cape, the Caribbean or the Indian Ocean and returns without meeting anybody. Long-range wireless and direction-finding loop."
+  },
+  {
+   "id": "hai_typ9",
+   "name": "Hai",
+   "nation": "DEU",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "wartime",
+   "design_year": 1937,
+   "cost_gold": 1250,
+   "durability": 135,
+   "displacement": {
+    "empty_tons": 780,
+    "standard_tons": 840,
+    "full_load_tons": 970,
+    "submerged_tons": 1120
+   },
+   "dimensions": {
+    "length_m": 68,
+    "beam_m": 6.3,
+    "draft_m": 4.7
+   },
+   "battery": {
+    "component": "de37bat",
+    "cells": 124,
+    "groups": 2,
+    "recharge_h": 3.0,
+    "kwh_total": 3348,
+    "kwh_per_t_submerged": 2.99,
+    "refit_groups": [
+     "de41bat"
+    ],
+    "notes": "124 x C/34 cells, two groups."
+   },
+   "machinery": {
+    "bays": 2,
+    "cruise_bank": 1,
+    "drive": "electric",
+    "fits": [
+     {
+      "component": "de36eng",
+      "shp": 3200,
+      "motor_shp": 800,
+      "speed_kn": 18,
+      "range_km": 16000,
+      "cruise_kn": 10
+     },
+     {
+      "component": "de43eng",
+      "shp": 3200,
+      "motor_shp": 800,
+      "speed_kn": 18,
+      "range_km": 16000,
+      "cruise_kn": 10
+     }
+    ]
+   },
+   "speed_submerged": {
+    "surfaced_kn": 18,
+    "snort_kn": 9,
+    "sprint_kn": 7.5,
+    "sprint_h": 1,
+    "patrol_kn": 4,
+    "patrol_h": 32,
+    "creep_kn": 2,
+    "creep_h": 115,
+    "battery": "124 x C/34 cells, two groups",
+    "recharge_h": 3,
+    "test_depth_m": 150
+   },
+   "fuel": {
+    "diesel_tons": 130
+   },
+   "batteries": [
+    {
+     "role": "main",
+     "component": "de29gun",
+     "mounts": 1,
+     "barrels_per_mount": 1,
+     "arrangement": "wet mounting",
+     "rounds_total": 180,
+     "firing_time_min": 12
+    },
+    {
+     "role": "torpedo",
+     "component": "de28tor",
+     "mounts": 5,
+     "tubes": 5,
+     "arrangement": "4 bow, 1 stern",
+     "stowage": 14
+    }
+   ],
+   "protection": {
+    "features": []
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 5,
+     "fitted": 5,
+     "state": "fitted"
+    },
+    {
+     "interface": "boat_gun_mount",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 2,
+     "fitted": 1,
+     "state": "wired"
+    },
+    {
+     "interface": "snorkel_trunk_foundation",
+     "count": 1,
+     "fitted": 0,
+     "state": "foundation_only"
+    },
+    {
+     "interface": "battery_group_hatch",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    }
+   ],
+   "sensors": [
+    "de33rad",
+    "de33snr"
+   ],
+   "complement": 46,
+   "kits": [
+    "de40kit"
+   ],
+   "possible_upgrades": [
+    "de38tor",
+    "de43tor",
+    "de40rad",
+    "de44rad",
+    "de40det",
+    "de44det",
+    "de40snr",
+    "de43snr"
+   ],
+   "notes": "THE BOAT THE CAMPAIGN IS MADE OF. A whole ocean boat that gives up a third of the bunker, a pair of tubes and two meters of depth, and comes out of the shed in TEN MONTHS AT ANY OF SIX YARDS, NONE OF THEM NAVAL. Drawn by people who had read the 1917 shipping returns rather than the 1916 fleet returns. NOT IN EXISTENCE at as_of — a 1937 design."
+  },
+  {
+   "id": "schwertwal_typ21",
+   "name": "Schwertwal",
+   "nation": "DEU",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "wartime",
+   "design_year": 1941,
+   "cost_gold": 4200,
+   "durability": 260,
+   "displacement": {
+    "empty_tons": 1900,
+    "standard_tons": 2000,
+    "full_load_tons": 2270,
+    "submerged_tons": 2450
+   },
+   "dimensions": {
+    "length_m": 84,
+    "beam_m": 7.4,
+    "draft_m": 6.4
+   },
+   "battery": {
+    "component": "de41bat",
+    "cells": 350,
+    "groups": 5,
+    "recharge_h": 4.0,
+    "kwh_total": 14000,
+    "kwh_per_t_submerged": 5.71,
+    "refit_groups": [],
+    "notes": "350 x C/39 cells, five groups - 14,000 kWh, or 5.71 kWh per ton submerged, which is 3.3 times the ocean boat. The cell itself is 73 percent better; the rest is a hull designed around it."
+   },
+   "machinery": {
+    "bays": 2,
+    "cruise_bank": 1,
+    "drive": "electric",
+    "swap": "closed-cycle diesel bank 1,900 shp in addition to the main groups",
+    "fits": [
+     {
+      "component": "de36eng",
+      "shp": 4000,
+      "motor_shp": 6400,
+      "speed_kn": 16,
+      "range_km": 16000,
+      "cruise_kn": 10,
+      "condition": "snorkelling"
+     },
+     {
+      "component": "de43eng",
+      "shp": 4000,
+      "motor_shp": 6400,
+      "speed_kn": 16,
+      "range_km": 16000,
+      "cruise_kn": 10,
+      "condition": "snorkelling"
+     }
+    ]
+   },
+   "speed_submerged": {
+    "surfaced_kn": 16,
+    "snort_kn": 11,
+    "sprint_kn": 18,
+    "sprint_h": 2,
+    "patrol_kn": 10,
+    "patrol_h": 15,
+    "creep_kn": 3,
+    "creep_h": 240,
+    "battery": "350 x C/41 cells, five groups",
+    "recharge_h": 4,
+    "test_depth_m": 200
+   },
+   "fuel": {
+    "diesel_tons": 270
+   },
+   "batteries": [
+    {
+     "role": "torpedo",
+     "component": "de38tor",
+     "mounts": 6,
+     "tubes": 6,
+     "arrangement": "bow, hydraulic reload — whole outfit fired and reloaded in 12 min",
+     "stowage": 24
+    }
+   ],
+   "protection": {
+    "features": [
+     "acoustic cladding over the pressure hull",
+     "rafted machinery",
+     "non-magnetic casing and fittings",
+     "escape trunks forward and aft"
+    ]
+   },
+   "provisions": [
+    {
+     "interface": "torpedo_tube_or_recess",
+     "count": 6,
+     "fitted": 6,
+     "state": "fitted"
+    },
+    {
+     "interface": "hydrophone_well",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "radar_search_position",
+     "count": 3,
+     "fitted": 2,
+     "state": "wired"
+    },
+    {
+     "interface": "snorkel_trunk_foundation",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted"
+    },
+    {
+     "interface": "battery_group_hatch",
+     "count": 5,
+     "fitted": 5,
+     "state": "fitted"
+    },
+    {
+     "interface": "engine_bay",
+     "count": 2,
+     "fitted": 2,
+     "state": "fitted"
+    },
+    {
+     "interface": "transfer_boom_hardpoints",
+     "count": 1,
+     "fitted": 1,
+     "state": "fitted",
+     "notes": "Alongside transfer: oil, torpedo, provision."
+    }
+   ],
+   "sensors": [
+    "de40snr",
+    "de40rad",
+    "de40det"
+   ],
+   "complement": 62,
+   "possible_upgrades": [
+    "de43tor",
+    "de44rad",
+    "de44det",
+    "de43snr"
+   ],
+   "notes": "THE BOAT THAT DOES NOT COME UP. No gun. Its stated priority is not tonnage sunk but CREWS BROUGHT BACK, which is what a navy building nothing else can afford to optimize for. Ten knots submerged for 18 hours on the battery and 60 on the closed-cycle bank. Fuel includes 90 t liquid oxidant for that bank. NOT IN EXISTENCE at as_of — a 1941 design, and the designed answer to a countermeasure that has not happened yet."
+  }
+ ],
+ "aircraft": [
+  {
+   "id": "seeschwalbe",
+   "name": "Seeschwalbe",
+   "nation": "DEU",
+   "designation": "C/31",
+   "type_year": 1933,
+   "role": "scout",
+   "cost_gold": 16,
+   "durability": 30,
+   "powerplant": {
+    "component": "de33aeg",
+    "count": 1,
+    "takeoff_hp": 850,
+    "refit_groups": [
+     "de40aeg"
+    ]
+   },
+   "dimensions": {
+    "span_m": 12.8,
+    "span_folded_m": 7.0,
+    "length_m": 11.4,
+    "wing_area_m2": 30,
+    "hangar_footprint_m2": 72
+   },
+   "weights": {
+    "empty_kg": 3035,
+    "normal_kg": 3955,
+    "max_kg": 4455,
+    "derivation": {
+     "comparator": "Arado Ar 196A-3",
+     "comparator_kg": 2990,
+     "added_kg": 135,
+     "not_carried_kg": 90,
+     "honest_kg": 3035,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 2,
+    "normal": 2,
+    "notes": "Pilot, and an observer who works the wireless."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_2000m": 260,
+     "sea_level": 263
+    },
+    "climb_ms": 6.6,
+    "ceiling_m": 4570,
+    "approach_kmh": 136
+   },
+   "fuel": {
+    "internal_l": 750,
+    "endurance_h": 6.2,
+    "ferry_km": 1515,
+    "combat_radius_km": 505
+   },
+   "armament": [
+    {
+     "mount": "fixed forward",
+     "count": 1,
+     "rounds": 750,
+     "spec": {
+      "name": "C/30 7.92 mm machine gun",
+      "caliber_mm": 7.92,
+      "round_belted_g": 27,
+      "gun_kg": 8
+     }
+    },
+    {
+     "mount": "flexible aft",
+     "count": 1,
+     "rounds": 750,
+     "spec": {
+      "name": "C/30 7.92 mm machine gun",
+      "caliber_mm": 7.92,
+      "round_belted_g": 27,
+      "gun_kg": 8
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "underwing",
+     "form": "underwing_rack",
+     "rating_kg": 150,
+     "racks": 2,
+     "alternatives": [
+      {
+       "count": 2,
+       "spec": {
+        "name": "SC 50 bomb",
+        "mass_kg": 50
+       }
+      },
+      {
+       "component": "de29dpc",
+       "count": 2
+      }
+     ]
+    }
+   ],
+   "equipment": [],
+   "features": [
+    "long-range wireless",
+    "direction-finding loop",
+    "homing-beacon receiver",
+    "slats and slotted flaps",
+    "sliding canopy",
+    "fixed seats",
+    "1 x fixed forward 7.92 mm + 1 x flexible aft 7.92 mm machine gun, 1,500 rounds",
+    "needs no aerodrome: catapult, fjord, estuary or lee shore"
+   ],
+   "protection": [],
+   "kits": [],
+   "possible_upgrades": [
+    "de36rad",
+    "de40det"
+   ],
+   "notes": "At as_of this is the navy's ONLY search type: 613 km reach, NO RADAR, and one raider in commission to fly it from. The reconnaissance gap is real at the start date and is not closed until 1940. Frame section 6.3 rounds the reach to 615 km; the catalog's own figure is ferry 1,840 / 3 = 613, and the catalog owns specifications.",
+   "fittings": [
+    {
+     "name": "Wireless, direction-finding loop and homing-beacon receiver",
+     "installed_kg": 75
+    }
+   ]
+  },
+  {
+   "id": "albatros",
+   "name": "Albatros",
+   "nation": "DEU",
+   "designation": "C/38",
+   "type_year": 1940,
+   "role": "patrol",
+   "cost_gold": 30,
+   "durability": 45,
+   "powerplant": {
+    "component": "de40aeg",
+    "count": 2,
+    "takeoff_hp": 1100
+   },
+   "dimensions": {
+    "span_m": 19.6,
+    "span_folded_m": 8.4,
+    "length_m": 15.2,
+    "wing_area_m2": 52,
+    "hangar_footprint_m2": 95
+   },
+   "weights": {
+    "empty_kg": 6080,
+    "normal_kg": 8545,
+    "max_kg": 9945,
+    "derivation": {
+     "comparator": "Lockheed Hudson Mk I",
+     "comparator_kg": 5275,
+     "added_kg": 1175,
+     "not_carried_kg": 370,
+     "honest_kg": 6080,
+     "credit": 0.0,
+     "dropped_kg": 0
+    }
+   },
+   "crew": {
+    "seats": 4,
+    "normal": 4,
+    "notes": "Pilot, observer, wireless operator, radar operator."
+   },
+   "performance": {
+    "speed_kmh": {
+     "at_2400m": 301,
+     "sea_level": 281
+    },
+    "climb_ms": 5.8,
+    "ceiling_m": 4400,
+    "approach_kmh": 152
+   },
+   "fuel": {
+    "internal_l": 2600,
+    "endurance_h": 10.5,
+    "ferry_km": 2720,
+    "combat_radius_km": 905,
+    "with_tank": {
+     "form": "2 x C/38 drop tanks, outboard racks",
+     "liters": 3600,
+     "endurance_h": 14.7,
+     "ferry_km": 3795,
+     "combat_radius_km": 1265
+    }
+   },
+   "armament": [
+    {
+     "mount": "flexible dorsal",
+     "count": 1,
+     "rounds": 1000,
+     "spec": {
+      "name": "C/38 13 mm machine gun",
+      "caliber_mm": 13,
+      "round_belted_g": 80,
+      "gun_kg": 20
+     }
+    },
+    {
+     "mount": "flexible aft",
+     "count": 1,
+     "rounds": 1000,
+     "spec": {
+      "name": "C/30 7.92 mm machine gun",
+      "caliber_mm": 7.92,
+      "round_belted_g": 27,
+      "gun_kg": 8
+     }
+    }
+   ],
+   "stations": [
+    {
+     "id": "underwing",
+     "form": "underwing_rack",
+     "rating_kg": 400,
+     "racks": 4,
+     "alternatives": [
+      {
+       "count": 4,
+       "spec": {
+        "name": "SC 50 bomb",
+        "mass_kg": 50
+       }
+      },
+      {
+       "component": "de29dpc",
+       "count": 4
+      }
+     ]
+    }
+   ],
+   "equipment": [
+    "de36rad"
+   ],
+   "features": [
+    "long-range wireless",
+    "direction-finding loop",
+    "homing-beacon receiver",
+    "slats and slotted flaps",
+    "enclosed cabin",
+    "fixed seats",
+    "1 x flexible dorsal 13 mm + 1 x flexible aft 7.92 mm machine gun, 2,000 rounds",
+    "needs no aerodrome"
+   ],
+   "protection": [
+    "self-sealing tanks"
+   ],
+   "kits": [],
+   "possible_upgrades": [
+    "de43rad",
+    "de40det"
+   ],
+   "notes": "A single aircraft searches more ocean in a day than the whole boat fleet does in a week. NOT IN EXISTENCE at as_of — a 1940 design, and the thing that closes the reconnaissance gap.",
+   "fittings": [
+    {
+     "name": "Wireless, direction-finding loop and homing-beacon receiver",
+     "installed_kg": 75
+    }
+   ]
+  }
+ ],
+ "hulls": [
+  {
+   "id": "km_seeadler",
+   "class_id": "seeadler_raider",
+   "name": "Seeadler",
+   "status": "active",
+   "fit": [
+    "de30gun",
+    "de31sec",
+    "de34can",
+    "de28tor",
+    "de33rad",
+    "de33snr",
+    "de31dir"
+   ],
+   "notes": "In commission. THE ONLY RAIDER IN COMMISSION, and therefore the only ship in the navy that can put a search aircraft over the middle of the ocean."
+  },
+  {
+   "id": "km_kormoran",
+   "class_id": "seeadler_raider",
+   "name": "Kormoran",
+   "status": "building"
+  },
+  {
+   "id": "km_widder",
+   "class_id": "seeadler_raider",
+   "name": "Widder",
+   "status": "building"
+  },
+  {
+   "id": "km_mowe",
+   "class_id": "seeadler_raider",
+   "name": "Möwe",
+   "status": "building"
+  }
+ ],
+ "aggregates": [
+  {
+   "class_id": "hecht_typ2",
+   "count": 27,
+   "status": "active",
+   "assignment": "Baltic and North Sea flotillas - THE SCHOOL, and the reason every ocean-boat crew already knows its trade",
+   "notes": "build_model_de.py, END 1935. Ordered 1934 as sections, jigs and machinery at yards that already had the drawings; nothing floated until the announcement. ⚠ THE ANNOUNCEMENT FLEET IS SMALLER THAN IT COULD HAVE BEEN, ON PURPOSE: 1934's money went to ocean hulls at two years apiece rather than coastal boats at one, so what surfaced in June 1935 is 33 boats and not 43."
+  },
+  {
+   "class_id": "hecht_typ2",
+   "count": 59,
+   "status": "building",
+   "notes": "Due 1936. One year from order to commissioning, and that figure is what thirteen years bought."
+  },
+  {
+   "class_id": "wolf_typ7",
+   "count": 6,
+   "status": "active",
+   "assignment": "Atlantic patrol - the hull the trade war is fought in, and she fights it on her own account",
+   "notes": "build_model_de.py, END 1935. Ordered 1933, two years to build."
+  },
+  {
+   "class_id": "wolf_typ7",
+   "count": 55,
+   "status": "building",
+   "notes": "Due 1936-37. ⚠ THE RAMP IS STEEPER THAN THE REVEAL SUGGESTS: 33 boats in commission and 114 on the slips."
+  }
+ ],
+ "national_state": {
+  "construction": {
+   "envelope_t_equiv_yr": {
+    "1922": 5600,
+    "1932": 9000,
+    "1933": 22000,
+    "1934": 48000,
+    "1935": 84000,
+    "1936": 78000,
+    "1940": 104000
+   },
+   "block_capable_yards": 6,
+   "notes": "NEAR-ZERO 1922-32, THEN NEAR-VERTICAL FROM 1933 - a shape no other nation has. THE FLAT DECADE IS THE DIVERGENCE AND NOT THE RAMP: 1922-31 runs at Germany's real historical construction rate, under a tenth of Japan's envelope and under a tenth of Britain's, and lays down ONE HULL with it. Everything else buys no tonnage at all - it buys LEAD TIME. One raider keel a year from 1932 is a quota off the top; the submarine share dominates everything left. Six block-capable yards, NONE OF THEM NAVAL, with sections drawn to travel by rail so that the shed and the slip need not be the same place: that is the only industrial advantage in the file and it is worth more than any of the ships."
+  },
+  "fuel": {
+   "self_supplied": false,
+   "notes": "WHOLLY IMPORTED, AND THE ASYMMETRY IS THE POINT. Germany's whole thesis is attacking somebody else's imports, and her own position is worse than her target's: no oil of her own, no rubber, no ore route that is not a sea route or a land route through somebody's territory - and the fleet she has built is the ONE INSTRUMENT THAT CANNOT PROTECT ANY OF IT. The submarine is the cheapest warship per ton of enemy shipping sunk and the least useful warship ever built for keeping a lane open. There is no German answer to a blockade in this scenario and the scenario file does not pretend to one (SS3.3). Nothing consumes this block yet."
+  },
+  "manpower": {
+   "pools": [
+    {
+     "rating": "seaman",
+     "count": 1700,
+     "training_months": 24,
+     "notes": "Sea-qualified submarine officers and ratings at the start date - about 1,700, which is 43 boats, and the twenties can just about account for them because the crews came home from Finland, Spain and Turkey when the boats did not. THIS IS THE CONSTRAINT THAT ACTUALLY BINDS AND NOTHING PRICES IT: build_model_de.py is a purse and it prices steel, not people. Its END 1939 figure of 359 boats is roughly 17,000 men and its END 1945 figure of 812 is nearly 40,000, and every one of them has to be trained by somebody who has been to sea. A ruling that wants this fleet smaller should reach for the school and not for the envelope. THE GERMAN EQUIVALENT OF BRITAIN'S 400 ARTIFICERS, AND A LARGER HOLE."
+    },
+    {
+     "rating": "sonar",
+     "count": 420,
+     "training_months": 12,
+     "notes": "Trained for a year on nothing else. The establishment predates the first set by three years and was the more expensive of the two."
+    },
+    {
+     "rating": "seaman",
+     "count": 4500,
+     "training_months": 0,
+     "notes": "Manning eight capital hulls the newest of which was designed in 1903. THEY ARE THE ONLY QUALIFIED SEA-GOING RATINGS IN THE NAVY NOT ALREADY IN A BOAT, which is what makes scrapping the pre-dreadnoughts an opening decision rather than an accounting exercise (scenario SS6.6)."
+    }
+   ],
+   "schools": [
+    "hydrophone - ratings trained for a year on nothing else; the establishment predates the first set by three years",
+    "the coastal-boat pipeline, which is why every ocean-boat crew already knows its trade: one design, one set of drills, one instrument layout, one torpedo, and an officer moving up finds nothing he has to unlearn",
+    "the foreign yards - Finland 1926, Spain, Turkey - which sent home no boats and every crew"
+   ]
+  },
+  "deception": {
+   "lie": "Existence",
+   "mechanism": [
+    "IvS opens in The Hague in 1922 — a foreign design bureau",
+    "prototypes built and trialled in Finland, Spain and Turkey through the decade",
+    "designs, jigs, drawings and people banked, because Germany is not permitted to own plant",
+    "the storage-battery line funded on a commercial traction contract that was never entirely fictitious"
+   ],
+   "disclosure_triggers": [
+    "the reveal, June 1935, and it is TOTAL - submarines announced and in the water in numbers within months, which is impossible unless the work started thirteen years earlier, and every naval attache in Europe can do that arithmetic. build_model_de.py --leads runs the identical envelope on identical shares with ordinary lead times and returns NOT ONE SUBMARINE IN COMMISSION at END 1935: the announcement is arithmetic and not assertion",
+    "Britain legalises it unilaterally in June 1935 without consulting the other Washington signatories, which is the first visible crack in the room - and GERMANY DID NOT MAKE THAT CRACK, Britain did"
+   ],
+   "independent": true,
+   "notes": "Germany cannot lie about tonnage, category or performance, because she is not inside the treaties — she is under Versailles prohibition, with no submarines permitted at all. She lies about EXISTENCE. Her exposure is six months old when the scenario opens, making her the freshest crisis on the board, and the fact that Britain legalised it unilaterally without consulting the other signatories is the first visible crack in the room."
+  },
+  "objectives": [
+   "Strangle trade",
+   "Find convoys — the binding constraint is finding them, not sinking them",
+   "Get the boat that never surfaces into the water before the countermeasure arrives"
+  ]
+ },
+ "notes": "THE HULL COUNTS ARE NOT CALIBRATED AND NONE ARE INVENTED HERE. Canon states four raiders at the start date and nothing else. Three of the five classes and one of the two aircraft postdate as_of and are carried because the catalog is the source of truth for specifications, not because they are afloat. NO GERMAN CLASS CARRIES A type_year. A German designation is the KONSTRUKTIONSJAHR - the year the drawing was signed - which conventions 1.2 says is DELIBERATELY NOT the year of introduction. The as-launched discipline is defined against a type year that means 'introduced', so it is ill-defined for a German sheet and would misfire on every one of them. design_year carries the drawing date instead. OWNERSHIP: docs/hindsight/de-nothing-above-water-scenario.md owns the order of battle, the opening decisions and every ruling (SS5); docs/hindsight/de-nothing-above-water-road.md owns the prohibition, the 1918-35 timeline and the ledger; the platform and equipment catalogs own the specifications. The Schwertwal is a 1941 boat and fits the [de41bat] cell and the [de43snr] array. The [de38tor] influence pistol WORKS, with no failure period and no reliability penalty on any German weapon. There is no centimetric German ship set: the line stops at [de40rad], and that hole is the countermeasure gap seen from the inside."
+}

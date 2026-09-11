@@ -1,0 +1,44 @@
+/* v0.13: larger complete queues and readable contextual inspections. */
+.queue-panel,.queue-list{height:auto;max-height:none;overflow:visible;flex-shrink:0}
+.view-yards .workspace-inner{overflow-y:auto}
+.class-hover{pointer-events:auto;max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
+.class-hover.fleet-hover{width:min(670px,94vw);padding:12px}
+.class-hover.fleet-hover h3{margin:4px 0 7px}
+.class-hover.fleet-hover>p{font-size:12px;line-height:1.45;margin:6px 0}
+.class-hover.fleet-hover .inspection-list{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin:6px 0}
+.class-hover.fleet-hover .inspection-list>div{grid-template-columns:1fr 1.3fr;gap:8px;font-size:11px}
+.hover-ship-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 12px;margin-top:9px}
+.hover-ship{min-width:0;padding:4px 0;border-top:1px solid var(--line);font-size:11px}
+.hover-ship strong,.hover-ship span,.hover-ship small{display:block;line-height:1.35;margin:0}
+.hover-ship strong{font-size:12px;color:var(--text);overflow-wrap:anywhere}
+.hover-ship.light>span{color:var(--green)}.hover-ship.moderate>span{color:var(--gold)}.hover-ship.serious>span{color:var(--red)}
+.class-hover .hover-ship small{font-size:10px;margin:0}
+.facility-card .daily-graduates{font-size:11px;line-height:1.4;margin:3px 0 6px}
+/* Latest command layout: broad chart, narrow right-hand information column. */
+.view-command .world-command{grid-template-columns:minmax(0,1fr) clamp(218px,15vw,245px);grid-template-rows:minmax(0,1fr);height:100%;gap:8px}
+.view-command .map-panel{grid-column:1;grid-row:1;min-height:0;height:100%}
+.view-command .command-side-panel{grid-column:2;grid-row:1;min-height:0;height:100%;max-height:none;padding:9px;overflow-y:auto;overflow-x:hidden}
+.view-command .fleet-command-list{display:flex;flex-direction:column;gap:5px;overflow:visible}
+.view-command .command-side-panel>.panel-title{align-items:center;gap:4px}
+.view-command .command-side-panel>.panel-title h2{font-size:16px;white-space:nowrap}
+.view-command .command-side-panel>.panel-title>span{font-size:10px;white-space:nowrap}
+.view-command .fleet-command-row{min-height:60px;padding:7px;text-align:left}
+.view-command .fleet-command-row strong{font-size:12px;line-height:1.35;white-space:normal}
+.view-command .fleet-command-row .fleet-composition{font-size:12px}
+.view-command .fleet-command-row small{font-size:10px;line-height:1.4}
+.view-command .command-fleet-layout,.view-command .map-information{display:block;height:auto;overflow:visible}
+.view-command .command-side-panel .order-content{overflow:visible;flex:0 0 auto;min-height:auto}
+.view-command .selected-manifest .manifest-grid{grid-template-columns:1fr}
+.view-command .command-fleet-layout>section,.view-command .map-information>section{padding:0 0 8px;border:0;min-height:0;overflow:visible}
+.view-command .command-fleet-layout h2,.view-command .map-information h2{font-size:17px;line-height:1.2;margin:4px 0 7px}
+.view-command .map-information .inspection-list{display:block}
+.view-command .map-information p,.view-command .command-fleet-layout p{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.view-command .command-details>div,.view-command .inspection-list>div{font-size:11px;gap:8px}
+.view-command .selected-manifest{height:auto;max-height:none;overflow:visible;border-top:1px solid var(--line);padding-top:8px}
+.view-command .selected-manifest[open] .fleet-popup-grid{display:block}
+.view-command .selected-manifest[open] .manifest-grid{max-height:none;overflow:visible}
+.view-command .fleet-readiness{gap:4px}.view-command .fleet-readiness div{padding:5px}.view-command .fleet-readiness span{font-size:10px}
+.view-command .fleet-mission-controls select{width:100%;font-size:11px;padding:5px}
+.view-command .fleet-mission-controls .risk-check{font-size:11px;gap:5px;margin:9px 0}
+.view-command .fleet-mission-controls .primary{font-size:12px;padding:8px 4px}
+body:has(.view-command) #toast{bottom:42px;right:calc(clamp(218px,15vw,245px) + 28px);max-width:min(480px,55vw)}

@@ -1,0 +1,1945 @@
+{
+  "nation": "SOV",
+  "revision": "0.5.0",
+  "notes": "Authored playable supplements. Engineering, aircraft progression and prices are provisional; historical legacy records retain their base-catalog provenance.",
+  "sources": [
+    "game/data/CAMPAIGN-SOURCES.md"
+  ],
+  "equipment": {
+    "su30snr": {
+      "name": "Krasny Okean active sonar",
+      "nation": "SOV",
+      "year": 1930,
+      "family": "snr",
+      "interface": "hull_sonar",
+      "range_km": 1.8,
+      "notes": "Provisional contemporary active sonar fit; no radar or advanced depth solution."
+    }
+  },
+  "campaigns": {
+    "in_good_faith_1936": {
+      "classes": [
+        {
+          "spec": {
+            "id": "ocean_bb28",
+            "nation": "SOV",
+            "name": "Sovetskaya Respublika battleship",
+            "type": "BB",
+            "design_year": 1928,
+            "displacement": {
+              "standard_tons": 38000
+            },
+            "propulsion": {
+              "speed_kn": 27,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 406,
+                "count": 9
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 320,
+              "deck_mm": 80
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 1331,
+            "cost_gold": 18240,
+            "treaty_category": "capital_ship",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_cv30",
+            "nation": "SOV",
+            "name": "Krasny Okean carrier",
+            "type": "CV",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 23000
+            },
+            "propulsion": {
+              "speed_kn": 30,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 130,
+                "count": 10
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 75,
+              "deck_mm": 19
+            },
+            "aviation": {
+              "aircraft_capacity": 60
+            },
+            "complement": 926,
+            "cost_gold": 11040,
+            "treaty_category": "aircraft_carrier",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_cl29",
+            "nation": "SOV",
+            "name": "Kirov ocean cruiser",
+            "type": "CL",
+            "design_year": 1929,
+            "displacement": {
+              "standard_tons": 8500
+            },
+            "propulsion": {
+              "speed_kn": 33,
+              "range_nm": 7000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 152,
+                "count": 9
+              },
+              "torpedo_tubes": {
+                "count": 6
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 100,
+              "deck_mm": 25
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 298,
+            "cost_gold": 4080,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_dd30",
+            "nation": "SOV",
+            "name": "Shtorm escort destroyer",
+            "type": "DD",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 2100
+            },
+            "propulsion": {
+              "speed_kn": 35,
+              "range_nm": 6000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 130,
+                "count": 4
+              },
+              "torpedo_tubes": {
+                "count": 8
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 15,
+              "deck_mm": 4
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 158,
+            "cost_gold": 1008,
+            "treaty_category": "other",
+            "sensors": [
+              "su30snr"
+            ]
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_ss29",
+            "nation": "SOV",
+            "name": "Okean patrol submarine",
+            "type": "SS",
+            "design_year": 1929,
+            "displacement": {
+              "standard_tons": 1100
+            },
+            "propulsion": {
+              "speed_kn": 19,
+              "range_nm": 8500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 1
+              },
+              "torpedo_tubes": {
+                "count": 6
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 55,
+            "cost_gold": 528,
+            "treaty_category": "other",
+            "speed_submerged": {
+              "surfaced_kn": 19,
+              "sprint_kn": 8
+            },
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_bb34",
+            "nation": "SOV",
+            "name": "Sovetsky Soyuz battleship",
+            "type": "BB",
+            "design_year": 1934,
+            "displacement": {
+              "standard_tons": 52000
+            },
+            "propulsion": {
+              "speed_kn": 29,
+              "range_nm": 8000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 406,
+                "count": 12
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 375,
+              "deck_mm": 94
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 1821,
+            "cost_gold": 24960,
+            "treaty_category": "capital_ship",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ocean_cv38",
+            "nation": "SOV",
+            "name": "Sovetskaya Aviatsiya carrier",
+            "type": "CV",
+            "design_year": 1938,
+            "displacement": {
+              "standard_tons": 30000
+            },
+            "propulsion": {
+              "speed_kn": 32,
+              "range_nm": 8500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 130,
+                "count": 12
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 100,
+              "deck_mm": 25
+            },
+            "aviation": {
+              "aircraft_capacity": 80
+            },
+            "complement": 1210,
+            "cost_gold": 14400,
+            "treaty_category": "aircraft_carrier",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "sov_program_oiler",
+            "nation": "SOV",
+            "name": "Krasny Okean fleet oiler",
+            "type": "AO",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 6500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 228,
+            "cost_gold": 3120,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
+          "service": "support"
+        },
+        {
+          "spec": {
+            "id": "su_merchant_1922",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "su_merchant_1936",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "su_merchant_1948",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1922",
+            "nation": "SOV",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1922",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1936",
+            "nation": "SOV",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1936",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1950",
+            "nation": "SOV",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1950",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "sov_program_1930_fighter",
+          "nation": "SOV",
+          "name": "Krasny Okean 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1930_strike",
+          "nation": "SOV",
+          "name": "Krasny Okean 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1930_scout",
+          "nation": "SOV",
+          "name": "Krasny Okean 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1936_fighter",
+          "nation": "SOV",
+          "name": "Krasny Okean 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1936_strike",
+          "nation": "SOV",
+          "name": "Krasny Okean 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1936_scout",
+          "nation": "SOV",
+          "name": "Krasny Okean 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1942_fighter",
+          "nation": "SOV",
+          "name": "Krasny Okean 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1942_strike",
+          "nation": "SOV",
+          "name": "Krasny Okean 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_program_1942_scout",
+          "nation": "SOV",
+          "name": "Krasny Okean 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 575,
+        "grossRegisterTons": 1110811,
+        "managedHulls": 0,
+        "referenceYear": 1935,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      },
+      "navy": {
+        "navy": "Workers and Peasants Red Fleet",
+        "title": "Krasny Okean",
+        "home": "atlantic",
+        "rival": "DEU",
+        "description": "Heavy industrial investment funds a Soviet battle fleet, carriers and the escorts needed to operate them across separated seas.",
+        "nation": "SOV",
+        "hulls": [
+          {
+            "id": "sov_marat",
+            "name": "Marat",
+            "class_id": "sevastopol_1914",
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "sov_parizhskaya",
+            "name": "Parizhskaya Kommuna",
+            "class_id": "sevastopol_1914",
+            "status": "active",
+            "legacy": true,
+            "port": "sevastopol"
+          },
+          {
+            "id": "sov_gangut",
+            "name": "Oktyabrskaya Revolyutsiya",
+            "class_id": "sevastopol_1914",
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "sov_svetlana",
+            "name": "Krasny Krym",
+            "class_id": "svetlana_1913",
+            "status": "active",
+            "pct_complete": 60,
+            "legacy": true
+          }
+        ],
+        "aggregates": [
+          {
+            "id": "program-ocean_bb28",
+            "class_id": "ocean_bb28",
+            "count": 1,
+            "status": "active"
+          },
+          {
+            "id": "program-ocean_bb28-detached",
+            "class_id": "ocean_bb28",
+            "count": 1,
+            "status": "active",
+            "port": "vladivostok"
+          },
+          {
+            "id": "program-ocean_cv30",
+            "class_id": "ocean_cv30",
+            "count": 1,
+            "status": "active"
+          },
+          {
+            "id": "program-ocean_cv30-detached",
+            "class_id": "ocean_cv30",
+            "count": 1,
+            "status": "active",
+            "port": "vladivostok"
+          },
+          {
+            "id": "program-ocean_cl29",
+            "class_id": "ocean_cl29",
+            "count": 3,
+            "status": "active"
+          },
+          {
+            "id": "program-ocean_cl29-detached",
+            "class_id": "ocean_cl29",
+            "count": 3,
+            "status": "active",
+            "port": "vladivostok"
+          },
+          {
+            "id": "program-ocean_dd30",
+            "class_id": "ocean_dd30",
+            "count": 18,
+            "status": "active"
+          },
+          {
+            "id": "program-ocean_dd30-detached",
+            "class_id": "ocean_dd30",
+            "count": 18,
+            "status": "active",
+            "port": "vladivostok"
+          },
+          {
+            "id": "program-ocean_ss29",
+            "class_id": "ocean_ss29",
+            "count": 12,
+            "status": "active"
+          },
+          {
+            "id": "program-ocean_ss29-detached",
+            "class_id": "ocean_ss29",
+            "count": 12,
+            "status": "active",
+            "port": "vladivostok"
+          },
+          {
+            "id": "program-ocean_bb34-building",
+            "class_id": "ocean_bb34",
+            "count": 2,
+            "status": "building",
+            "progress": 0.45
+          },
+          {
+            "id": "legacy-sov-novik",
+            "class_id": "novik_series",
+            "count": 17,
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "legacy-sov-bars",
+            "class_id": "bars_1915",
+            "count": 6,
+            "status": "reserve",
+            "legacy": true
+          }
+        ],
+        "designs": [
+          "ocean_bb28",
+          "ocean_cv30",
+          "ocean_cl29",
+          "ocean_dd30",
+          "ocean_ss29",
+          "ocean_bb34",
+          "ocean_cv38",
+          "sov_program_oiler",
+          "su_merchant_1922",
+          "su_merchant_1936",
+          "su_merchant_1948"
+        ],
+        "support": [
+          {
+            "id": "support-SOV",
+            "class_id": "sov_program_oiler",
+            "count": 6,
+            "status": "active"
+          }
+        ],
+        "state": {},
+        "legacyNote": "Historical surviving capital ships and representative inherited light forces accompany the hypothetical program. See game/data/CAMPAIGN-SOURCES.md."
+      }
+    },
+    "campaign_1922": {
+      "classes": [
+        {
+          "spec": {
+            "id": "su_merchant_1922",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "su_merchant_1936",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "su_merchant_1948",
+            "nation": "SOV",
+            "name": "Soviet Union standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1922",
+            "nation": "SOV",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1922",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1936",
+            "nation": "SOV",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1936",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_depot_1950",
+            "nation": "SOV",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "su_oiler_1950",
+            "nation": "SOV",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "sov_early_fighter",
+          "nation": "SOV",
+          "name": "Naval Nieuport fighter",
+          "type_year": 1921,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 30,
+          "weights": {
+            "empty_kg": 1050
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_early_strike",
+          "nation": "SOV",
+          "name": "Naval Avro trainer-bomber",
+          "type_year": 1921,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_early_scout",
+          "nation": "SOV",
+          "name": "Grigorovich M-9",
+          "type_year": 1921,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1930_fighter",
+          "nation": "SOV",
+          "name": "SOV 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1930_strike",
+          "nation": "SOV",
+          "name": "SOV 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1930_scout",
+          "nation": "SOV",
+          "name": "SOV 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1936_fighter",
+          "nation": "SOV",
+          "name": "SOV 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1936_strike",
+          "nation": "SOV",
+          "name": "SOV 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1936_scout",
+          "nation": "SOV",
+          "name": "SOV 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1942_fighter",
+          "nation": "SOV",
+          "name": "SOV 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1942_strike",
+          "nation": "SOV",
+          "name": "SOV 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "sov_standard_1942_scout",
+          "nation": "SOV",
+          "name": "SOV 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 100,
+        "grossRegisterTons": null,
+        "managedHulls": 0,
+        "referenceYear": 1922,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": "PROVISIONAL: 100 game hulls. The 1921–22 Lloyd’s casualty summary does not enumerate Soviet-controlled vessels; no verified 1922 national total is claimed.",
+        "estimated": true
+      }
+    }
+  },
+  "historicalBase": {
+    "nation": "SOV",
+    "classes": [
+      {
+        "id": "sevastopol_1914",
+        "nation": "SOV",
+        "name": "Sevastopol class",
+        "type": "BB",
+        "design_year": 1909,
+        "displacement": {
+          "standard_tons": 23000
+        },
+        "propulsion": {
+          "speed_kn": 23,
+          "range_nm": 6000
+        },
+        "armament": {
+          "main_battery": {
+            "caliber_mm": 305,
+            "count": 12
+          },
+          "torpedo_tubes": {
+            "count": 4
+          },
+          "aa_battery": [
+            {
+              "caliber_mm": 40,
+              "count": 2
+            }
+          ]
+        },
+        "protection": {
+          "belt_mm": 225,
+          "deck_mm": 56
+        },
+        "aviation": {
+          "aircraft_capacity": 0
+        },
+        "complement": 806,
+        "cost_gold": 11040,
+        "treaty_category": "capital_ship",
+        "sensors": []
+      },
+      {
+        "id": "svetlana_1913",
+        "nation": "SOV",
+        "name": "Svetlana class",
+        "type": "CL",
+        "design_year": 1913,
+        "displacement": {
+          "standard_tons": 6800
+        },
+        "propulsion": {
+          "speed_kn": 29,
+          "range_nm": 6000
+        },
+        "armament": {
+          "main_battery": {
+            "caliber_mm": 130,
+            "count": 15
+          },
+          "torpedo_tubes": {
+            "count": 4
+          },
+          "aa_battery": [
+            {
+              "caliber_mm": 40,
+              "count": 2
+            }
+          ]
+        },
+        "protection": {
+          "belt_mm": 75,
+          "deck_mm": 19
+        },
+        "aviation": {
+          "aircraft_capacity": 0
+        },
+        "complement": 239,
+        "cost_gold": 3264,
+        "treaty_category": "other",
+        "sensors": []
+      },
+      {
+        "id": "novik_series",
+        "nation": "SOV",
+        "name": "Novik type destroyer",
+        "type": "DD",
+        "design_year": 1913,
+        "displacement": {
+          "standard_tons": 1300
+        },
+        "propulsion": {
+          "speed_kn": 32,
+          "range_nm": 2200
+        },
+        "armament": {
+          "main_battery": {
+            "caliber_mm": 102,
+            "count": 4
+          },
+          "torpedo_tubes": {
+            "count": 9
+          },
+          "aa_battery": [
+            {
+              "caliber_mm": 40,
+              "count": 2
+            }
+          ]
+        },
+        "protection": {
+          "belt_mm": 0,
+          "deck_mm": 0
+        },
+        "aviation": {
+          "aircraft_capacity": 0
+        },
+        "complement": 98,
+        "cost_gold": 624,
+        "treaty_category": "other",
+        "sensors": []
+      },
+      {
+        "id": "bars_1915",
+        "nation": "SOV",
+        "name": "Bars class submarine",
+        "type": "SS",
+        "design_year": 1912,
+        "displacement": {
+          "standard_tons": 650
+        },
+        "propulsion": {
+          "speed_kn": 18,
+          "range_nm": 3500
+        },
+        "armament": {
+          "main_battery": {
+            "caliber_mm": 75,
+            "count": 1
+          },
+          "torpedo_tubes": {
+            "count": 4
+          },
+          "aa_battery": [
+            {
+              "caliber_mm": 40,
+              "count": 2
+            }
+          ]
+        },
+        "protection": {
+          "belt_mm": 0,
+          "deck_mm": 0
+        },
+        "aviation": {
+          "aircraft_capacity": 0
+        },
+        "complement": 33,
+        "cost_gold": 312,
+        "treaty_category": "other",
+        "speed_submerged": {
+          "surfaced_kn": 18,
+          "sprint_kn": 8
+        },
+        "sensors": []
+      },
+      {
+        "id": "aurora_1903",
+        "nation": "SOV",
+        "name": "Pallada class (Aurora)",
+        "type": "CL",
+        "design_year": 1897,
+        "displacement": {
+          "standard_tons": 6731
+        },
+        "propulsion": {
+          "speed_kn": 19,
+          "range_nm": 6000
+        },
+        "armament": {
+          "main_battery": {
+            "caliber_mm": 152,
+            "count": 8
+          },
+          "torpedo_tubes": {
+            "count": 3
+          },
+          "aa_battery": [
+            {
+              "caliber_mm": 40,
+              "count": 2
+            }
+          ]
+        },
+        "protection": {
+          "belt_mm": 38,
+          "deck_mm": 10
+        },
+        "aviation": {
+          "aircraft_capacity": 0
+        },
+        "complement": 236,
+        "cost_gold": 3231,
+        "treaty_category": "other",
+        "sensors": []
+      }
+    ],
+    "hulls": [
+      {
+        "id": "sov_marat",
+        "name": "Marat",
+        "class_id": "sevastopol_1914",
+        "status": "active"
+      },
+      {
+        "id": "sov_parizhskaya",
+        "name": "Parizhskaya Kommuna",
+        "class_id": "sevastopol_1914",
+        "status": "reserve"
+      },
+      {
+        "id": "sov_gangut",
+        "name": "Gangut",
+        "class_id": "sevastopol_1914",
+        "status": "reserve"
+      },
+      {
+        "id": "sov_svetlana",
+        "name": "Svetlana",
+        "class_id": "svetlana_1913",
+        "status": "building",
+        "pct_complete": 60
+      },
+      {
+        "id": "sov_aurora",
+        "name": "Aurora",
+        "class_id": "aurora_1903",
+        "status": "reserve"
+      }
+    ],
+    "aggregates": [
+      {
+        "class_id": "novik_series",
+        "count": 7,
+        "status": "active",
+        "representative": true,
+        "notes": "Seven active destroyers in the 1922 Baltic roster, represented by a common Novik fit."
+      },
+      {
+        "class_id": "novik_series",
+        "count": 10,
+        "status": "reserve",
+        "representative": true,
+        "notes": "Provisional useful inherited destroyer reserve; mixed exact fits are not yet cataloged."
+      },
+      {
+        "class_id": "bars_1915",
+        "count": 7,
+        "status": "reserve",
+        "representative": true,
+        "notes": "Representative Baltic submarine flotilla. Listed boats returned to service late in 1922; the player may recommission them."
+      }
+    ]
+  }
+}

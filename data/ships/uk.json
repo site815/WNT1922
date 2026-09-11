@@ -1,0 +1,1396 @@
+{
+ "nation": "GBR",
+ "navy": "Royal Navy",
+ "as_of": "1922-02-06",
+ "classes": [
+  {
+   "id": "queen_elizabeth",
+   "name": "Queen Elizabeth class",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 27500,
+    "full_load_tons": 33000
+   },
+   "dimensions": {
+    "length_m": 196.8,
+    "beam_m": 27.6,
+    "draft_m": 9.2
+   },
+   "propulsion": {
+    "speed_kn": 24,
+    "shp": 75000,
+    "range_nm": 5000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 15,
+     "mounts": "4x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 14,
+      "caliber_in": 6,
+      "mounts": "casemate"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 21,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 330,
+    "deck_mm": 76,
+    "turret_mm": 330,
+    "ct_mm": 280,
+    "torpedo_defense": 1
+   },
+   "complement": 950,
+   "design_year": 1912,
+   "notes": "First oil-fired fast battleship squadron; prime 1930s rebuild candidates."
+  },
+  {
+   "id": "revenge",
+   "name": "Revenge class",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 28000,
+    "full_load_tons": 31000
+   },
+   "dimensions": {
+    "length_m": 190.3,
+    "beam_m": 27.0,
+    "draft_m": 8.7
+   },
+   "propulsion": {
+    "speed_kn": 23,
+    "shp": 40000,
+    "range_nm": 5000,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 15,
+     "mounts": "4x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 14,
+      "caliber_in": 6,
+      "mounts": "casemate"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 21,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 330,
+    "deck_mm": 51,
+    "turret_mm": 330,
+    "ct_mm": 280,
+    "torpedo_defense": 1
+   },
+   "complement": 940,
+   "design_year": 1913,
+   "notes": "Slower, cheaper QE derivative; poor modernization margin."
+  },
+  {
+   "id": "iron_duke",
+   "name": "Iron Duke class",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 25000,
+    "full_load_tons": 29560
+   },
+   "dimensions": {
+    "length_m": 189.8,
+    "beam_m": 27.4,
+    "draft_m": 9.0
+   },
+   "propulsion": {
+    "speed_kn": 21.25,
+    "shp": 29000,
+    "range_nm": 7800,
+    "range_at_kn": 10,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 10,
+     "caliber_in": 13.5,
+     "mounts": "5x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 12,
+      "caliber_in": 6,
+      "mounts": "casemate"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 21,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 305,
+    "deck_mm": 64,
+    "turret_mm": 279,
+    "ct_mm": 279,
+    "torpedo_defense": 1
+   },
+   "complement": 995,
+   "design_year": 1911,
+   "notes": "Coal/oil mixed firing — logistics penalty."
+  },
+  {
+   "id": "king_george_v_1911",
+   "name": "King George V class (1911)",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 23000,
+    "full_load_tons": 25700
+   },
+   "propulsion": {
+    "speed_kn": 21,
+    "shp": 31000,
+    "range_nm": 6730,
+    "range_at_kn": 10,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 10,
+     "caliber_in": 13.5,
+     "mounts": "5x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 16,
+      "caliber_in": 4,
+      "mounts": "casemate"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 305,
+    "deck_mm": 51,
+    "turret_mm": 279,
+    "ct_mm": 279,
+    "torpedo_defense": 0
+   },
+   "complement": 860,
+   "design_year": 1910,
+   "notes": "Treaty: scrapped when Nelson class completes."
+  },
+  {
+   "id": "orion",
+   "name": "Orion class",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 22200,
+    "full_load_tons": 25870
+   },
+   "propulsion": {
+    "speed_kn": 21,
+    "shp": 27000,
+    "range_nm": 6730,
+    "range_at_kn": 10,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 10,
+     "caliber_in": 13.5,
+     "mounts": "5x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 16,
+      "caliber_in": 4,
+      "mounts": "casemate"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 305,
+    "deck_mm": 45,
+    "turret_mm": 279,
+    "ct_mm": 279,
+    "torpedo_defense": 0
+   },
+   "complement": 750,
+   "design_year": 1908,
+   "notes": "Only Thunderer retained (training); sisters disposed 1922."
+  },
+  {
+   "id": "tiger",
+   "name": "Tiger",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "super_dreadnought",
+   "displacement": {
+    "standard_tons": 28500,
+    "full_load_tons": 33260
+   },
+   "propulsion": {
+    "speed_kn": 29,
+    "shp": 108000,
+    "range_nm": 4650,
+    "range_at_kn": 12,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 13.5,
+     "mounts": "4x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 12,
+      "caliber_in": 6,
+      "mounts": "casemate"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 21,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 229,
+    "deck_mm": 76,
+    "turret_mm": 229,
+    "ct_mm": 254,
+    "torpedo_defense": 1
+   },
+   "complement": 1121,
+   "design_year": 1911,
+   "notes": "Last coal-burning British battlecruiser."
+  },
+  {
+   "id": "renown",
+   "name": "Renown class",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "displacement": {
+    "standard_tons": 27650,
+    "full_load_tons": 32000
+   },
+   "propulsion": {
+    "speed_kn": 31.5,
+    "shp": 112000,
+    "range_nm": 4700,
+    "range_at_kn": 12,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 6,
+     "caliber_in": 15,
+     "mounts": "3x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 17,
+      "caliber_in": 4,
+      "mounts": "triple/single"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 2,
+     "caliber_in": 21,
+     "submerged": true
+    }
+   },
+   "protection": {
+    "belt_mm": 152,
+    "deck_mm": 51,
+    "turret_mm": 279,
+    "ct_mm": 254,
+    "torpedo_defense": 1
+   },
+   "complement": 967,
+   "design_year": 1914,
+   "notes": "Thin belt as designed; Repulse received 9-inch belt in 1918-21 refit."
+  },
+  {
+   "id": "admiral",
+   "name": "Admiral class",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "displacement": {
+    "standard_tons": 41200,
+    "full_load_tons": 45200
+   },
+   "dimensions": {
+    "length_m": 262.1,
+    "beam_m": 31.8,
+    "draft_m": 9.9
+   },
+   "propulsion": {
+    "speed_kn": 31,
+    "shp": 144000,
+    "range_nm": 7500,
+    "range_at_kn": 14,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 8,
+     "caliber_in": 15,
+     "mounts": "4x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 12,
+      "caliber_in": 5.5,
+      "mounts": "single"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 6,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 305,
+    "deck_mm": 51,
+    "turret_mm": 381,
+    "ct_mm": 280,
+    "torpedo_defense": 2
+   },
+   "complement": 1433,
+   "design_year": 1916,
+   "notes": "HMS Hood — largest warship afloat in 1922; deck protection is the known weakness."
+  },
+  {
+   "id": "nelson",
+   "name": "Nelson class",
+   "nation": "GBR",
+   "type": "BB",
+   "treaty_category": "capital_ship",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 33950,
+    "full_load_tons": 38000
+   },
+   "propulsion": {
+    "speed_kn": 23,
+    "shp": 45000,
+    "range_nm": 7000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 9,
+     "caliber_in": 16,
+     "mounts": "3x3",
+     "notes": "All forward"
+    },
+    "secondary_battery": [
+     {
+      "count": 12,
+      "caliber_in": 6,
+      "mounts": "6x2"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 159,
+    "turret_mm": 406,
+    "ct_mm": 356,
+    "torpedo_defense": 3
+   },
+   "complement": 1361,
+   "design_year": 1922,
+   "notes": "Treaty exception: UK allowed two new 16in ships. Laid down Dec 1922."
+  },
+  {
+   "id": "g3",
+   "name": "G3 battlecruiser (canceled)",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "displacement": {
+    "standard_tons": 48400,
+    "full_load_tons": 53909
+   },
+   "propulsion": {
+    "speed_kn": 32,
+    "shp": 160000,
+    "range_nm": 7000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 9,
+     "caliber_in": 16,
+     "mounts": "3x3"
+    },
+    "secondary_battery": [
+     {
+      "count": 16,
+      "caliber_in": 6,
+      "mounts": "8x2"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 356,
+    "deck_mm": 203,
+    "turret_mm": 432,
+    "ct_mm": 356,
+    "torpedo_defense": 3
+   },
+   "complement": 1716,
+   "design_year": 1921,
+   "notes": "Ordered Oct 1921, suspended for the treaty, canceled Feb 1922. The alt-history build if Washington collapses."
+  },
+  {
+   "id": "argus",
+   "name": "Argus",
+   "nation": "GBR",
+   "type": "CV",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 14450,
+    "full_load_tons": 16500
+   },
+   "propulsion": {
+    "speed_kn": 20,
+    "shp": 20000,
+    "range_nm": 3600,
+    "range_at_kn": 10,
+    "fuel": "oil"
+   },
+   "aviation": {
+    "aircraft_capacity": 18,
+    "flight_deck": true
+   },
+   "complement": 495,
+   "design_year": 1917,
+   "notes": "World's first flush-deck carrier (liner conversion)."
+  },
+  {
+   "id": "eagle",
+   "name": "Eagle",
+   "nation": "GBR",
+   "type": "CV",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 22600,
+    "full_load_tons": 26800
+   },
+   "propulsion": {
+    "speed_kn": 24,
+    "shp": 50000,
+    "range_nm": 4800,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "armament": {
+    "secondary_battery": [
+     {
+      "count": 9,
+      "caliber_in": 6,
+      "mounts": "single"
+     }
+    ]
+   },
+   "protection": {
+    "belt_mm": 114
+   },
+   "aviation": {
+    "aircraft_capacity": 21,
+    "flight_deck": true
+   },
+   "complement": 950,
+   "design_year": 1918,
+   "notes": "Converted from Chilean battleship Almirante Cochrane."
+  },
+  {
+   "id": "hermes",
+   "name": "Hermes",
+   "nation": "GBR",
+   "type": "CVL",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 10850,
+    "full_load_tons": 13200
+   },
+   "propulsion": {
+    "speed_kn": 25,
+    "shp": 40000,
+    "range_nm": 4480,
+    "range_at_kn": 10,
+    "fuel": "oil"
+   },
+   "armament": {
+    "secondary_battery": [
+     {
+      "count": 6,
+      "caliber_in": 5.5,
+      "mounts": "single"
+     }
+    ]
+   },
+   "aviation": {
+    "aircraft_capacity": 20,
+    "flight_deck": true
+   },
+   "complement": 660,
+   "design_year": 1918,
+   "notes": "First carrier designed as such from the keel."
+  },
+  {
+   "id": "furious",
+   "name": "Furious (as reconstructed)",
+   "nation": "GBR",
+   "type": "CV",
+   "treaty_category": "aircraft_carrier",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 22450,
+    "full_load_tons": 26500
+   },
+   "propulsion": {
+    "speed_kn": 30,
+    "shp": 90000,
+    "range_nm": 4300,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "aviation": {
+    "aircraft_capacity": 36,
+    "flight_deck": true
+   },
+   "complement": 795,
+   "design_year": 1921,
+   "notes": "Stats are the post-1925 full flush-deck reconstruction; hull is mid-conversion at scenario start."
+  },
+  {
+   "id": "courageous_llc",
+   "name": "Courageous class (large light cruiser)",
+   "nation": "GBR",
+   "type": "BC",
+   "treaty_category": "capital_ship",
+   "generation": "fast_battleship",
+   "displacement": {
+    "standard_tons": 18600,
+    "full_load_tons": 22560
+   },
+   "propulsion": {
+    "speed_kn": 32,
+    "shp": 90000,
+    "range_nm": 6000,
+    "range_at_kn": 16,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 4,
+     "caliber_in": 15,
+     "mounts": "2x2"
+    },
+    "secondary_battery": [
+     {
+      "count": 18,
+      "caliber_in": 4,
+      "mounts": "6x3"
+     }
+    ],
+    "torpedo_tubes": {
+     "count": 14,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 76,
+    "deck_mm": 45,
+    "turret_mm": 229,
+    "torpedo_defense": 1
+   },
+   "complement": 828,
+   "design_year": 1915,
+   "notes": "Fisher's freaks — fast, huge, unarmored. Ideal carrier-conversion hulls under the 33,000-ton clause."
+  },
+  {
+   "id": "hawkins",
+   "name": "Hawkins class",
+   "nation": "GBR",
+   "type": "CA",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "scout_cruiser",
+   "displacement": {
+    "standard_tons": 9750,
+    "full_load_tons": 12190
+   },
+   "propulsion": {
+    "speed_kn": 30,
+    "shp": 60000,
+    "range_nm": 5400,
+    "range_at_kn": 14,
+    "fuel": "mixed"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 7,
+     "caliber_in": 7.5,
+     "mounts": "single"
+    }
+   },
+   "protection": {
+    "belt_mm": 76,
+    "deck_mm": 38
+   },
+   "complement": 712,
+   "design_year": 1915,
+   "hulls_aggregate": {
+    "count": 5,
+    "status": "mixed",
+    "notes": "Hawkins, Raleigh active; Frobisher, Effingham completing; Vindictive as carrier-hybrid. Template for the treaty 10,000t/8in cruiser limit."
+   },
+   "notes": "The class the treaty cruiser rules were written around."
+  },
+  {
+   "id": "c_class_cl",
+   "name": "C class (Caledon/Ceres/Carlisle groups)",
+   "nation": "GBR",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "scout_cruiser",
+   "displacement": {
+    "standard_tons": 4290,
+    "full_load_tons": 5250
+   },
+   "propulsion": {
+    "speed_kn": 29,
+    "shp": 40000,
+    "range_nm": 5900,
+    "range_at_kn": 10,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 5,
+     "caliber_in": 6,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 8,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 76,
+    "deck_mm": 25
+   },
+   "complement": 430,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 23,
+    "status": "mixed",
+    "notes": "Approximate count of post-1916 groups in service/reserve; future CLAA conversion stock."
+   }
+  },
+  {
+   "id": "danae",
+   "name": "Danae (D) class",
+   "nation": "GBR",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "scout_cruiser",
+   "displacement": {
+    "standard_tons": 4850,
+    "full_load_tons": 5870
+   },
+   "propulsion": {
+    "speed_kn": 29,
+    "shp": 40000,
+    "range_nm": 6700,
+    "range_at_kn": 10,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 6,
+     "caliber_in": 6,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 12,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 76,
+    "deck_mm": 25
+   },
+   "complement": 469,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 8,
+    "status": "active"
+   }
+  },
+  {
+   "id": "emerald",
+   "name": "Emerald (E) class",
+   "nation": "GBR",
+   "type": "CL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "scout_cruiser",
+   "displacement": {
+    "standard_tons": 7550,
+    "full_load_tons": 9435
+   },
+   "propulsion": {
+    "speed_kn": 33,
+    "shp": 80000,
+    "range_nm": 8000,
+    "range_at_kn": 15,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 7,
+     "caliber_in": 6,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 12,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "protection": {
+    "belt_mm": 76,
+    "deck_mm": 25
+   },
+   "complement": 572,
+   "design_year": 1918,
+   "hulls_aggregate": {
+    "count": 2,
+    "status": "building",
+    "notes": "Emerald, Enterprise — completed 1926."
+   }
+  },
+  {
+   "id": "v_w",
+   "name": "V & W class",
+   "nation": "GBR",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 1100,
+    "full_load_tons": 1490
+   },
+   "propulsion": {
+    "speed_kn": 34,
+    "shp": 27000,
+    "range_nm": 3500,
+    "range_at_kn": 15,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 4,
+     "caliber_in": 4,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 6,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "complement": 110,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 58,
+    "status": "mixed",
+    "notes": "The interwar destroyer benchmark."
+   }
+  },
+  {
+   "id": "s_class_dd_rn",
+   "name": "S class",
+   "nation": "GBR",
+   "type": "DD",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 1075,
+    "full_load_tons": 1220
+   },
+   "propulsion": {
+    "speed_kn": 36,
+    "shp": 27000,
+    "range_nm": 2750,
+    "range_at_kn": 15,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 3,
+     "caliber_in": 4,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "complement": 90,
+   "design_year": 1917,
+   "hulls_aggregate": {
+    "count": 60,
+    "status": "mixed",
+    "notes": "Large fraction in reserve; approximate count."
+   }
+  },
+  {
+   "id": "scott_shakespeare",
+   "name": "Scott / Shakespeare flotilla leaders",
+   "nation": "GBR",
+   "type": "DL",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 1580,
+    "full_load_tons": 2050
+   },
+   "propulsion": {
+    "speed_kn": 36,
+    "shp": 40000,
+    "range_nm": 5000,
+    "range_at_kn": 15,
+    "fuel": "oil"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 5,
+     "caliber_in": 4.7,
+     "mounts": "single"
+    },
+    "torpedo_tubes": {
+     "count": 6,
+     "caliber_in": 21,
+     "submerged": false
+    }
+   },
+   "complement": 164,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 13,
+    "status": "mixed"
+   }
+  },
+  {
+   "id": "l_class_ss_rn",
+   "name": "L class",
+   "nation": "GBR",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 890,
+    "full_load_tons": 1080
+   },
+   "propulsion": {
+    "speed_kn": 17,
+    "range_nm": 3800,
+    "range_at_kn": 10,
+    "fuel": "diesel"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 1,
+     "caliber_in": 4,
+     "mounts": "deck"
+    },
+    "torpedo_tubes": {
+     "count": 6,
+     "caliber_in": 18,
+     "submerged": true
+    }
+   },
+   "complement": 35,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 27,
+    "status": "mixed",
+    "notes": "Approximate; postwar drawdown ongoing."
+   }
+  },
+  {
+   "id": "m_class_ss_rn",
+   "name": "M class (submarine monitor)",
+   "nation": "GBR",
+   "type": "SM",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 1600,
+    "full_load_tons": 1950
+   },
+   "propulsion": {
+    "speed_kn": 15,
+    "range_nm": 3840,
+    "range_at_kn": 10,
+    "fuel": "diesel"
+   },
+   "armament": {
+    "main_battery": {
+     "count": 1,
+     "caliber_in": 12,
+     "mounts": "deck",
+     "notes": "Submarine-mounted battleship gun"
+    },
+    "torpedo_tubes": {
+     "count": 4,
+     "caliber_in": 18,
+     "submerged": true
+    }
+   },
+   "complement": 65,
+   "design_year": 1916,
+   "hulls_aggregate": {
+    "count": 3,
+    "status": "mixed",
+    "notes": "M2 later converted seaplane carrier, M3 minelayer."
+   }
+  },
+  {
+   "id": "k_class_ss_rn",
+   "name": "K class (steam submarine)",
+   "nation": "GBR",
+   "type": "SS",
+   "treaty_category": "auxiliary_combatant",
+   "generation": "interwar",
+   "displacement": {
+    "standard_tons": 1980,
+    "full_load_tons": 2566
+   },
+   "propulsion": {
+    "speed_kn": 24,
+    "shp": 10500,
+    "range_nm": 3000,
+    "range_at_kn": 13,
+    "fuel": "oil"
+   },
+   "armament": {
+    "torpedo_tubes": {
+     "count": 8,
+     "caliber_in": 18,
+     "submerged": true
+    }
+   },
+   "complement": 59,
+   "design_year": 1915,
+   "hulls_aggregate": {
+    "count": 13,
+    "status": "reserve",
+    "notes": "Steam-powered fleet subs, accident-prone; being paid off."
+   }
+  }
+ ],
+ "hulls": [
+  {
+   "id": "hms_queen_elizabeth",
+   "class_id": "queen_elizabeth",
+   "name": "HMS Queen Elizabeth",
+   "pennant": "00",
+   "laid_down": "1912-10-21",
+   "launched": "1913-10-16",
+   "completed": "1915-01-19",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet (flagship)"
+  },
+  {
+   "id": "hms_warspite",
+   "class_id": "queen_elizabeth",
+   "name": "HMS Warspite",
+   "pennant": "03",
+   "laid_down": "1912-10-31",
+   "launched": "1913-11-26",
+   "completed": "1915-03-08",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet",
+   "notes": "Jutland veteran"
+  },
+  {
+   "id": "hms_valiant",
+   "class_id": "queen_elizabeth",
+   "name": "HMS Valiant",
+   "pennant": "02",
+   "laid_down": "1913-01-31",
+   "launched": "1914-11-04",
+   "completed": "1916-02-19",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_barham",
+   "class_id": "queen_elizabeth",
+   "name": "HMS Barham",
+   "pennant": "04",
+   "laid_down": "1913-02-24",
+   "launched": "1914-10-31",
+   "completed": "1915-10-19",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_malaya",
+   "class_id": "queen_elizabeth",
+   "name": "HMS Malaya",
+   "pennant": "01",
+   "laid_down": "1913-10-20",
+   "launched": "1915-03-18",
+   "completed": "1916-02-01",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet",
+   "notes": "Gift of the Federated Malay States"
+  },
+  {
+   "id": "hms_revenge",
+   "class_id": "revenge",
+   "name": "HMS Revenge",
+   "pennant": "06",
+   "laid_down": "1913-12-22",
+   "launched": "1915-05-29",
+   "completed": "1916-02-01",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_resolution",
+   "class_id": "revenge",
+   "name": "HMS Resolution",
+   "pennant": "09",
+   "laid_down": "1913-11-29",
+   "launched": "1915-01-14",
+   "completed": "1916-12-30",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_royal_oak",
+   "class_id": "revenge",
+   "name": "HMS Royal Oak",
+   "pennant": "08",
+   "laid_down": "1914-01-15",
+   "launched": "1914-11-17",
+   "completed": "1916-05-01",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_royal_sovereign",
+   "class_id": "revenge",
+   "name": "HMS Royal Sovereign",
+   "pennant": "05",
+   "laid_down": "1914-01-15",
+   "launched": "1915-04-29",
+   "completed": "1916-05-18",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_ramillies",
+   "class_id": "revenge",
+   "name": "HMS Ramillies",
+   "pennant": "07",
+   "laid_down": "1913-11-12",
+   "launched": "1916-09-12",
+   "completed": "1917-09-01",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_iron_duke",
+   "class_id": "iron_duke",
+   "name": "HMS Iron Duke",
+   "laid_down": "1912-01-12",
+   "launched": "1912-10-12",
+   "completed": "1914-03-10",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Mediterranean Fleet (flagship)",
+   "notes": "Demilitarized as training ship under London Treaty 1931 (historical)"
+  },
+  {
+   "id": "hms_marlborough",
+   "class_id": "iron_duke",
+   "name": "HMS Marlborough",
+   "laid_down": "1912-01-25",
+   "launched": "1912-10-24",
+   "completed": "1914-06-02",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Mediterranean Fleet"
+  },
+  {
+   "id": "hms_benbow",
+   "class_id": "iron_duke",
+   "name": "HMS Benbow",
+   "laid_down": "1912-05-30",
+   "launched": "1913-11-12",
+   "completed": "1914-10-07",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Mediterranean Fleet"
+  },
+  {
+   "id": "hms_emperor_of_india",
+   "class_id": "iron_duke",
+   "name": "HMS Emperor of India",
+   "laid_down": "1912-05-31",
+   "launched": "1913-11-27",
+   "completed": "1914-11-10",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Mediterranean Fleet"
+  },
+  {
+   "id": "hms_king_george_v_1911",
+   "class_id": "king_george_v_1911",
+   "name": "HMS King George V",
+   "laid_down": "1911-01-16",
+   "launched": "1911-10-09",
+   "completed": "1912-11-16",
+   "status": "active",
+   "treaty_fate": "scrap_on_replacement",
+   "assignment": "Reserve / training"
+  },
+  {
+   "id": "hms_ajax",
+   "class_id": "king_george_v_1911",
+   "name": "HMS Ajax",
+   "laid_down": "1911-02-27",
+   "launched": "1912-03-21",
+   "completed": "1913-10-31",
+   "status": "active",
+   "treaty_fate": "scrap_on_replacement"
+  },
+  {
+   "id": "hms_centurion",
+   "class_id": "king_george_v_1911",
+   "name": "HMS Centurion",
+   "laid_down": "1911-01-16",
+   "launched": "1911-11-18",
+   "completed": "1913-05-22",
+   "status": "active",
+   "treaty_fate": "target",
+   "notes": "Became radio-controlled target ship 1926 (historical)"
+  },
+  {
+   "id": "hms_thunderer",
+   "class_id": "orion",
+   "name": "HMS Thunderer",
+   "laid_down": "1910-04-13",
+   "launched": "1911-02-01",
+   "completed": "1912-06-15",
+   "status": "active",
+   "treaty_fate": "scrap_on_replacement",
+   "assignment": "Cadet training ship"
+  },
+  {
+   "id": "hms_tiger",
+   "class_id": "tiger",
+   "name": "HMS Tiger",
+   "laid_down": "1912-06-20",
+   "launched": "1913-12-15",
+   "completed": "1914-10-03",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet / gunnery training",
+   "notes": "Scrapped 1932 under London Treaty (historical)"
+  },
+  {
+   "id": "hms_renown",
+   "class_id": "renown",
+   "name": "HMS Renown",
+   "laid_down": "1915-01-25",
+   "launched": "1916-03-04",
+   "completed": "1916-09-20",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Special service (royal tours)"
+  },
+  {
+   "id": "hms_repulse",
+   "class_id": "renown",
+   "name": "HMS Repulse",
+   "laid_down": "1915-01-25",
+   "launched": "1916-01-08",
+   "completed": "1916-08-18",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_hood",
+   "class_id": "admiral",
+   "name": "HMS Hood",
+   "pennant": "51",
+   "laid_down": "1916-09-01",
+   "launched": "1918-08-22",
+   "completed": "1920-05-15",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Battlecruiser Squadron (flagship)",
+   "notes": "Sisters Anson, Howe, Rodney (Admiral class) canceled 1919"
+  },
+  {
+   "id": "hms_nelson",
+   "class_id": "nelson",
+   "name": "HMS Nelson",
+   "laid_down": "1922-12-28",
+   "launched": null,
+   "completed": null,
+   "pct_complete": 0,
+   "status": "building",
+   "treaty_fate": "retained",
+   "notes": "Authorized by treaty; not yet laid down at scenario start"
+  },
+  {
+   "id": "hms_rodney",
+   "class_id": "nelson",
+   "name": "HMS Rodney",
+   "laid_down": "1922-12-28",
+   "launched": null,
+   "completed": null,
+   "pct_complete": 0,
+   "status": "building",
+   "treaty_fate": "retained",
+   "notes": "Authorized by treaty; not yet laid down at scenario start"
+  },
+  {
+   "id": "hms_argus",
+   "class_id": "argus",
+   "name": "HMS Argus",
+   "laid_down": null,
+   "launched": "1917-12-02",
+   "completed": "1918-09-16",
+   "status": "active",
+   "treaty_fate": "retained",
+   "assignment": "Atlantic Fleet"
+  },
+  {
+   "id": "hms_eagle",
+   "class_id": "eagle",
+   "name": "HMS Eagle",
+   "laid_down": "1913-02-20",
+   "launched": "1918-06-08",
+   "completed": null,
+   "pct_complete": 90,
+   "status": "trials",
+   "treaty_fate": "retained",
+   "notes": "Full completion 1924"
+  },
+  {
+   "id": "hms_hermes",
+   "class_id": "hermes",
+   "name": "HMS Hermes",
+   "laid_down": "1918-01-15",
+   "launched": "1919-09-11",
+   "completed": null,
+   "pct_complete": 80,
+   "status": "building",
+   "treaty_fate": "retained",
+   "notes": "Commissioned 1923-24"
+  },
+  {
+   "id": "hms_furious",
+   "class_id": "furious",
+   "name": "HMS Furious",
+   "laid_down": "1915-06-08",
+   "launched": "1916-08-15",
+   "completed": "1917-06-26",
+   "status": "converting",
+   "pct_complete": 15,
+   "treaty_fate": "retained",
+   "notes": "Rebuilding to flush-deck carrier, 1922-25"
+  },
+  {
+   "id": "hms_courageous",
+   "class_id": "courageous_llc",
+   "name": "HMS Courageous",
+   "laid_down": "1915-03-28",
+   "launched": "1916-02-05",
+   "completed": "1917-01-04",
+   "status": "reserve",
+   "treaty_fate": "convert_carrier",
+   "notes": "Historical conversion 1924-28 under 33,000t clause"
+  },
+  {
+   "id": "hms_glorious",
+   "class_id": "courageous_llc",
+   "name": "HMS Glorious",
+   "laid_down": "1915-05-01",
+   "launched": "1916-04-20",
+   "completed": "1917-01-14",
+   "status": "reserve",
+   "treaty_fate": "convert_carrier",
+   "notes": "Historical conversion 1924-30 under 33,000t clause"
+  }
+ ]
+}

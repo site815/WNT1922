@@ -1,0 +1,1635 @@
+{
+  "nation": "FRA",
+  "revision": "0.5.0",
+  "notes": "Authored playable supplements. Engineering, aircraft progression and prices are provisional; historical legacy records retain their base-catalog provenance.",
+  "sources": [
+    "game/data/CAMPAIGN-SOURCES.md"
+  ],
+  "equipment": {
+    "fr30snr": {
+      "name": "La Revanche de l'École active sonar",
+      "nation": "FRA",
+      "year": 1930,
+      "family": "snr",
+      "interface": "hull_sonar",
+      "range_km": 1.8,
+      "notes": "Provisional contemporary active sonar fit; no radar or advanced depth solution."
+    }
+  },
+  "campaigns": {
+    "in_good_faith_1936": {
+      "classes": [
+        {
+          "spec": {
+            "id": "ecole_ss28",
+            "nation": "FRA",
+            "name": "École ocean submarine",
+            "type": "SS",
+            "design_year": 1928,
+            "displacement": {
+              "standard_tons": 1450
+            },
+            "propulsion": {
+              "speed_kn": 19,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 1
+              },
+              "torpedo_tubes": {
+                "count": 8
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 73,
+            "cost_gold": 696,
+            "treaty_category": "other",
+            "speed_submerged": {
+              "surfaced_kn": 19,
+              "sprint_kn": 8
+            },
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ecole_dd30",
+            "nation": "FRA",
+            "name": "Vengeur torpedo destroyer",
+            "type": "DD",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 2100
+            },
+            "propulsion": {
+              "speed_kn": 37,
+              "range_nm": 5000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 138,
+                "count": 5
+              },
+              "torpedo_tubes": {
+                "count": 12
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 12,
+              "deck_mm": 3
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 158,
+            "cost_gold": 1008,
+            "treaty_category": "other",
+            "sensors": [
+              "fr30snr"
+            ]
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ecole_cl29",
+            "nation": "FRA",
+            "name": "Éclaireur fast cruiser",
+            "type": "CL",
+            "design_year": 1929,
+            "displacement": {
+              "standard_tons": 7200
+            },
+            "propulsion": {
+              "speed_kn": 35,
+              "range_nm": 7500
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 152,
+                "count": 9
+              },
+              "torpedo_tubes": {
+                "count": 9
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 80,
+              "deck_mm": 20
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 253,
+            "cost_gold": 3456,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ecole_cv31",
+            "nation": "FRA",
+            "name": "Liberté carrier",
+            "type": "CV",
+            "design_year": 1931,
+            "displacement": {
+              "standard_tons": 16500
+            },
+            "propulsion": {
+              "speed_kn": 31,
+              "range_nm": 7000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 130,
+                "count": 8
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 65,
+              "deck_mm": 16
+            },
+            "aviation": {
+              "aircraft_capacity": 48
+            },
+            "complement": 674,
+            "cost_gold": 7920,
+            "treaty_category": "aircraft_carrier",
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "ecole_ss37",
+            "nation": "FRA",
+            "name": "École submarine, 1937",
+            "type": "SS",
+            "design_year": 1937,
+            "displacement": {
+              "standard_tons": 1700
+            },
+            "propulsion": {
+              "speed_kn": 20,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 1
+              },
+              "torpedo_tubes": {
+                "count": 10
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 85,
+            "cost_gold": 816,
+            "treaty_category": "other",
+            "speed_submerged": {
+              "surfaced_kn": 20,
+              "sprint_kn": 9
+            },
+            "sensors": []
+          },
+          "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
+        },
+        {
+          "spec": {
+            "id": "fra_program_oiler",
+            "nation": "FRA",
+            "name": "La Revanche de l'École fleet oiler",
+            "type": "AO",
+            "design_year": 1930,
+            "displacement": {
+              "standard_tons": 6500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 8
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 228,
+            "cost_gold": 3120,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
+          "service": "support"
+        },
+        {
+          "spec": {
+            "id": "fr_merchant_1922",
+            "nation": "FRA",
+            "name": "France standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "fr_merchant_1936",
+            "nation": "FRA",
+            "name": "France standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "fr_merchant_1948",
+            "nation": "FRA",
+            "name": "France standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1922",
+            "nation": "FRA",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1922",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1936",
+            "nation": "FRA",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1936",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1950",
+            "nation": "FRA",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1950",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "fra_program_1930_fighter",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1930_strike",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1930_scout",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1936_fighter",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1936_strike",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1936_scout",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1942_fighter",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1942_strike",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_program_1942_scout",
+          "nation": "FRA",
+          "name": "La Revanche de l'École 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 1382,
+        "grossRegisterTons": 2989386,
+        "managedHulls": 0,
+        "referenceYear": 1935,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      },
+      "navy": {
+        "navy": "Marine Nationale",
+        "title": "La Revanche de l'École",
+        "home": "mediterranean",
+        "rival": "ITA",
+        "description": "A modern Jeune École: submarine flotillas, torpedo destroyers, fast cruisers and a practiced naval air arm.",
+        "nation": "FRA",
+        "hulls": [
+          {
+            "id": "mn_courbet",
+            "class_id": "courbet",
+            "name": "Courbet",
+            "laid_down": "1910-09-01",
+            "launched": "1911-09-23",
+            "completed": "1913-11-19",
+            "status": "active",
+            "treaty_fate": "retained",
+            "assignment": "Mediterranean Squadron",
+            "legacy": true
+          },
+          {
+            "id": "mn_jean_bart_1911",
+            "class_id": "courbet",
+            "name": "Jean Bart",
+            "laid_down": "1910-11-15",
+            "launched": "1911-09-22",
+            "completed": "1913-06-05",
+            "status": "reserve",
+            "treaty_fate": "retained",
+            "assignment": "Mediterranean Squadron",
+            "legacy": true
+          },
+          {
+            "id": "mn_paris",
+            "class_id": "courbet",
+            "name": "Paris",
+            "laid_down": "1911-11-10",
+            "launched": "1912-09-28",
+            "completed": "1914-08-01",
+            "status": "active",
+            "treaty_fate": "retained",
+            "assignment": "Mediterranean Squadron",
+            "legacy": true
+          },
+          {
+            "id": "mn_bretagne",
+            "class_id": "bretagne",
+            "name": "Bretagne",
+            "laid_down": "1912-07-22",
+            "launched": "1913-04-21",
+            "completed": "1916-02-10",
+            "status": "active",
+            "treaty_fate": "retained",
+            "assignment": "Mediterranean Squadron (flagship)",
+            "legacy": true
+          },
+          {
+            "id": "mn_provence",
+            "class_id": "bretagne",
+            "name": "Provence",
+            "laid_down": "1912-05-01",
+            "launched": "1913-04-20",
+            "completed": "1916-03-01",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          },
+          {
+            "id": "mn_lorraine",
+            "class_id": "bretagne",
+            "name": "Lorraine",
+            "laid_down": "1912-08-01",
+            "launched": "1913-09-30",
+            "completed": "1916-03-10",
+            "status": "active",
+            "treaty_fate": "retained",
+            "legacy": true
+          },
+          {
+            "id": "mn_bearn",
+            "class_id": "bearn_cv",
+            "name": "Bearn",
+            "laid_down": "1914-01-10",
+            "launched": "1920-04-15",
+            "completed": null,
+            "pct_complete": 25,
+            "status": "active",
+            "treaty_fate": "convert_carrier",
+            "notes": "Conversion to carrier decided 1922; references bearn_cv design when complete",
+            "legacy": true
+          }
+        ],
+        "aggregates": [
+          {
+            "id": "program-ecole_ss28",
+            "class_id": "ecole_ss28",
+            "count": 18,
+            "status": "active"
+          },
+          {
+            "id": "program-ecole_ss28-detached",
+            "class_id": "ecole_ss28",
+            "count": 18,
+            "status": "active",
+            "port": "brest"
+          },
+          {
+            "id": "program-ecole_dd30",
+            "class_id": "ecole_dd30",
+            "count": 16,
+            "status": "active"
+          },
+          {
+            "id": "program-ecole_dd30-detached",
+            "class_id": "ecole_dd30",
+            "count": 16,
+            "status": "active",
+            "port": "brest"
+          },
+          {
+            "id": "program-ecole_cl29",
+            "class_id": "ecole_cl29",
+            "count": 3,
+            "status": "active"
+          },
+          {
+            "id": "program-ecole_cl29-detached",
+            "class_id": "ecole_cl29",
+            "count": 3,
+            "status": "active",
+            "port": "brest"
+          },
+          {
+            "id": "program-ecole_cv31",
+            "class_id": "ecole_cv31",
+            "count": 1,
+            "status": "active"
+          },
+          {
+            "id": "program-ecole_cv31-detached",
+            "class_id": "ecole_cv31",
+            "count": 1,
+            "status": "active",
+            "port": "brest"
+          },
+          {
+            "id": "legacy-fra-duguay",
+            "class_id": "duguay_trouin",
+            "count": 3,
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "legacy-fra-chacal",
+            "class_id": "chacal",
+            "count": 6,
+            "status": "active",
+            "legacy": true
+          },
+          {
+            "id": "legacy-fra-requin",
+            "class_id": "requin",
+            "count": 9,
+            "status": "active",
+            "legacy": true
+          }
+        ],
+        "designs": [
+          "ecole_ss28",
+          "ecole_dd30",
+          "ecole_cl29",
+          "ecole_cv31",
+          "ecole_ss37",
+          "fra_program_oiler",
+          "fr_merchant_1922",
+          "fr_merchant_1936",
+          "fr_merchant_1948"
+        ],
+        "support": [
+          {
+            "id": "support-FRA",
+            "class_id": "fra_program_oiler",
+            "count": 4,
+            "status": "active"
+          }
+        ],
+        "state": {},
+        "legacyNote": "Historical surviving capital ships and representative inherited light forces accompany the hypothetical program. See game/data/CAMPAIGN-SOURCES.md."
+      }
+    },
+    "campaign_1922": {
+      "classes": [
+        {
+          "spec": {
+            "id": "fr_merchant_1922",
+            "nation": "FRA",
+            "name": "France standard freighter 1922",
+            "type": "AK",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 4800
+            },
+            "merchant_grt": 3500,
+            "propulsion": {
+              "speed_kn": 11,
+              "range_nm": 6500
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 48,
+            "cost_gold": 1344,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1935
+        },
+        {
+          "spec": {
+            "id": "fr_merchant_1936",
+            "nation": "FRA",
+            "name": "France standard freighter 1936",
+            "type": "AK",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7000
+            },
+            "merchant_grt": 5000,
+            "propulsion": {
+              "speed_kn": 13,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 1960,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added.",
+          "buildUntil": 1947
+        },
+        {
+          "spec": {
+            "id": "fr_merchant_1948",
+            "nation": "FRA",
+            "name": "France standard freighter 1948",
+            "type": "AK",
+            "design_year": 1948,
+            "displacement": {
+              "standard_tons": 9500
+            },
+            "merchant_grt": 7000,
+            "propulsion": {
+              "speed_kn": 15,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "count": 0,
+                "caliber_mm": 0
+              }
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "complement": 60,
+            "cost_gold": 2660,
+            "treaty_category": "other"
+          },
+          "service": "merchant",
+          "notes": "Provisional standardized replacement freighter. Registered capacity is separate from displacement; no opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1922",
+            "nation": "FRA",
+            "name": "Fleet depot · 1922",
+            "type": "AD",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 5500,
+              "full_load_tons": 8000
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 300,
+            "cost_gold": 3400,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1922",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1922",
+            "type": "AO",
+            "design_year": 1922,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 13500
+            },
+            "propulsion": {
+              "speed_kn": 14,
+              "range_nm": 9000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 7.7,
+                  "count": 2
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 160,
+            "cost_gold": 2800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1935,
+          "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1936",
+            "nation": "FRA",
+            "name": "Fleet depot · 1936",
+            "type": "AD",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 6500,
+              "full_load_tons": 9000
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 330,
+            "cost_gold": 4100,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1936",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1936",
+            "type": "AO",
+            "design_year": 1936,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 14500
+            },
+            "propulsion": {
+              "speed_kn": 16,
+              "range_nm": 10000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 190,
+            "cost_gold": 3500,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1949,
+          "notes": "Provisional 1936 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_depot_1950",
+            "nation": "FRA",
+            "name": "Fleet depot · 1950",
+            "type": "AD",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 7500,
+              "full_load_tons": 10000
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 360,
+            "cost_gold": 4800,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        },
+        {
+          "spec": {
+            "id": "fr_oiler_1950",
+            "nation": "FRA",
+            "name": "Fleet oiler · 1950",
+            "type": "AO",
+            "design_year": 1950,
+            "displacement": {
+              "standard_tons": 8500,
+              "full_load_tons": 15500
+            },
+            "propulsion": {
+              "speed_kn": 18,
+              "range_nm": 11000
+            },
+            "armament": {
+              "main_battery": {
+                "caliber_mm": 100,
+                "count": 2
+              },
+              "torpedo_tubes": {
+                "count": 0
+              },
+              "aa_battery": [
+                {
+                  "caliber_mm": 40,
+                  "count": 4
+                }
+              ]
+            },
+            "protection": {
+              "belt_mm": 0,
+              "deck_mm": 0
+            },
+            "aviation": {
+              "aircraft_capacity": 0
+            },
+            "complement": 220,
+            "cost_gold": 4200,
+            "treaty_category": "other",
+            "sensors": []
+          },
+          "service": "support",
+          "buildUntil": 1963,
+          "notes": "Provisional 1950 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+        }
+      ],
+      "aircraft": [
+        {
+          "id": "fra_early_fighter",
+          "nation": "FRA",
+          "name": "Nieuport naval fighter",
+          "type_year": 1921,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 30,
+          "weights": {
+            "empty_kg": 1050
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_early_strike",
+          "nation": "FRA",
+          "name": "Farman maritime bomber",
+          "type_year": 1921,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_early_scout",
+          "nation": "FRA",
+          "name": "FBA Type H",
+          "type_year": 1921,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 35,
+          "weights": {
+            "empty_kg": 1300
+          },
+          "fuel": {
+            "combat_radius_km": 220
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1930_fighter",
+          "nation": "FRA",
+          "name": "FRA 1930 fighter",
+          "type_year": 1930,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1930_strike",
+          "nation": "FRA",
+          "name": "FRA 1930 strike",
+          "type_year": 1930,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1930_scout",
+          "nation": "FRA",
+          "name": "FRA 1930 scout",
+          "type_year": 1930,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1936_fighter",
+          "nation": "FRA",
+          "name": "FRA 1936 fighter",
+          "type_year": 1936,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1936_strike",
+          "nation": "FRA",
+          "name": "FRA 1936 strike",
+          "type_year": 1936,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1936_scout",
+          "nation": "FRA",
+          "name": "FRA 1936 scout",
+          "type_year": 1936,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1942_fighter",
+          "nation": "FRA",
+          "name": "FRA 1942 fighter",
+          "type_year": 1942,
+          "role": "fighter",
+          "crew": {
+            "normal": 1
+          },
+          "cost_gold": 50,
+          "weights": {
+            "empty_kg": 2200
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1942_strike",
+          "nation": "FRA",
+          "name": "FRA 1942 strike",
+          "type_year": 1942,
+          "role": "strike",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        },
+        {
+          "id": "fra_standard_1942_scout",
+          "nation": "FRA",
+          "name": "FRA 1942 scout",
+          "type_year": 1942,
+          "role": "scout",
+          "crew": {
+            "normal": 2
+          },
+          "cost_gold": 60,
+          "weights": {
+            "empty_kg": 2800
+          },
+          "fuel": {
+            "combat_radius_km": 400
+          },
+          "notes": "Period role and crew; production cost and combat-radius fit are provisional game estimates."
+        }
+      ],
+      "merchants": {
+        "hulls": 1662,
+        "grossRegisterTons": 3298759,
+        "managedHulls": 0,
+        "referenceYear": 1921,
+        "groups": [],
+        "scope": "Powered merchant ships of at least 100 GRT; USA excludes Great Lakes; United Kingdom excludes Dominions.",
+        "note": ""
+      }
+    }
+  }
+}
