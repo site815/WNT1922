@@ -1,6 +1,6 @@
 # Beta distribution
 
-Updated for release 0.18.1, 11 September 2026.
+Updated for release 0.18.2, 11 September 2026.
 
 The first distribution is a portable Windows x64 ZIP with its own runtime. Extract everything and open WNT1922.exe; retain DLLs, resources, notices and runtime source archives. Saves live in the user's application-data folder. See [building and distribution](building.md).
 
