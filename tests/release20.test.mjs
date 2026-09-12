@@ -333,7 +333,6 @@ test("ALB Raiden replaces both combat roles without duplicating airframes or byp
   );
   assert.throws(() => setProductionModel(s, c, "fighter", "raiden_t39"));
   setCampaignMinutes(s, Date.parse("1939-01-01") / 60000);
-  n.aircraftUnlocked.push("raiden_t39");
   Object.assign(n, { gold: 1e7, industry: 1e7, influence: 300 });
   for (const role of ["fighter", "strike", "scout"])
     setProductionModel(s, c, role, "raiden_t39");

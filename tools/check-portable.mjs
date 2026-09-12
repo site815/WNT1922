@@ -201,10 +201,17 @@ try {
     if (await page.locator('[data-action="begin"]').count())
       await page.locator('[data-action="begin"]').click();
     await page.locator(".world-map").waitFor();
+    for (const key of ["YARDS", "SAILORS", "AVIATORS", "AIRCRAFT"]) {
+      const counter = page.locator('[data-resource="' + key + '"] strong');
+      assert.match(await counter.innerText(), /^[\d,]+\([+−][\d,]+\)$/);
+      assert(await counter.evaluate(el => el.scrollWidth <= el.clientWidth + 1), key + " counter must fit without truncation");
+    }
     await page.mouse.move(12, 12);
     await delay(300);
     await page.screenshot({ path: path.join(output, `map-${nation}.png`) });
     await page.locator('.sidebar [data-view="aircraft"]').click();
+    assert.equal(await page.locator('[data-action="air-design"]').count(), 0);
+    assert.equal(await page.locator('[data-model][data-future="false"]:not(:has(.badge.active))').count(), 0);
     assert.equal(
       await page.locator(".government-aircraft").evaluate((el) => el.open),
       false,

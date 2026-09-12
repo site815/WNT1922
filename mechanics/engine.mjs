@@ -126,8 +126,6 @@ import {
   staffAircraft,
   operationalAircraftModels,
   aircraftModels,
-  aircraftPrice,
-  orderAircraft,
   planeRole,
 } from "./naval-resources.mjs";
 import { supplyDetails } from "./logistics.mjs";
@@ -288,9 +286,6 @@ export function newGame(
         Object.keys(PROGRAMS).map((key) => [key, data.starting.level]),
       ),
       customDesigns: [],
-      unlocked: data.designs.filter(
-        (cid) => content.classes[cid].year <= yearOf(state),
-      ),
       bases: [...data.starting.bases],
       treatyPolicy: "disclose",
       exposure: 0,
@@ -779,12 +774,10 @@ export function shipPrice(s, content, classId, count = 1, id = s.player) {
 }
 export const treatyLedger = treatyAssessment;
 export function shipOrderBlock(s, content, classId, id = s.player) {
-  const n = s.nations[id];
   if (!content.nations[id].designs.includes(classId))
     return "Only designs in your active national catalog can be ordered.";
   const blocked = productionBlock(s, content, classId, id);
   if (blocked) return blocked;
-  if (!n.unlocked.includes(classId)) return "Develop this design first.";
   return "";
 }
 export function orderShip(s, content, classId, count = 1, id = s.player) {
@@ -883,45 +876,6 @@ export function startProject(s, key, id = s.player) {
       `${p.name} funded; completion in about ${Math.ceil(price.days / 30)} months.`,
       "industry",
     );
-}
-export function designPrice(s, content, classId, id = s.player) {
-  const c = content.classes[classId];
-  if (!c || c.nation !== id) throw new Error("Unknown design.");
-  const ahead = Math.max(0, c.year - yearOf(s));
-  return {
-    gold: Math.ceil(c.cost * 0.3 * (1 + ahead * 0.3)),
-    influence: Math.ceil(12 + ahead * 4),
-    industry: Math.ceil(c.tons * 0.2 * (1 + ahead * 0.25)),
-    days: Math.ceil(365 * (1 + ahead * 0.2)),
-    ahead,
-  };
-}
-export function developDesign(s, content, classId, id = s.player) {
-  const n = s.nations[id];
-  const blocked = productionBlock(s, content, classId, id);
-  if (blocked) throw new Error(blocked);
-  if (
-    !content.nations[id].designs.includes(classId) ||
-    n.unlocked.includes(classId)
-  )
-    throw new Error(
-      "This design is already available or outside your catalog.",
-    );
-  if (n.projects.length >= 4 || n.projects.some((p) => p.classId === classId))
-    throw new Error(
-      "A design program is already running, or all four project slots are occupied.",
-    );
-  const price = designPrice(s, content, classId, id);
-  spend(n, price);
-  n.projects.push({
-    id: `project-${s.nextId++}`,
-    key: "design",
-    classId,
-    name: `Develop ${content.classes[classId].name}`,
-    days: price.days,
-    remaining: price.days,
-    paid: price,
-  });
 }
 export function cancelOrder(s, id, actor = s.player) {
   const n = s.nations[actor],
@@ -1132,21 +1086,15 @@ export function clearOptionalAlerts(s, c) {
       contact.dismissedAt = campaignMinutes(s);
 }
 function completeProject(s, content, n, p) {
-  if (p.key === "design") n.unlocked.push(p.classId);
-  else {
-    const definition = PROGRAMS[p.key];
-    if (definition.level) n.tech[definition.level]++;
-    if (p.key === "school")
-      n.crewYear =
-        economyFor(s, n.id).crewYear * facilityFactor(n.tech, "school", 0.25);
-    if (p.key === "pilots")
-      n.aviatorsYear =
-        economyFor(s, n.id).aviatorsYear *
-        facilityFactor(n.tech, "pilots", 0.3);
-    if (p.key === "training") {
-      n.training = clamp(n.training + 9, 0, 100);
-      n.morale = clamp(n.morale + 3, 0, 100);
-    }
+  const definition = PROGRAMS[p.key];
+  if (definition.level) n.tech[definition.level]++;
+  if (p.key === "school")
+    n.crewYear = economyFor(s, n.id).crewYear * facilityFactor(n.tech, "school", 0.25);
+  if (p.key === "pilots")
+    n.aviatorsYear = economyFor(s, n.id).aviatorsYear * facilityFactor(n.tech, "pilots", 0.3);
+  if (p.key === "training") {
+    n.training = clamp(n.training + 9, 0, 100);
+    n.morale = clamp(n.morale + 3, 0, 100);
   }
   if (n.id === s.player) {
     addLog(s, `${p.name} completed.`, "industry");
@@ -1563,32 +1511,10 @@ export function aiTurn(s, content, id) {
   for (const role of ["fighter", "strike", "scout"]) {
     const ready = models.find(
       (a) =>
-        n.aircraftUnlocked.includes(a.id) &&
         [role, "multirole"].includes(planeRole(a)),
     );
     if (ready) command("production", { role, model: ready.id });
   }
-  const newModel = models.find(
-    (a) =>
-      !n.aircraftUnlocked.includes(a.id) &&
-      !n.airOrders.some((o) => o.model === a.id) &&
-      !models.some(
-        (other) =>
-          other.type_year > a.type_year &&
-          planeRole(other) === planeRole(a) &&
-          n.aircraftUnlocked.includes(other.id),
-      ),
-  );
-  if (
-    newModel &&
-    n.airOrders.length < 3 &&
-    aiCanSpend(
-      s,
-      id,
-      aircraftPrice(s, content, newModel.id, 1, id, { development: true }),
-    )
-  )
-    command("air-design", { id: newModel.id });
   yards = yardLoad(s, content, id);
   const scores = aiResearchScores(s, content, id, needs, shipping, yards);
   if (n.projects.length < 3) {
@@ -1678,26 +1604,7 @@ export function aiTurn(s, content, id) {
       if (quantity === -1) break;
     }
   }
-  const qualification = content.nations[id].designs
-    .map((cid) => content.classes[cid])
-    .filter(
-      (cl) =>
-        !n.unlocked.includes(cl.id) &&
-        !productionBlock(s, content, cl.id, id) &&
-        !n.projects.some((p) => p.classId === cl.id) &&
-        aiHullScore(s, content, id, cl, needs) > 0,
-    )
-    .sort(
-      (a, b) =>
-        aiHullScore(s, content, id, b, needs) -
-          aiHullScore(s, content, id, a, needs) || b.year - a.year,
-    )[0];
-  if (
-    qualification &&
-    n.projects.length < 3 &&
-    aiCanSpend(s, id, designPrice(s, content, qualification.id, id))
-  )
-    command("develop", { id: qualification.id });
+
 }
 
 function matchup(own, enemy) {

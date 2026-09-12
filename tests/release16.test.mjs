@@ -297,7 +297,6 @@ test("ferry planning cannot bypass a future model date or depart without full ai
     models = aircraftModels(c, "JPN"),
     future = models.find((a) => a.type_year > 1936);
   n.aircraft[future.id] = 6;
-  n.aircraftUnlocked.push(future.id);
   assert.equal(
     dispatchAviation(s, c, "JPN", {
       destination: "kure",
@@ -401,8 +400,8 @@ test("facility hovers and cards expose funded operating costs without NaN or und
     "TRAINING",
     "MORALE",
     "YARDS",
-    "SAILORS ±",
-    "AVIATORS ±",
+    "SAILORS",
+    "AVIATORS",
     "AIRCRAFT",
   ])
     assert.doesNotMatch(resourceHover(s, c, key), /undefined|NaN/);

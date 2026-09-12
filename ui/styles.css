@@ -8536,6 +8536,16 @@ body:has(.view-command) #toast {
 .game-body .resource-bar .resource-change.negative { color:var(--red); }
 .game-body .resource-bar .resource-change.positive { color:var(--green); }
 .resource-detail { display:block; color:var(--muted); font-size:10px; line-height:1.2; }
+.game-body .resource-bar {
+  grid-template-columns: repeat(12, minmax(0, 1fr)) repeat(4, minmax(0, 1.65fr));
+}
+.game-body .resource-bar:has(.resource-war) {
+  grid-template-columns: repeat(12, minmax(0, 1fr)) repeat(4, minmax(0, 1.65fr)) minmax(0, 1.8fr);
+}
+.game-body .resource-bar .resource-war { grid-column: auto; }
+.resource-reserve { font-size: .92em; font-weight: 500; }
+.resource-reserve.positive { color: var(--green); }
+.resource-reserve.negative { color: var(--red); }
 .class-hover.resource-hover { width:min(570px,94vw); }
 .class-hover.base-hover { width:min(840px,94vw); padding:14px; }
 .class-hover.base-hover .inspection-list { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; margin:8px 0; }

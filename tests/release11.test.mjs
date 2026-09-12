@@ -80,16 +80,16 @@ test("all 126 doctrine levels agree with engine availability and future work has
   s.day = Date.parse("1936-01-01") / 86400000;
   const c = contentFor(bundle, s),
     model = c.nations.GBR.aircraft.find((a) => a.type_year > 1936);
-  const p = aircraftPrice(s, c, model.id, 1, s.player, { development: true });
-  assert.equal(p.days, 180);
+  const p = aircraftPrice(s, c, model.id, 1, s.player);
+  assert.equal(p.days, 90);
   assert.match(aircraftBlock(s, c, model.id), /Development opens/);
   assert.throws(
-    () => orderAircraft(s, c, model.id, 1, s.player, { development: true }),
+    () => orderAircraft(s, c, model.id, 1, s.player),
     /Development opens/,
   );
   s.day = Date.parse(model.type_year + "-01-01") / 86400000;
   assert.deepEqual(
-    aircraftPrice(s, c, model.id, 1, s.player, { development: true }),
+    aircraftPrice(s, c, model.id, 1, s.player),
     p,
   );
 });

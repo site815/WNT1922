@@ -79,6 +79,20 @@ $portableOutput = Join-Path $releaseRoot ('dist/WNT1922-' + $releaseVersion + '-
 if ($LASTEXITCODE -ne 0) { throw 'Portable executable compilation failed.' }
 $portableHash = (Get-FileHash -LiteralPath $portableOutput -Algorithm SHA256).Hash.ToLowerInvariant()
 Set-Content -LiteralPath ($portableOutput + '.sha256') -Value ($portableHash + '  ' + [IO.Path]::GetFileName($portableOutput)) -Encoding ascii
+$downloadName = 'WNT1922-portable-win-x64.exe'
+Set-Content -LiteralPath (Join-Path $releaseRoot ('dist/' + $downloadName + '.sha256')) -Value ($portableHash + '  ' + $downloadName) -Encoding ascii
+$releaseMetadata = [ordered]@{
+    version = $releaseVersion
+    localFile = [IO.Path]::GetFileName($portableOutput)
+    downloadName = $downloadName
+    bytes = (Get-Item -LiteralPath $portableOutput).Length
+    sha256 = $portableHash
+    tag = 'v' + $releaseVersion
+    releaseUrl = 'https://github.com/site815/WNT1922/releases/tag/v' + $releaseVersion
+    latestReleaseUrl = 'https://github.com/site815/WNT1922/releases/latest'
+    downloadUrl = 'https://github.com/site815/WNT1922/releases/latest/download/' + $downloadName
+}
+$releaseMetadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $releaseRoot 'dist/latest.json') -Encoding ascii
 foreach ($assemblyDirectory in @($resolvedOutput, $portableToolDirectory)) {
     $assemblyTarget = (Resolve-Path -LiteralPath $assemblyDirectory).Path
     if (-not $assemblyTarget.StartsWith($expectedDist,[StringComparison]::OrdinalIgnoreCase)) { throw 'Unsafe assembly cleanup directory.' }

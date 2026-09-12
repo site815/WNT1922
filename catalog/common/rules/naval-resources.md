@@ -1,8 +1,12 @@
 # naval resources — data and balance
 
-Superseded naval models expose a reserve-retirement action once a newer developed model covers their role and every required basing installation. Switch any active production lines first. Retirement removes unassigned and accessible shore-reserve airframes, retaining all aviators and awarding no salvage. Aircraft embarked, stationed, airborne or in transit remain in service. Other-service aircraft continue their automatic replacement/retirement program.
+Superseded naval models expose a reserve-retirement action once a newer available model covers their role and every required basing installation. Switch any active production lines first. Retirement removes unassigned and accessible shore-reserve airframes, retaining all aviators and awarding no salvage. Aircraft embarked, stationed, airborne or in transit remain in service. Other-service aircraft continue their automatic replacement/retirement program.
 
 Aircraft accounting: total owned = embarked + stationed + transit/airborne + reserve. Every owned aircraft, including reserves, requires its full documented crew for the aviator balance.
+
+Catalog availability is determined directly by each ship's year or aircraft's type_year: the item becomes available on 1 January of that year for every controller. Future plans show a countdown. No additional unlock payment or development project is required; normal construction/production costs and time still apply. Superseded and obsolete ship lines remain closed. Player-created ship and aircraft drafts retain their registration fee.
+
+The resource bar shows yards, sailors, aviators and aircraft as total(+reserve). Yard figures are usable and spare tons/year. Personnel reserves are total trained minus required complements; a negative value means a staffing deficit. Aircraft reserve excludes embarked, stationed and in-transit aircraft. Personnel recoveries remain separate until their return date.
 
 ```json game-data
 {

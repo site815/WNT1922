@@ -91,7 +91,7 @@ test("all fourteen opening ministries have levels 1–9, with period opening pri
       validateSave(s, b);
     }
 });
-test("development dates block ship, aircraft and technology orders even if a future design is unlocked", () => {
+test("catalog dates block ship and aircraft orders; research retains its availability gates", () => {
   const s = start(),
     c = contentFor(b, s),
     n = s.nations.JPN;
@@ -99,26 +99,22 @@ test("development dates block ship, aircraft and technology orders even if a fut
   const a = aircraftModels(c, "JPN").find((a) => a.type_year > 1936);
   assert.ok(a);
   assert.throws(
-    () => orderAircraft(s, c, a.id, 1, "JPN", { development: true }),
+    () => orderAircraft(s, c, a.id, 1, "JPN"),
     /Development opens/,
   );
-  n.aircraftUnlocked.push(a.id);
   assert.throws(() => orderAircraft(s, c, a.id, 1), /Development opens/);
   assert.throws(() => setProductionModel(s, c, "fighter", a.id));
   const future = c.nations.JPN.designs.find((id) => c.classes[id].year > 1936);
   if (future) {
-    n.unlocked.push(future);
     assert.throws(() => sim.orderShip(s, c, future), /Development opens/);
-    assert.throws(() => sim.developDesign(s, c, future), /Development opens/);
   }
   assert.match(sim.projectBlock(s, "radar"), /1939/);
   const before = n.gold;
   assert.throws(() => sim.startProject(s, "radar"));
   assert.equal(n.gold, before);
   setCampaignMinutes(s, Date.parse(a.type_year + "-01-01T00:00:00Z") / 60000);
-  n.aircraftUnlocked = n.aircraftUnlocked.filter((id) => id !== a.id);
   assert.doesNotThrow(() =>
-    orderAircraft(s, c, a.id, 1, "JPN", { development: true }),
+    orderAircraft(s, c, a.id, 1, "JPN"),
   );
 });
 test("tiny rounded time intervals return promptly and repeated resume/pause uses a real worker", async (t) => {

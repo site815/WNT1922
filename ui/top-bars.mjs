@@ -30,6 +30,9 @@ const compact = (v) =>
 const balance = (v) => (v >= 0 ? "+" : "−") + compact(Math.abs(v));
 const signed = (v) => (v >= 0 ? "+" : "−") + num(Math.abs(v)),
   pct = (v) => num(v * 100) + "%";
+const totalReserve = (total, reserve) =>
+  '<span class="resource-total">' + num(total) + '</span><span class="resource-reserve ' +
+  (reserve < 0 ? 'negative' : 'positive') + '">(' + signed(reserve) + ')</span>';
 export function topBars(s, c, m = {}) {
   const n = s.nations[s.player],
     clock = capitalClock(s),
@@ -46,9 +49,9 @@ export function topBars(s, c, m = {}) {
     GDP:monthly(n.gdp*growth.monthly),GTP:monthly(growth.tradeMonth),SHIPPING:[(growth.merchantHullsMonth>=0?'+':'−')+num(Math.abs(growth.merchantHullsMonth),2)+' /mo',growth.merchantHullsMonth],
     'PORT TRADE':[pct(e.ports.coverage)+' access',0],LOGISTICS:[pct(e.deliveryCoverage)+' delivered',0],SUPPLY:['Fleet average',0],
     TRAINING:daily(-.0025/(1+upgradeLevel(n.tech,'training')*.2)),MORALE:daily((75-n.morale)*.0006),
-    YARDS:[compact(yards.spare*365)+' empty /yr',0],
-    'SAILORS ±':['+'+compact(n.crewYear*n.schoolFunding/12)+' /mo trained',0],
-    'AVIATORS ±':['+'+compact(n.aviatorsYear*n.aviatorFunding/4)+' /quarter',0],
+    YARDS:['Tons / year',0],
+    SAILORS:['+'+compact(n.crewYear*n.schoolFunding/12)+' /mo trained',0],
+    AVIATORS:['+'+compact(n.aviatorsYear*n.aviatorFunding/4)+' /quarter',0],
     AIRCRAFT:['+'+num(n.aircraftOutput||0)+' /day built',0]};
   const stats = [
     [
@@ -95,13 +98,13 @@ export function topBars(s, c, m = {}) {
     ["MORALE", num(n.morale) + "%", "National morale"],
     [
       "YARDS",
-      compact((v?.yards || yardLoad(s, c)).capacity * 365),
-      num((v?.yards || yardLoad(s, c)).capacity * 365) +
-        " tons per year after funding and port damage",
+      totalReserve(yards.capacity * 365, yards.spare * 365),
+      num(yards.capacity * 365) + " total (+" + num(yards.spare * 365) +
+        " spare) tons per year after funding and port damage",
     ],
     [
-      "SAILORS ±",
-      balance(crew.balance),
+      "SAILORS",
+      totalReserve(crew.total, crew.balance),
       num(crew.total) +
         " trained / " +
         num(crew.required) +
@@ -112,8 +115,8 @@ export function topBars(s, c, m = {}) {
       crew.balance < 0,
     ],
     [
-      "AVIATORS ±",
-      balance(air.aviatorBalance),
+      "AVIATORS",
+      totalReserve(n.aviators, air.aviatorBalance),
       num(n.aviators) +
         " aviators / " +
         num(air.aviatorsRequired) +
@@ -123,7 +126,7 @@ export function topBars(s, c, m = {}) {
     ],
     [
       "AIRCRAFT",
-      compact(air.total)+'<small class="resource-detail">'+compact(air.reserve)+' reserve</small>',
+      totalReserve(air.total, air.reserve),
       num(air.total) +
         " aircraft · " +
         num(air.assigned) +

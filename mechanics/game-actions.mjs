@@ -6,7 +6,6 @@ import { contentFor } from "./campaign-content.mjs";
 import { commissionDraft } from "./designer.mjs";
 import { commissionAircraft } from "./aircraft-designer.mjs";
 import {
-  orderAircraft,
   setFacilityFunding,
   setProductionModel,
   SPEEDS,
@@ -78,9 +77,6 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     case "production":
       setProductionModel(s, c, args.role, args.model, actor);
       break;
-    case "air-design":
-      orderAircraft(s, c, args.id, 1, actor, { development: true });
-      break;
     case "retire-aircraft":
       return retireAircraft(s,c,args.id,actor);
     case "commission-draft": {
@@ -111,9 +107,6 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
       break;
     case "order":
       sim.orderShip(s, c, args.id, args.count, actor);
-      break;
-    case "develop":
-      sim.developDesign(s, c, args.id, actor);
       break;
     case "project":
       sim.startProject(s, args.id, actor);

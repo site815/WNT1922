@@ -113,7 +113,7 @@ test("production closes superseded lines without removing ships or funded constr
   assert.deepEqual(sim.fleetSummary(s, c), original);
   const de = start("DEU");
   assert.equal(productionBlock(de, c, "seeadler_raider"), "");
-  de.nations.DEU.unlocked.push("atlantis_raider");
+  setCampaignMinutes(de, Date.UTC(c.classes.atlantis_raider.year, 0, 1) / 60000);
   assert.match(productionBlock(de, c, "seeadler_raider"), /superseded/);
 });
 test("all three facilities honor 10-100% funding, charge resources, and stop when unfunded", () => {
@@ -163,19 +163,16 @@ test("all three facilities honor 10-100% funding, charge resources, and stop whe
   assert.throws(() => setFacilityFunding(high, "schoolFunding", 0));
   assert.throws(() => setFacilityFunding(high, "aircraftFunding", 1.1));
 });
-test("aircraft designs are funded before model selection and then continuously produced", () => {
+test("aircraft models become selectable on their catalog date and are continuously produced", () => {
   const s = start(),
     n = s.nations.JPN;
   funded(s);
   assert.throws(() => setProductionModel(s, c, "fighter", "raiden_t39"));
   assert.throws(
-    () => orderAircraft(s, c, "raiden_t39", 1, "JPN", { development: true }),
+    () => orderAircraft(s, c, "raiden_t39", 1, "JPN"),
     /1939/,
   );
   setCampaignMinutes(s, Date.parse("1939-01-01T00:00:00Z") / 60000);
-  const p = orderAircraft(s, c, "raiden_t39", 1, "JPN", { development: true });
-  p.remaining = 1;
-  dailyResources(s, c, () => {});
   setProductionModel(s, c, "fighter", "raiden_t39");
   for (let i = 0; i < 7; i++) dailyResources(s, c, () => {});
   assert.ok(n.aircraft.raiden_t39 > 0);

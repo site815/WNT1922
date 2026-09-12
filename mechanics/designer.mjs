@@ -368,6 +368,5 @@ export function commissionDraft(s, c, recipe, id = s.player) {
   n.gold -= result.fee;
   s.nextId++;
   n.customDesigns.push(clean);
-  n.unlocked.push(clean.id);
   return result;
 }

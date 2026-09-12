@@ -137,7 +137,6 @@ test("air wings modernize in port without consuming aircraft, bypassing dates or
   n.aircraft[old.id] = capacity;
   n.aircraft[modern.id] = capacity;
   n.aviators = capacity * 10;
-  n.aircraftUnlocked = [old.id, modern.id];
   g.airWing = [
     { model: old.id, role: "fighter", count: capacity, crewed: capacity },
   ];

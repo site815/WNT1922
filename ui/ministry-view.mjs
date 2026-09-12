@@ -21,7 +21,6 @@ import {
   aircraftSummary,
   aircraftModels,
   planeRole,
-  aircraftPrice,
   aircraftBlock,
 } from "../mechanics/naval-resources.mjs";
 import {
@@ -258,7 +257,6 @@ export function aircraftCatalogView(s, c) {
         const choices = models.filter(
           (a) =>
             !aircraftBlock(s, c, a.id) &&
-            n.aircraftUnlocked.includes(a.id) &&
             [role, "multirole"].includes(planeRole(a)),
         );
         return (
@@ -271,9 +269,9 @@ export function aircraftCatalogView(s, c) {
           '" ' +
           (choices.length
             ? ""
-            : 'disabled title="No developed ' +
+            : 'disabled title="No available ' +
               role +
-              ' model is available. Develop an eligible model below."') +
+              ' model yet. Catalog models become ready automatically on their listed date."') +
           ">" +
           choices
             .map(
@@ -299,11 +297,7 @@ export function aircraftCatalogView(s, c) {
     .sort((a, b) => a.type_year - b.type_year || a.name.localeCompare(b.name))
     .map((a) => {
       const stock=inventory.get(a.id);
-      const future = !!aircraftBlock(s, c, a.id),
-        available = n.aircraftUnlocked.includes(a.id),
-        order = n.airOrders.find((o) => o.model === a.id && o.development),
-        price = aircraftPrice(s, c, a.id, 1, s.player, { development: true }),
-        block = aircraftBlock(s, c, a.id) || affordability(n, price);
+      const future = !!aircraftBlock(s, c, a.id);
       return (
         '<article data-model="' +
         a.id +
@@ -333,27 +327,7 @@ export function aircraftCatalogView(s, c) {
             " gold · " +
             num((a.weights?.empty_kg || 2500) / 80, 1) +
             " industry</small>" +
-            (available
-              ? '<span class="badge active">Production ready</span>'
-              : order
-                ? projectProgress(s, order)
-                : "<p>" +
-                  cost(price) +
-                  "</p><small>Development: " +
-                  price.days +
-                  ' days after funding</small><button class="action-slot" data-action="air-design" data-id="' +
-                  a.id +
-                  '" ' +
-                  (block
-                    ? 'disabled data-disabled-reason="' + esc(block) + '"'
-                    : "") +
-                  ' title="' +
-                  esc(block) +
-                  '">' +
-                  (aircraftBlock(s, c, a.id)
-                    ? "Available 1 Jan " + a.type_year
-                    : "Develop aircraft model") +
-                  "</button>")) +
+            '<span class="badge active" title="Available automatically from 1 January ' + a.type_year + '. Select it in a production line above.">Production ready</span>') +
         (stock.replacement ? '<button class="action-slot" data-action="retire-aircraft" data-id="'+a.id+'" '+
           (stock.block?'disabled data-disabled-reason="'+esc(stock.block)+'"':'')+' title="'+
           esc(stock.block || 'Retire '+num(stock.retireable)+' reserve airframes. Embarked, stationed and in-transit aircraft remain in service. Aviators are retained.')+'">Retire reserve airframes</button>':'') +

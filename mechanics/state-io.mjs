@@ -9,6 +9,7 @@ import { validateAviation } from "./aviation-validation.mjs";
 import {
   SYSTEMS_REVISION,
   aircraftModels,
+  planeRole,
   SPEEDS,
 } from "./naval-resources.mjs";
 import { GAME_VERSION } from "./version.mjs";
@@ -286,9 +287,7 @@ export function validateSave(value, content) {
       !Array.isArray(n.bases) ||
       !n.bases.length ||
       n.bases.length > 4 ||
-      !n.bases.every((k) => REGIONS[k]) ||
-      !Array.isArray(n.unlocked) ||
-      !n.unlocked.every((k) => content.nations[id].designs.includes(k))
+      !n.bases.every((k) => REGIONS[k])
     )
       fail();
     for (const p of Object.values(PROGRAMS))
@@ -314,11 +313,7 @@ export function validateSave(value, content) {
         !price(p.paid)
       )
         fail();
-      if (p.key === "design") {
-        if (!content.nations[id].designs.includes(p.classId)) fail();
-      } else if (p.key === "base") {
-        if (!REGIONS[p.region]) fail();
-      } else if (!PROGRAMS[p.key]) fail();
+      if (!PROGRAMS[p.key]) fail();
     }
     if (
       !plain(value.initial[id]) ||
@@ -704,8 +699,6 @@ export function validateSave(value, content) {
         !Object.values(n.aircraft).every(
           (v) => Number.isInteger(v) && amount(v),
         ) ||
-        !Array.isArray(n.aircraftUnlocked) ||
-        !n.aircraftUnlocked.every((k) => modelIds.includes(k)) ||
         !plain(n.productionModels) ||
         !plain(n.airProductionCarry)
       )
@@ -713,7 +706,9 @@ export function validateSave(value, content) {
       for (const [role, model] of Object.entries(n.productionModels))
         if (
           !["fighter", "strike", "scout"].includes(role) ||
-          (model !== null && !n.aircraftUnlocked.includes(model))
+          (model !== null && !models.some(a => a.id === model &&
+            a.type_year <= new Date(value.day * 86400000).getUTCFullYear() &&
+            [role, "multirole"].includes(planeRole(a))))
         )
           fail();
       for (const [model, carry] of Object.entries(n.airProductionCarry))
@@ -725,10 +720,9 @@ export function validateSave(value, content) {
           !text(o.id) ||
           !modelIds.includes(o.model) ||
           !Number.isInteger(o.count) ||
-          !finite(o.count, 0, 500) ||
+          !finite(o.count, 1, 500) ||
           !finite(o.days, 1, 100000) ||
           !finite(o.remaining, 0, o.days) ||
-          typeof o.development !== "boolean" ||
           !price(o.paid)
         )
           fail();

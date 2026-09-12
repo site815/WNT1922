@@ -18,7 +18,7 @@ export function navalAircraftInventory(s,c,id=s.player) {
       && Object.entries(basing).every(([key,value])=>!value||aircraftBasing(b)[key]))
       .sort((a,b)=>b.type_year-a.type_year)[0];
     const producing=Object.values(n.productionModels).includes(a.id);
-    const block=!replacement?"No newer developed model covers this role and basing."
+    const block=!replacement?"No newer available model covers this role and basing."
       :producing?"Select a replacement on every production line using this model first."
       :retireable<1?"No reserve airframes are available. Aircraft in service or transit remain assigned.":"";
     return {model:a,owned:n.aircraft[a.id]||0,embarked,ashore,transit,reserve,retireable,replacement,block};

@@ -232,6 +232,5 @@ export function commissionAircraft(s, c, recipe, id = s.player) {
   s.nextId++;
   n.customAircraft.push(clean);
   n.aircraft[clean.id] = 0;
-  n.aircraftUnlocked.push(clean.id);
   return r;
 }

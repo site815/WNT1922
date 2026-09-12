@@ -6,7 +6,9 @@ A naval strategy sandbox with The Treaty System (1922) and In Good Faith (1936),
 
 This repository contains the game source and required assets. Portable executable builds are distributed through GitHub Releases.
 
-Version 0.26 adds 15-minute simulation ticks, independent GDP/GTP growth, delivery-based logistics, additive industry expansions, reserve-aircraft retirement and expanded resource explanations. Start a new campaign for these rules.
+See the [release index](dist/RELEASE.md) for the current portable build and release notes.
+
+Version 0.26.1 shows total and reserve capacity together, and makes catalog ships and aircraft available automatically on their listed dates. It includes the 0.26 economy, logistics and fifteen-minute simulation. Start a new campaign for these rules.
 
 ## Edit and build
 
@@ -38,7 +40,9 @@ The two additional long-campaign tests can be run by omitting the skip pattern. 
 | tests | Regression and architecture checks |
 | tools | Validation and the single portable build pipeline |
 
-`.build/`, `dist/` and `test-output/` are disposable local output. They are excluded from Git. Git synchronization remains manual; this workflow does not publish or push anything.
+`.build/` and `test-output/` are disposable local output, excluded from Git. The `dist/` release index, build metadata and checksums are tracked; its executable files are uploaded as Release assets. Git synchronization and release publication are manual. Building never publishes or pushes anything.
+
+To publish after testing: commit and manually push the source and `dist` metadata, then run `tools/Publish-Release.ps1`. It uses the existing GitHub sign-in, uploads the EXE and checksum to a draft Release, verifies their hashes, then publishes it. The release index always points to the latest published portable.
 
 Catalog documents are **the runtime data**, not a description of a separate database. Displayed names and blurbs belong in their data fields. Dynamic orders, damage, resources and player-created designs belong to campaign saves. See [catalog editing](catalog/README.md).
 

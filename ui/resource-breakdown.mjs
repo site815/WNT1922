@@ -218,8 +218,8 @@ export function resourceHover(s, c, key) {
     ];
     note =
       "Formula: catalog yards × GDP/current-opening-GDP ratio × opening facility factor × (1 + 15% × upgrades since opening) × funding × paid operation × strategic effectiveness × intact dockyards × (1 − yard disruption). Each upgrade adds opening capacity; bonuses do not compound. Daily throughput = annual capacity / 365. Overload multiplies build time by work / capacity.";
-  } else if (key === "SAILORS ±" || key === "AVIATORS ±") {
-    const sailor = key === "SAILORS ±",
+  } else if (key === "SAILORS" || key === "AVIATORS") {
+    const sailor = key === "SAILORS",
       a = v?.air || aircraftSummary(s, c),
       crew = v?.crew || sailorSummary(s, c),
       type = sailor ? "sailors" : "aviators";
@@ -229,7 +229,7 @@ export function resourceHover(s, c, key) {
         "Required complements",
         -(sailor ? crew.required : a.aviatorsRequired),
       ),
-      flow("Surplus / deficit", sailor ? crew.balance : a.aviatorBalance),
+      flow("Reserve / staffing deficit = total − required", sailor ? crew.balance : a.aviatorBalance),
       [
         "Funded training / year",
         num(

@@ -116,10 +116,10 @@ test("material changes rebase a moving route without jumping to a different posi
 test("ship and aircraft orders consume strategic materials atomically for every actor",()=>{
   for(const id of ["JPN","USA"]){
     const [s,c,n]=start(id);n.gold=n.industry=n.strategic=1e7;n.influence=500;
-    const cl=c.nations[id].designs.find(k=>c.classes[k].type==="DD"&&n.unlocked.includes(k)&&c.classes[k].year===1932)
+    const cl=c.nations[id].designs.find(k=>c.classes[k].type==="DD"&&c.classes[k].year===1932)
       ||c.nations[id].designs.find(k=>c.classes[k].type==="DD"&&c.classes[k].year>=1930&&c.classes[k].year<=1936);
     const p=shipPrice(s,c,cl,1,id),old=n.strategic;orderShip(s,c,cl,1,id);near(n.strategic,old-p.strategic);
-    const a=aircraftModels(c,id).find(a=>n.aircraftUnlocked.includes(a.id)), cost=aircraftPrice(s,c,a.id,12,id);
+    const a=aircraftModels(c,id).find(a=>a.type_year<=1936), cost=aircraftPrice(s,c,a.id,12,id);
     const stock=n.strategic;orderAircraft(s,c,a.id,12,id);near(n.strategic,stock-cost.strategic);
     n.strategic=0;const before=JSON.stringify(s);
     assert.throws(()=>orderShip(s,c,cl,1,id),/strategic/);assert.equal(JSON.stringify(s),before);

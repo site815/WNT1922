@@ -39,7 +39,7 @@ export function productionBlock(
   if (cl.year > year(s) && !includeFuture)
     return "Development opens in " + cl.year + ".";
   const next = CLOSED_LINES[classId];
-  if (next && s.nations[id].unlocked.includes(next))
+  if (next && c.nations[id].designs.includes(next) && c.classes[next]?.year <= year(s))
     return "Production superseded by " + c.classes[next].name + ".";
   if (cl.buildUntil && year(s) > cl.buildUntil)
     return "This production line is obsolete.";
@@ -62,8 +62,7 @@ export function operationalAircraftModels(c, id) {
 }
 export const governmentModel = (a) => a?.catalogKind === "government";
 export const modelAvailable = (s, n, a) =>
-  a.type_year <= year(s) &&
-  (governmentModel(a) || n.aircraftUnlocked.includes(a.id));
+  a.type_year <= year(s);
 export function planeRole(a) {
   return /multirole/.test(a.role)
     ? "multirole"
@@ -106,7 +105,6 @@ export function initializeResources(s, c) {
     }
     n.aircraft = {};
     n.airOrders = [];
-    n.aircraftUnlocked = current.map((a) => a.id);
     n.schoolFunding = c.nations[id].starting.funding;
     n.aviatorFunding = c.nations[id].starting.funding;
     n.aircraftFunding = c.nations[id].starting.funding;
@@ -350,7 +348,6 @@ export function allocateAircraft(s, c, id, { initial = false } = {}) {
         (a) =>
           aircraftFitsShip(a, c.classes[g.classId]) &&
           a.type_year <= year(s) &&
-          n.aircraftUnlocked.includes(a.id) &&
           free[a.id] > 0,
       )
       .sort((a, b) => b.type_year - a.type_year);
@@ -449,13 +446,10 @@ export function aircraftPrice(
   model,
   count = 1,
   id = s.player,
-  { development = false } = {},
 ) {
   const a = aircraftModels(c, id).find((a) => a.id === model);
   if (!a) throw new Error("Unknown aircraft model.");
-  return development
-    ? { gold: 800, influence: 8, industry: 300, days: 180 }
-    : {
+  return {
         gold: Math.ceil(a.cost_gold * count),
         influence: Math.max(1, Math.ceil(count / 25)),
         industry: Math.ceil(((a.weights?.empty_kg || 2500) / 80) * count),
@@ -477,32 +471,22 @@ export function orderAircraft(
   model,
   count,
   id = s.player,
-  { development = false } = {},
 ) {
   const blocked = aircraftBlock(s, c, model, id);
   if (blocked) throw new Error(blocked);
   const n = s.nations[id];
   if (!Number.isInteger(count) || count < 1 || count > 500)
     throw new Error("Order 1 to 500 aircraft.");
-  if (development) {
-    if (
-      n.aircraftUnlocked.includes(model) ||
-      n.airOrders.some((o) => o.model === model && o.development)
-    )
-      throw new Error("This aircraft is already available or being developed.");
-  } else if (!n.aircraftUnlocked.includes(model))
-    throw new Error("Develop this aircraft model first.");
   if (n.airOrders.length >= 12)
     throw new Error("Twelve aircraft programs are already underway.");
-  const p = aircraftPrice(s, c, model, count, id, { development });
+  const p = aircraftPrice(s, c, model, count, id);
   expend(n, p);
   const order = {
     id: `air-${s.nextId++}`,
     model,
-    count: development ? 0 : count,
+    count,
     remaining: p.days,
     days: p.days,
-    development,
     paid: p,
   };
   n.airOrders.push(order);
@@ -515,7 +499,6 @@ export function aircraftProductionPlan(s, c, id = s.player) {
       .filter(
         ([, model]) =>
           model &&
-          n.aircraftUnlocked.includes(model) &&
           !aircraftBlock(s, c, model, id),
       )
       .map(([role, model]) => ({
@@ -529,7 +512,6 @@ export function aircraftProductionPlan(s, c, id = s.player) {
       n.aircraftFunding) /
     365;
   const demand = n.airOrders
-      .filter((o) => !o.development)
       .reduce((v, o) => v + o.count / o.days, 0),
     factor = Math.max(1, demand / Math.max(0.001, capacity));
   return {
@@ -642,15 +624,14 @@ export function dailyResources(s, c, log) {
     for (const o of [...n.airOrders]) {
       o.remaining = Math.max(
         0,
-        o.remaining - (o.development ? 1 : strategicFactor(n) / plan.factor),
+        o.remaining - strategicFactor(n) / plan.factor,
       );
       if (o.remaining > 1e-6) continue;
-      if (o.development) n.aircraftUnlocked.push(o.model);
-      else n.aircraft[o.model] = (n.aircraft[o.model] || 0) + o.count;
+      n.aircraft[o.model] = (n.aircraft[o.model] || 0) + o.count;
       n.airOrders.splice(n.airOrders.indexOf(o), 1);
       if (id === s.player)
         log(
-          `${o.development ? "Design ready:" : `${o.count} aircraft delivered:`} ${aircraftModels(c, id).find((a) => a.id === o.model).name}.`,
+          `${o.count} aircraft delivered: ${aircraftModels(c, id).find((a) => a.id === o.model).name}.`,
           "industry",
         );
     }
@@ -679,7 +660,6 @@ export function setProductionModel(s, c, role, model, id = s.player) {
     !["fighter", "strike", "scout"].includes(role) ||
     !a ||
     aircraftBlock(s, c, model, id) ||
-    !n.aircraftUnlocked.includes(model) ||
     (planeRole(a) !== role && planeRole(a) !== "multirole")
   )
     throw new Error(

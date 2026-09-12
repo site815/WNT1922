@@ -68,25 +68,16 @@ test("standardization changes later prices only after its funded program complet
   assert.equal(s.nations.JPN.tech.standardization, 6);
   assert.ok(sim.shipPrice(s, content, "kaze_t32").gold < before.gold);
 });
-test("future designs wait for their development year before funded research", () => {
-  const s = start("DEU");
-  fund(s);
-  assert.match(
-    sim.shipOrderBlock(s, content, "schwertwal_typ21"),
-    /Development opens/,
-  );
-  const early = sim.designPrice(s, content, "schwertwal_typ21");
-  assert.equal(early.ahead, 5);
-  assert.throws(
-    () => sim.developDesign(s, content, "schwertwal_typ21"),
-    /Development opens/,
-  );
+test("future designs become orderable on their catalog year without a paid unlock", () => {
+  const s = start("DEU"); fund(s);
+  assert.match(sim.shipOrderBlock(s, content, "schwertwal_typ21"), /Development opens/);
+  const before = s.nations.DEU.gold;
   s.day = Date.parse("1941-01-01T00:00:00Z") / 86400000;
-  sim.developDesign(s, content, "schwertwal_typ21");
-  s.nations.DEU.projects[0].remaining = 1;
-  sim.advanceDays(s, content, 1);
-  assert.ok(s.nations.DEU.unlocked.includes("schwertwal_typ21"));
   assert.equal(sim.shipOrderBlock(s, content, "schwertwal_typ21"), "");
+  assert.equal(s.nations.DEU.gold, before);
+  assert.equal(s.nations.DEU.projects.length, 0);
+  sim.orderShip(s, content, "schwertwal_typ21");
+  assert(s.nations.DEU.gold < before);
 });
 test("oversized orders remain available and proportional concealment reduces disclosure penalties", () => {
   const s = start("USA");

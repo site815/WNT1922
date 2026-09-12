@@ -530,12 +530,9 @@ function yardsView() {
   return `${designerView(state, draft?.kind === "aircraft" ? null : draft)}${heading("CONSTRUCTION & PROCUREMENT", "The fleet, in time", `<span class="tag">${number(load.capacity * 365)} TONS / YEAR YARD CAPACITY</span>`)}<section class="panel queue-panel"><div class="panel-title"><h2>Under construction <span class="count">${queue.reduce((v, g) => v + g.count, 0)} hulls</span></h2><span>${load.blocked ? load.reason + "; construction suspended" : load.factor > 1 ? `${number(load.factor, 2)}× longer from yard congestion` : "Yards within capacity"}</span></div>${yardCapacityChart(load)}${queue.length ? `<div class="queue-list">${queue.map((g) => `<div class="queue-row"><div><strong>${g.count} × ${esc(g.name)}</strong><small>${SERVICES[fleetService(content.classes[g.classId])]} · ${g.paid?.gold ? "Ordered by the ministry" : "Inherited campaign construction"}${g.covert ? " · concealed" : ""}</small></div><div>${meter(g.progress * 100, "var(--gold)")}<span>${percent(g.progress)} · ~${load.blocked ? "suspended" : months((1 - g.progress) * g.days * load.factor) + " remaining"}</span></div>${btn("Cancel", "cancel", `data-id="${g.id}" class="subtle"`)}</div>`).join("")}</div>` : "<p>No active orders. Choose a design below.</p>"}<p class="panel-note">All orders share yard throughput. Resources are committed on order; delivery dates respond to yard load.</p></section><div class="section-heading"><h2>Ship catalog</h2><div class="catalog-tools">${btn("New design draft", "open-designer", 'title="Create a suggested fit or design a class yourself. Gold is paid only when the design is registered."')}<select id="design-filter" aria-label="Filter ship designs"><option value="all">All ship types</option>${[...new Set(designs.map((c) => c.type))].map((t) => `<option value="${t}" ${designFilter === t ? "selected" : ""}>${TYPES[t] || t}</option>`).join("")}</select></div></div><div class="design-grid">${designPage.rows
     .map((c) => {
       const future = c.year > sim.yearOf(state),
-        work = n.projects.find((p) => p.classId === c.id),
         price = sim.shipPrice(state, content, c.id),
-        block = sim.shipOrderBlock(state, content, c.id),
-        locked = !n.unlocked.includes(c.id),
-        p = locked ? sim.designPrice(state, content, c.id) : price;
-      return `<article class="design-card panel" data-future="${future}" data-design="${c.id}"><div class="design-top"><span class="type-mark">${c.type}</span><span>${locked ? `${c.year} DESIGN · UNDEVELOPED` : SERVICES[fleetService(c)].toUpperCase()}</span></div><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3><div class="design-specs"><span><b>${number(c.tons)}</b> standard tons</span><span><b>${number(c.speed, 1)}</b> knots</span><span><b>${number(c.crew)}</b> crew</span></div><p class="armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="cost-line">${cost(p)}</div><small title="Base time before shared yard congestion. All yards contribute to one national pool.">${locked ? `Design work · ${months(p.days)}${p.ahead ? ` · ${p.ahead} years early` : ""}` : `Base build time ${months(price.days)}`}</small>${block && !locked ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${work ? projectProgress(state, work) : btn(locked ? "Develop design" : "Order hulls", locked ? "develop" : "order", `data-id="${c.id}" class="primary"`, locked ? (n.projects.some((p) => p.classId === c.id) ? "Development already underway." : affordableMessage(p)) : block || affordableMessage(price))}</div>`}</article>`;
+        block = sim.shipOrderBlock(state, content, c.id);
+      return `<article class="design-card panel" data-future="${future}" data-design="${c.id}"><div class="design-top"><span class="type-mark">${c.type}</span><span>${SERVICES[fleetService(c)].toUpperCase()}</span></div><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3><div class="design-specs"><span><b>${number(c.tons)}</b> standard tons</span><span><b>${number(c.speed, 1)}</b> knots</span><span><b>${number(c.crew)}</b> crew</span></div><p class="armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="cost-line">${cost(price)}</div><small title="Base time before shared yard congestion. All yards contribute to one national pool.">Base build time ${months(price.days)}</small>${block ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${btn("Order hulls", "order", `data-id="${c.id}" class="primary"`, block || affordableMessage(price))}</div>`}</article>`;
     })
     .join("")}</div>${pageControls(designPage, "design")}`;
 }
@@ -1503,13 +1500,6 @@ app.addEventListener("click", async (event) => {
       );
       return;
     }
-    if (action === "air-design") {
-      mutate(
-        { type: "air-design", args: { id } },
-        "Aircraft development order transmitted.",
-      );
-      return;
-    }
     if (action === "retire-aircraft") {
       const a=content.nations[state.player].aircraft.find(a=>a.id===id);
       openDialog({type:"confirm",title:"Retire reserve "+a.name+" airframes?",
@@ -1580,10 +1570,6 @@ app.addEventListener("click", async (event) => {
         dialog = null;
         render();
       }
-      return;
-    }
-    if (action === "develop") {
-      mutate({ type: "develop", args: { id } }, "Design development funded.");
       return;
     }
     if (action === "project") {

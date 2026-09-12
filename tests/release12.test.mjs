@@ -5,7 +5,6 @@ import fs from "node:fs";
 import {
   newGame,
   orderShip,
-  developDesign,
   clearOptionalAlerts,
 } from "../mechanics/engine.mjs";
 import { contentFor } from "../mechanics/campaign-content.mjs";
@@ -105,11 +104,10 @@ test("future catalog countdowns never authorize purchases or silently fund quali
   assert.match(productionBlock(s, c, future.id), /Development opens/);
   const before = JSON.stringify(s);
   assert.throws(() => orderShip(s, c, future.id), /Development opens/);
-  assert.throws(() => developDesign(s, c, future.id), /Development opens/);
   assert.equal(JSON.stringify(s), before);
   const plane = c.nations.USA.aircraft.find((a) => a.type_year > 1936);
   assert.throws(
-    () => orderAircraft(s, c, plane.id, 1, "USA", { development: true }),
+    () => orderAircraft(s, c, plane.id, 1, "USA"),
     /Development opens/,
   );
   const html = aircraftCatalogView(s, c);
