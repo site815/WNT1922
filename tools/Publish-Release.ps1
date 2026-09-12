@@ -27,14 +27,25 @@ if (-not $credentialEntry) { throw 'No GitHub credential is available.' }
 $headers = @{ Authorization = 'Bearer ' + $credentialEntry.Substring(9); Accept = 'application/vnd.github+json'; 'User-Agent' = 'WNT1922-Release'; 'X-GitHub-Api-Version' = '2026-03-10' }
 $api = 'https://api.github.com/repos/site815/WNT1922/releases'
 $release = $null
-try { $release = Invoke-RestMethod -Uri ($api + '/tags/' + $metadata.tag) -Headers $headers }
-catch { if ([int]$_.Exception.Response.StatusCode -ne 404) { throw } }
+$releaseRecord = Join-Path $publishRoot '.build/releases/github-release.json'
+if (Test-Path -LiteralPath $releaseRecord) {
+    $record = Get-Content -Raw -LiteralPath $releaseRecord | ConvertFrom-Json
+    if ($record.repository -eq 'site815/WNT1922' -and $record.tag -eq $metadata.tag -and $record.id -gt 0) {
+        try { $release = Invoke-RestMethod -Uri ($api + '/' + $record.id) -Headers $headers }
+        catch { if ([int]$_.Exception.Response.StatusCode -ne 404) { throw } }
+        if ($release -and $release.tag_name -ne $metadata.tag) { throw 'The recorded Release ID now has a different version tag.' }
+    }
+}
+if (-not $release) {
+    try { $release = Invoke-RestMethod -Uri ($api + '/tags/' + $metadata.tag) -Headers $headers }
+    catch { if ([int]$_.Exception.Response.StatusCode -ne 404) { throw } }
+}
 # GitHub's REST collection/tag views can omit drafts or filtered releases. Resolve IDs through GraphQL.
 if (-not $release) {
     $matchingDrafts = @()
     $cursor = $null
     do {
-        $query = @{ query = 'query($cursor:String) { repository(owner:"site815",name:"WNT1922") { releases(first:100,after:$cursor) { nodes { databaseId tagName } pageInfo { hasNextPage endCursor } } } }'; variables = @{cursor=$cursor} } | ConvertTo-Json -Depth 5
+        $query = @{ query = 'query($cursor:String) { repository(owner:"site815",name:"WNT1922") { releases(first:100,after:$cursor,orderBy:{field:CREATED_AT,direction:DESC}) { nodes { databaseId tagName } pageInfo { hasNextPage endCursor } } } }'; variables = @{cursor=$cursor} } | ConvertTo-Json -Depth 5
         $graph = Invoke-RestMethod -Method Post -Uri 'https://api.github.com/graphql' -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($query))
         if ($graph.errors) { throw ('Cannot inspect existing Releases: ' + ($graph.errors.message -join '; ')) }
         $releasePage = $graph.data.repository.releases
@@ -58,6 +69,8 @@ if (-not $release) {
     } | ConvertTo-Json
     $release = Invoke-RestMethod -Method Post -Uri $api -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($body))
 }
+@{repository='site815/WNT1922';tag=$metadata.tag;id=$release.id} | ConvertTo-Json | Set-Content -LiteralPath $releaseRecord -Encoding ascii
+Write-Output ('Using Release ID ' + $release.id + ' for ' + $metadata.tag)
 $uploadUrl = $release.upload_url -replace '\{.*$', ''
 if (-not $uploadUrl.StartsWith('https://uploads.github.com/repos/site815/WNT1922/releases/')) { throw 'Unexpected release upload destination.' }
 $assets = @(
