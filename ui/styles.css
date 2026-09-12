@@ -1,0 +1,8552 @@
+/* style.css */
+:root {
+  color-scheme: dark;
+  --bg: #101a24;
+  --panel: #172430;
+  --line: #2b3b48;
+  --muted: #9eafbd;
+  --text: #edf1f2;
+  --gold: #e7c579;
+  --green: #91cbb6;
+  --red: #f49b88;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  color: inherit;
+  background: #203341;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+}
+button:hover {
+  border-color: var(--gold);
+  background: #293e4d;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+h1,
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+h1 {
+  font-size: 3rem;
+}
+h2 {
+  font-size: 1.65rem;
+}
+.loading {
+  padding: 5rem;
+}
+.start {
+  max-width: 1440px;
+  margin: auto;
+  padding: 2.5rem 4vw;
+}
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 3rem;
+}
+.wordmark {
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: 0.14rem;
+}
+.wordmark > span {
+  font-weight: 300;
+  color: var(--gold);
+}
+.tag,
+.eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.start-heading {
+  padding: 1rem 0 2rem;
+}
+.start-heading h1 {
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  margin: 0.5rem 0 1rem;
+  letter-spacing: -0.04em;
+}
+.start-heading h1 > span {
+  color: var(--gold);
+}
+.nation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.nation-card {
+  padding: 1.6rem;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  background: var(--panel);
+  border-top: 3px solid var(--nation);
+  min-height: 360px;
+}
+.nation-code {
+  color: var(--nation);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16rem;
+  margin-bottom: 1.3rem;
+}
+.nation-name {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  margin-bottom: 0.6rem;
+}
+.nation-card strong {
+  font-weight: 500;
+  color: var(--nation);
+  font-size: 0.95rem;
+}
+.nation-card p {
+  font-size: 0.93rem;
+  flex: 1;
+  margin: 1.25rem 0;
+}
+.nation-stats {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 1rem 0 1.5rem;
+}
+.nation-stats b {
+  display: block;
+  font-size: 1.4rem;
+  color: var(--text);
+  font-weight: 500;
+}
+.card-link {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  font-size: 0.9rem;
+}
+.card-link > span {
+  color: var(--nation);
+}
+.start-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-grid article,
+.panel {
+  padding: 1.5rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.stat-grid label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.stat-grid b {
+  display: block;
+  font-weight: 400;
+  font-size: 2rem;
+  margin-top: 0.4rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+th {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+th,
+td {
+  padding: 0.85rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+#toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  padding: 0.8rem 1.25rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px #0005;
+  z-index: 20;
+  display: none;
+  max-width: 90vw;
+}
+@media (max-width: 1000px) {
+  .nation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .nation-grid,
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .start {
+    padding: 1.5rem;
+  }
+  .masthead {
+    margin-bottom: 2rem;
+  }
+  .tag {
+    display: none;
+  }
+  .start-footer {
+    flex-direction: column;
+  }
+}
+:root {
+  --sidebar: 232px;
+}
+.selected.nation-card {
+  background: #20303c;
+  box-shadow: 0 0 0 1px var(--nation);
+}
+.start-actions,
+.resume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.start-actions p {
+  margin: 0.5rem 0 0;
+}
+.start-actions .primary {
+  padding: 1rem 1.5rem;
+}
+.start-bottom {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.resume {
+  padding: 1.1rem 1.5rem;
+  background: #203b3c;
+  border-left: 3px solid var(--green);
+  margin-bottom: 1.5rem;
+}
+.resume span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
+.primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #15212b;
+  font-weight: 650;
+}
+.primary:hover {
+  background: #f4d89a;
+  color: #15212b;
+}
+.full {
+  width: 100%;
+  margin-top: 1rem;
+}
+.subtle {
+  background: transparent;
+  color: var(--muted);
+}
+.muted,
+small {
+  color: var(--muted);
+}
+small {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.game-shell {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  border-right: 1px solid var(--line);
+  background: #0e1720;
+  position: fixed;
+  inset: 0 auto 0 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.7rem 1rem;
+  z-index: 3;
+}
+.side-brand {
+  padding: 0 0.6rem 1.6rem;
+}
+.side-country {
+  padding: 1.5rem 0.6rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.side-country .eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+}
+.side-country > strong {
+  font:
+    1.7rem Georgia,
+    serif;
+}
+.side-country > span:last-child {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+nav {
+  padding: 1.2rem 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  text-align: left;
+  margin: 0.25rem 0;
+  padding: 0.85rem 0.65rem;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.nav-item > span {
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
+.nav-item b {
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-left: auto;
+}
+.nav-item.current {
+  color: var(--gold);
+  background: #22313a;
+  border-color: #3a4548;
+}
+.side-bottom {
+  margin-top: auto;
+  padding: 0.75rem 0.35rem 0;
+  display: grid;
+  gap: 0.65rem;
+}
+.side-bottom > div {
+  display: flex;
+  gap: 0.5rem;
+}
+.side-bottom button {
+  font-size: 0.84rem;
+  flex: 1;
+}
+.save-status {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.game-body {
+  margin-left: var(--sidebar);
+  width: calc(100% - var(--sidebar));
+  min-width: 0;
+}
+.command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.1rem 2rem;
+  border-bottom: 1px solid var(--line);
+  background: #13202b;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.command-bar > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+.command-bar strong {
+  font-size: 1.2rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.command-bar .eyebrow {
+  font-size: 0.72rem;
+}
+.clock-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.clock-label {
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 0.08em;
+}
+.clock-label.paused {
+  color: var(--gold);
+}
+select,
+input[type="number"] {
+  background: #12212c;
+  color: var(--text);
+  border: 1px solid #3a4b58;
+  border-radius: 4px;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.88rem;
+  max-width: 100%;
+}
+label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.pause-control {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.resources {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #16232e;
+  border-bottom: 1px solid var(--line);
+}
+.resources > div {
+  padding: 1.2rem 2rem;
+  border-right: 1px solid var(--line);
+}
+.resources > div:last-child {
+  border: 0;
+}
+.resources label {
+  font-size: 0.68rem;
+  letter-spacing: 0.11em;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0;
+}
+.resources strong {
+  font-size: 1.8rem;
+  font-weight: 400;
+  display: block;
+  margin: 0.4rem 0 0.15rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.resources em {
+  font-size: 0.8rem;
+  font-style: normal;
+  color: var(--muted);
+}
+.resources small {
+  font-size: 0.78rem;
+}
+.resource-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.gold-dot {
+  background: var(--gold);
+}
+.influence-dot {
+  background: #b2a4da;
+}
+.steel-dot {
+  background: #81b2c4;
+}
+.workspace {
+  padding: 1.75rem 2rem 3rem;
+  max-width: 1700px;
+  margin: 0 auto;
+}
+.view-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.1rem 0 1.6rem;
+}
+.view-heading h1 {
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  margin: 0.5rem 0 0;
+}
+.view-heading .eyebrow {
+  font-size: 0.72rem;
+}
+.view-intro {
+  max-width: 920px;
+  font-size: 0.92rem;
+  margin-bottom: 1.75rem;
+}
+.situation {
+  font-size: 0.74rem;
+  letter-spacing: 0.1rem;
+  color: var(--green);
+  border: 1px solid #3b5c51;
+  border-radius: 3px;
+  padding: 0.6rem 0.9rem;
+  white-space: nowrap;
+}
+.situation.hostile {
+  color: var(--red);
+  border-color: #754639;
+}
+.decision-banner {
+  width: 100%;
+  background: #373328;
+  border-color: #71613e;
+  color: #f3dca5;
+  text-align: left;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  font-size: 0.86rem;
+  margin-bottom: 1.4rem;
+}
+.decision-banner > span:last-child {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+.signal {
+  height: 7px;
+  width: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.command-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 1.2rem;
+}
+.panel {
+  padding: 1.35rem;
+  margin-bottom: 0;
+  min-width: 0;
+}
+.panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+.panel-title h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.panel-title > span {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.ocean-board {
+  background: #14232e;
+}
+.ocean-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  background-image:
+    linear-gradient(#34506112 1px, transparent 1px),
+    linear-gradient(90deg, #34506112 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.sea-region {
+  padding: 1.2rem;
+  background: #1a2c37cc;
+  border: 1px solid #354650;
+  border-radius: 3px;
+  min-height: 213px;
+}
+.sea-region.focused {
+  border-color: #8f7950;
+  background: #233139e8;
+}
+.sea-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+.sea-top b {
+  font-size: 0.57rem;
+  font-weight: 500;
+  color: var(--green);
+  white-space: nowrap;
+}
+.sea-region h3 {
+  font:
+    1.4rem Georgia,
+    serif;
+  margin: 0.85rem 0 0.8rem;
+}
+.sea-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  font-size: 2rem;
+  font-weight: 300;
+}
+.sea-count small {
+  font-size: 0.72rem;
+}
+.control-bar {
+  display: flex;
+  height: 4px;
+  background: var(--line);
+  margin: 1rem 0 0.5rem;
+  border-radius: 1px;
+  overflow: hidden;
+}
+.control-bar i {
+  display: block;
+  height: 100%;
+}
+.sea-caption,
+.sea-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.sea-bottom {
+  border-top: 1px solid #3a4c555c;
+  margin-top: 1rem;
+  padding-top: 0.7rem;
+  font-size: 0.67rem;
+}
+.panel-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 1.2rem 0 0;
+}
+.directive h2 {
+  font-size: 1.5rem;
+  margin: 0.6rem 0 1.25rem;
+}
+.directive select {
+  width: 100%;
+  font-size: 0.85rem;
+}
+.directive p {
+  font-size: 0.82rem;
+  margin: 0.7rem 0 1.15rem;
+}
+.directive > small {
+  display: block;
+  margin-top: 0.6rem;
+}
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 1.4rem 0;
+}
+.readiness-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.83rem;
+  margin: 0.85rem 0 0.4rem;
+}
+.readiness-row span {
+  color: var(--muted);
+}
+.readiness-row b {
+  font-weight: 500;
+}
+.meter {
+  display: block;
+  height: 5px;
+  background: #0f1b25;
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 55px;
+}
+.meter i {
+  height: 100%;
+  display: block;
+  transition: width 0.2s;
+}
+.lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+.dispatch {
+  display: grid;
+  grid-template-columns: 65px 1fr;
+  gap: 0.25rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.9rem 0;
+}
+.dispatch:last-child {
+  border: 0;
+}
+.dispatch-kind {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.3rem;
+}
+.dispatch-kind.war,
+.dispatch-kind.battle {
+  color: var(--red);
+}
+.dispatch-kind.industry {
+  color: var(--gold);
+}
+.dispatch-kind.diplomacy {
+  color: #aface0;
+}
+.dispatch p {
+  font-size: 0.85rem;
+  margin: 0;
+  color: #c3cdd5;
+}
+.dispatch time {
+  grid-column: 2;
+  font-size: 0.7rem;
+  color: #7f96a8;
+}
+.overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+.overview-metrics strong {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 350;
+  color: var(--text);
+}
+.overview-metrics span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+.count {
+  font:
+    0.8rem "Segoe UI",
+    sans-serif;
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
+.queue-list {
+  max-height: 360px;
+  overflow: auto;
+}
+.queue-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.4fr) minmax(160px, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.86rem;
+}
+.queue-row:last-child {
+  border: 0;
+}
+.queue-row strong {
+  font-weight: 550;
+}
+.queue-row small,
+.queue-row > div > span {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 0.45rem;
+}
+.queue-row button {
+  font-size: 0.76rem;
+  padding: 0.45rem 0.65rem;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem 0 1rem;
+}
+.section-heading h2 {
+  margin: 0;
+}
+.design-grid,
+.program-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.design-card {
+  display: flex;
+  flex-direction: column;
+}
+.design-top,
+.program-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.design-top > span:last-child,
+.program-top > span:last-child {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.type-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 35px;
+  border: 1px solid #666454;
+  border-radius: 3px;
+  color: var(--gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+.design-card h3,
+.program-card h3 {
+  font:
+    1.35rem Georgia,
+    serif;
+  margin: 0 0 1rem;
+}
+.design-specs {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.66rem;
+  color: var(--muted);
+}
+.design-specs b {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 450;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.armament {
+  font-size: 0.78rem;
+  margin: 1.25rem 0;
+  flex: 1;
+}
+.cost-line {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0.8rem 0;
+}
+.cost {
+  font-size: 0.76rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.gold {
+  color: var(--gold);
+}
+.influence {
+  color: #c1abea;
+}
+.steel {
+  color: #9acddd;
+}
+.design-card > small {
+  font-size: 0.73rem;
+}
+.design-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+}
+.design-actions button {
+  font-size: 0.82rem;
+  flex: 1;
+  padding: 0.65rem 0.55rem;
+}
+.block-reason {
+  font-size: 0.75rem;
+  color: var(--red);
+  margin: 0.75rem 0 0;
+}
+.program-grid {
+  margin: 1.5rem 0;
+}
+.program-card {
+  display: flex;
+  flex-direction: column;
+}
+.program-card p {
+  font-size: 0.85rem;
+  flex: 1;
+}
+.program-card .eyebrow {
+  font-size: 0.67rem;
+}
+.program-card > small {
+  font-size: 0.75rem;
+}
+.program-card button {
+  font-size: 0.84rem;
+}
+.ahead {
+  font-size: 0.72rem;
+  color: var(--gold);
+  padding: 0.6rem;
+  background: #9a773719;
+  border-left: 2px solid #a68a4b;
+  margin-bottom: 0.5rem;
+}
+.expansion,
+.treaty-panel {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+.expansion h2,
+.treaty-panel h2 {
+  margin: 0.65rem 0;
+}
+.expansion p,
+.treaty-panel p {
+  font-size: 0.85rem;
+}
+.expansion select,
+.treaty-panel select {
+  width: 100%;
+}
+.table-panel {
+  padding: 0.6rem 1.2rem;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+td small {
+  display: block;
+  font-size: 0.72rem;
+  margin-top: 0.35rem;
+}
+.text-button {
+  background: none;
+  border: 0;
+  text-align: left;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.text-button:hover {
+  background: none;
+  color: var(--gold);
+}
+td .subtle {
+  font-size: 0.76rem;
+  padding: 0.5rem 0.65rem;
+}
+.badge {
+  font-size: 0.68rem;
+  border: 1px solid #52616a;
+  border-radius: 3px;
+  color: var(--muted);
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge.active {
+  border-color: #426454;
+  color: #9bcead;
+}
+.badge.reserve {
+  color: #bbc1c6;
+  border-color: #53626d;
+}
+.badge.war {
+  color: var(--red);
+  border-color: #795044;
+}
+.government-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.government-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.government .nation-code {
+  margin: 0;
+}
+.government h2 {
+  margin: 1.5rem 0 1rem;
+  font-size: 1.7rem;
+}
+.relation-score {
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--green);
+}
+.relation-score.negative {
+  color: var(--red);
+}
+.relation-score span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0.1rem 0 1rem;
+}
+.relation-scale {
+  height: 4px;
+  background: linear-gradient(90deg, #d78571 0%, #6d7780 50%, #88bfa8 100%);
+  position: relative;
+  margin-top: 1.5rem;
+}
+.relation-scale i {
+  position: absolute;
+  width: 3px;
+  height: 14px;
+  background: #fff;
+  top: -5px;
+}
+.scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+.government > p {
+  font-size: 0.8rem;
+  min-height: 2.5rem;
+  margin-top: 1.5rem;
+}
+.government-actions {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.government-actions button {
+  font-size: 0.81rem;
+}
+.government > small {
+  display: block;
+  font-size: 0.74rem;
+}
+.treaty-ledger {
+  display: flex;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+.treaty-ledger b {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 450;
+}
+.treaty-ledger span {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.report-card {
+  text-align: left;
+}
+.report-card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.report-card .eyebrow {
+  font-size: 0.68rem;
+}
+.result {
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+.won {
+  color: var(--green);
+}
+.lost {
+  color: var(--red);
+}
+.report-card h2 {
+  font-size: 1.7rem;
+  margin-bottom: 0.5rem;
+}
+.report-card p {
+  font-size: 0.85rem;
+}
+.report-losses {
+  display: flex;
+  gap: 2rem;
+  margin: 1.5rem 0;
+}
+.report-losses b {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--text);
+}
+.report-losses span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.upset {
+  color: var(--gold);
+}
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.empty p {
+  max-width: 600px;
+  margin: 1rem auto 1.5rem;
+}
+.review-banner {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.75rem 2rem;
+  background: #22353d;
+  border-left: 3px solid var(--gold);
+  margin: 0 0 1.5rem;
+}
+.review-banner h2 {
+  font-size: 1.65rem;
+}
+.review-banner p {
+  font-size: 0.88rem;
+  margin: 0;
+}
+.review-banner > strong {
+  font:
+    4.5rem Georgia,
+    serif;
+  color: #65818c;
+  margin-left: auto;
+}
+.player-row {
+  background: #ba9f5520;
+}
+.review-row {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.review-row > strong {
+  font-size: 1.4rem;
+  color: var(--gold);
+}
+.review-row span {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #040b12cc;
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 2rem;
+}
+.modal {
+  background: #192935;
+  border: 1px solid #52616c;
+  border-radius: 6px;
+  max-width: 620px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 100px #0008;
+}
+.modal.wide {
+  max-width: 780px;
+}
+.modal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.modal h2 {
+  font-size: 1.65rem;
+  margin: 0;
+}
+.close {
+  border: 0;
+  background: transparent;
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0.2rem 0.6rem;
+  color: var(--muted);
+}
+.modal-body {
+  padding: 1.5rem 1.6rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.modal-body > p {
+  font-size: 0.95rem;
+  margin: 0 0 1.2rem;
+}
+.modal-body > input[type="number"] {
+  width: 100%;
+  margin: 0.3rem 0 1rem;
+  font-size: 1.1rem;
+}
+.modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding: 1rem 1.6rem;
+  border-top: 1px solid var(--line);
+}
+.decision-options {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.decision-options button {
+  text-align: left;
+  padding: 1.1rem 1.2rem;
+  background: #203744;
+}
+.decision-options strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 550;
+}
+.decision-options span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+.decision-options small {
+  display: block;
+  color: var(--red);
+  margin-top: 0.5rem;
+}
+.spec-lead {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.spec-lead strong,
+.spec-lead span {
+  display: block;
+}
+.spec-lead .type-mark {
+  display: inline-flex;
+}
+.spec-lead > div > span {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.35rem;
+}
+.spec-list {
+  margin: 0;
+}
+.spec-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.spec-list dt {
+  color: var(--muted);
+}
+.spec-list dd {
+  margin: 0;
+  text-align: right;
+}
+.spaced {
+  margin-top: 1.5rem;
+}
+.help-list {
+  padding-left: 1.3rem;
+}
+.help-list li {
+  line-height: 1.65;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+.help-list strong {
+  color: var(--text);
+}
+.check-label {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.check-label input {
+  accent-color: var(--gold);
+  width: 18px;
+  height: 18px;
+}
+.menu-actions {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+}
+@media (min-width: 1800px) {
+  .workspace {
+    padding-top: 2.5rem;
+  }
+  .sea-region {
+    min-height: 260px;
+  }
+  .sea-region h3 {
+    font-size: 1.7rem;
+  }
+  .sea-count {
+    font-size: 2.6rem;
+  }
+}
+@media (max-width: 1250px) {
+  :root {
+    --sidebar: 205px;
+  }
+  .command-bar {
+    padding: 1rem;
+  }
+  .command-bar > div:first-child > .eyebrow {
+    display: none;
+  }
+  .resources > div {
+    padding: 1rem 1.2rem;
+  }
+  .workspace {
+    padding: 1.2rem;
+  }
+  .command-grid {
+    grid-template-columns: minmax(0, 1fr) 265px;
+  }
+  .ocean-grid {
+    gap: 0.65rem;
+  }
+  .sea-region {
+    padding: 0.9rem;
+  }
+  .sea-top {
+    font-size: 0.52rem;
+  }
+  .sea-region h3 {
+    font-size: 1.2rem;
+  }
+  .sea-count small {
+    font-size: 0.65rem;
+  }
+  .sea-bottom {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .design-grid,
+  .program-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .government-grid {
+    gap: 0.7rem;
+  }
+  .government {
+    padding: 1.15rem;
+  }
+  .government h2 {
+    font-size: 1.4rem;
+  }
+  .nav-item {
+    font-size: 0.82rem;
+  }
+}
+@media (max-width: 1000px) {
+  .command-grid {
+    grid-template-columns: 1fr;
+  }
+  .directive {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem 1rem;
+  }
+  .directive > h2,
+  .directive > .eyebrow,
+  .directive > .divider {
+    grid-column: 1/-1;
+  }
+  .directive > label {
+    margin: 0;
+    align-self: end;
+  }
+  .directive .readiness-row {
+    margin: 0;
+  }
+  .directive > p {
+    margin: 0;
+  }
+  .directive > .divider {
+    margin: 0.5rem 0;
+  }
+  .directive .full {
+    margin: 0;
+  }
+  .government-grid {
+    grid-template-columns: 1fr;
+  }
+  .government {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+  .government-top,
+  .government > small {
+    grid-column: 1/-1;
+  }
+  .government h2 {
+    margin: 0.5rem 0;
+  }
+  .government .relation-score {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .government-actions {
+    grid-column: 2;
+    grid-row: 2/6;
+  }
+  .government .relation-scale,
+  .government .scale-labels {
+    grid-column: 1;
+  }
+  .government > p {
+    grid-column: 1/-1;
+    margin: 0.8rem 0;
+    min-height: 0;
+  }
+  .clock-label {
+    display: none;
+  }
+  .command-bar strong {
+    font-size: 1.05rem;
+  }
+  .clock-controls select {
+    max-width: 155px;
+  }
+  .lower-grid {
+    grid-template-columns: 1fr;
+  }
+  .view-heading h1 {
+    font-size: 2rem;
+  }
+  .view-heading > .tag {
+    display: none;
+  }
+  .expansion,
+  .treaty-panel {
+    grid-template-columns: 1fr;
+  }
+  .resources strong {
+    font-size: 1.5rem;
+  }
+  .resources label {
+    font-size: 0.61rem;
+  }
+  .resources small {
+    font-size: 0.65rem;
+  }
+  .decision-banner > span:last-child {
+    font-size: 0.7rem;
+  }
+}
+@media (max-width: 760px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    padding: 0.9rem 1rem;
+    display: block;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .game-shell {
+    display: block;
+  }
+  .side-brand {
+    display: inline;
+    padding: 0;
+    font-size: 1.1rem;
+  }
+  .side-country {
+    border: 0;
+    padding: 0;
+    display: inline-flex;
+    float: right;
+  }
+  .side-country .eyebrow,
+  .side-country > span:last-child {
+    display: none;
+  }
+  .side-country > strong {
+    font-size: 1.1rem;
+  }
+  .sidebar nav {
+    display: flex;
+    overflow-x: auto;
+    clear: both;
+    padding: 0.75rem 0 0;
+    gap: 0.3rem;
+  }
+  .nav-item {
+    width: auto;
+    flex-shrink: 0;
+    font-size: 0.76rem;
+    padding: 0.55rem 0.65rem;
+  }
+  .nav-item > span {
+    display: none;
+  }
+  .side-bottom {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0 0;
+    gap: 0.5rem;
+  }
+  .save-status {
+    font-size: 0.65rem;
+    margin-right: auto;
+  }
+  .side-bottom button {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+  }
+  .game-body {
+    margin: 0;
+    width: 100%;
+  }
+  .command-bar {
+    position: static;
+    padding: 0.8rem 1rem;
+  }
+  .resources {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .resources > div {
+    padding: 0.85rem 0.75rem;
+  }
+  .resources strong {
+    font-size: 1.3rem;
+  }
+  .resources small {
+    font-size: 0.6rem;
+  }
+  .workspace {
+    padding: 1rem;
+  }
+  .view-heading {
+    margin-top: 1.25rem;
+  }
+  .view-heading h1 {
+    font-size: 1.8rem;
+  }
+  .decision-banner {
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+  .decision-banner > span:last-child {
+    margin-left: 1rem;
+  }
+  .report-grid {
+    grid-template-columns: 1fr;
+  }
+  .review-banner > strong {
+    display: none;
+  }
+  .start-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .start-bottom {
+    flex-direction: column;
+    align-items: start;
+  }
+  .queue-row {
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+  }
+  .queue-row > div:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .queue-row > button {
+    grid-column: 2;
+    grid-row: 1/3;
+  }
+  .view-heading select {
+    max-width: 180px;
+    font-size: 0.74rem;
+  }
+  .table-scroll table {
+    min-width: 680px;
+  }
+  .modal-backdrop {
+    padding: 0.75rem;
+  }
+  .modal > header,
+  .modal-body {
+    padding: 1.1rem 1.2rem;
+  }
+  .modal footer {
+    flex-wrap: wrap;
+    padding: 0.8rem 1.2rem;
+  }
+}
+@media (max-width: 480px) {
+  .ocean-grid,
+  .design-grid,
+  .program-grid {
+    grid-template-columns: 1fr;
+  }
+  .sea-top {
+    font-size: 0.65rem;
+  }
+  .sea-region h3 {
+    font-size: 1.5rem;
+  }
+  .sea-bottom {
+    flex-direction: row;
+  }
+  .directive {
+    display: block;
+  }
+  .directive label {
+    margin: 1rem 0 0.5rem;
+  }
+  .directive .full {
+    margin-top: 1rem;
+  }
+  .directive .readiness-row {
+    margin: 0.9rem 0 0.4rem;
+  }
+  .directive p {
+    margin: 0.75rem 0;
+  }
+  .directive .divider {
+    margin: 1.4rem 0;
+  }
+  .clock-controls {
+    gap: 0.35rem;
+  }
+  .clock-controls select {
+    max-width: 130px;
+    font-size: 0.7rem;
+  }
+  .pause-control {
+    font-size: 0.73rem;
+    padding: 0.65rem;
+  }
+  .command-bar strong {
+    font-size: 0.9rem;
+  }
+  .resources {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .resources > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .resources strong {
+    font-size: 1.5rem;
+  }
+  .resources small {
+    font-size: 0.73rem;
+  }
+  .resources label {
+    font-size: 0.7rem;
+  }
+  .view-heading {
+    align-items: start;
+  }
+  .situation {
+    font-size: 0.6rem;
+    padding: 0.5rem;
+  }
+  .government {
+    display: block;
+  }
+  .government-top {
+    margin-bottom: 1rem;
+  }
+  .government-actions {
+    margin-top: 1rem;
+  }
+  .modal h2 {
+    font-size: 1.4rem;
+  }
+  .modal td,
+  .modal th {
+    font-size: 0.75rem;
+    padding: 0.65rem 0.4rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+.register-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.register-card {
+  text-align: left;
+  padding: 1.3rem 1.5rem;
+}
+.register-card.selected {
+  border-color: var(--gold);
+  background: #263a43;
+}
+.register-card > span,
+.register-card > small {
+  display: block;
+}
+.register-card > span {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.register-card > strong {
+  display: block;
+  font-size: 2.25rem;
+  font-weight: 450;
+  margin: 0.6rem 0;
+}
+.register-card > small {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.register-note {
+  margin-bottom: 1.2rem;
+}
+.register-note h3 {
+  margin: 0 0 0.7rem;
+  font-weight: 500;
+}
+.register-note p,
+.merchant-comparison > p {
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+.register-note > span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.register-note button {
+  margin-top: 1rem;
+}
+.roster-detail {
+  max-width: 28rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.roster-detail summary {
+  cursor: pointer;
+  color: var(--gold);
+}
+.roster-detail p {
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+.merchant-comparison {
+  margin-top: 1.5rem;
+}
+.merchant-comparison > small {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
+.merchant-comparison a {
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+.nation-stats {
+  flex-wrap: wrap;
+  row-gap: 0.65rem;
+}
+.nation-stats > span {
+  min-width: 45%;
+}
+@media (max-width: 760px) {
+  .register-tabs {
+    gap: 0.5rem;
+  }
+  .register-card {
+    padding: 1rem 0.7rem;
+  }
+  .register-card > strong {
+    font-size: 1.8rem;
+  }
+  .register-card > span {
+    font-size: 0.85rem;
+  }
+  .register-card > small {
+    font-size: 0.75rem;
+  }
+}
+@media (max-width: 480px) {
+  .register-tabs {
+    grid-template-columns: 1fr;
+  }
+  .register-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 1rem;
+  }
+  .register-card > strong {
+    grid-column: 2;
+    grid-row: 1/3;
+    margin: 0;
+  }
+  .register-card > small {
+    grid-column: 1;
+  }
+  .register-card > span {
+    align-self: center;
+  }
+}
+.tag,
+.eyebrow,
+.side-country .eyebrow,
+.side-country > span:last-child,
+.save-status,
+.nav-item > span,
+.command-bar .eyebrow,
+.clock-label,
+.resources label,
+.resources small,
+.view-heading .eyebrow,
+.decision-banner > span:last-child,
+.panel-title > span,
+.sea-top,
+.sea-top b,
+.sea-count small,
+.sea-caption,
+.sea-bottom,
+.dispatch-kind,
+.dispatch time,
+.count,
+.queue-row small,
+.queue-row > div > span,
+.design-top > span:last-child,
+.program-top > span:last-child,
+.design-specs,
+.cost,
+.design-card > small,
+.block-reason,
+.program-card .eyebrow,
+.program-card > small,
+.ahead,
+td small,
+.badge,
+.relation-score span,
+.scale-labels,
+.government > small,
+.treaty-ledger span,
+.report-card .eyebrow,
+.result,
+.report-losses span {
+  font-size: max(0.75rem, 12px);
+}
+.nav-item {
+  font-size: 0.875rem;
+}
+.game-body .resources label {
+  letter-spacing: 0.07em;
+}
+.sea-top {
+  flex-wrap: wrap;
+}
+.design-specs {
+  flex-wrap: wrap;
+}
+.start-footer,
+.panel-note {
+  font-size: 0.875rem;
+}
+
+/* command.css */
+.campaign-clock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.date-time {
+  font-variant-numeric: tabular-nums;
+}
+.date-time b {
+  font-weight: 550;
+  color: var(--gold);
+  margin-left: 0.45rem;
+}
+.capital-zone {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.command-bar > div:first-child {
+  gap: 1rem;
+}
+.clock-controls > button {
+  font-size: 0.8rem;
+  padding: 0.6rem 0.7rem;
+}
+.world-command {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 1rem;
+  align-items: start;
+}
+.world-board {
+  padding: 0;
+  overflow: hidden;
+}
+.map-heading {
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.map-heading h2 {
+  margin: 0 0 0.3rem;
+  font-size: 1.4rem;
+}
+.map-heading > div > span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.map-tools {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.map-tools button,
+.map-pan button {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.8rem;
+}
+.map-stage {
+  position: relative;
+  background: #0b2231;
+  border-block: 1px solid #34515d;
+  overflow: hidden;
+}
+.world-map {
+  display: block;
+  width: 100%;
+  height: clamp(350px, 45vw, 550px);
+}
+.world-map .sea {
+  fill: #102b3a;
+}
+.land {
+  fill: #344b50;
+  stroke: #687b77;
+  stroke-width: 0.45;
+  vector-effect: non-scaling-stroke;
+}
+.graticule {
+  fill: none;
+  stroke: #97b7bb;
+  stroke-opacity: 0.12;
+  stroke-width: 1;
+}
+.sea-labels text {
+  fill: #7eabb4;
+  opacity: 0.35;
+  font:
+    italic 12px Georgia,
+    serif;
+  letter-spacing: 3px;
+}
+.operating-area {
+  cursor: pointer;
+}
+.operating-area circle {
+  fill: transparent;
+  stroke: #a6bdc3;
+  stroke-opacity: 0.35;
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+  vector-effect: non-scaling-stroke;
+}
+.operating-area.chosen circle {
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-opacity: 0.9;
+  fill: #e8c47711;
+}
+.operating-area text {
+  fill: var(--gold);
+  paint-order: stroke;
+  stroke: #102b3a;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.map-port {
+  fill: #a8c5c1;
+}
+.map-port text {
+  paint-order: stroke;
+  stroke: #102b3a;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+.ordered-route {
+  fill: none;
+  stroke: currentColor;
+  stroke-dasharray: 6 5;
+  stroke-width: 1.5;
+  opacity: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+.fleet-marker {
+  cursor: pointer;
+  stroke: currentColor;
+  fill: currentColor;
+}
+.fleet-marker path {
+  stroke-width: 1.5;
+}
+.fleet-marker .leader {
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.55;
+}
+.fleet-marker .map-hit {
+  fill: transparent;
+  stroke: none;
+}
+.fleet-marker .selection-ring {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.fleet-marker.contact path {
+  fill: #102b3a;
+  stroke-width: 2;
+}
+.fleet-marker.contact.reported path {
+  stroke-dasharray: 3 2;
+}
+.fleet-marker:focus-visible {
+  outline: none;
+}
+.fleet-marker:focus-visible .map-hit,
+.operating-area:focus-visible circle {
+  stroke: var(--gold);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+.uncertainty-area {
+  fill: currentColor;
+  fill-opacity: 0.08;
+  stroke: currentColor;
+  stroke-opacity: 0.5;
+  stroke-width: 1;
+  stroke-dasharray: 6 5;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+.map-pan {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 0.8rem;
+  display: flex;
+  gap: 0.3rem;
+}
+.map-pan button {
+  background: #112332e8;
+}
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.map-legend > span:first-child {
+  color: var(--gold);
+}
+.map-legend small {
+  margin-left: auto;
+  font-size: 0.72rem;
+}
+.map-legend a {
+  color: var(--muted);
+}
+.world-board > .panel-note {
+  padding: 0 1.25rem 0.8rem;
+  margin: 0;
+}
+.fleet-order-panel {
+  padding: 1.35rem;
+}
+.fleet-order-panel h2 {
+  font-size: 1.65rem;
+  margin: 0.6rem 0 1rem;
+}
+.fleet-order-panel select {
+  width: 100%;
+  font-size: 0.85rem;
+}
+.force-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0.7rem 0;
+}
+.force-strength strong {
+  font-size: 2.5rem;
+  font-weight: 350;
+  color: var(--gold);
+}
+.force-strength span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.command-details {
+  margin: 1rem 0 1.3rem;
+}
+.command-details > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8rem;
+}
+.command-details dt {
+  color: var(--muted);
+}
+.command-details dd {
+  margin: 0;
+  text-align: right;
+}
+.mission-description {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 1rem;
+}
+.formation-manifest {
+  font-size: 0.8rem;
+}
+.formation-manifest summary,
+details > summary {
+  cursor: pointer;
+  color: var(--gold);
+  line-height: 1.6;
+}
+.formation-manifest > div {
+  padding: 0.6rem 0;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--line);
+}
+.operations-lists {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.operations-lists > .panel {
+  padding: 1.2rem;
+}
+.fleet-command-list,
+.contact-list {
+  max-height: 335px;
+  overflow: auto;
+}
+.fleet-command-row,
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border: 1px solid transparent;
+  border-bottom-color: var(--line);
+  background: transparent;
+  text-align: left;
+  padding: 0.8rem 0.5rem;
+  border-radius: 0;
+}
+.fleet-command-row.selected,
+.contact-row.selected {
+  background: #dcc08012;
+  border-left-color: var(--gold);
+}
+.fleet-command-row > div:first-child {
+  flex: 1;
+}
+.fleet-command-row > div:last-child {
+  text-align: right;
+  min-width: 80px;
+}
+.fleet-command-row strong,
+.contact-row strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.fleet-command-row small,
+.contact-row small {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.5;
+}
+.fleet-command-row b {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+.contact-row > div {
+  flex: 1;
+}
+.contact-diamond {
+  font-size: 1.8rem;
+}
+.contact-age {
+  font-size: 0.73rem;
+  color: var(--muted);
+}
+.contact-kind {
+  font-size: 0.88rem;
+}
+.lower-grid details > label {
+  margin-top: 1rem;
+}
+.lower-grid details > select {
+  width: 100%;
+}
+.dispatch time {
+  font-variant-numeric: tabular-nums;
+  min-width: 8rem;
+}
+.fleet-order-panel .panel-note {
+  font-size: 0.8rem;
+}
+.world-command + .operations-lists .panel-title {
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+@media (min-width: 1700px) {
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+  .world-map {
+    height: 580px;
+  }
+}
+@media (max-width: 1250px) {
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 285px;
+  }
+  .map-heading {
+    flex-direction: column;
+    align-items: start;
+  }
+  .world-map {
+    height: 410px;
+  }
+  .command-bar {
+    gap: 0.5rem;
+  }
+  .command-bar strong {
+    font-size: 1.05rem;
+  }
+  .clock-controls {
+    gap: 0.4rem;
+  }
+  .clock-controls select {
+    max-width: 145px;
+  }
+  .command-bar .eyebrow {
+    display: none !important;
+  }
+}
+@media (max-width: 1050px) {
+  .world-command {
+    grid-template-columns: 1fr;
+  }
+  .fleet-order-panel {
+    display: block;
+  }
+  .world-map {
+    height: 430px;
+  }
+  .map-heading {
+    flex-direction: row;
+    align-items: center;
+  }
+  .operations-lists {
+    grid-template-columns: 1fr;
+  }
+  .command-bar {
+    flex-wrap: wrap;
+  }
+  .clock-controls {
+    margin-left: auto;
+  }
+  .fleet-order-panel .formation-manifest {
+    max-height: 250px;
+    overflow: auto;
+  }
+}
+@media (max-width: 760px) {
+  .map-heading {
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+  .world-map {
+    height: 350px;
+  }
+  .map-legend {
+    padding: 0.75rem 1rem;
+  }
+  .map-legend small {
+    margin-left: 0;
+  }
+  .clock-controls {
+    flex-wrap: wrap;
+    margin-left: 0;
+  }
+  .command-bar {
+    align-items: start;
+  }
+  .command-bar .date-time {
+    font-size: 1rem;
+  }
+  .operations-lists > .panel {
+    padding: 1rem;
+  }
+  .contact-row strong,
+  .fleet-command-row strong {
+    font-size: 0.8rem;
+  }
+  .dispatch time {
+    min-width: 0;
+  }
+  .world-command {
+    gap: 0.75rem;
+  }
+}
+@media (max-width: 480px) {
+  .clock-controls select {
+    max-width: 140px;
+  }
+  .clock-controls > button {
+    font-size: 0.73rem;
+  }
+  .world-map {
+    height: 300px;
+  }
+  .map-heading h2 {
+    font-size: 1.2rem;
+  }
+  .map-tools button {
+    padding: 0.4rem 0.6rem;
+  }
+  .map-legend {
+    font-size: 0.7rem;
+  }
+  .panel-title h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* upgrade.css */
+.compact-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 1rem;
+  padding: 0.6rem 1.2rem;
+  position: relative;
+  min-height: 0;
+}
+.compact-bar .campaign-clock {
+  gap: 0.1rem;
+  margin: 0;
+  font-size: 1.06rem;
+}
+.compact-bar .capital-zone {
+  font-size: 0.75rem;
+}
+.compact-bar .clock-controls {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.compact-bar .clock-controls select {
+  max-width: 220px;
+  font-size: 0.78rem;
+  padding: 0.5rem;
+}
+.compact-bar .clock-controls button {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+}
+.compact-bar .auto-pause-control {
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  margin: 0;
+}
+.auto-pause-control input {
+  height: 15px;
+  width: 15px;
+  margin: 0;
+}
+.compact-resources {
+  grid-column: 1/-1;
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  border: 0;
+  padding: 0.45rem 0 0;
+  background: none;
+  border-top: 1px solid var(--line);
+}
+.compact-resources > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.compact-resources label {
+  font-size: 0.75rem !important;
+  margin: 0;
+  color: var(--muted);
+  letter-spacing: 0.03em !important;
+}
+.compact-resources strong {
+  font-size: 0.98rem !important;
+  font-weight: 550;
+  line-height: 1.2;
+  margin: 0;
+}
+.compact-resources > div:nth-child(-n + 3) strong {
+  color: var(--gold);
+}
+.game-body .workspace {
+  padding-top: 1rem;
+}
+.alert-rail {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.5rem 1.2rem;
+  background: #142330;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.78rem;
+  min-height: 42px;
+}
+.alert-heading {
+  white-space: nowrap;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+}
+.alert-heading.urgent {
+  color: #efb677;
+}
+.alert-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+  scrollbar-width: thin;
+}
+.alert-chips > button,
+.alert-rail > button {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.76rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+  background: #1b303b;
+}
+.alert-chips > .critical {
+  border-color: #b78451;
+  color: #f0c58a;
+}
+.alert-chips > .selected {
+  background: #364a50;
+  border-color: var(--gold);
+}
+.alert-chips > .won {
+  color: #96c7a7;
+}
+.alert-chips > .lost {
+  color: #f0a594;
+}
+.alert-detail {
+  position: relative;
+  background: #1b2c38;
+  margin: 0;
+  padding: 1.2rem 2.2rem;
+  border-bottom: 1px solid #566065;
+  max-height: 430px;
+  overflow: auto;
+}
+.alert-detail > .close {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.7rem;
+}
+.alert-detail h2 {
+  font-size: 1.4rem;
+  margin: 0.4rem 2rem 0.7rem 0;
+}
+.alert-detail > p {
+  max-width: 1000px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.inline-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0.8rem 0 0;
+}
+.inline-options > button {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.8rem;
+}
+.inline-options strong {
+  font-size: 0.88rem;
+}
+.inline-options span {
+  font-size: 0.8rem;
+}
+.deadline {
+  padding: 0.7rem 0.9rem;
+  background: #bd925619;
+  border-left: 3px solid #cfac71;
+}
+.battle-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.battle-sides h3 {
+  margin: 0.6rem 0;
+  font-size: 1.05rem;
+}
+.battle-sides p {
+  font-size: 0.84rem;
+}
+.condition-scroll {
+  max-height: 210px;
+  overflow: auto;
+}
+.condition-line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.78rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.condition-line small {
+  grid-column: 1/-1;
+}
+.condition-line.serious b,
+.condition-line.sunk b,
+.ship-condition.serious small {
+  color: #f29987;
+}
+.condition-line.moderate b,
+.ship-condition.moderate small {
+  color: #dec070;
+}
+.condition-line.light b,
+.ship-condition.light small {
+  color: #97bda3;
+}
+.history-alert {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.history-alert h3 {
+  font-size: 1rem;
+}
+.danger {
+  color: #e99f8b;
+}
+.formation-manifest {
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+  margin-top: 1rem;
+}
+.formation-manifest h3 {
+  font-size: 0.95rem;
+}
+.manifest-scroll {
+  max-height: 340px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.manifest-scroll > .ship-condition {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0;
+}
+.manifest-scroll .text-button {
+  text-align: left;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.manifest-scroll small {
+  font-size: 0.75rem;
+}
+.risk-check {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.risk-check input {
+  flex-shrink: 0;
+}
+.fleet-order-panel {
+  max-height: 1000px;
+  overflow: auto;
+}
+.fleet-order-panel .command-details {
+  margin: 0.7rem 0;
+}
+.fleet-order-panel .command-details > div {
+  padding: 0.45rem 0;
+}
+.fleet-order-panel h2 {
+  font-size: 1.35rem;
+  line-height: 1.3;
+}
+.world-command {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+.world-map {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  height: clamp(380px, 44vw, 620px);
+}
+.world-map:active {
+  cursor: grabbing;
+}
+.map-stage {
+  background: #0b1c28;
+}
+.world-map .sea {
+  fill: #102c3b;
+  stroke: #54717a;
+  stroke-width: 0.7;
+}
+.political-territory {
+  stroke: #b4c1ac;
+  stroke-opacity: 0.55;
+  stroke-width: 0.45;
+  vector-effect: non-scaling-stroke;
+}
+.power-label {
+  fill: #e3ded0;
+  opacity: 0.7;
+  text-anchor: middle;
+  letter-spacing: 1.4px;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: #11222a;
+  stroke-width: 0.4;
+}
+.land-front {
+  fill: none;
+  stroke: #f5aa72;
+  stroke-width: 2.6;
+  stroke-dasharray: 7 2;
+  vector-effect: non-scaling-stroke;
+}
+.front-key {
+  color: #f5aa72;
+}
+.convoy-marker {
+  fill: #8eb9a4;
+  stroke: #d5e3c6;
+  stroke-width: 0.7;
+  cursor: pointer;
+}
+.convoy-marker:focus-visible {
+  outline: 2px solid var(--gold);
+}
+.drag-hint {
+  position: absolute;
+  bottom: 0.65rem;
+  left: 1rem;
+  font-size: 0.75rem;
+  pointer-events: none;
+  color: #a1b4b6;
+  background: #10242dd9;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+}
+.map-credit {
+  font-size: 0.75rem;
+  padding: 0 1.25rem 0.9rem;
+}
+.map-credit p {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.power-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  margin-top: 0.75rem;
+}
+.power-key > span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.power-key i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.land-campaigns {
+  margin-bottom: 1rem;
+}
+.land-front-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+.land-front-list article > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.82rem;
+}
+.land-front-list article span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.front-progress {
+  height: 5px;
+  border-radius: 4px;
+  background: #596952;
+  margin: 0.6rem 0;
+}
+.front-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+.land-front-list article small {
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.production-panel {
+  margin-bottom: 1.2rem;
+}
+.facility-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.3rem;
+}
+.facility-grid article {
+  border: 1px solid var(--line);
+  background: #172935;
+  padding: 1rem;
+}
+.facility-grid h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem;
+}
+.facility-grid p {
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+.facility-grid label {
+  font-size: 0.82rem;
+  display: flex;
+  justify-content: space-between;
+}
+.facility-grid input[type="range"],
+#sound-volume {
+  width: 100%;
+  accent-color: var(--gold);
+  padding: 0;
+  height: 22px;
+}
+.funding-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.facility-grid small {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  display: block;
+  color: var(--muted);
+}
+.production-lines {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+.production-lines select {
+  width: 100%;
+  font-size: 0.82rem;
+}
+.production-lines label {
+  font-size: 0.8rem;
+}
+.aircraft-models {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.aircraft-models article {
+  padding: 1rem;
+  border: 1px solid var(--line);
+}
+.aircraft-models h3 {
+  font-size: 1.12rem;
+  margin: 0.5rem 0;
+}
+.aircraft-models p {
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.aircraft-models small {
+  display: block;
+  font-size: 0.76rem;
+  margin-bottom: 0.6rem;
+}
+.aircraft-models button {
+  font-size: 0.82rem;
+}
+.modal {
+  max-height: 82vh;
+  max-width: 780px;
+}
+.modal.wide {
+  max-width: 1000px;
+}
+.modal-backdrop {
+  padding: 3vh 2rem;
+  background: #08121b99;
+}
+.situation {
+  max-width: 45%;
+  line-height: 1.5;
+  white-space: normal;
+}
+.view-heading h1 {
+  font-size: 2.1rem;
+}
+@media (min-width: 1800px) {
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 355px;
+  }
+  .world-map {
+    height: 650px;
+  }
+}
+@media (max-width: 1300px) {
+  .compact-bar {
+    grid-template-columns: 1fr;
+  }
+  .compact-bar .campaign-clock {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+  .compact-bar .clock-controls {
+    justify-content: flex-start;
+  }
+  .compact-resources {
+    gap: 0.65rem 1rem;
+  }
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+  .world-map {
+    height: 440px;
+  }
+  .facility-grid {
+    grid-template-columns: 1fr;
+  }
+  .facility-grid article {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 1rem;
+  }
+  .facility-grid article h3 {
+    grid-column: 1/-1;
+  }
+  .facility-grid article p {
+    margin: 0.2rem 0;
+  }
+  .facility-grid input {
+    grid-column: 2;
+  }
+  .funding-labels {
+    grid-column: 2;
+  }
+  .facility-grid article small {
+    grid-column: 1/-1;
+  }
+}
+@media (max-width: 1050px) {
+  .world-command {
+    grid-template-columns: 1fr;
+  }
+  .fleet-order-panel {
+    max-height: none;
+  }
+  .manifest-scroll {
+    max-height: 260px;
+  }
+  .production-lines {
+    grid-template-columns: 1fr;
+  }
+  .world-map {
+    height: 500px;
+  }
+}
+@media (max-width: 760px) {
+  .compact-bar {
+    padding: 0.65rem 1rem;
+  }
+  .compact-bar .capital-zone {
+    font-size: 0.75rem;
+  }
+  .compact-resources {
+    gap: 0.5rem 0.85rem;
+  }
+  .compact-resources label {
+    font-size: 0.75rem !important;
+  }
+  .compact-resources strong {
+    font-size: 0.88rem !important;
+  }
+  .alert-rail {
+    padding: 0.5rem 0.75rem;
+  }
+  .alert-detail {
+    padding: 1rem;
+    max-height: 390px;
+  }
+  .inline-options {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .battle-sides,
+  .land-front-list,
+  .aircraft-models {
+    grid-template-columns: 1fr;
+  }
+  .world-map {
+    height: 380px;
+  }
+  .situation {
+    max-width: 48%;
+    font-size: 0.75rem;
+  }
+  .view-heading h1 {
+    font-size: 1.6rem;
+  }
+  .modal-backdrop {
+    padding: 2vh 0.6rem;
+  }
+  .modal {
+    max-height: 84vh;
+  }
+}
+.war-foes {
+  font-size: 0.75rem;
+  color: #edab93;
+  font-weight: 450;
+}
+.compact-resources {
+  gap: 0.4rem 1rem;
+  padding-top: 0.3rem;
+}
+.compact-resources label {
+  font-size: 0.66rem !important;
+}
+.compact-resources strong {
+  font-size: 0.83rem !important;
+}
+.compact-resources .negative strong {
+  color: #f28e88;
+}
+.facility-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.facility-grid article {
+  display: block;
+}
+.facility-expansion {
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+.facility-expansion small {
+  display: block;
+  margin-top: 0.6rem;
+}
+.casualty-ledger {
+  overflow: auto;
+  margin: 1.2rem 0;
+}
+.casualty-ledger table {
+  width: 100%;
+  font-size: 0.8rem;
+}
+.casualty-ledger small {
+  color: var(--muted);
+}
+.draft-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.ship-designer {
+  margin-bottom: 1.3rem;
+}
+.draft-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+.draft-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.draft-fields label,
+.draft-top label {
+  font-size: 0.8rem;
+}
+.draft-fields input,
+.draft-top input,
+.draft-top select {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+.draft-quote {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  padding: 0.8rem;
+  background: #112431;
+}
+.draft-quote span {
+  font-size: 0.85rem;
+}
+.draft-weights {
+  display: flex;
+  height: 30px;
+  gap: 2px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.draft-weights span {
+  flex-basis: 0;
+  min-width: 20px;
+  background: #3b6680;
+  padding: 6px;
+  color: #eee;
+  font-size: 0.7rem;
+  overflow: hidden;
+}
+.draft-weights span:nth-child(2n) {
+  background: #5c7165;
+}
+.draft-weights span:nth-child(3n) {
+  background: #a0764e;
+}
+.map-capital {
+  fill: #f0dcaa;
+  stroke: #0c1c27;
+  stroke-width: 0.4;
+}
+.map-capital text,
+.map-port text {
+  paint-order: stroke;
+  stroke: #101e29;
+  stroke-width: 2px;
+  fill: #e1e8ec;
+  pointer-events: none;
+}
+.map-capital text {
+  font-weight: 600;
+}
+.map-port text {
+  font-size: 9px;
+}
+.nation-grid {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.start-heading select {
+  width: auto;
+  min-width: 300px;
+  margin: 0.5rem 0 1rem;
+}
+.start-heading label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.fleet-order-panel .command-details {
+  font-size: 0.78rem;
+}
+@media (max-width: 1100px) {
+  .draft-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .draft-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .facility-grid {
+    grid-template-columns: 1fr;
+  }
+  .facility-grid article {
+    display: block;
+  }
+  .draft-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (max-width: 600px) {
+  .draft-fields,
+  .draft-top,
+  .draft-quote {
+    grid-template-columns: 1fr;
+  }
+  .compact-resources {
+    gap: 0.35rem 0.65rem;
+  }
+  .compact-resources label {
+    font-size: 0.6rem !important;
+  }
+  .compact-resources strong {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* desktop.css */
+/* Desktop command workspace: fixed viewport, persistent chart, contained lists. */
+.build-version {
+  display: block;
+  letter-spacing: 0.07em;
+  font:
+    11px "Segoe UI",
+    sans-serif;
+  margin-top: 5px;
+  color: var(--muted);
+}
+.scenario-choices,
+.panel-tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.scenario-choices button {
+  flex: 1;
+  text-align: left;
+  border-left: 3px solid var(--gold);
+  padding: 12px 16px;
+}
+.scenario-choices strong,
+.scenario-choices span {
+  display: block;
+}
+.scenario-choices span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.scenario-choices .selected,
+.panel-tabs .selected {
+  background: #314552;
+  border-color: var(--gold);
+}
+.panel-tabs {
+  margin-bottom: 10px;
+}
+.panel-tabs button {
+  font-size: 0.82rem;
+  padding: 6px 12px;
+}
+.actual-speed {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 92px;
+  text-align: right;
+  color: var(--green);
+}
+.actual-speed.slow-yellow {
+  color: #efd279;
+}
+.actual-speed.slow-red {
+  color: #ff8b7a;
+}
+.war-strip {
+  display: flex;
+  gap: 14px;
+  overflow: auto;
+  padding: 4px 15px;
+  background: #311f28;
+  border-bottom: 1px solid #67464c;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+}
+.war-estimate {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+  align-items: center;
+}
+.war-estimate strong {
+  font-weight: 500;
+  color: var(--muted);
+}
+.war-estimate.leading strong {
+  color: var(--green);
+}
+.war-estimate.trailing strong {
+  color: var(--red);
+}
+.war-overview {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.war-overview .war-estimate {
+  white-space: normal;
+  padding: 12px;
+  border: 1px solid var(--line);
+  flex-direction: column;
+  align-items: start;
+  flex: 1;
+}
+.economy-panel td {
+  font-variant-numeric: tabular-nums;
+}
+.workspace-inner {
+  min-width: 0;
+}
+.command-desk[data-desk="forces"] > .land-campaigns,
+.command-desk[data-desk="forces"] > .lower-grid,
+.command-desk[data-desk="fronts"] > .operations-lists,
+.command-desk[data-desk="fronts"] > .lower-grid,
+.command-desk[data-desk="readiness"] > .operations-lists,
+.command-desk[data-desk="readiness"] > .land-campaigns {
+  display: none;
+}
+@media (min-width: 1200px) and (min-height: 680px) {
+  :root {
+    font-size: clamp(12px, 0.85vw, 15px);
+    --sidebar: 184px;
+  }
+  html,
+  body,
+  #app {
+    height: 100%;
+    overflow: hidden;
+  }
+  .game-shell {
+    height: 100dvh;
+    min-height: 0;
+  }
+  .sidebar {
+    width: var(--sidebar);
+    padding: 16px 10px;
+  }
+  .side-brand {
+    padding: 0 8px 12px;
+  }
+  .side-country {
+    padding: 12px 6px;
+  }
+  .side-country > strong {
+    font-size: 1.45rem;
+  }
+  .nav-item {
+    padding: 10px 7px;
+  }
+  .nav-item > span {
+    font-size: 0.72rem;
+  }
+  .game-body {
+    height: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    margin-left: var(--sidebar);
+    width: calc(100% - var(--sidebar));
+  }
+  .command-bar.compact-bar {
+    position: static;
+    padding: 8px 14px 6px;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .campaign-clock {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .clock-controls {
+    gap: 6px;
+  }
+  .clock-controls button,
+  .clock-controls select {
+    padding: 5px 8px;
+    font-size: 0.79rem;
+  }
+  .capital-zone {
+    font-size: 0.7rem;
+  }
+  .compact-resources {
+    padding-top: 5px;
+    gap: 4px 10px;
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    width: 100%;
+    margin: 0;
+  }
+  .compact-resources > div {
+    padding: 0 0 0 7px;
+    min-width: 0;
+  }
+  .compact-resources label {
+    font-size: 0.6rem;
+    letter-spacing: 0.07em;
+  }
+  .compact-resources strong {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  .alert-rail {
+    position: relative;
+    top: auto;
+    flex-shrink: 0;
+    padding: 4px 12px;
+    min-height: 35px;
+  }
+  .alert-chips button {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+  .alert-detail {
+    position: absolute;
+    top: 140px;
+    right: 20px;
+    width: min(760px, 65vw);
+    max-height: 60vh;
+    overflow: auto;
+    z-index: 5;
+    box-shadow: 0 15px 40px #0009;
+    border: 1px solid var(--gold);
+  }
+  .workspace {
+    padding: 12px 15px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    width: 100%;
+    max-width: none;
+  }
+  .workspace-inner {
+    height: 100%;
+    overflow: auto;
+    scrollbar-width: thin;
+    padding-right: 3px;
+  }
+  .view-heading {
+    margin: 0 0 10px;
+    gap: 12px;
+  }
+  .view-heading h1 {
+    font-size: 1.85rem;
+    margin: 3px 0 0;
+  }
+  .view-heading .eyebrow {
+    font-size: 0.65rem;
+  }
+  .panel {
+    padding: 14px;
+  }
+  .panel h2 {
+    font-size: 1.3rem;
+  }
+  .panel h3 {
+    font-size: 1.02rem;
+  }
+  .view-intro {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    line-height: 1.45;
+  }
+  .view-command .workspace-inner {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto minmax(125px, 23%);
+    overflow: hidden;
+  }
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) clamp(285px, 22vw, 390px);
+    min-height: 0;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .world-board {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .map-heading {
+    padding: 10px 14px;
+  }
+  .map-heading h2 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  .map-stage {
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    background: #142938;
+  }
+  .world-map {
+    height: 100%;
+    width: 100%;
+    max-height: none;
+  }
+  .map-legend {
+    padding: 5px 12px;
+    font-size: 0.7rem;
+  }
+  .map-credit {
+    padding: 5px 12px;
+    font-size: 0.68rem;
+  }
+  .map-credit[open] {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    width: 60%;
+    padding: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    z-index: 2;
+  }
+  .world-board {
+    position: relative;
+  }
+  .fleet-order-panel {
+    max-height: none;
+    overflow: auto;
+    min-height: 0;
+    padding: 12px;
+    scrollbar-width: thin;
+  }
+  .order-content {
+    display: flex;
+    flex-direction: column;
+  }
+  .order-content .formation-manifest {
+    order: -1;
+    padding: 8px;
+    margin: 0 0 12px;
+    background: #10222c;
+    border: 1px solid var(--line);
+  }
+  .manifest-scroll {
+    max-height: 150px;
+    overflow: auto;
+  }
+  .formation-manifest h3 {
+    margin: 0 0 5px;
+  }
+  .formation-manifest .ship-condition {
+    padding: 5px;
+  }
+  .force-strength {
+    margin: 8px 0;
+  }
+  .order-content > h2 {
+    margin: 5px 0;
+  }
+  .order-content p {
+    margin: 7px 0;
+  }
+  .order-content dl {
+    font-size: 0.8rem;
+  }
+  .command-desk-tabs {
+    margin: 9px 0 5px;
+  }
+  .command-desk {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .command-desk > div,
+  .command-desk > section {
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+  }
+  .operations-lists {
+    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 0;
+  }
+  .operations-lists > section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .operations-lists .panel-title {
+    margin-bottom: 7px;
+  }
+  .fleet-command-list,
+  .contact-list {
+    max-height: none;
+    overflow: auto;
+    min-height: 0;
+    flex: 1;
+    scrollbar-width: thin;
+  }
+  .fleet-command-row,
+  .contact-row {
+    padding: 6px 10px;
+  }
+  .land-campaigns {
+    display: flex;
+    flex-direction: column;
+  }
+  .land-campaigns > .panel-note {
+    display: none;
+  }
+  .land-front-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    overflow: auto;
+  }
+  .land-front-list article {
+    padding: 8px;
+  }
+  .command-desk .lower-grid {
+    display: block;
+    overflow: auto;
+  }
+  .command-desk .overview-metrics {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .command-desk .lower-grid .panel {
+    height: 100%;
+  }
+  .command-desk .lower-grid .panel > dl {
+    display: none;
+  }
+  .design-grid,
+  .program-grid,
+  .government-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .design-card {
+    padding: 14px;
+  }
+  .design-card h3 {
+    font-size: 1.25rem;
+    margin: 8px 0;
+  }
+  .design-card p {
+    margin: 8px 0;
+  }
+  .draft-intro {
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+  .draft-intro h2 {
+    font-size: 1.25rem;
+    margin: 2px 0;
+  }
+  .draft-intro p {
+    margin: 3px 0;
+  }
+  .facility-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .facility-grid > article {
+    padding: 13px;
+  }
+  .production-panel .facility-grid p {
+    line-height: 1.35;
+    margin: 8px 0;
+  }
+  .facility-expansion {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  .production-lines {
+    margin-top: 10px;
+  }
+  .production-panel .panel-note {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin: 8px 0;
+  }
+  .aircraft-models {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .government .nation-code {
+    margin: 0;
+  }
+  .government h2 {
+    margin: 5px 0;
+  }
+  .relation-score {
+    font-size: 2rem;
+    margin: 8px 0;
+  }
+  .government-actions {
+    gap: 5px;
+  }
+  .government-actions button {
+    padding: 6px 9px;
+    font-size: 0.8rem;
+  }
+  .government p,
+  .government small {
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+  .government p {
+    margin: 8px 0;
+  }
+  .treaty-panel {
+    margin-top: 12px;
+  }
+  .fleet-table td {
+    padding: 7px;
+  }
+  .modal {
+    max-height: 85dvh;
+    width: min(780px, 85vw);
+  }
+  .start {
+    height: 100dvh;
+    max-width: none;
+    padding: 18px 3vw;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .masthead {
+    margin: 0;
+    padding: 0 0 12px;
+  }
+  .start-heading {
+    padding: 0;
+  }
+  .start-heading h1 {
+    font-size: 2.4rem;
+    margin: 8px 0 2px;
+  }
+  .start-heading > p {
+    font-size: 0.8rem;
+    margin: 0;
+    line-height: 1.35;
+  }
+  .nation-grid {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .nation-card {
+    padding: 14px 12px;
+    min-height: 0;
+    overflow: auto;
+  }
+  .nation-code {
+    margin: 0 0 10px;
+  }
+  .nation-name {
+    font-size: 1.4rem;
+  }
+  .nation-card > strong {
+    font-size: 0.8rem;
+    min-height: 36px;
+  }
+  .nation-card p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 10px 0;
+  }
+  .nation-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 10px 0;
+    font-size: 0.66rem;
+  }
+  .nation-stats b {
+    font-size: 1.2rem;
+  }
+  .card-link {
+    font-size: 0.75rem;
+    padding-top: 8px;
+  }
+  .start-actions {
+    margin: 0;
+  }
+  .start-actions p {
+    font-size: 0.78rem;
+    margin: 4px 0;
+  }
+  .start-footer {
+    margin: 0;
+    padding: 8px 0;
+    font-size: 0.7rem;
+  }
+  .start-bottom {
+    font-size: 0.7rem;
+  }
+  .resume {
+    margin: 0;
+    padding: 8px 12px;
+  }
+  .resume span {
+    display: inline;
+    margin-left: 12px;
+  }
+  .scenario-choices button {
+    padding: 8px 14px;
+  }
+  .start-actions .primary {
+    padding: 10px 18px;
+  }
+}
+@media (min-aspect-ratio: 2/1) and (min-width: 1600px) {
+  .compact-resources {
+    grid-template-columns: repeat(17, minmax(0, 1fr));
+  }
+  .compact-resources strong {
+    font-size: 0.78rem;
+  }
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+  .view-command .workspace-inner {
+    grid-template-rows: auto minmax(0, 1fr) auto minmax(130px, 23%);
+  }
+  .design-grid,
+  .program-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .government-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+@media (max-height: 800px) and (min-width: 1200px) {
+  .nation-card p {
+    font-size: 0.72rem;
+  }
+  .start-heading > p br {
+    display: none;
+  }
+  .start-heading h1 {
+    font-size: 1.8rem;
+  }
+  .manifest-scroll {
+    max-height: 110px;
+  }
+  .side-country > span:last-child {
+    display: none;
+  }
+}
+.map-capital text,
+.map-port text {
+  fill: inherit;
+}
+.power-label {
+  paint-order: stroke;
+  stroke: #111d26;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+/* Three persistent bars: time and controls, resources, then dismissible alerts. */
+.command-bar.time-bar {
+  position: static;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding: 7px 12px;
+  flex-shrink: 0;
+  min-height: 46px;
+}
+.time-bar .campaign-clock {
+  white-space: nowrap;
+  display: block;
+  font-size: 12px;
+}
+.campaign-clock small {
+  font-weight: 400;
+  font-size: 10px;
+}
+.time-bar .clock-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  margin-left: auto;
+}
+.time-bar button,
+.time-bar select {
+  padding: 5px 6px;
+  font-size: 11px;
+}
+.time-bar #speed {
+  width: 157px;
+}
+.time-bar .actual-speed {
+  font-size: 10px;
+  min-width: 83px;
+}
+.time-bar .check-label {
+  font-size: 10px;
+  white-space: nowrap;
+  gap: 3px;
+}
+.header-audio {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.header-audio label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  margin: 0;
+}
+.header-audio input[type="range"] {
+  width: 54px;
+  margin: 0;
+  accent-color: var(--gold);
+}
+.header-audio input[type="checkbox"] {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+.resource-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 6px 12px;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  background: #13232d;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.resource-bar > div {
+  min-width: max-content;
+  padding: 0 6px;
+  border-left: 1px solid var(--line);
+}
+.resource-bar label {
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+.resource-bar strong {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.resource-war {
+  color: var(--red);
+}
+.alert-chip {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  max-width: 350px;
+}
+.alert-chip > button:first-child {
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  border-radius: 3px 0 0 3px;
+}
+.alert-chip .dismiss-chip {
+  padding: 4px 7px;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+  color: var(--muted);
+}
+.alert-chip .dismiss-chip:hover {
+  color: white;
+  background: #763f45;
+}
+.alert-detail {
+  top: 133px;
+}
+.facility-grid {
+  align-items: stretch;
+  grid-auto-rows: 1fr;
+}
+.facility-grid > .facility-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.facility-card > h3 {
+  min-height: 2.4em;
+  margin: 0 0 8px;
+}
+.facility-card > p:first-of-type {
+  min-height: 3.8em;
+}
+.facility-expansion {
+  margin-top: auto;
+}
+.facility-card .production-lines {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  margin: 10px 0;
+}
+.facility-card .production-lines label {
+  font-size: 10px;
+  text-transform: capitalize;
+  margin: 0;
+}
+.facility-card .production-lines select {
+  width: 100%;
+  min-width: 0;
+  font-size: 11px;
+  padding: 5px;
+}
+.facility-effect {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.view-diplomacy .treaty-panel {
+  margin: 0 0 12px;
+}
+.view-review .panel-tabs {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+.world-map .fleet-marker path:not(.leader),
+.world-map .convoy-marker rect,
+.world-map .map-port circle,
+.world-map .map-capital path {
+  fill: currentColor;
+  stroke: #000;
+  stroke-width: 1.5px;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.world-map .map-port,
+.world-map .map-capital {
+  color: inherit;
+  cursor: pointer;
+}
+.world-map .map-port circle,
+.world-map .map-capital path {
+  fill: inherit;
+}
+.world-map .convoy-marker {
+  fill: currentColor;
+  color: inherit;
+}
+.world-map .map-port text,
+.world-map .map-capital text,
+.power-label {
+  fill: inherit;
+  paint-order: stroke fill;
+  stroke: #000;
+  stroke-width: 2.2px;
+  stroke-linejoin: round;
+}
+.map-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  line-height: 1.4;
+}
+.map-legend span {
+  white-space: nowrap;
+}
+.map-legend small {
+  font-size: 0.9em;
+  color: var(--muted);
+}
+.map-port:focus circle,
+.map-port:hover circle {
+  stroke: white;
+}
+.world-map .map-hit {
+  stroke: none;
+  fill: transparent;
+}
+@media (min-width: 1200px) and (max-width: 1500px) {
+  .time-bar {
+    gap: 5px !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+  .time-bar .campaign-clock {
+    font-size: 10px;
+  }
+  .campaign-clock small {
+    font-size: 9px;
+  }
+  .time-bar #speed {
+    width: 129px;
+  }
+  .time-bar .clock-controls {
+    gap: 3px;
+  }
+  .header-audio input[type="range"] {
+    width: 36px;
+  }
+  .time-bar button,
+  .time-bar select {
+    font-size: 10px;
+    padding: 4px;
+  }
+  .resource-bar strong {
+    font-size: 10px;
+  }
+  .resource-bar label {
+    font-size: 8px;
+  }
+  .resource-bar > div {
+    padding: 0 3px;
+  }
+  .resource-bar {
+    gap: 2px;
+  }
+}
+
+/* Fleet manifests appear on demand; short, paged command lists keep the chart visible. */
+.fleet-composition {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.fleet-composition small,
+.fleet-status {
+  color: var(--muted);
+}
+.fleet-readiness {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 8px 0;
+}
+.fleet-readiness div {
+  background: #10222c;
+  padding: 7px;
+  border: 1px solid var(--line);
+}
+.fleet-readiness span,
+.fleet-readiness b {
+  display: block;
+}
+.fleet-readiness span {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.fleet-readiness b {
+  margin-top: 3px;
+  font-size: 1.05rem;
+}
+.order-content > label {
+  margin-top: 10px;
+}
+.order-content .risk-check {
+  margin: 10px 0;
+}
+.order-content .mission-description {
+  font-size: 0.83rem;
+  line-height: 1.4;
+  min-height: 2.8em;
+}
+.fleet-popup-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 22px;
+}
+.fleet-popup-grid h3 {
+  margin-top: 0;
+}
+.manifest-grid {
+  display: grid;
+  gap: 6px;
+}
+.manifest-grid .ship-condition {
+  padding: 7px 9px;
+}
+.manifest-grid small {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.ship-type {
+  display: inline-block;
+  min-width: 26px;
+  color: var(--gold);
+  font-size: 0.75rem;
+}
+.list-pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  margin-top: 6px;
+}
+.list-pager button {
+  font-size: 14px;
+  padding: 0 10px;
+  line-height: 22px;
+}
+.list-pager button:disabled {
+  opacity: 0.25;
+}
+.yard-capacity {
+  margin: 12px 0 18px;
+  padding: 15px;
+  background: #10222c;
+  border: 1px solid var(--line);
+}
+.yard-capacity figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.yard-capacity figcaption span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.yard-capacity svg {
+  width: 100%;
+  height: 30px;
+  display: block;
+}
+.yard-capacity-key {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+.yard-capacity-key span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.yard-capacity-key span:last-child {
+  margin-left: auto;
+}
+.yard-capacity-key i {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #ffffff30;
+}
+.yard-used {
+  background: #dfbc60;
+}
+.yard-spare {
+  background: #28413b;
+}
+@media (min-width: 1200px) and (min-height: 680px) {
+  .view-command .workspace-inner {
+    grid-template-rows: auto minmax(0, 1fr) auto 180px;
+  }
+  .fleet-command-list,
+  .contact-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: minmax(0, 1fr);
+    gap: 5px;
+    overflow: visible;
+  }
+  .fleet-command-row,
+  .contact-row {
+    min-width: 0;
+    min-height: 0;
+    align-items: center;
+  }
+  .fleet-command-row {
+    display: block;
+    padding: 6px 8px;
+  }
+  .fleet-command-row > div {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .fleet-command-row strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8rem;
+  }
+  .fleet-command-row .fleet-composition {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.73rem;
+  }
+  .fleet-command-row > div:last-child {
+    margin-top: 4px;
+  }
+  .fleet-command-row small {
+    font-size: 0.69rem;
+  }
+  .contact-row {
+    font-size: 0.77rem;
+    padding: 5px;
+  }
+  .contact-row .contact-age {
+    font-size: 0.67rem;
+  }
+  .operations-lists .panel-title h2 {
+    font-size: 1.15rem;
+  }
+  .operations-lists .panel-title > span {
+    font-size: 0.68rem;
+  }
+  .operations-lists > section {
+    padding: 10px;
+  }
+  .fleet-order-panel {
+    padding: 12px;
+  }
+  .fleet-order-panel h2 {
+    font-size: 1.25rem;
+  }
+  .fleet-order-panel .force-strength {
+    display: none;
+  }
+  .fleet-order-panel .order-content > p {
+    margin: 4px 0;
+  }
+  .fleet-order-panel .order-content > button {
+    padding: 7px 9px;
+  }
+  .fleet-popup-grid .command-details {
+    font-size: 0.8rem;
+  }
+  .modal.wide {
+    width: min(1000px, 88vw);
+  }
+}
+@media (min-width: 1200px) and (max-height: 800px) {
+  .view-command .workspace-inner {
+    grid-template-rows: auto minmax(0, 1fr) auto 150px;
+  }
+  .fleet-command-row > div:last-child > small:last-child {
+    display: none;
+  }
+  .fleet-order-panel .fleet-status {
+    display: none;
+  }
+  .fleet-order-panel .fleet-readiness {
+    margin: 5px 0;
+  }
+  .fleet-readiness div {
+    padding: 4px;
+  }
+  .order-content .risk-check {
+    margin: 6px 0;
+  }
+  .fleet-order-panel .order-content > label {
+    margin-top: 6px;
+  }
+  .fleet-order-panel .order-content > p.mission-description {
+    font-size: 0.73rem;
+    line-height: 1.3;
+    min-height: 0;
+  }
+  .fleet-order-panel select {
+    padding: 5px;
+  }
+  .fleet-popup-grid .manifest-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .fleet-popup-grid {
+    grid-template-columns: 1.5fr 1fr;
+  }
+  .manifest-grid .ship-condition {
+    padding: 5px;
+  }
+  .manifest-grid .text-button {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 900px) {
+  .fleet-popup-grid {
+    grid-template-columns: 1fr;
+  }
+  .yard-capacity figcaption {
+    display: block;
+  }
+  .yard-capacity figcaption span {
+    display: block;
+    margin-top: 5px;
+  }
+}
+.header-audio #sound-volume {
+  width: 54px;
+}
+.formation-manifest > .manifest-grid {
+  display: grid;
+  flex-direction: initial;
+  padding: 0;
+  border: 0;
+}
+.formation-manifest > .list-pager {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  border: 0;
+}
+.fleet-popup-grid .formation-manifest {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.fleet-command-row small {
+  margin-top: 0;
+  line-height: 1.25;
+}
+.fleet-command-row > div:last-child {
+  line-height: 1.25;
+}
+.fleet-command-row > div:first-child {
+  min-height: 18px;
+}
+@media (min-width: 1200px) and (max-width: 1500px) {
+  .header-audio #sound-volume {
+    width: 36px;
+  }
+}
+.register-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.register-filters input {
+  width: 230px;
+  padding: 7px 10px;
+}
+.register-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.8rem;
+}
+.register-pager .list-pager {
+  margin: 0;
+}
+.register-note {
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.register-note summary {
+  font-size: 0.85rem;
+}
+.view-fleet .register-card {
+  padding: 10px 14px;
+}
+.view-fleet .register-tabs {
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.view-fleet .register-card strong {
+  font-size: 1.8rem;
+  margin: 4px 0;
+}
+.view-fleet table td {
+  padding: 7px 10px;
+}
+.view-fleet table td small {
+  font-size: 0.73rem;
+}
+.view-fleet table td button.subtle {
+  font-size: 0.75rem;
+  padding: 5px 7px;
+}
+.view-fleet table td .text-button {
+  font-size: 0.88rem;
+}
+.view-fleet table th {
+  padding: 8px 10px;
+}
+.view-fleet .panel-note {
+  margin: 8px 0;
+  font-size: 0.75rem;
+}
+.register-filters select {
+  padding: 7px;
+}
+.catalog-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+.catalog-pager .list-pager {
+  margin: 0;
+}
+.government-costs {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+.view-diplomacy .treaty-panel h2 {
+  font-size: 1.3rem;
+  margin: 6px 0;
+}
+.view-diplomacy .treaty-panel p {
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.view-diplomacy .treaty-ledger {
+  margin-top: 12px;
+}
+.view-diplomacy .treaty-ledger b {
+  font-size: 1.3rem;
+}
+.view-diplomacy .view-intro {
+  font-size: 0.8rem;
+  margin: 10px 0;
+}
+.fleet-command-row small {
+  line-height: 1.1;
+}
+.fleet-command-row {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.fleet-command-row > div:first-child {
+  min-height: 15px;
+}
+.fleet-command-row > div:last-child {
+  margin-top: 2px;
+}
+@media (min-width: 1200px) and (max-height: 850px) {
+  .fleet-command-row {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+  .production-panel .panel-title {
+    margin-bottom: 12px;
+  }
+  .view-diplomacy .treaty-panel {
+    padding: 10px 14px;
+    gap: 18px;
+    margin-bottom: 8px;
+  }
+  .view-diplomacy .treaty-panel p {
+    margin: 6px 0;
+  }
+  .view-diplomacy .treaty-panel .full {
+    margin-top: 6px;
+    padding: 5px;
+  }
+  .view-diplomacy .treaty-panel .readiness-row {
+    margin-top: 6px;
+  }
+  .view-diplomacy .treaty-ledger {
+    margin-top: 8px;
+  }
+  .view-diplomacy .view-intro {
+    margin: 6px 0;
+  }
+  .government-costs {
+    margin: 4px 0 8px;
+  }
+  .government .relation-score {
+    font-size: 1.6rem;
+    margin: 4px 0;
+  }
+  .government .relation-score span {
+    display: inline;
+    margin-left: 8px;
+  }
+  .government .relation-scale {
+    margin-top: 12px;
+  }
+  .government > p {
+    min-height: 0;
+    margin: 6px 0;
+  }
+  .government-actions {
+    margin-bottom: 0;
+    gap: 4px;
+  }
+  .government-actions button {
+    padding: 5px 8px;
+  }
+  .view-review .review-banner {
+    padding: 10px 16px;
+    margin-bottom: 10px;
+  }
+  .view-review .review-banner h2 {
+    margin: 5px 0;
+  }
+  .view-review .review-banner > strong {
+    font-size: 3rem;
+  }
+  .view-review table td,
+  .view-review table th {
+    padding: 6px 10px;
+  }
+  .view-review .lower-grid {
+    margin-top: 10px;
+  }
+  .view-review .lower-grid h2 {
+    margin-top: 0;
+  }
+  .view-review .overview-metrics {
+    gap: 10px;
+  }
+  .view-review .overview-metrics strong {
+    font-size: 1.6rem;
+  }
+}
+.war-ledger,
+.combat-calculations {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  margin-top: 10px;
+}
+.war-ledger summary,
+.combat-calculations summary {
+  color: var(--gold);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.war-ledger .war-overview {
+  margin: 10px 0 0;
+}
+.treaty-inactive {
+  align-self: center;
+  color: var(--muted);
+}
+.treaty-inactive strong {
+  color: var(--green);
+}
+.combat-calculations table {
+  margin-top: 12px;
+}
+
+/* layout08.css */
+/* v0.8: one command column, persistent chart, navigation in the sidebar. */
+.nav-submenu {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 7px 18px;
+  border-left: 1px solid #54606a;
+  padding-left: 9px;
+}
+.nav-submenu button {
+  text-align: left;
+  border: 0;
+  background: none;
+  font-size: 0.78rem;
+  padding: 6px 5px;
+  color: var(--muted);
+  border-radius: 0;
+}
+.nav-submenu .selected {
+  color: var(--gold);
+  background: #263b46;
+}
+.sidebar nav {
+  overflow: auto;
+  scrollbar-width: thin;
+  min-height: 0;
+}
+.nav-item {
+  width: 100%;
+}
+.side-bottom {
+  flex-shrink: 0;
+}
+.world-command {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+}
+.command-side-panel {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  padding: 12px;
+}
+.command-side-panel > .order-content {
+  border-top: 1px solid var(--line);
+  padding: 12px 0 0;
+  margin-top: 12px;
+  max-height: none;
+  overflow: visible;
+}
+.command-side-panel .fleet-command-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  overflow: visible;
+}
+.command-side-panel .fleet-command-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 8px;
+  width: 100%;
+  text-align: left;
+}
+.command-side-panel .fleet-command-row strong {
+  font-size: 0.87rem;
+}
+.command-side-panel .fleet-command-row .fleet-composition {
+  font-size: 0.8rem;
+  white-space: normal;
+}
+.command-side-panel .fleet-command-row small {
+  font-size: 0.72rem;
+}
+.command-side-panel .contact-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.command-side-panel .contact-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  text-align: left;
+}
+.command-side-panel .contact-row small {
+  grid-column: 1/-1;
+}
+.command-side-panel .panel {
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  background: none;
+}
+.command-side-panel .land-front-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: visible;
+}
+.command-side-panel .land-front-list article > div:first-child {
+  display: block;
+}
+.command-side-panel .land-front-list article span {
+  display: block;
+  margin: 4px 0;
+}
+.command-side-panel .land-campaigns > .panel-note {
+  display: block;
+}
+.command-side-panel .overview-metrics {
+  grid-template-columns: repeat(2, 1fr);
+}
+.command-side-panel .lower-grid {
+  display: block;
+  margin: 0;
+}
+.command-side-panel .fleet-order-panel {
+  overflow: visible;
+}
+.command-side-panel .order-content .fleet-status {
+  display: block;
+}
+.command-side-panel .order-content .mission-description {
+  font-size: 0.81rem;
+  line-height: 1.5;
+}
+.command-side-panel .fleet-readiness {
+  margin: 7px 0;
+}
+.command-side-panel .fleet-readiness div {
+  padding: 6px;
+}
+.command-side-panel .risk-check {
+  margin: 9px 0;
+}
+.world-board {
+  min-width: 0;
+}
+.map-port text,
+.map-capital text {
+  fill: inherit;
+  stroke: #000;
+  stroke-width: 2.8px;
+  paint-order: stroke;
+  stroke-linejoin: round;
+}
+.map-port circle,
+.map-capital path,
+.fleet-marker > path,
+.fleet-marker g > path,
+.convoy-marker rect {
+  stroke: #000;
+  stroke-width: 1.4px;
+  vector-effect: non-scaling-stroke;
+}
+.convoy-marker {
+  fill: currentColor;
+}
+.map-port {
+  cursor: pointer;
+}
+.map-port:hover circle {
+  stroke: white;
+}
+.world-map .map-hit {
+  stroke: none;
+}
+.power-label {
+  stroke: #000;
+  stroke-width: 1px;
+  opacity: 1;
+  paint-order: stroke;
+}
+.map-legend {
+  justify-content: center;
+  gap: 12px;
+}
+.map-legend span {
+  white-space: nowrap;
+}
+.world-map {
+  max-height: none;
+}
+.class-name {
+  font: inherit !important;
+  text-align: left;
+  padding: 0;
+}
+.class-hover {
+  position: fixed;
+  z-index: 50;
+  width: min(465px, 92vw);
+  padding: 18px;
+  background: #172a36;
+  border: 1px solid var(--gold);
+  box-shadow: 0 12px 35px #000b;
+  pointer-events: none;
+  max-height: none;
+  overflow: visible;
+}
+.class-hover[hidden] {
+  display: none;
+}
+.class-hover h3 {
+  font-size: 1.15rem;
+  margin: 7px 0 12px;
+}
+.class-hover small {
+  display: block;
+  font-size: 0.73rem;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.inspection-list {
+  margin: 10px 0;
+}
+.inspection-list > div {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+.inspection-list dt {
+  color: var(--muted);
+}
+.inspection-list dd {
+  margin: 0;
+  text-align: right;
+}
+.class-hover .inspection-list > div {
+  padding: 5px 0;
+  font-size: 0.79rem;
+}
+.ship-health {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 15px;
+  background: #10202c;
+}
+.ship-health strong {
+  font-size: 1.45rem;
+}
+.ship-health.serious {
+  color: var(--red);
+}
+.ship-health.moderate {
+  color: var(--gold);
+}
+.ship-health.light {
+  color: var(--green);
+}
+.timed-progress {
+  padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+}
+.timed-progress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.78rem;
+}
+.progress-track {
+  height: 7px;
+  margin: 7px 0;
+  background: #0e202b;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-track > i {
+  height: 100%;
+  display: block;
+  background: var(--gold);
+}
+.timed-progress small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+.facility-expansion {
+  margin-top: auto;
+  min-height: 102px;
+}
+.government-actions .timed-progress {
+  padding: 4px 0;
+}
+.government-actions .timed-progress .progress-track {
+  height: 5px;
+  margin: 4px 0;
+}
+.program-card .timed-progress {
+  margin-top: auto;
+}
+.government .timed-progress small {
+  font-size: 0.72rem;
+}
+.program-card {
+  display: flex;
+  flex-direction: column;
+}
+.modal-backdrop {
+  overflow: hidden;
+}
+.modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+}
+.modal > header,
+.modal > footer {
+  flex-shrink: 0;
+}
+.modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.modal-body .condition-scroll,
+.alert-detail .condition-scroll {
+  max-height: none;
+  overflow: visible;
+}
+.battle-sides {
+  align-items: start;
+}
+.engaged-composition {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.6;
+}
+.report-losses {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.report-losses span {
+  line-height: 1.6;
+}
+.alert-detail {
+  overscroll-behavior: contain;
+}
+.resource-bar {
+  min-width: 0;
+}
+.resource-bar > div {
+  min-width: 0;
+}
+.time-bar .campaign-clock {
+  white-space: nowrap;
+}
+.view-review .overview-metrics {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (min-width: 1200px) and (min-height: 680px) {
+  .view-command .workspace-inner {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .world-command {
+    grid-template-columns: clamp(295px, 22vw, 355px) minmax(0, 1fr);
+    min-height: 0;
+  }
+  .world-map {
+    height: 100%;
+    width: 100%;
+  }
+  .world-board {
+    height: 100%;
+    min-height: 0;
+  }
+  .map-stage {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+  }
+  .command-side-panel {
+    height: 100%;
+  }
+  .fleet-order-panel {
+    max-height: none;
+  }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+  }
+  .side-country {
+    padding: 9px 6px;
+  }
+  .nav-item {
+    padding: 8px 7px;
+  }
+  .side-bottom {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+  .workspace-inner {
+    scrollbar-gutter: auto;
+  }
+  .view-programs .facility-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+  }
+  .facility-grid > article {
+    display: flex;
+    flex-direction: column;
+  }
+  .facility-grid .production-lines {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .facility-grid .production-lines label {
+    display: block;
+  }
+  .facility-grid .production-lines select {
+    padding: 6px;
+    margin-top: 3px;
+  }
+  .facility-effect {
+    flex: 1;
+  }
+  .resource-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .resource-bar label {
+    font-size: 0.57rem;
+    letter-spacing: 0;
+  }
+  .resource-bar strong {
+    font-size: 0.76rem;
+  }
+  .resource-bar > div {
+    padding: 0 3px;
+  }
+  .resource-war strong {
+    white-space: normal;
+    max-width: 180px;
+  }
+  .alert-detail {
+    top: 125px;
+    max-height: 65vh;
+  }
+  .nation-card p {
+    line-height: 1.42;
+  }
+}
+@media (min-width: 1200px) and (max-height: 850px) {
+  .command-side-panel {
+    padding: 10px;
+  }
+  .command-side-panel .panel-title {
+    margin-bottom: 6px;
+  }
+  .command-side-panel .fleet-command-row {
+    padding: 5px;
+    gap: 2px;
+  }
+  .command-side-panel .fleet-readiness {
+    margin: 5px 0;
+  }
+  .command-side-panel .fleet-readiness div {
+    padding: 4px;
+  }
+  .command-side-panel .order-content {
+    padding-top: 7px;
+    margin-top: 8px;
+  }
+  .command-side-panel .order-content h2 {
+    font-size: 1.15rem;
+  }
+  .command-side-panel .order-content .fleet-status {
+    font-size: 0.71rem;
+  }
+  .command-side-panel .order-content .mission-description {
+    font-size: 0.74rem;
+    line-height: 1.35;
+  }
+  .command-side-panel .order-content > button {
+    padding: 6px;
+  }
+  .command-side-panel .order-content label {
+    margin-top: 5px;
+  }
+  .command-side-panel .risk-check {
+    margin: 5px 0;
+  }
+  .nav-submenu button {
+    padding: 5px;
+  }
+  .nav-item {
+    padding: 7px;
+  }
+  .production-panel .facility-grid small {
+    font-size: 0.71rem;
+    line-height: 1.4;
+  }
+  .production-panel .facility-grid p {
+    font-size: 0.78rem;
+  }
+  .production-panel .facility-grid > article {
+    padding: 10px;
+  }
+  .facility-expansion {
+    min-height: 100px;
+  }
+  .view-review .lower-grid .overview-metrics strong {
+    font-size: 1.35rem;
+  }
+  .nation-grid .nation-card p {
+    font-size: 0.71rem;
+    line-height: 1.36;
+  }
+  .nation-grid .nation-card {
+    padding: 10px;
+  }
+  .nation-card .nation-name {
+    font-size: 1.3rem;
+  }
+  .resource-bar label {
+    font-size: 7px;
+  }
+  .resource-bar strong {
+    font-size: 9px;
+  }
+  .resource-bar > div {
+    padding: 0 2px;
+  }
+  .time-bar .actual-speed {
+    font-size: 10px;
+    min-width: 76px;
+  }
+  .resource-war strong {
+    max-width: 116px;
+  }
+}
+@media (max-width: 1199px) {
+  .world-command {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .world-map {
+    height: 650px;
+  }
+  .command-side-panel {
+    max-height: 750px;
+  }
+  .nav-submenu {
+    margin-left: 8px;
+  }
+  .class-hover {
+    width: 420px;
+  }
+  .resource-bar {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 850px) {
+  .world-command {
+    grid-template-columns: 1fr;
+  }
+  .world-board {
+    grid-row: 1;
+  }
+  .command-side-panel {
+    max-height: 600px;
+  }
+  .world-map {
+    height: 480px;
+  }
+  .battle-sides {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* compact-layout.css */
+/* Compact controls, equal resource columns, and denser lists. */
+.world-map .map-port text,
+.world-map .map-capital text,
+.world-map .power-label {
+  vector-effect: non-scaling-stroke;
+  stroke-width: 2px;
+}
+.game-body .resource-bar strong {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.game-body .resource-bar label {
+  letter-spacing: 0;
+}
+.game-body .resource-war strong {
+  font-size: 9px;
+}
+.command-side-panel .fleet-order-panel {
+  height: auto;
+  max-height: none;
+  padding-bottom: 0;
+}
+.command-side-panel .list-pager {
+  margin: 3px 0;
+}
+.view-fleet .fleet-table td {
+  padding: 5px 7px;
+}
+.view-fleet .fleet-table th {
+  padding: 6px 7px;
+}
+.view-fleet .fleet-table .text-button {
+  padding: 0;
+}
+.view-fleet .fleet-table td small {
+  line-height: 1.25;
+  margin: 2px 0;
+}
+.view-fleet .fleet-table button.subtle {
+  padding: 4px 6px;
+}
+.facility-grid .facility-card .production-lines label {
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+}
+.command-bar.time-bar {
+  min-height: 36px;
+  padding: 4px 10px;
+  gap: 8px;
+}
+.time-bar .clock-controls {
+  gap: 4px;
+}
+.time-bar .check-label,
+.time-bar .header-audio label {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  line-height: 1;
+  height: 26px;
+  gap: 4px;
+}
+.time-bar input[type="checkbox"] {
+  display: block;
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  align-self: center;
+}
+.time-bar button,
+.time-bar select {
+  height: 26px;
+  padding: 3px 6px;
+  line-height: 1.2;
+}
+.time-bar #speed {
+  width: 148px;
+}
+.time-bar .campaign-clock {
+  font-variant-numeric: tabular-nums;
+}
+.header-audio input[type="range"] {
+  height: 20px;
+}
+.time-bar .actual-speed {
+  min-width: 78px;
+}
+.resource-bar {
+  display: grid;
+  grid-template-columns: repeat(var(--resource-count, 15), minmax(0, 1fr));
+  gap: 0;
+  padding: 3px 6px;
+  overflow: visible;
+  align-items: stretch;
+  min-height: 40px;
+}
+.resource-bar > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 2px 5px;
+  border-left: 1px solid var(--line);
+  gap: 2px;
+}
+.resource-bar > div:first-child {
+  border-left: 0;
+}
+.resource-bar label {
+  margin: 0;
+  font-size: 9px;
+  letter-spacing: 0;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.resource-bar strong {
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.resource-bar .resource-war {
+  grid-column: span 2;
+}
+.resource-war strong {
+  max-width: none;
+  font-size: 9px;
+  white-space: normal;
+}
+.resource-war label {
+  font-size: 7px;
+}
+.alert-rail {
+  min-height: 29px;
+  padding: 3px 10px;
+  gap: 7px;
+}
+.alert-rail > button,
+.alert-chips button {
+  padding: 3px 6px;
+  font-size: 0.73rem;
+}
+.alert-detail {
+  top: 110px;
+  max-height: calc(100dvh - 130px);
+  width: min(1000px, 80vw);
+  scrollbar-width: thin;
+  overflow-anchor: none;
+}
+.alert-detail .close {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 1;
+  background: var(--panel);
+}
+.panel {
+  padding: 11px;
+}
+.panel-title {
+  margin-bottom: 8px;
+}
+.panel h2 {
+  margin-top: 0;
+}
+.view-heading {
+  margin-bottom: 7px;
+}
+.view-heading h1 {
+  font-size: 1.65rem;
+}
+.view-heading .eyebrow {
+  font-size: 0.61rem;
+}
+.workspace {
+  padding: 8px 10px;
+}
+.section-heading {
+  margin: 9px 0;
+}
+.catalog-pager {
+  margin-top: 6px;
+}
+.list-pager {
+  gap: 6px;
+}
+.list-pager button {
+  padding: 3px 8px;
+}
+.panel-note {
+  line-height: 1.35;
+  margin: 6px 0;
+}
+.design-grid,
+.program-grid,
+.government-grid,
+.facility-grid,
+.aircraft-models {
+  gap: 8px;
+}
+.design-card {
+  padding: 10px;
+}
+.design-top {
+  font-size: 0.67rem;
+}
+.type-mark {
+  font-size: 1.2rem;
+}
+.design-card h3 {
+  margin: 5px 0;
+  font-size: 1.12rem;
+}
+.design-card .design-specs {
+  gap: 5px;
+  margin: 6px 0;
+}
+.design-specs span {
+  font-size: 0.72rem;
+}
+.design-specs b {
+  font-size: 0.95rem;
+}
+.design-card p {
+  margin: 5px 0;
+  font-size: 0.79rem;
+  line-height: 1.3;
+}
+.design-card .armament {
+  min-height: 2.6em;
+}
+.cost-line {
+  gap: 7px;
+  margin: 6px 0;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+.cost {
+  white-space: nowrap;
+}
+.design-actions {
+  margin-top: 7px;
+}
+.design-actions button {
+  padding: 6px 10px;
+}
+.design-card > small {
+  font-size: 0.75rem;
+}
+.program-card {
+  padding: 11px;
+}
+.program-card h3 {
+  margin: 5px 0;
+}
+.program-card p {
+  margin: 5px 0 7px;
+  font-size: 0.81rem;
+  line-height: 1.4;
+  min-height: 2.8em;
+}
+.program-card button {
+  margin-top: 7px;
+  padding: 7px;
+}
+.program-top {
+  font-size: 0.7rem;
+}
+.program-card .cost-line {
+  margin-top: auto;
+}
+.queue-row {
+  padding: 8px 4px;
+}
+.queue-row small {
+  margin-top: 3px;
+}
+.queue-list {
+  gap: 0;
+}
+.queue-row button {
+  padding: 5px 8px;
+}
+.production-panel {
+  padding: 10px;
+}
+.facility-grid > .facility-card {
+  padding: 10px;
+  min-width: 0;
+}
+.facility-card > h3 {
+  min-height: 0;
+  margin: 0 0 5px;
+  font-size: 1.04rem;
+}
+.facility-card > p:first-of-type {
+  min-height: 2.7em;
+}
+.production-panel .facility-grid p {
+  margin: 5px 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+.facility-card > label {
+  margin: 6px 0 1px;
+  font-size: 0.8rem;
+}
+.facility-card > input[type="range"] {
+  margin: 1px 0;
+}
+.funding-labels {
+  font-size: 0.68rem;
+}
+.facility-card > small {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.facility-card .production-lines {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  margin: 7px 0;
+  width: 100%;
+}
+.facility-card .production-lines label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font-size: 10px;
+}
+.facility-card .production-lines select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: 26px;
+  margin: 0;
+  padding: 3px 5px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+.facility-expansion {
+  min-height: 0;
+  padding-top: 7px;
+  margin-top: auto;
+}
+.facility-expansion > strong {
+  font-size: 0.81rem;
+}
+.facility-expansion button {
+  padding: 6px;
+  width: 100%;
+  font-size: 0.8rem;
+}
+.aircraft-models > article {
+  padding: 10px;
+}
+.aircraft-models h3 {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+.aircraft-models p {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  margin: 6px 0;
+}
+.aircraft-models button {
+  padding: 6px;
+  font-size: 0.79rem;
+}
+.aircraft-models small {
+  font-size: 0.74rem;
+}
+.world-command {
+  gap: 8px;
+}
+.command-side-panel {
+  padding: 9px;
+}
+.command-side-panel .fleet-command-list {
+  gap: 2px;
+}
+.command-side-panel .fleet-command-row {
+  padding: 4px 6px;
+  gap: 1px;
+  min-height: 49px;
+}
+.command-side-panel .fleet-command-row strong {
+  font-size: 0.84rem;
+}
+.command-side-panel .fleet-command-row .fleet-composition {
+  font-size: 0.73rem;
+  line-height: 1.2;
+}
+.command-side-panel .fleet-command-row small {
+  font-size: 0.66rem;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.command-side-panel > .order-content {
+  padding-top: 7px;
+  margin-top: 7px;
+}
+.command-side-panel .panel-title h2 {
+  font-size: 1.12rem;
+}
+.command-side-panel .order-content > .eyebrow {
+  display: none;
+}
+.command-side-panel .order-content h2 {
+  font-size: 1.12rem;
+  margin: 3px 0;
+}
+.command-side-panel .order-content p {
+  margin: 4px 0;
+}
+.command-side-panel .order-content .fleet-status {
+  font-size: 0.71rem;
+}
+.command-side-panel .order-content .fleet-composition {
+  font-size: 0.8rem;
+}
+.command-side-panel .order-content .mission-description {
+  font-size: 0.73rem;
+  line-height: 1.35;
+  min-height: 0;
+}
+.command-side-panel .order-content > label {
+  margin: 5px 0 3px;
+}
+.command-side-panel .order-content > select {
+  padding: 5px;
+}
+.command-side-panel .fleet-readiness {
+  margin: 4px 0;
+}
+.command-side-panel .fleet-readiness div {
+  padding: 4px;
+}
+.command-side-panel .order-content > button {
+  padding: 5px 7px;
+  font-size: 0.79rem;
+}
+.command-side-panel .risk-check {
+  margin: 5px 0 !important;
+  font-size: 0.77rem;
+}
+.command-side-panel .risk-check input {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+.map-heading {
+  padding: 7px 10px;
+}
+.map-heading h2 {
+  font-size: 1.12rem;
+}
+.map-legend {
+  gap: 9px;
+  padding: 4px 8px;
+}
+.map-credit {
+  padding: 3px 8px;
+}
+.land-front.advancing {
+  stroke-dasharray: 7 5;
+  animation: front-march 1.8s linear infinite;
+}
+.land-front.retreating {
+  animation-direction: reverse;
+}
+.island-front.advancing {
+  animation: island-pulse 2s ease-in-out infinite;
+}
+.island-label {
+  stroke: #000;
+  paint-order: stroke;
+  stroke-linejoin: round;
+  stroke-width: 2.5px;
+  fill: currentColor;
+}
+.island-marker {
+  cursor: pointer;
+}
+.island-marker > circle {
+  stroke: #000;
+  vector-effect: non-scaling-stroke;
+}
+.island-marker.selected > circle {
+  stroke: white;
+}
+@keyframes front-march {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes island-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .land-front.advancing,
+  .island-front.advancing {
+    animation: none;
+  }
+}
+.modal.wide {
+  width: min(1120px, 92vw);
+}
+.modal > header {
+  padding: 12px 16px;
+}
+.modal > header h2 {
+  font-size: 1.25rem;
+}
+.modal > footer {
+  padding: 8px 16px;
+}
+.modal-body {
+  padding: 12px 16px;
+  overflow-anchor: none;
+  touch-action: pan-y;
+}
+.modal-body .condition-scroll {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+.battle-sides {
+  gap: 12px;
+}
+.battle-sides > section {
+  min-width: 0;
+}
+.battle-sides h3 {
+  margin: 5px 0;
+}
+.battle-sides p {
+  margin: 5px 0;
+  line-height: 1.4;
+}
+.battle-sides small {
+  font-size: 0.79rem;
+}
+.condition-line {
+  padding: 5px 7px;
+  gap: 3px;
+  font-size: 0.8rem;
+}
+.engaged-composition {
+  padding: 5px 0;
+}
+.combat-calculations {
+  padding: 7px 10px;
+}
+.combat-calculations summary {
+  padding: 5px 0;
+  font-size: 0.92rem;
+}
+.combat-calculations td,
+.combat-calculations th {
+  padding: 6px 9px;
+}
+.combat-calculations p {
+  font-size: 0.85rem;
+  margin: 7px 0;
+}
+.report-card {
+  padding: 11px;
+}
+.report-card > p {
+  margin: 6px 0;
+}
+.report-losses {
+  gap: 4px;
+}
+.report-losses span {
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+.report-footer {
+  margin-top: 7px;
+}
+.report-footer button {
+  padding: 5px 8px;
+}
+.yard-capacity {
+  margin: 7px 0 10px;
+}
+.yard-capacity figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+.yard-capacity figcaption span {
+  font-size: 0.73rem;
+}
+.yard-capacity svg {
+  display: block;
+  width: 100%;
+  height: 36px;
+  margin: 3px 0;
+}
+.yard-capacity-key {
+  gap: 12px;
+  font-size: 0.77rem;
+}
+.yard-capacity-key i.yard-overload {
+  background: #d75b56;
+}
+.yard-capacity-key i.yard-spare {
+  background: #407560;
+}
+.yard-capacity p {
+  font-size: 0.8rem;
+  margin: 5px 0;
+}
+.fleet-table td,
+.fleet-table th {
+  padding: 6px 7px;
+}
+.fleet-table small {
+  margin: 2px 0;
+}
+.fleet-table .fleet-name {
+  font-size: 0.9rem;
+}
+.fleet-table button {
+  padding: 4px 6px;
+}
+.register-note {
+  padding: 7px 10px;
+  margin-bottom: 6px;
+}
+.treaty-panel {
+  gap: 15px;
+  padding: 10px;
+}
+.treaty-ledger {
+  margin-top: 6px !important;
+}
+.treaty-ledger b {
+  font-size: 1.2rem;
+}
+.view-diplomacy .view-intro {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  margin: 6px 0;
+}
+.government-costs {
+  margin: 5px 0 7px;
+  font-size: 0.71rem;
+}
+.government {
+  padding: 9px;
+}
+.government h2 {
+  font-size: 1.05rem;
+  margin: 3px 0;
+}
+.government-top {
+  font-size: 0.8rem;
+}
+.government .nation-code {
+  font-size: 0.8rem;
+}
+.relation-score {
+  font-size: 1.6rem;
+  margin: 4px 0;
+}
+.relation-score span {
+  font-size: 0.68rem;
+}
+.government p {
+  margin: 4px 0;
+  font-size: 0.73rem;
+}
+.government-actions {
+  gap: 3px;
+}
+.government-actions button {
+  padding: 4px 6px;
+  font-size: 0.73rem;
+}
+.scale-labels {
+  font-size: 0.65rem;
+}
+.timed-progress {
+  padding: 5px 0;
+}
+.government-actions .timed-progress small {
+  font-size: 0.65rem;
+}
+.ship-designer {
+  padding: 12px;
+}
+.ship-designer > p {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 6px 0;
+}
+.draft-top {
+  gap: 10px;
+}
+.draft-fields {
+  gap: 8px;
+}
+.draft-fields label,
+.draft-top label {
+  margin: 6px 0;
+  font-size: 0.79rem;
+}
+.draft-fields input,
+.draft-top input,
+.draft-top select {
+  padding: 6px;
+}
+.draft-quote {
+  padding: 10px;
+  gap: 10px;
+}
+.draft-quote span {
+  font-size: 0.8rem;
+}
+@media (min-width: 1200px) and (min-height: 680px) {
+  :root {
+    --sidebar: 204px;
+  }
+  .sidebar {
+    padding: 10px 8px;
+  }
+  .side-brand {
+    padding: 0 7px 7px;
+  }
+  .side-country {
+    padding: 7px 5px;
+  }
+  .side-country > strong {
+    font-size: 1.28rem;
+  }
+  .nav-item {
+    padding: 7px 6px;
+    font-size: 15px;
+  }
+  .nav-submenu button {
+    padding: 4px 5px;
+  }
+  .nav-submenu {
+    margin-bottom: 5px;
+  }
+  .design-grid,
+  .program-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .government-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .program-grid {
+    align-items: stretch;
+  }
+  .government-actions button {
+    width: 100%;
+  }
+}
+@media (min-width: 1900px) {
+  .design-grid,
+  .program-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .resource-bar strong {
+    font-size: 12px;
+  }
+  .resource-bar label {
+    font-size: 9px;
+  }
+  .resource-war strong {
+    font-size: 11px;
+  }
+}
+@media (max-width: 1199px) {
+  .resource-bar {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+  .resource-bar strong {
+    font-size: 11px;
+  }
+  .command-bar.time-bar {
+    flex-wrap: wrap;
+  }
+  .government-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Report reading leaves the persistent time/audio controls and navigation usable. */
+.modal-backdrop.report-backdrop {
+  inset: 124px 0 0 var(--sidebar);
+  pointer-events: none;
+  padding: 12px;
+}
+.report-backdrop .modal {
+  pointer-events: auto;
+  max-height: calc(100dvh - 148px);
+  width: min(1120px, 100%);
+}
+/* One chart, one context panel. Shared type sizes are independent of viewport width. */
+:root {
+  font-size: 16px;
+  --sidebar: 204px;
+}
+.game-shell {
+  font-size: 13px;
+}
+.sidebar {
+  padding: 10px 8px;
+}
+.sidebar .nav-item {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 8px 7px;
+  gap: 8px;
+}
+.sidebar .nav-item > span {
+  font-size: 11px;
+  min-width: 16px;
+}
+.sidebar .nav-submenu {
+  margin-left: 24px;
+}
+.sidebar .nav-submenu button {
+  font-size: 13px;
+  line-height: 1.3;
+  padding: 6px 5px;
+  font-weight: 400;
+}
+.sidebar .nav-submenu .selected {
+  font-weight: 600;
+}
+.sidebar .side-country > strong {
+  font-size: 21px;
+}
+.sidebar .side-country > span:last-child {
+  font-size: 11px;
+  line-height: 1.4;
+}
+.sidebar .side-bottom button {
+  font-size: 13px;
+  padding: 6px 9px;
+}
+.sidebar .save-status {
+  font-size: 11px;
+}
+.workspace .panel h2,
+.workspace .section-heading h2 {
+  font-size: 20px;
+}
+.workspace h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+.workspace p,
+.workspace label,
+.workspace .panel-note {
+  font-size: 13px;
+  line-height: 1.45;
+}
+.workspace small,
+.workspace .cost-line,
+.workspace .cost,
+.workspace .eyebrow {
+  font-size: 11px;
+}
+.workspace .eyebrow {
+  letter-spacing: 0.08em;
+}
+.workspace button,
+.workspace select,
+.workspace input {
+  font-size: 13px;
+}
+.workspace td {
+  font-size: 13px;
+}
+.workspace th {
+  font-size: 12px;
+}
+.workspace b,
+.workspace strong {
+  font-weight: 600;
+}
+.workspace .view-heading h1 {
+  font-size: 26px;
+}
+.workspace .program-card p {
+  min-height: 0;
+}
+.command-bar.time-bar {
+  gap: 7px;
+}
+.time-bar .campaign-clock {
+  font-size: 13px;
+  font-weight: 500;
+  gap: 5px;
+}
+.time-bar .campaign-clock small {
+  font-size: 11px;
+}
+.time-bar .clock-controls {
+  gap: 4px;
+}
+.time-bar .actual-speed {
+  font-size: 11px;
+}
+.time-bar button,
+.time-bar select,
+.time-bar .auto-pause-control,
+.time-bar .header-audio label {
+  font-size: 11px;
+}
+.game-body .resource-bar label {
+  font-size: 9px;
+  letter-spacing: 0;
+}
+.game-body .resource-bar strong {
+  font-size: 12px;
+}
+.game-body .resource-war label {
+  font-size: 8px;
+}
+.game-body .resource-war strong {
+  font-size: 10px;
+}
+.alert-rail,
+.alert-rail button,
+.alert-rail .alert-heading {
+  font-size: 11px;
+}
+.view-command .workspace-inner {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+.world-command {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) clamp(310px, 24vw, 370px);
+  gap: 8px;
+  align-items: stretch;
+}
+.world-board {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.world-board .map-stage {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  border: 0;
+}
+.world-map {
+  height: 100%;
+  width: 100%;
+  max-height: none;
+  touch-action: none;
+}
+.world-map:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: -1px;
+}
+.world-map .political-territory,
+.world-map .map-capital,
+.world-map [data-action="select-front"] {
+  cursor: pointer;
+}
+.world-map .power-label,
+.world-map .ordered-route,
+.world-map .graticule {
+  pointer-events: none;
+}
+.world-board .map-legend {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  min-height: 27px;
+  height: 27px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.map-legend .legend-powers {
+  display: flex;
+  gap: 5px;
+}
+.map-legend button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.map-legend span {
+  margin: 0;
+}
+.map-legend .legend-powers span {
+  font-weight: 600;
+}
+.map-legend .front-key {
+  margin: 0;
+}
+.world-command .command-side-panel {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+.command-side-panel .fleet-command-list {
+  max-height: none;
+  overflow: visible;
+  gap: 3px;
+}
+.command-side-panel .fleet-command-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 6px;
+  min-height: 62px;
+  gap: 2px;
+}
+.command-side-panel .fleet-command-row strong {
+  font-size: 14px;
+}
+.command-side-panel .fleet-command-row .fleet-composition {
+  font-size: 12px;
+}
+.command-side-panel .fleet-command-row small {
+  font-size: 11px;
+  margin: 0;
+}
+.command-side-panel .order-content {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.command-side-panel .order-content > .eyebrow {
+  display: block;
+  margin: 9px 0 4px;
+}
+.command-side-panel .order-content h2 {
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+.command-side-panel .order-content p,
+.command-side-panel .order-content .fleet-status,
+.command-side-panel .order-content .mission-description,
+.command-side-panel .order-content .fleet-composition {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 7px 0;
+}
+.command-side-panel .risk-check {
+  font-size: 13px;
+  margin: 10px 0 !important;
+}
+.command-side-panel .fleet-readiness {
+  margin: 9px 0;
+}
+.command-side-panel .fleet-readiness div {
+  padding: 7px;
+}
+.command-side-panel .fleet-readiness span {
+  font-size: 11px;
+}
+.command-side-panel .fleet-readiness b {
+  font-size: 15px;
+}
+.command-side-panel .order-content button {
+  font-size: 13px;
+  padding: 7px;
+}
+.command-panel-nav {
+  display: flex;
+  align-items: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.command-panel-nav > button {
+  padding: 4px 7px;
+  font-size: 12px;
+}
+.command-side-panel .selected-manifest {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+.selected-manifest summary {
+  font-size: 13px;
+}
+.selected-manifest .fleet-popup-grid {
+  display: block;
+}
+.selected-manifest .manifest-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.selected-manifest .fleet-composition {
+  display: none;
+}
+.selected-manifest .formation-manifest > div {
+  display: grid;
+}
+.selected-manifest .manifest-grid small {
+  font-size: 11px;
+}
+.selected-manifest .ship-condition {
+  padding: 6px 0;
+}
+.selected-manifest .ship-condition .text-button {
+  padding: 0;
+}
+.command-side-panel .command-details > div,
+.command-side-panel .inspection-list > div {
+  font-size: 12px;
+  padding: 6px 0;
+  gap: 10px;
+}
+.command-side-panel .command-details,
+.command-side-panel .inspection-list {
+  margin: 10px 0;
+}
+.command-side-panel .chart-powers {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0;
+}
+.command-side-panel a {
+  color: var(--gold);
+}
+.view-fleet .table-scroll {
+  overflow: visible;
+}
+.fleet-register-section th {
+  background: #253947;
+  color: var(--gold);
+  font-weight: 600;
+  padding: 9px !important;
+}
+.view-fleet .register-pager {
+  margin: 8px 0;
+}
+.view-fleet .table-panel {
+  overflow: visible;
+}
+.view-fleet .fleet-table th:nth-child(2) {
+  min-width: 48px;
+}
+.view-programs .workspace-inner,
+.view-fleet .workspace-inner,
+.view-reports .workspace-inner {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+.view-reports .report-grid {
+  align-items: start;
+}
+.workspace .facility-grid .production-lines select {
+  height: 28px;
+  font-size: 12px;
+}
+.workspace .facility-grid .production-lines label {
+  font-size: 11px;
+}
+.workspace .facility-card > small {
+  font-size: 11px;
+}
+.workspace .government-actions button {
+  font-size: 12px;
+}
+.workspace .government p,
+.workspace .government-costs,
+.workspace .view-intro {
+  font-size: 12px;
+}
+.workspace .government h2 {
+  font-size: 17px;
+}
+.workspace .government-actions .timed-progress small {
+  font-size: 10px;
+}
+@media (min-width: 1900px) {
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 370px;
+  }
+  .world-board .map-legend,
+  .map-legend button {
+    font-size: 11px;
+  }
+}
+@media (max-width: 1199px) {
+  .world-command {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+  .world-board {
+    min-height: 450px;
+  }
+  .world-board .map-legend {
+    justify-content: flex-start;
+  }
+  .command-bar.time-bar {
+    flex-wrap: wrap;
+  }
+  .world-command .command-side-panel {
+    max-height: 700px;
+  }
+}
+@media (max-width: 850px) {
+  .world-command {
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: 450px auto;
+  }
+  .view-command .workspace-inner {
+    overflow-y: auto;
+  }
+  .world-command .command-side-panel {
+    height: auto;
+    min-height: 250px;
+  }
+  .world-board .map-legend {
+    overflow-x: auto;
+  }
+}
+
+/* interface11.css */
+/* Stable action footprints and an always-visible ministry navigation. */
+.sidebar nav {
+  padding: 5px 0;
+}
+.sidebar .nav-item {
+  margin: 2px 0;
+}
+.sidebar {
+  padding: 8px;
+}
+.sidebar .side-brand {
+  padding-bottom: 5px;
+}
+.sidebar .side-country {
+  padding: 6px 5px;
+}
+.sidebar nav {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.sidebar .nav-item {
+  font-size: 15px;
+  padding: 6px 7px;
+  line-height: 1.25;
+}
+.sidebar .nav-submenu {
+  display: grid;
+  gap: 0;
+  margin: 0 0 3px 24px;
+}
+.sidebar .nav-submenu button {
+  padding: 3px 5px;
+  line-height: 1.25;
+  font-size: 13px;
+}
+.sidebar .side-bottom {
+  flex-shrink: 0;
+  padding-top: 6px;
+}
+.sidebar .side-country > span:last-child {
+  display: none;
+}
+.workspace .action-slot,
+.action-slot {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  margin: 7px 0 0;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  line-height: 1.2;
+  font-size: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.workspace .timed-progress,
+.timed-progress {
+  background: #142b35;
+  color: var(--text);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 6px 7px;
+  gap: 2px;
+}
+.timed-progress > div:first-child {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+  line-height: 1.1;
+}
+.timed-progress > div:first-child > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.workspace .timed-progress small {
+  font-size: 10px;
+  margin: 0;
+  line-height: 1.1;
+  color: var(--gold);
+}
+.timed-progress .progress-track {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: 0;
+  height: 3px;
+  background: #12212a;
+}
+.timed-progress .progress-track i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+}
+.government-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.government-actions .action-slot {
+  margin: 0;
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  padding: 4px 5px;
+  font-size: 12px;
+}
+.government-actions .timed-progress {
+  padding-bottom: 7px;
+}
+.government-grid {
+  align-items: start;
+}
+.workspace .government h2 {
+  font-size: 17px;
+  min-height: 2.5em;
+}
+.government .badge {
+  white-space: normal;
+  min-height: 27px;
+  text-transform: none;
+}
+.government .relation-score {
+  margin: 7px 0;
+}
+.government .relation-meter {
+  height: 4px;
+  background: linear-gradient(90deg, #763a43, #516574, #3f7867);
+  position: relative;
+}
+.relation-meter i {
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  top: -2px;
+  transform: translateX(-50%);
+  border: 1px solid #000;
+}
+.government p {
+  line-height: 1.4;
+}
+.treaty-panel {
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr);
+}
+.treaty-panel .treaty-current {
+  margin: 5px 0;
+}
+.treaty-panel .action-slot {
+  height: 34px;
+  min-height: 34px;
+  max-height: 34px;
+}
+.treaty-panel select {
+  padding: 6px;
+  width: 100%;
+}
+.workspace .facility-card .facility-next {
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 4.2em;
+  margin: 5px 0;
+}
+.workspace .facility-card .expansion-cost {
+  font-size: 11px;
+  min-height: 2.8em;
+  line-height: 1.4;
+  margin: 5px 0;
+}
+.workspace .facility-card .facility-expansion {
+  min-height: 0;
+  padding-top: 7px;
+}
+.workspace .facility-card .action-slot {
+  margin-top: 5px;
+}
+.program-card .level-current {
+  color: var(--muted);
+}
+.program-card .level-next {
+  color: var(--text);
+}
+.workspace .program-card .program-effect {
+  font-size: 12px;
+  color: var(--gold);
+  line-height: 1.4;
+}
+.program-card .cost-line {
+  margin-top: auto;
+}
+.workspace .program-card {
+  display: flex;
+  flex-direction: column;
+}
+.aircraft-models > article {
+  display: flex;
+  flex-direction: column;
+}
+.aircraft-models .action-slot {
+  margin-top: auto;
+}
+.aircraft-models > article > small:last-of-type {
+  margin-bottom: 7px;
+}
+.view-yards .view-heading {
+  margin: 0 0 5px;
+}
+.view-yards .view-heading h1 {
+  font-size: 23px;
+}
+.view-yards .queue-panel {
+  padding: 8px 10px;
+  margin-bottom: 6px;
+}
+.view-yards .queue-panel .panel-title {
+  margin-bottom: 3px;
+}
+.view-yards .queue-panel h2 {
+  font-size: 16px;
+}
+.queue-panel .yard-capacity {
+  margin: 3px 0 5px;
+}
+.queue-panel .yard-capacity svg {
+  height: 24px;
+  margin: 0;
+}
+.queue-panel .yard-capacity figcaption {
+  font-size: 12px;
+}
+.queue-panel .yard-capacity-key {
+  font-size: 11px;
+}
+.queue-panel .yard-capacity p {
+  display: none;
+}
+.queue-panel .queue-row {
+  padding: 4px 2px;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.55fr) auto;
+  gap: 12px;
+}
+.queue-panel .queue-row strong {
+  font-size: 12px;
+}
+.queue-panel .queue-row small {
+  font-size: 10px;
+  margin: 1px 0;
+}
+.queue-panel .queue-row span {
+  font-size: 11px;
+}
+.queue-panel .panel-note {
+  display: none;
+}
+.queue-panel .catalog-pager {
+  margin-top: 4px;
+}
+.queue-panel .catalog-pager button {
+  padding: 2px 6px;
+}
+.queue-panel .queue-row button {
+  padding: 3px 7px;
+  font-size: 11px;
+}
+.view-yards .section-heading {
+  margin: 6px 0;
+}
+.view-yards .section-heading h2 {
+  font-size: 17px;
+}
+.view-yards .design-card {
+  padding: 8px;
+}
+.view-yards .design-card h3 {
+  font-size: 15px;
+  margin: 3px 0;
+}
+.view-yards .design-specs {
+  margin: 3px 0;
+  display: flex;
+  justify-content: space-between;
+}
+.view-yards .design-specs span {
+  font-size: 11px;
+}
+.view-yards .design-specs b {
+  display: inline;
+  font-size: 12px;
+}
+.view-yards .armament {
+  font-size: 12px;
+  line-height: 1.3;
+  min-height: 2.6em;
+  margin: 3px 0;
+}
+.view-yards .design-card .cost-line {
+  margin: 4px 0;
+  font-size: 11px;
+  gap: 5px;
+}
+.view-yards .design-actions {
+  margin-top: 5px;
+}
+.view-yards .design-actions button {
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.view-yards .design-card > small {
+  font-size: 11px;
+}
+.view-yards .design-top {
+  font-size: 10px;
+}
+.view-yards .type-mark {
+  font-size: 17px;
+}
+.view-yards .design-grid {
+  gap: 6px;
+}
+.view-yards .design-card .block-reason {
+  font-size: 11px;
+  margin: 3px 0;
+}
+.report-card > h2 {
+  font-size: 18px !important;
+  margin: 9px 0;
+}
+.report-losses {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0;
+}
+.report-losses > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.report-losses strong {
+  color: var(--muted);
+  font-size: 12px;
+}
+.report-losses span {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.view-review[data-record="reports"] .report-grid {
+  align-items: start;
+}
+.modal-body .battle-sides section {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.modal-body .condition-scroll {
+  overflow: visible;
+  max-height: none;
+}
+.modal-body .combat-calculations {
+  margin-top: 12px;
+}
+.modal-body .combat-calculations summary {
+  cursor: pointer;
+}
+.modal input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+}
+.modal label:has(output) {
+  display: flex;
+  justify-content: space-between;
+}
+.modal output {
+  font-weight: 600;
+  color: var(--gold);
+}
+.land-campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.land-campaign-card {
+  text-align: left;
+}
+.land-campaign-card .program-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.land-campaign-card h2 {
+  font-size: 18px !important;
+  margin: 8px 0;
+}
+.land-campaign-card p {
+  font-size: 12px;
+}
+.land-campaign-card .front-progress {
+  height: 6px;
+  margin: 10px 0;
+  background: #273e4b;
+}
+.front-progress i {
+  display: block;
+  height: 100%;
+}
+.land-campaign-card small {
+  font-size: 11px;
+}
+.land-front.advancing,
+.land-front.retreating {
+  animation: front-breathe 2.8s ease-in-out infinite alternate;
+  stroke-dasharray: 7 5;
+  stroke-dashoffset: 0;
+}
+.island-front.advancing {
+  animation: front-breathe 2.8s ease-in-out infinite alternate;
+}
+.world-map[data-paused="true"] .land-front,
+.world-map[data-paused="true"] .island-front {
+  animation-play-state: paused;
+}
+@keyframes front-breathe {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+.time-bar .actual-speed.is-paused {
+  color: var(--gold);
+  animation: pause-breathe 1.8s ease-in-out infinite alternate;
+}
+@keyframes pause-breathe {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+.world-map .map-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+.world-map .map-port,
+.world-map .map-capital {
+  pointer-events: visiblePainted;
+}
+.world-map .map-port text,
+.world-map .map-capital text {
+  pointer-events: visiblePainted;
+}
+.world-map [data-action]:focus-visible {
+  outline: 0;
+  filter: drop-shadow(0 0 2px #fff);
+}
+.queue-panel .yard-capacity {
+  padding: 6px 8px;
+}
+.queue-panel .yard-capacity figcaption {
+  margin-bottom: 2px;
+}
+.queue-panel .yard-capacity figcaption span {
+  margin: 0;
+}
+.queue-panel .yard-capacity-key {
+  margin-top: 3px;
+}
+.queue-panel > p {
+  margin: 4px 0;
+}
+.view-yards .design-top {
+  margin-bottom: 3px;
+}
+.workspace .program-top {
+  margin-bottom: 5px;
+}
+@media (min-width: 1900px) {
+  .land-campaign-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .sidebar .nav-item {
+    padding: 7px;
+  }
+  .sidebar .nav-submenu button {
+    padding: 4px 5px;
+  }
+}
+@media (max-width: 1199px) {
+  .land-campaign-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .government-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .land-front.advancing,
+  .land-front.retreating,
+  .island-front.advancing,
+  .time-bar .actual-speed.is-paused {
+    animation: none;
+  }
+}
+
+/* interface12.css */
+/* The chart and the horizontal command desk share one stable viewport. */
+#toast {
+  pointer-events: none;
+  left: auto;
+  right: 20px;
+  bottom: 14px;
+  transform: none;
+  max-width: min(540px, 90vw);
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  background: #213641;
+  color: var(--text);
+  border: 1px solid var(--gold);
+}
+body:has(.view-command) #toast {
+  bottom: 284px;
+}
+.world-map [data-action] circle.map-hit {
+  fill: transparent !important;
+  stroke: none !important;
+  pointer-events: all;
+}
+.view-command .world-command {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(230px, 1fr) 230px;
+  height: 100%;
+  min-height: 0;
+  gap: 8px;
+}
+.world-command .world-board {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  height: 100%;
+}
+.world-command .command-side-panel {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  overflow: hidden;
+  padding: 8px 10px;
+}
+.command-side-panel > .panel-title {
+  flex-shrink: 0;
+  margin: 0 0 4px;
+}
+.command-side-panel .fleet-command-list {
+  display: grid;
+  grid-template-columns: repeat(var(--command-columns, 4), minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.command-side-panel .fleet-command-row {
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  background: #162a35;
+}
+.fleet-command-row .fleet-composition {
+  line-height: 1.3;
+}
+.command-side-panel > .list-pager {
+  flex-shrink: 0;
+  margin: 4px 0 0;
+}
+.world-command .command-panel-nav {
+  padding: 0 0 4px;
+  border: 0;
+  flex-shrink: 0;
+}
+.command-panel-nav button {
+  padding: 2px 6px;
+}
+.world-command .command-side-panel .order-content {
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.command-fleet-layout,
+.map-information {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.85fr) minmax(290px, 1.15fr) minmax(
+      280px,
+      1.5fr
+    );
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+}
+.command-fleet-layout > section,
+.map-information > section {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.command-fleet-layout .fleet-mission-controls {
+  overflow: visible;
+}
+.command-side-panel .order-content h2 {
+  font-size: 19px;
+  margin: 3px 0 5px;
+}
+.command-side-panel .order-content p {
+  margin: 4px 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.command-side-panel .order-content .fleet-composition {
+  font-size: 12px;
+}
+.command-side-panel .order-content .fleet-status {
+  font-size: 12px;
+}
+.command-side-panel .fleet-readiness {
+  margin: 6px 0;
+}
+.command-side-panel .fleet-readiness div {
+  padding: 4px 6px;
+}
+.command-side-panel .fleet-readiness b {
+  font-size: 14px;
+}
+.fleet-mission-controls > label {
+  margin: 0;
+  font-size: 12px;
+}
+.fleet-mission-controls select {
+  width: 100%;
+  height: 28px;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+.command-side-panel .order-content .mission-description {
+  font-size: 12px;
+  line-height: 1.35;
+  margin: 4px 0;
+  min-height: 32px;
+}
+.command-side-panel .fleet-mission-controls .risk-check {
+  margin: 4px 0 !important;
+  font-size: 12px;
+}
+.command-side-panel .order-content .primary {
+  height: 30px;
+  padding: 4px 7px;
+  font-size: 12px;
+}
+.command-side-panel .selected-manifest {
+  margin: 0;
+  padding: 0 0 0 12px;
+  border-top: 0;
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+}
+.selected-manifest > summary {
+  position: sticky;
+  top: 0;
+  background: var(--panel, #172935);
+  padding-bottom: 4px;
+  z-index: 1;
+}
+.selected-manifest .formation-manifest {
+  padding-top: 0;
+  margin-top: 5px;
+  border: 0;
+}
+.selected-manifest .manifest-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.selected-manifest .ship-condition {
+  padding: 3px 0;
+  min-width: 0;
+}
+.selected-manifest .ship-condition .text-button {
+  font-size: 12px;
+}
+.selected-manifest .fleet-popup-grid > section > h3 {
+  font-size: 12px;
+  margin: 5px 0;
+}
+.command-side-panel .command-details,
+.command-side-panel .inspection-list {
+  margin: 4px 0;
+}
+.command-side-panel .command-details > div,
+.command-side-panel .inspection-list > div {
+  font-size: 12px;
+  padding: 4px 0;
+}
+.map-information {
+  grid-template-columns: minmax(170px, 0.7fr) minmax(360px, 1.8fr) minmax(
+      210px,
+      0.85fr
+    );
+}
+.map-information:has(.selection-notes:empty) {
+  grid-template-columns: minmax(180px, 0.6fr) minmax(0, 2.4fr);
+}
+.map-information .selection-notes:empty {
+  display: none;
+}
+.map-information .inspection-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+.map-information .chart-powers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0 0 5px;
+  font-size: 12px;
+}
+.map-information button {
+  max-width: 100%;
+  height: 30px;
+  padding: 4px 7px;
+  font-size: 12px;
+}
+.aircraft-production {
+  margin: 0 0 10px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--line);
+}
+.aircraft-production .panel-title {
+  margin: 0 0 7px;
+  gap: 12px;
+}
+.aircraft-production .panel-title h2 {
+  font-size: 18px;
+}
+.aircraft-production .panel-title span {
+  font-size: 12px;
+  margin-left: auto;
+}
+.aircraft-production button {
+  font-size: 12px;
+  padding: 5px 7px;
+}
+.aircraft-production .production-lines {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.aircraft-production .production-lines label {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  min-width: 0;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+.aircraft-production .production-lines select {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.view-programs .facility-effect {
+  min-height: 4.2em;
+}
+.view-programs .facility-expansion {
+  margin-top: 8px;
+}
+.aircraft-models > article[data-future="true"] .timed-progress,
+.design-card[data-future="true"] .timed-progress {
+  margin-top: auto;
+}
+.design-card[data-future="true"] {
+  display: flex;
+  flex-direction: column;
+}
+.design-card .design-actions .timed-progress {
+  margin: 0;
+}
+.design-card[data-future="true"] .armament {
+  margin-bottom: 8px;
+}
+.record-intro {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.view-review[data-record="overview"] .lower-grid {
+  margin-top: 10px;
+}
+.view-review[data-record="overview"] .panel {
+  padding: 12px;
+}
+.view-review[data-record="overview"] .overview-metrics {
+  gap: 10px;
+}
+.view-review[data-record="overview"] .overview-metrics strong {
+  font-size: 23px;
+}
+.government-actions {
+  grid-auto-rows: 42px;
+  align-items: stretch;
+}
+.workspace .government-actions > .action-slot {
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  margin: 0;
+  align-self: stretch;
+  line-height: 1.2;
+  padding: 4px 5px;
+}
+.workspace .government-actions > .timed-progress {
+  padding-bottom: 7px;
+}
+.view-review[data-record="overview"] .lower-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.view-review[data-record="overview"] .lower-grid > section:last-child {
+  order: -1;
+}
+.view-review[data-record="overview"]
+  .lower-grid[data-reviews="0"]
+  > section:first-child {
+  display: none;
+}
+.view-review[data-record="overview"] .overview-metrics {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 10px 0 0;
+}
+.view-review[data-record="overview"] .overview-metrics div {
+  padding: 0;
+}
+.view-review[data-record="overview"] .overview-metrics span {
+  font-size: 12px;
+}
+.view-review[data-record="overview"] .panel h2 {
+  font-size: 19px;
+  margin: 0 0 7px;
+}
+@media (min-width: 1900px) {
+  body:has(.view-command) #toast {
+    bottom: 299px;
+  }
+  .view-command .world-command {
+    grid-template-rows: minmax(280px, 1fr) 245px;
+  }
+  .command-fleet-layout {
+    grid-template-columns: minmax(260px, 0.8fr) minmax(360px, 1fr) minmax(
+        450px,
+        1.8fr
+      );
+  }
+  .selected-manifest .manifest-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1199px) {
+  .view-command .world-command {
+    grid-template-rows: minmax(230px, 1fr) 260px;
+  }
+  .command-fleet-layout,
+  .map-information {
+    grid-template-columns: 1fr 1.4fr 1.5fr;
+    gap: 10px;
+  }
+  .command-side-panel .order-content .mission-description {
+    min-height: 0;
+  }
+  .selected-manifest .manifest-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 850px) {
+  .view-command .world-command {
+    height: auto;
+    grid-template-rows: 400px auto;
+  }
+  .world-command .command-side-panel {
+    height: auto;
+    min-height: 260px;
+    overflow: auto;
+  }
+  .command-fleet-layout,
+  .map-information,
+  .map-information:has(.selection-notes:empty) {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .command-side-panel .selected-manifest {
+    max-height: 300px;
+    border: 0;
+    padding: 0;
+  }
+  .aircraft-production .production-lines {
+    grid-template-columns: 1fr;
+  }
+  .aircraft-production .panel-title {
+    flex-wrap: wrap;
+  }
+}
+
+/* interface13.css */
+/* v0.13: larger complete queues and readable contextual inspections. */
+.queue-panel,
+.queue-list {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  flex-shrink: 0;
+}
+.view-yards .workspace-inner {
+  overflow-y: auto;
+}
+.class-hover {
+  pointer-events: auto;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.class-hover.fleet-hover {
+  width: min(670px, 94vw);
+  padding: 12px;
+}
+.class-hover.fleet-hover h3 {
+  margin: 4px 0 7px;
+}
+.class-hover.fleet-hover > p {
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 6px 0;
+}
+.class-hover.fleet-hover .inspection-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+  margin: 6px 0;
+}
+.class-hover.fleet-hover .inspection-list > div {
+  grid-template-columns: 1fr 1.3fr;
+  gap: 8px;
+  font-size: 11px;
+}
+.hover-ship-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px 12px;
+  margin-top: 9px;
+}
+.hover-ship {
+  min-width: 0;
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+}
+.hover-ship strong,
+.hover-ship span,
+.hover-ship small {
+  display: block;
+  line-height: 1.35;
+  margin: 0;
+}
+.hover-ship strong {
+  font-size: 12px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.hover-ship.light > span {
+  color: var(--green);
+}
+.hover-ship.moderate > span {
+  color: var(--gold);
+}
+.hover-ship.serious > span {
+  color: var(--red);
+}
+.class-hover .hover-ship small {
+  font-size: 10px;
+  margin: 0;
+}
+.facility-card .daily-graduates {
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 3px 0 6px;
+}
+/* Latest command layout: broad chart, narrow right-hand information column. */
+.view-command .world-command {
+  grid-template-columns: minmax(0, 1fr) clamp(218px, 15vw, 245px);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  gap: 8px;
+}
+.view-command .map-panel {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: 0;
+  height: 100%;
+}
+.view-command .command-side-panel {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  padding: 9px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.view-command .fleet-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: visible;
+}
+.view-command .command-side-panel > .panel-title {
+  align-items: center;
+  gap: 4px;
+}
+.view-command .command-side-panel > .panel-title h2 {
+  font-size: 16px;
+  white-space: nowrap;
+}
+.view-command .command-side-panel > .panel-title > span {
+  font-size: 10px;
+  white-space: nowrap;
+}
+.view-command .fleet-command-row {
+  min-height: 60px;
+  padding: 7px;
+  text-align: left;
+}
+.view-command .fleet-command-row strong {
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: normal;
+}
+.view-command .fleet-command-row .fleet-composition {
+  font-size: 12px;
+}
+.view-command .fleet-command-row small {
+  font-size: 10px;
+  line-height: 1.4;
+}
+.view-command .command-fleet-layout,
+.view-command .map-information {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+.view-command .command-side-panel .order-content {
+  overflow: visible;
+  flex: 0 0 auto;
+  min-height: auto;
+}
+.view-command .selected-manifest .manifest-grid {
+  grid-template-columns: 1fr;
+}
+.view-command .command-fleet-layout > section,
+.view-command .map-information > section {
+  padding: 0 0 8px;
+  border: 0;
+  min-height: 0;
+  overflow: visible;
+}
+.view-command .command-fleet-layout h2,
+.view-command .map-information h2 {
+  font-size: 17px;
+  line-height: 1.2;
+  margin: 4px 0 7px;
+}
+.view-command .map-information .inspection-list {
+  display: block;
+}
+.view-command .map-information p,
+.view-command .command-fleet-layout p {
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.view-command .command-details > div,
+.view-command .inspection-list > div {
+  font-size: 11px;
+  gap: 8px;
+}
+.view-command .selected-manifest {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+.view-command .selected-manifest[open] .fleet-popup-grid {
+  display: block;
+}
+.view-command .selected-manifest[open] .manifest-grid {
+  max-height: none;
+  overflow: visible;
+}
+.view-command .fleet-readiness {
+  gap: 4px;
+}
+.view-command .fleet-readiness div {
+  padding: 5px;
+}
+.view-command .fleet-readiness span {
+  font-size: 10px;
+}
+.view-command .fleet-mission-controls select {
+  width: 100%;
+  font-size: 11px;
+  padding: 5px;
+}
+.view-command .fleet-mission-controls .risk-check {
+  font-size: 11px;
+  gap: 5px;
+  margin: 9px 0;
+}
+.view-command .fleet-mission-controls .primary {
+  font-size: 12px;
+  padding: 8px 4px;
+}
+body:has(.view-command) #toast {
+  bottom: 42px;
+  right: calc(clamp(218px, 15vw, 245px) + 28px);
+  max-width: min(480px, 55vw);
+}
+
+/* interface14.css */
+/* Reserve space for both notices and the horizontal scrollbar. */
+.game-body > .alert-rail {
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  flex: 0 0 48px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+.alert-rail .alert-chips {
+  height: 47px;
+  min-height: 47px;
+  box-sizing: border-box;
+  padding: 7px 0 0;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.alert-rail .alert-chip,
+.alert-rail > .alert-heading,
+.alert-rail > button {
+  flex-shrink: 0;
+}
+.alert-rail .alert-chip,
+.alert-rail .alert-chip > button,
+.alert-rail > button {
+  height: 30px;
+  box-sizing: border-box;
+}
+.alert-rail .alert-chips > span:not(.alert-chip) {
+  line-height: 30px;
+  white-space: nowrap;
+}
+.school-graduation {
+  min-height: 4em;
+}
+.escort-coverage-layer {
+  pointer-events: none;
+  fill: #6cdbab;
+  fill-opacity: 0.14;
+  stroke: #6cdbab;
+  stroke-width: 1;
+  stroke-opacity: 0.8;
+}
+.escort-coverage-layer path {
+  vector-effect: non-scaling-stroke;
+}
+.convoy-cover-ring {
+  pointer-events: none;
+  fill: none;
+  stroke-width: 1.7px;
+  vector-effect: non-scaling-stroke;
+  paint-order: stroke;
+}
+.convoy-cover-ring.covered {
+  stroke: #7ae5ad;
+}
+.convoy-cover-ring.exposed {
+  stroke: #fa8a7c;
+  stroke-dasharray: 3 2;
+}
+.marker-location {
+  pointer-events: none;
+  stroke: currentColor;
+  fill: currentColor;
+  opacity: 0.55;
+}
+.marker-location line {
+  stroke-width: 0.8px;
+  vector-effect: non-scaling-stroke;
+}
+.world-map .fleet-marker .leader {
+  stroke: currentColor;
+  fill: none;
+  opacity: 0.55;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+.map-legend button[data-action="escort-overlay"][aria-pressed="true"] {
+  border-color: #7ae5ad;
+  color: #7ae5ad;
+  background: #16382f;
+}
+.world-map .land-front.advancing,
+.world-map .land-front.retreating,
+.world-map .island-front.advancing {
+  animation: front-sweep 2.4s ease-in-out infinite alternate;
+  stroke-dasharray: 7 5;
+}
+.world-map .island-front.advancing {
+  stroke-dasharray: 4 3;
+}
+.world-map[data-paused="true"] .land-front,
+.world-map[data-paused="true"] .island-front {
+  animation-play-state: paused;
+}
+@keyframes front-sweep {
+  from {
+    stroke-dashoffset: -5;
+    opacity: 1;
+  }
+  to {
+    stroke-dashoffset: 5;
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-map .land-front,
+  .world-map .island-front {
+    animation: none;
+  }
+}
+
+/* interface15.css */
+/* Flat ministry navigation and consolidated, independently rendered pages. */
+.sidebar nav {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  min-height: 0;
+}
+.sidebar .nav-item {
+  font-size: 15px;
+  line-height: 1.25;
+  padding: 10px 7px;
+  gap: 9px;
+  min-height: 39px;
+}
+.sidebar .nav-item > span {
+  font-size: 11px;
+  min-width: 18px;
+}
+.sidebar .nav-item > b {
+  font-size: 11px;
+  margin-left: auto;
+}
+.view-programs .workspace-inner,
+.view-aircraft .workspace-inner,
+.view-review .workspace-inner {
+  overflow-y: auto;
+}
+.view-programs .facility-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.view-programs .program-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+.view-programs .production-panel {
+  margin-bottom: 12px;
+}
+.facility-card .school-graduation {
+  margin: 5px 0 7px;
+}
+.facility-card .school-graduation .timed-progress {
+  margin: 0;
+  height: 42px;
+}
+.facility-card .school-graduation > small {
+  margin-top: 3px;
+  font-size: 11px;
+}
+.facility-card .facility-effect {
+  flex: 1;
+}
+.view-aircraft .aircraft-models {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.view-aircraft .aircraft-models article {
+  padding: 10px;
+  background: #172935;
+}
+.view-aircraft .aircraft-models h3 {
+  font-size: 17px;
+  margin: 5px 0;
+}
+.view-aircraft .aircraft-models p {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 6px 0;
+}
+.view-aircraft .aircraft-models small {
+  font-size: 11px;
+  line-height: 1.4;
+}
+.catalog-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.catalog-tools button,
+.catalog-tools select {
+  font-size: 12px;
+  padding: 6px 9px;
+  height: 32px;
+}
+.register-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.register-summary > div {
+  padding: 9px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.register-summary strong,
+.register-summary small {
+  display: block;
+}
+.register-summary strong {
+  font-size: 17px;
+  color: var(--gold);
+}
+.register-summary small {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.view-fleet .register-note {
+  margin-top: 10px;
+}
+.view-fleet .table-scroll {
+  max-height: none;
+  overflow: visible;
+}
+.view-review .recovery-panel {
+  margin-top: 10px;
+}
+.budget-panel {
+  margin-bottom: 12px;
+}
+.budget-panel .panel-title button {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+.budget-balances {
+  display: flex;
+  gap: 24px;
+  margin: 7px 0 10px;
+  font-size: 13px;
+}
+.budget-balances b {
+  font-size: 19px;
+}
+.budget-panel td,
+.economy-panel td {
+  font-size: 12px;
+  padding: 7px;
+}
+.budget-panel th,
+.economy-panel th {
+  font-size: 11px;
+}
+.view-command .selected-manifest .fleet-popup-grid {
+  display: block;
+}
+.view-command .selected-manifest .manifest-grid {
+  max-height: none;
+  overflow: visible;
+}
+.view-command .selected-manifest .formation-manifest {
+  margin-top: 6px;
+}
+@media (min-width: 1900px) {
+  .view-programs .program-grid,
+  .view-aircraft .aircraft-models {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-height: 800px) {
+  .sidebar .nav-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: 35px;
+  }
+  .sidebar .side-country {
+    margin-bottom: 5px;
+  }
+}
+@media (max-width: 1100px) {
+  .view-programs .facility-grid,
+  .view-programs .program-grid,
+  .view-aircraft .aircraft-models {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .register-filters input {
+    width: 180px;
+  }
+}
+
+/* interface16.css */
+/* Compact navigation, persistent selection, and explicit operating budgets. */
+.game-shell {
+  grid-template-columns: 186px minmax(0, 1fr);
+}
+.sidebar {
+  width: auto;
+  min-width: 0;
+  padding-left: 9px;
+  padding-right: 9px;
+}
+.sidebar .nav-item {
+  gap: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: 14px;
+}
+.sidebar .nav-item > span {
+  min-width: 16px;
+  font-size: 10px;
+}
+.sidebar .side-country {
+  overflow-wrap: anywhere;
+}
+.bulk-fleet-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  padding: 7px 0;
+  min-height: 45px;
+}
+.bulk-fleet-tools button {
+  font-size: 12px;
+  padding: 6px 9px;
+}
+.bulk-fleet-tools > span {
+  font-size: 12px;
+  margin-right: auto;
+}
+.fleet-table .select-hull {
+  width: 30px;
+  text-align: center;
+}
+.select-hull input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.fleet-table tr.is-selected {
+  background: #bda15b20;
+}
+.facility-spending {
+  display: grid;
+  gap: 3px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0;
+  margin: 5px 0;
+  font-size: 12px;
+}
+.facility-spending span {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+}
+.facility-spending b {
+  white-space: nowrap;
+  color: var(--gold);
+}
+.resource-breakdown {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.resource-breakdown h3 {
+  font-size: 17px;
+  margin: 4px 0 8px;
+}
+.resource-breakdown dl {
+  margin: 6px 0;
+}
+.resource-breakdown dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 0;
+  border-bottom: 1px solid #ffffff10;
+}
+.resource-breakdown dt {
+  color: var(--muted);
+}
+.resource-breakdown dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.resource-breakdown .positive {
+  color: var(--green);
+}
+.resource-breakdown .negative {
+  color: var(--red);
+}
+.resource-breakdown p {
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+.resource-bar > [data-resource] {
+  cursor: help;
+}
+.resource-bar > [data-resource]:focus-visible {
+  outline: 1px solid var(--gold);
+}
+.aviation-base-wing {
+  font-size: 12px;
+}
+.aviation-base-wing ul {
+  padding-left: 16px;
+  margin: 5px 0;
+}
+.aviation-base-wing small {
+  display: block;
+}
+
+:root {
+  --sidebar: 186px;
+}
+.sidebar {
+  width: var(--sidebar);
+}
+.game-body {
+  margin-left: var(--sidebar);
+  width: calc(100% - var(--sidebar));
+}
+
+.view-programs .facility-card > p:first-of-type {
+  min-height: 0;
+}
+.view-programs .facility-card .facility-effect {
+  min-height: 2.8em;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.workspace .facility-card .facility-next {
+  min-height: 2.8em;
+}
+.workspace .facility-card .expansion-cost {
+  min-height: 1.4em;
+}
+.facility-card .school-graduation > small {
+  margin-top: 1px;
+}
+.facility-card .school-graduation {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+/* interface17.css */
+.register-summary > button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: left;
+  background: var(--panel);
+  padding: 10px 12px;
+  min-width: 0;
+  border: 1px solid var(--line);
+}
+.register-summary > button strong {
+  font-size: 18px;
+}
+.register-summary > button small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.register-summary > button:hover {
+  border-color: var(--gold);
+}
+.fleet-register-section {
+  scroll-margin-top: 8px;
+}
+.selected-manifest .manifest-grid {
+  max-height: none;
+  overflow: visible;
+}
+.facility-expansion .facility-effect {
+  margin: 0 0 8px;
+}
+.facility-card .facility-expansion {
+  margin-top: auto;
+}
+.relation-history {
+  font-size: 12px;
+  line-height: 1.35;
+  display: grid;
+  gap: 3px;
+  padding: 7px 0;
+  min-height: 72px;
+}
+.relation-history p {
+  margin: 0;
+}
+.relation-history .positive {
+  color: var(--green);
+}
+.relation-history .negative {
+  color: var(--red);
+}
+.relation-warning {
+  padding: 7px 0;
+}
+.relation-warning .timed-progress {
+  width: 100%;
+}
+.pact-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pact-summary article {
+  flex: 1 1 210px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.pact-summary strong,
+.pact-summary small {
+  display: block;
+}
+.pact-summary small {
+  color: var(--muted);
+  margin-top: 4px;
+}
+.diplomatic-dispatch {
+  width: min(640px, calc(100vw - 36px));
+  max-height: calc(100vh - 90px);
+}
+.diplomatic-dispatch header {
+  padding: 18px 22px 8px;
+}
+.diplomatic-dispatch h2 {
+  margin: 7px 0;
+}
+.diplomatic-dispatch .modal-body {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.dispatch-options {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dispatch-options button {
+  min-height: 42px;
+}
+
+.government-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Stable full-width diplomacy controls, including cooldown replacements. */
+.government .government-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+.government-actions > .action-slot,
+.government-actions > .timed-progress {
+  width: 100%;
+  min-height: 50px;
+  height: 50px;
+  box-sizing: border-box;
+}
+.government {
+  min-width: 0;
+  align-self: start;
+}
+.government .deployment-state {
+  display: block;
+  min-height: 3em;
+  margin-top: 8px;
+}
+.government h2 {
+  min-height: 2.4em;
+}
+.government-aircraft > summary {
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 14px 0;
+}
+.aircraft-models [data-aircraft] {
+  cursor: help;
+}
+
+.draft-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.draft-quote {
+  flex-wrap: wrap;
+}
+.draft-weights span {
+  min-width: 0;
+  overflow: hidden;
+}
+.component-designer .draft-fields {
+  grid-template-columns: repeat(5, minmax(100px, 1fr));
+}
+.world-map [data-action]:focus,
+.world-map:focus {
+  outline: none;
+}
+.world-map .map-hit {
+  fill: transparent !important;
+  stroke: none !important;
+  pointer-events: all;
+}
+.chart-focus {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  pointer-events: none;
+}
+.chart-focus circle {
+  vector-effect: non-scaling-stroke;
+}
+.chart-focus .focus-underlay {
+  stroke: #000;
+  stroke-width: 4;
+}
+.world-map .political-territory:hover {
+  stroke: #fff;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.fleet-command-row {
+  display: block;
+  cursor: pointer;
+}
+.fleet-command-row strong,
+.fleet-command-row small,
+.fleet-command-row .fleet-composition {
+  display: block;
+}
+.inline-fleet-orders {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+  margin-top: 6px;
+}
+.inline-fleet-orders select,
+.inline-fleet-orders button {
+  padding: 5px;
+  font-size: 11px;
+  min-width: 0;
+}
+.inline-fleet-orders label {
+  grid-column: 1/-1;
+  font-size: 11px;
+  margin: 2px 0;
+}
+.view-command .workspace-inner,
+.view-land .workspace-inner,
+.view-airwar .workspace-inner {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+.land-campaign-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 7px 0;
+  padding: 9px;
+}
+.land-campaign-card strong,
+.land-campaign-card small {
+  display: block;
+  margin: 4px 0;
+}
+.world-command .command-side-panel {
+  min-width: 220px;
+  width: clamp(220px, 16vw, 275px);
+}
+.world-command {
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 16vw, 275px);
+}
+.world-command .command-side-panel .fleet-command-list {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  grid-template-rows: none;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+.world-command .command-side-panel .fleet-command-row {
+  display: block;
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  padding: 8px;
+  overflow: visible;
+}
+.world-command .command-side-panel .fleet-command-row > div:first-child {
+  display: block;
+  min-width: 0;
+  cursor: pointer;
+}
+.world-command .command-side-panel .fleet-command-row strong,
+.world-command .command-side-panel .fleet-command-row .fleet-composition,
+.world-command .command-side-panel .fleet-command-row small {
+  display: block;
+  position: static;
+  white-space: normal;
+  margin: 2px 0;
+  line-height: 1.25;
+  overflow: visible;
+}
+.world-command .command-side-panel .fleet-command-row > .inline-fleet-orders {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px;
+  gap: 5px;
+  margin-top: 7px;
+  min-width: 0;
+}
+.world-command .command-side-panel .inline-fleet-orders select {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  height: 30px;
+  padding: 4px;
+}
+.world-command .command-side-panel .inline-fleet-orders button {
+  width: 48px;
+  height: 30px;
+  min-height: 30px;
+  margin: 0;
+  padding: 4px;
+}
+.world-command .command-side-panel .inline-fleet-orders label {
+  display: flex;
+  grid-column: 1/-1;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 3px 0 0;
+  white-space: normal;
+  font-size: 12px;
+}
+.world-command .command-side-panel .inline-fleet-orders input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+.world-command .command-side-panel > .panel-title {
+  margin: 0 0 9px;
+  padding-bottom: 5px;
+}
+.growth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.economy-growth {
+  margin: 12px 0;
+}
+.growth-grid p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.view-command .world-command,
+.view-land .world-command,
+.view-airwar .world-command {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(220px, 16vw, 275px);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+.world-command .world-board {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+.world-command .command-side-panel {
+  grid-column: 2;
+  grid-row: 1;
+  width: auto;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.battle-progress { margin: .45rem 0; color: #e4bd74; display: grid; gap: .35rem; }
+.battle-progress small { font-size: .8rem; }
+.battle-stages { display:flex; gap:3px; }
+.battle-stages span { flex:1; padding:5px 3px; font-size:.72rem; border-bottom:3px solid #364655; color:#91a2ad; }
+.battle-stages .done {border-color:#6c917f;}
+.battle-stages .active {border-color:#e4bd74;color:#f1d19c;}
+.battle-progress progress {width:100%;height:5px;accent-color:#e4bd74;}
+.result.ongoing,.alert-chip .ongoing {color:#e4bd74;}
+/* Resource rates and map inspections share stable, readable dimensions. */
+.game-body .resource-bar > div { min-height: 63px; justify-content: center; }
+.game-body .resource-bar .resource-change { display:block; margin-top:3px; font-size:10px; line-height:1.2; white-space:nowrap; color:var(--muted); }
+.game-body .resource-bar .resource-change.negative { color:var(--red); }
+.game-body .resource-bar .resource-change.positive { color:var(--green); }
+.resource-detail { display:block; color:var(--muted); font-size:10px; line-height:1.2; }
+.class-hover.resource-hover { width:min(570px,94vw); }
+.class-hover.base-hover { width:min(840px,94vw); padding:14px; }
+.class-hover.base-hover .inspection-list { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; margin:8px 0; }
+.class-hover.base-hover .inspection-list > div { grid-template-columns:1fr 1.1fr; font-size:12px; gap:10px; padding:4px 0; }
+.class-hover.base-hover p { font-size:12px; line-height:1.4; margin:6px 0; }
+.class-hover.base-hover .aviation-base-wing ul { display:grid; grid-template-columns:1fr 1fr; gap:4px 24px; }
+.fleet-command-row.selected { border-color:var(--gold); background:#66532050; box-shadow:inset 4px 0 var(--gold); }
+.facility-bonus { font-size:12px; line-height:1.4; color:var(--gold); }
+.formula { font-size:12px; line-height:1.5; padding:7px 9px; background:#ffffff07; border-left:2px solid var(--gold); }
+.resource-aircraft-types { width:100%; font-size:11px; border-collapse:collapse; }
+.resource-aircraft-types th { text-align:right; font-weight:500; color:var(--muted); }
+.resource-aircraft-types th:first-child,.resource-aircraft-types td:first-child { text-align:left; }
+.resource-aircraft-types td { text-align:right; padding:3px 4px; }
+.class-hover.base-hover { pointer-events:none; }

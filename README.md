@@ -1,52 +1,45 @@
 # WNT1922
 
-Playable naval grand strategy for Windows.
+A naval strategy sandbox with The Treaty System (1922) and In Good Faith (1936), each with seven playable nations.
 
-## Download and play
+## Current version
 
-### [Download WNT1922 0.19.0 — portable Windows executable](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe)
+This repository contains the game source and required assets. Portable executable builds are distributed through GitHub Releases.
 
-**One self-contained `.exe` for Windows 10/11, 64-bit.** The game, runtime, music and required libraries are included. No installer, administrator rights, Node.js or separate browser installation is needed.
+Version 0.26 adds 15-minute simulation ticks, independent GDP/GTP growth, delivery-based logistics, additive industry expansions, reserve-aircraft retirement and expanded resource explanations. Start a new campaign for these rules.
 
-1. Download **WNT1922-0.19.0-portable-win-x64.exe** from the link above.
-2. Double-click it and wait for the bundled game to open.
-3. Choose a nation and start a **new campaign** for this version.
+## Edit and build
 
-Share that single `.exe` with testers. Downloads are public; a GitHub account is not required. Play works offline. The launcher temporarily unpacks its files and removes them after closing; saves remain in `%APPDATA%\WNT1922\saves` between runs.
+1. Edit the relevant source files below.
+2. Double-click **Build.cmd**. It validates the catalogs and assets, then creates the portable EXE and its SHA-256 checksum in `dist/`.
+3. Run **Play-WNT1922.cmd** to test it.
 
-[Release notes](https://github.com/site815/WNT1922/releases/tag/v0.19.0) · [SHA-256 checksum](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe.sha256) · [Build from source and manual Git sync](docs/building.md)
+The portable build includes its browser engine, simulation, catalogs, maps, music and required notices. Playing requires no installation, separate browser, Node.js or internet connection. Saves are written to `%APPDATA%\WNT1922\saves`. New releases may require a new campaign. The executable is currently unsigned.
 
-This beta is unsigned, so Windows may show an unknown-publisher warning. For bug reports, include the version, campaign, nation and steps to reproduce; attach an exported save when useful.
+Building requires Windows and Node.js 24 or later. The first build downloads pinned, checksum-verified Electron and NSIS tools. Subsequent builds reuse `.build/cache/`. There is no npm install step, transpiler, generated game database, browser copy, installer target or documentation exporter.
 
-## About the game
+For a mechanics change, run the regression suite before distributing:
 
-Release **0.19.0** has two campaign buttons: **The Treaty System — 6 February 1922** and **In Good Faith — 1 January 1936**. Choose the United Kingdom, the United States, Japan, France, Italy, Germany or the Soviet Union. The campaign is scored in 1950 and continues afterward.
+```powershell
+node --test --test-isolation=none --test-skip-pattern="all selectable countries|multi-year campaign" tests/*.test.mjs
+```
 
-Ten main menus cover fleet missions, ship and aircraft catalogs, a merged fleet register, facilities and research, diplomacy, battle reports, naval record, and economy. School panels show graduation progress. Manage resources, shipyards, fleet missions, diplomacy and naval preparation. Automatic battles use ship specifications, air wings, logistics, training, morale, scouting and escape speed. The Equal Earth map shows fleets, scouted contacts, convoys, ports, capitals and supply-sensitive land campaigns.
+The two additional long-campaign tests can be run by omitting the skip pattern. `node tools/check.mjs` checks every live catalog and all 14 opening states. `node tools/check-portable.mjs` tests the packaged executable when the optional Playwright test driver is available; that driver is not shipped.
 
-Simulation uses one-minute operations in a worker separate from the interface, with selectable speeds up to 100,000× and measured actual speed. The large map opens selections in a narrow right-hand command panel; friendly movement targets 60 fps. Wartime contact alerts expire when reports become stale. Saves remain local. Start a new campaign for the revised opening balance.
+## Source layout
 
-- [Controls, mechanics, balance and development commands](game/README.md)
-- [Validation and performance evidence](game/VALIDATION.md)
-- [Release audit and proposed improvements](game/AUDIT-0.17.md)
-- [Technology tree: all fourteen branches and 126 levels](docs/tech-tree.md)
-- [All seven national platform/equipment catalogs, both campaigns](docs/playable/README.md)
-- [Complete 14-start catalog review](docs/reviews/catalog-14-starts.html)
-- [Operational air warfare: automatic sorties, CAP, weather and shore aviation](docs/operational-air-warfare.md)
-- [Monthly economic growth and civilian shipping](docs/economic-growth.md)
-- [Campaign sources and provisional estimates](game/data/CAMPAIGN-SOURCES.md)
-- [Strategic port tiers, trade weights and historical references](docs/strategic-ports.md)
-- [Music credits and licenses](game/assets/music/CREDITS.md)
-- [Map sources and license](game/data/MAP-SOURCES.md)
-- [Windows builds, saves, Git and release workflow](docs/building.md)
-- [Complete asset audit](docs/asset-audit.md) · [Redistribution notices](THIRD_PARTY_NOTICES.md)
+| Folder | Owns |
+| --- | --- |
+| [ui](ui/README.md) | Screens, controls, hover details, map animation, audio playback, one stylesheet |
+| [catalog](catalog/README.md) | Editable Markdown data: common rules/catalogs, 1922, 1936 hindsight |
+| [mechanics](mechanics/README.md) | Shared calculations, simulation systems, legal actions and AI policy |
+| [worker](worker/README.md) | Catalog/asset loading, simulation scheduling, snapshots, portable desktop host |
+| assets | Maps, soundtrack, provenance, licenses and required runtime sources |
+| tests | Regression and architecture checks |
+| tools | Validation and the single portable build pipeline |
 
-The original four detailed hindsight canon sets remain in `docs/hindsight/`, alongside the three new programs. Historical bases are in `data/ships/`; new playable supplements are in `data/playable/`. Builds read these data, and generated Markdown catalogs are checked against them.
+`.build/`, `dist/` and `test-output/` are disposable local output. They are excluded from Git. Git synchronization remains manual; this workflow does not publish or push anything.
 
-Promotional fiction, manga, multiplayer and set-piece battle modes are outside this build.
+Catalog documents are **the runtime data**, not a description of a separate database. Displayed names and blurbs belong in their data fields. Dynamic orders, damage, resources and player-created designs belong to campaign saves. See [catalog editing](catalog/README.md).
 
-Release 0.16 adds physical base aviation, ferry and merchant reinforcement, finite aviation stores, explicit coastal battery reach, bulk fleet selection, detailed resource accounts, funding costs and fifteen music tracks. [Base aviation and its historical/provisional assumptions](docs/base-aviation.md).
-
-Release 0.17 adds historical opening diplomacy, monthly relationship context, irrevocable 1–12 month war warnings, declaration popups and defensive alliance calls. All four facilities start at 50% and stay under manual funding control. [Diplomacy rules](docs/diplomacy.md) · [Beta distribution plan](docs/beta-release.md).
-
-Release 0.19 completes the aircraft overhaul: three-year naval and other-service generations, explicit aircraft compatibility, daylight/weather, search sectors, assembly, CAP/escorts, flights and deck cycles. Aircraft remain accounted for while airborne and can divert after carrier loss. Government maritime reinforcements travel by ferry or merchant transport. Japan’s 1936 program is preserved.
+Third-party attribution is available in the game and in [the asset notices](assets/licenses/third-party-notices.html).
