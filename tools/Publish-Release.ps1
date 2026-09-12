@@ -66,7 +66,7 @@ if ($release.draft) {
     }
     if (-not $DraftOnly) { $releaseFields.make_latest = 'true' }
     $body = $releaseFields | ConvertTo-Json
-    $release = Invoke-RestMethod -Method Patch -Uri ($api + '/' + $release.id) -Headers $headers -ContentType 'application/json' -Body $body
+    $release = Invoke-RestMethod -Method Patch -Uri ($api + '/' + $release.id) -Headers $headers -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($body))
 }
 if ($DraftOnly) {
     Write-Output ('Release assets verified; publication deferred: ' + $release.html_url)
