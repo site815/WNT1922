@@ -1,12 +1,12 @@
 # Building and distributing WNT1922
 
-## Windows download
+## Portable Windows download
 
-Distribute the complete `dist/WNT1922-0.19.0-win-x64.zip` and its `.sha256` file. Extract the entire folder before opening `WNT1922.exe`. Do not distribute the executable alone: DLLs, resources, licenses and source notices are required. Builds are unsigned until the owner supplies a signing certificate; Windows may show an unknown-publisher prompt.
+Distribute **[WNT1922-0.19.0-portable-win-x64.exe](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe)**. This is the only tester distribution format. The public release also provides its SHA-256 checksum. Download and double-click the executable; the complete game and runtime are embedded. No installation, administrator rights, Node.js or separate browser is required. Windows 10/11 x64 is supported. The beta is unsigned, so Windows may show an unknown-publisher prompt.
 
-The application uses its bundled Electron runtime and opens in a maximized normal window. It binds a random loopback port and makes no telemetry requests. Internet access is unnecessary for play. Renderer Node access is disabled, context isolation and sandboxing are enabled, and the simulation worker remains separate from the UI. External credit links open in the system browser.
+The launcher expands the game into a fresh temporary directory, starts it, waits for normal shutdown, then removes those temporary files. It does not register an installation, create shortcuts or write to Program Files. Allow about 1 GB of free temporary storage. Saves stay in `%APPDATA%\WNT1922\saves`, including a previous-save backup. Replacing or sharing the executable never includes or removes a player's campaign. New beta versions may require a new campaign.
 
-Saves are stored in `%APPDATA%\WNT1922\saves`, with a previous-save backup. A normal close waits for the latest worker snapshot to save. Closing after a save error requires an explicit choice. Browser-development saves remain in `game/saves`. New releases may require new campaigns; the portable ZIP never contains a player's save.
+The game uses its bundled Electron runtime and opens in a maximized normal window. It binds a random loopback port and makes no telemetry requests. Play works offline. Renderer Node access is disabled; context isolation, sandboxing and the separate simulation worker remain enabled. External credit links open in the system browser. A normal close waits for the latest campaign snapshot to save; a save error presents an explicit choice before closing.
 
 ## Rebuild from source
 
@@ -20,14 +20,30 @@ node --test --test-isolation=none --test-skip-pattern='old campaign migration|un
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/Package-Windows.ps1
 ```
 
-The packaging script downloads a pinned official runtime, verifies its SHA-256, builds from source, audits asset hashes and assembles an explicit allowlist. Output contains a per-file manifest and archive checksum. It recreates only the versioned folder inside `dist`; player saves are never touched. `node tools/verify-package.mjs dist/WNT1922-0.19.0-win-x64` checks an extracted package against its manifest and current source build.
+The script verifies the pinned official Electron archive, builds an allowlisted game folder, audits assets and wraps the folder in a single executable with NSIS 3.12. Both tools are pinned by SHA-256. NSIS's launcher and the selected zlib compression module use the [zlib/libpng license](https://nsis.sourceforge.io/Docs/AppendixI.html); the compiler's unmodified license text is in `licenses/NSIS-LICENSE.txt` and embedded in the portable. The compiler itself is not shipped. Electron's component notices and corresponding source archives remain embedded with the game. No license rights are changed by the wrapper.
 
-The release suite excludes obsolete save-migration fixtures and multi-decade soak runs, following the established release checks. Endurance runs are separate (`tools/check-long-campaigns.mjs`). For executable UI checks, install the test-only driver with `npm install --no-save --ignore-scripts --package-lock=false playwright@1.62.1` and run `node tools/check-desktop.mjs`; neither Playwright nor npm is included in the game.
+The intermediate `dist/WNT1922-<version>-win-x64` folder is for assembly and verification. Distribute the resulting **`dist/WNT1922-<version>-portable-win-x64.exe`**; the adjacent `.exe.sha256` records its checksum. `node tools/verify-package.mjs dist/WNT1922-0.19.0-win-x64` verifies the intermediate payload. `tools/Package-Portable.ps1` can rewrap an already verified folder without rebuilding the game.
 
-Normal builds use committed map JSON. Regenerating maps is optional and needs Python plus `tools/map-requirements.txt`; see [map provenance](../game/data/MAP-SOURCES.md). After a deliberate, reviewed asset change, update the asset manifest and notices. Do not bypass the audit for unexplained hash changes.
+Install the test-only driver with `npm install --no-save --ignore-scripts --package-lock=false playwright@1.62.1`, then run **`node tools/check-portable.mjs`**. This starts the distributed executable with Node removed from PATH, verifies every extracted payload file, plays both starts, checks saves/reopening and confirms temporary cleanup. Profiles are isolated from real saves. Playwright and the test driver are not shipped. The release suite excludes obsolete save-migration fixtures and separate multi-decade soak runs; see [validation](../game/VALIDATION-0.19.0.md).
 
-## Git and build artifacts
+Normal builds use committed map JSON. Optional map regeneration needs Python and `tools/map-requirements.txt`; see [map provenance](../game/data/MAP-SOURCES.md). The source checkout can run `Play-WNT1922.cmd` for development. That launcher is not a tester distribution.
 
-Source, canonical data, reviewed assets and provenance belong in Git. Generated public/staging folders, executable ZIPs, saves, credentials, caches and research scans are ignored. The initial repository is private; no open-source license has been assigned to original game code or scenarios. Third-party material retains its own license.
+## Manual local / GitHub sync
 
-The Windows GitHub Actions workflow runs tests and assembles an artifact on version tags or manual dispatch. It does not publish a store page or make the repository public. Download the resulting artifact from the Actions run and share the game ZIP with authorized testers. Retain all notices and source material accompanying the package. Update source, desktop and game package versions together before tagging another release.
+The source repository is public at [site815/WNT1922](https://github.com/site815/WNT1922). Public visibility does not grant an open-source license to original game code or scenarios; third-party materials retain their own terms. Credentials, saves, generated builds, test output, caches and research scans remain ignored.
+
+At each completed major change, review the diff, run the relevant checks, commit the reviewed files and **manually push** them. There are no automatic push hooks, schedules or background sync jobs.
+
+```powershell
+git fetch origin
+git status -sb
+git diff
+# Stage only the files belonging to the completed change.
+git add README.md
+git commit -m "Describe the completed change"
+git push origin main
+```
+
+If another computer updated `main`, merge or rebase those changes before pushing, preserving local work. Do not force-push to synchronize. Verify `git rev-parse HEAD` matches `git rev-parse origin/main` after a successful push.
+
+For a new tested version, update the game and desktop version files, manually push its tag, then upload the portable executable and checksum to that GitHub release and update the README's direct download link. The Windows Actions workflow tests and builds on a pushed version tag or manual dispatch; it does not push commits or publish release downloads automatically. Its retained build artifact contains only the executable and checksum. GitHub's generated source archives are source checkouts, not playable downloads.

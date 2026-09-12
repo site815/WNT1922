@@ -1,6 +1,24 @@
 # WNT1922
 
-Playable naval grand strategy for Windows. For a distributable build, extract the whole **WNT1922 Windows ZIP** and open **WNT1922.exe**. No separate Node.js or browser installation is required. The source checkout also supports **Play-WNT1922.cmd** and [local browser play](http://127.0.0.1:19222/).
+Playable naval grand strategy for Windows.
+
+## Download and play
+
+### [Download WNT1922 0.19.0 — portable Windows executable](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe)
+
+**One self-contained `.exe` for Windows 10/11, 64-bit.** The game, runtime, music and required libraries are included. No installer, administrator rights, Node.js or separate browser installation is needed.
+
+1. Download **WNT1922-0.19.0-portable-win-x64.exe** from the link above.
+2. Double-click it and wait for the bundled game to open.
+3. Choose a nation and start a **new campaign** for this version.
+
+Share that single `.exe` with testers. Downloads are public; a GitHub account is not required. Play works offline. The launcher temporarily unpacks its files and removes them after closing; saves remain in `%APPDATA%\WNT1922\saves` between runs.
+
+[Release notes](https://github.com/site815/WNT1922/releases/tag/v0.19.0) · [SHA-256 checksum](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe.sha256) · [Build from source and manual Git sync](docs/building.md)
+
+This beta is unsigned, so Windows may show an unknown-publisher warning. For bug reports, include the version, campaign, nation and steps to reproduce; attach an exported save when useful.
+
+## About the game
 
 Release **0.19.0** has two campaign buttons: **The Treaty System — 6 February 1922** and **In Good Faith — 1 January 1936**. Choose the United Kingdom, the United States, Japan, France, Italy, Germany or the Soviet Union. The campaign is scored in 1950 and continues afterward.
 

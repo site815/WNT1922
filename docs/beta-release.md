@@ -1,13 +1,9 @@
 # Beta distribution
 
-Updated for release 0.18.2, 11 September 2026.
+The public GitHub [README](https://github.com/site815/WNT1922#download-and-play) links directly to the current portable Windows executable. Distribute that single `.exe` to testers. It includes the game, runtime, music, notices and runtime sources; no installer or separately installed dependencies are required. The release also supplies a checksum. No other tester distribution format is offered.
 
-The first distribution is a portable Windows x64 ZIP with its own runtime. Extract everything and open WNT1922.exe; retain DLLs, resources, notices and runtime source archives. Saves live in the user's application-data folder. See [building and distribution](building.md).
+The launcher unpacks temporary game files and cleans them up on normal exit. Saves persist in the user's application-data folder. See [building, testing and manual Git sync](building.md).
 
-The source repository is private. GitHub Actions can build a downloadable Windows artifact from version tags or manual runs. This does not publish a storefront or make the source public. Keep the repository private unless the owner chooses otherwise; no open-source license has been assigned to the original game.
+For reports, include the game version, campaign, nation, reproduction steps, expected and actual behavior, and an exported save when useful. The game does not upload telemetry or saves automatically. The beta is unsigned.
 
-For an initial external test group, a [Restricted itch.io page](https://itch.io/docs/creators/access-control) remains an option: it supports private downloads and individual download keys. No itch.io page has been created. Begin with a small invited cohort and ask for game version, campaign, nation, reproduction steps, resolution/scaling, expected and actual behavior, and an optional exported save. The game collects no telemetry.
-
-The earlier political-map license restriction was removed by replacing the geometry with public-domain Natural Earth data and independent approximate overlays. Music permits commercial redistribution with CC BY 4.0 attribution; the runtime retains its component terms. [Asset audit](asset-audit.md) · [Notices](../THIRD_PARTY_NOTICES.md). Keep these materials intact when distributing builds.
-
-The beta is unsigned. Code signing and an installer can follow if broader distribution warrants them. A browser release would still need browser-based save persistence and relative asset paths for hosting; the Windows package preserves the existing save server locally.
+The public source repository retains its existing game license. Public-domain map data, CC BY 4.0 music and runtime components retain their respective terms. Their notices are included in the executable. [Asset audit](asset-audit.md) · [Notices](../THIRD_PARTY_NOTICES.md).

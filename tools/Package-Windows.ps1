@@ -37,8 +37,4 @@ Copy-Item -LiteralPath 'desktop/source-lock.json' -Destination $packagedSources
 Copy-Item -LiteralPath 'licenses/RUNTIME-SOURCES.md' -Destination $packagedSources
 & $releaseNode tools/verify-package.mjs $resolvedOutput --write-manifest
 if ($LASTEXITCODE -ne 0) { throw 'Package verification failed.' }
-$archivePath = $resolvedOutput + '.zip'
-Compress-Archive -LiteralPath $resolvedOutput -DestinationPath $archivePath -Force -CompressionLevel Optimal
-$archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
-Set-Content -LiteralPath ($archivePath + '.sha256') -Value ($archiveHash + '  ' + [IO.Path]::GetFileName($archivePath)) -Encoding ascii
-Write-Output ('Windows executable package ready: ' + $archivePath)
+& (Join-Path $PSScriptRoot 'Package-Portable.ps1')

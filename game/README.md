@@ -2,9 +2,9 @@
 
 Release 0.19 adds [automatic operational air warfare](../docs/operational-air-warfare.md). Air engagements now resolve through scheduled sorties; older descriptions of combined instantaneous carrier/surface power below refer to strategic estimates. Aircraft use separate naval and government ledgers, explicit basing and physical reinforcement. The main test build is the Windows portable executable.
 
-# WNT1922 — playable Windows build 0.18.1
+# WNT1922 — playable Windows build 0.19.0
 
-Double-click **Play-WNT1922.cmd** in the project root, or open [the running game](http://127.0.0.1:19222/). The launcher opens a maximized app window with normal Alt-Tab switching. Menu also offers fullscreen. Play and saves remain on this computer. For distribution, extract the entire Windows ZIP and run WNT1922.exe. The runtime is bundled. See [build instructions](../docs/building.md).
+Download and run the **[self-contained portable executable](https://github.com/site815/WNT1922/releases/download/v0.19.0/WNT1922-0.19.0-portable-win-x64.exe)**. The game opens maximized with normal Alt-Tab switching; Menu also offers fullscreen. Play and saves remain on this computer. For source development, `Play-WNT1922.cmd` runs the local checkout. See [build instructions and manual Git sync](../docs/building.md).
 
 ## Start and controls
 

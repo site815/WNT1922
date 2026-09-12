@@ -28,13 +28,13 @@ jobs:
       - name: Install executable test driver (not included in game)
         run: npm install --no-save --ignore-scripts --package-lock=false playwright@1.62.1
       - name: Test executable launch, gameplay and save/reopen
-        run: node tools/check-desktop.mjs
-      - name: Upload distributable ZIP and checksum
+        run: node tools/check-portable.mjs
+      - name: Upload portable executable and checksum
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: WNT1922-Windows-x64
+          name: WNT1922-portable-exe
           path: |
-            dist/*.zip
-            dist/*.sha256
+            dist/*-portable-win-x64.exe
+            dist/*-portable-win-x64.exe.sha256
           if-no-files-found: error
           retention-days: 30

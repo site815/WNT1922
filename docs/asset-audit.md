@@ -12,6 +12,7 @@ Reviewed 11 September 2026. Scope: all game asset files, generated maps, browser
 | Fonts | Operating-system fonts; no font binaries or remote font services. |
 | Ship/aircraft/scenario data | Factual specifications and authored scenario text. Research citations remain; source scans are excluded. |
 | Windows runtime | Official, unmodified Electron 44.3.0 archive verified against the release's SHA-256. Runtime license files and corresponding source information accompany the package. |
+| Portable launcher | NSIS 3.12, with its zlib compression module; compiler SHA-256 pinned in `desktop/portable-tool-lock.json`. Both selected components use zlib/libpng terms. Unmodified `licenses/NSIS-LICENSE.txt` is embedded; the build compiler is not distributed. Added 12 September 2026. |
 | Development tools | Git, GitHub CLI, Python/map libraries and browser testing tools are not shipped with the game. |
 
 Natural Earth's [terms](https://www.naturalearthdata.com/about/terms-of-use/) permit commercial adaptation and redistribution. The composer's [licensing page](https://incompetech.com/music/royalty-free/licenses/) supplies CC BY 4.0 credits; [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) permits commercial use with its attribution and notice conditions. These conditions remain in force independently of any license chosen for the game itself.

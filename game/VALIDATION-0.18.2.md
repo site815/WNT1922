@@ -13,4 +13,4 @@ Artifact: `dist/WNT1922-0.18.2-win-x64.zip`.
 
 SHA-256: `857e0da1f4410242f1df68fc5745fa60e6a36ef33a8e709e352c5a882bab853d`.
 
-Operational air warfare and the revised aircraft roster remain unfinished and are excluded. [Session record](../docs/reviews/SESSION-2026-09-12.md) · [Full catalog review](../docs/reviews/catalog-14-starts.html).
+Operational air warfare and the revised aircraft roster were excluded from 0.18.2; their completed validation is recorded in [0.19.0](VALIDATION-0.19.0.md). [Full catalog review](../docs/reviews/catalog-14-starts.html).
