@@ -1,19 +1,22 @@
+import { aircraftFitsShip, aircraftBasing } from './aircraft-compatibility.mjs';
+import { governmentProduction, governmentCapacity, navalBaseCapacity } from './government-aviation.mjs';
 import { PORTS,NODES,HOME_PORT,seaRoute,routeLength,distanceNm } from './world.mjs';
 import { campaignMinutes } from './campaign-clock.mjs';
 import { portSpec } from './port-catalog.mjs';
 import { fleetPosition,merchantCount,convoyCoverage } from './task-forces.mjs';
-import { aircraftModels,aircraftSeats,loseAircraft,staffAircraft } from './naval-resources.mjs';
+import { aircraftModels,operationalAircraftModels,governmentModel,modelAvailable,aircraftSeats,loseAircraft,staffAircraft } from './naval-resources.mjs';
 import { aviationOwner,aviationStockCapacity,addWing,allocatedWings,freeAircraft,airWarehouse,chooseAirWarehouse,modelFerryKm,shipAirLocation,aircraftRoleFits,wingTargets,suppliesExpense,aviationLog } from './base-aviation.mjs';
 const pair=(a,b)=>[a,b].sort().join('-');
 const total=wings=>wings.reduce((v,w)=>v+w.count,0);
 const MAINLAND={USA:['san_diego','mare_island','puget','norfolk'],GBR:['scapa','portsmouth','rosyth'],JPN:['yokosuka','sasebo','kure'],FRA:['brest','toulon'],ITA:['la_spezia','taranto'],DEU:['kiel','wilhelmshaven'],SOV:['leningrad','sevastopol','vladivostok']};
 export const landSupplied=(id,port)=>port===HOME_PORT[id]||MAINLAND[id]?.includes(port);
 function carrier(s,c,id,g){return g.count&&g.status==='active'&&['CV','CVL'].includes(c.classes[g.classId].type)&&g.health>.5;}
-function endpoints(s,c,id){const n=s.nations[id];return [...Object.keys(n.airBases).filter(p=>aviationOwner(s,p)===id&&(portSpec(s,p).aircraft>0||p===airWarehouse(s,id))&&(s.ports[p]?.health??1)>.15).map(p=>({key:p,position:NODES[p]})),...n.groups.filter(g=>carrier(s,c,id,g)).map(g=>({key:g.id,position:shipAirLocation(s,n,g)}))];}
+function endpoints(s,c,id,aircraft){const n=s.nations[id];return [...Object.keys(n.airBases).filter(p=>aviationOwner(s,p)===id&&(portSpec(s,p).aircraft>0||p===airWarehouse(s,id))&&(s.ports[p]?.health??1)>.15).map(p=>({key:p,position:NODES[p]})),...n.groups.filter(g=>carrier(s,c,id,g)&&aircraftBasing(aircraft).carrier).map(g=>({key:g.id,position:shipAirLocation(s,n,g)}))];}
 function endpoint(s,n,key){if(PORTS[key])return aviationOwner(s,key)===n.id?NODES[key]:null;const g=n.groups.find(g=>g.id===key);return g?.count&&g.status==='active'&&g.health>.5?shipAirLocation(s,n,g):null;}
 export function ferryPath(s,c,id,from,to,aircraft){
  const n=s.nations[id],start=endpoint(s,n,from),end=endpoint(s,n,to),range=modelFerryKm(aircraft)/1.852;if(!start||!end||!range)return null;
- const points=endpoints(s,c,id);if(!points.some(p=>p.key===to))points.push({key:to,position:end});
+ if(!PORTS[to]&&!aircraftFitsShip(aircraft,c.classes[n.groups.find(g=>g.id===to)?.classId]))return null;
+ const points=endpoints(s,c,id,aircraft);if(!points.some(p=>p.key===to))points.push({key:to,position:end});
  const queue=[[from]],seen=new Set([from]);for(let i=0;i<queue.length;i++){const route=queue[i],last=endpoint(s,n,route.at(-1));for(const p of points){if(seen.has(p.key)||distanceNm(last,p.position)>range)continue;const next=[...route,p.key];if(p.key===to)return next;seen.add(p.key);queue.push(next);}}return from===to?[from]:null;
 }
 export function shippingRisk(s,c,id,route,destination){
@@ -25,14 +28,15 @@ export function shippingRisk(s,c,id,route,destination){
  }return risk;
 }
 function sourceWing(s,c,id,model,role,count,source){
- const n=s.nations[id],a=aircraftModels(c,id).find(a=>a.id===model),base=n.airBases[source],stored=base?.reserve.find(w=>w.model===model&&w.count>0);
+ const n=s.nations[id],a=operationalAircraftModels(c,id).find(a=>a.id===model),base=n.airBases[source],stored=base?.reserve.find(w=>w.model===model&&w.count>0);
  let taken,crewed;if(stored){taken=Math.min(count,stored.count);crewed=Math.min(taken,stored.crewed||0);stored.count-=taken;stored.crewed-=crewed;}
- else {taken=source===airWarehouse(s,id)?Math.min(count,freeAircraft(n)[model]||0):0;const people=allocatedWings(n).reduce((v,w)=>v+(w.crewed||0)*aircraftSeats(aircraftModels(c,id).find(a=>a.id===w.model)),0);crewed=Math.min(taken,Math.floor(Math.max(0,n.aviators-people)/aircraftSeats(a)));}
+ else {taken=source===airWarehouse(s,id)?Math.min(count,freeAircraft(n)[model]||0):0;const gov=governmentModel(a),models=new Map(operationalAircraftModels(c,id).map(a=>[a.id,a])),people=allocatedWings(n).filter(w=>governmentModel(models.get(w.model))===gov).reduce((v,w)=>v+(w.crewed||0)*aircraftSeats(models.get(w.model)),0);crewed=Math.min(taken,Math.floor(Math.max(0,(gov?n.governmentAviators:n.aviators)-people)/aircraftSeats(a)));}
  return {model,role,count:taken,crewed};
 }
 function putDestination(s,c,id,t){
- const n=s.nations[id],base=n.airBases[t.destination],g=n.groups.find(g=>g.id===t.destination),capacity=base?Math.floor(portSpec(s,t.destination).aircraft*(s.ports[t.destination]?.health??1)):g?(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)*g.count:0;
- const wings=base?.airWing||g?.airWing;if(!wings||!endpoint(s,n,t.destination))return false;if(t.diverting&&base){for(const w of t.airWing)addWing(base.reserve,w);t.airWing=[];return true;}
+ const n=s.nations[id],government=governmentModel(operationalAircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model)),base=n.airBases[t.destination],g=n.groups.find(g=>g.id===t.destination),capacity=base?(government?governmentCapacity(s,t.destination):navalBaseCapacity(s,t.destination)):g?(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)*g.count:0;
+ if(g&&t.airWing.some(w=>!aircraftFitsShip(operationalAircraftModels(c,id).find(a=>a.id===w.model),c.classes[g.classId])))return false;
+ const wings=(base?(government?(base.governmentWing??=[]):base.airWing):g?.airWing);if(!wings||!endpoint(s,n,t.destination))return false;if(t.diverting&&base){for(const w of t.airWing)addWing(base.reserve,w);t.airWing=[];return true;}
  for(const w of t.airWing){
   // Modernization returns replaced airframes to local storage. At-sea carriers
   // only fill empty spots; replacement is performed while in port.
@@ -44,12 +48,13 @@ function putDestination(s,c,id,t){
  t.airWing=[];t.supplies=0;return true;
 }
 function beginLeg(s,c,id,t){const n=s.nations[id],from=endpoint(s,n,t.path[t.leg]),to=endpoint(s,n,t.path[t.leg+1]);if(!from||!to)return false;
- const a=aircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model);if(distanceNm(from,to)*1.852>modelFerryKm(a))return false;
+ const a=operationalAircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model);if(distanceNm(from,to)*1.852>modelFerryKm(a))return false;
  const base=n.airBases[t.path[t.leg]],fuel=total(t.airWing)*.5;if(base){if(base.supplies<fuel)return false;base.supplies-=fuel;}
  t.route=[from,to];t.departAt=campaignMinutes(s);t.arriveAt=t.departAt+Math.max(20,distanceNm(from,to)*1.852/Math.max(110,(a.performance?.speed_kmh?.cruise||a.performance?.speed_kmh?.sea_level||240)*.7)*60);return true;
 }
 export function dispatchAviation(s,c,id,{source=airWarehouse(s,id),destination,model=null,role='strike',count=0,supplies=0,replace=false}={}){
- const n=s.nations[id],now=campaignMinutes(s),a=aircraftModels(c,id).find(a=>a.id===model);if(!source||!n.airBases[source]||aviationOwner(s,source)!==id||!destination||!endpoint(s,n,destination))return null;if(count&&(!a||a.type_year>new Date(s.day*86400000).getUTCFullYear()||!n.aircraftUnlocked.includes(model)||!aircraftRoleFits(a,role)))return null;
+ const n=s.nations[id],now=campaignMinutes(s),a=operationalAircraftModels(c,id).find(a=>a.id===model);if(!source||!n.airBases[source]||aviationOwner(s,source)!==id||!destination||!endpoint(s,n,destination))return null;if(count&&(!a||a.type_year>new Date(s.day*86400000).getUTCFullYear()||!modelAvailable(s,n,a)||!aircraftRoleFits(a,role)))return null;
+ if(count&&!PORTS[destination]&&!aircraftFitsShip(a,c.classes[n.groups.find(g=>g.id===destination)?.classId]))return null;
  const flight=count&&a?ferryPath(s,c,id,source,destination,a):null,domestic=PORTS[source]&&PORTS[destination]&&landSupplied(id,source)&&landSupplied(id,destination),mode=flight&&!supplies&&(n.airBases[source]?.supplies||0)>=count*.5?'ferry':domestic?'rail':'merchant';
  let destinationPort=PORTS[destination]?destination:null,route,shipCount=0;
  if(mode==='merchant'){
@@ -70,7 +75,7 @@ export function dispatchAviation(s,c,id,{source=airWarehouse(s,id),destination,m
 }
 function failTransfer(s,c,id,t){const n=s.nations[id];
  if(t.mode==='ferry'&&!t.diverting){
-  const position=t.route.at(-1),a=aircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model),remaining=modelFerryKm(a)-distanceNm(t.route[0],position)*1.852;
+  const position=t.route.at(-1),a=operationalAircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model),remaining=modelFerryKm(a)-distanceNm(t.route[0],position)*1.852;
   const ports=Object.keys(n.airBases).filter(port=>aviationOwner(s,port)===id&&portSpec(s,port).aircraft>0&&(s.ports[port]?.health??1)>.15&&distanceNm(position,NODES[port])*1.852<=remaining).sort((a,b)=>distanceNm(position,NODES[a])-distanceNm(position,NODES[b]));
   if(ports.length){const port=ports[0];t.diverting=true;t.destination=port;t.path=[port,port];t.leg=0;t.route=[position,NODES[port]];t.departAt=campaignMinutes(s);t.arriveAt=t.departAt+Math.max(20,distanceNm(position,NODES[port])*1.852/180*60);aviationLog(s,n,'Flight diverted to '+PORTS[port].name+'; destination no longer reachable.');return;}
  }
@@ -91,7 +96,7 @@ export function minuteAviation(s,c){
    }
    if(now<t.arriveAt)continue;
    if(t.mode==='ferry'){
-    const to=endpoint(s,n,t.path[t.leg+1]||t.destination),a=aircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model);
+    const to=endpoint(s,n,t.path[t.leg+1]||t.destination),a=operationalAircraftModels(c,id).find(a=>a.id===t.airWing[0]?.model);
     if(!to||distanceNm(t.route[0],to)*1.852>modelFerryKm(a)){failTransfer(s,c,id,t);continue;}
     if(t.leg<t.path.length-2){t.leg++;if(!beginLeg(s,c,id,t)){failTransfer(s,c,id,t);continue;}t.departAt+=120;t.arriveAt+=120;continue;}
    }
@@ -106,15 +111,15 @@ export function dailyAviation(s,c){
  const now=campaignMinutes(s);
  for(const [id,n]of Object.entries(s.nations)){
   if(!n.airBases)continue;
-  if(n.airWarehousePort&&aviationOwner(s,n.airWarehousePort)!==id){const models=aircraftModels(c,id);let people=Math.max(0,Math.floor(n.aviators)-allocatedWings(n).reduce((v,w)=>v+w.crewed*aircraftSeats(models.find(a=>a.id===w.model)),0));const stores=Object.entries(freeAircraft(n)).filter(([,count])=>count>0).map(([model,count])=>{const cost=aircraftSeats(models.find(a=>a.id===model)),crewed=Math.min(count,Math.floor(people/cost));people-=crewed*cost;return {model,role:'strike',count,crewed};});loseAircraft(s,c,id,{airWing:stores},1,{rescue:.15,airframeRescue:0});aviationLog(s,n,'The aircraft warehouse was overrun; its remaining airframes were lost.');n.airWarehousePort=null;}
+  if(n.airWarehousePort&&aviationOwner(s,n.airWarehousePort)!==id){const models=operationalAircraftModels(c,id);let people=Math.max(0,Math.floor(n.aviators)-allocatedWings(n).reduce((v,w)=>v+w.crewed*aircraftSeats(models.find(a=>a.id===w.model)),0));const stores=Object.entries(freeAircraft(n)).filter(([,count])=>count>0).map(([model,count])=>{const a=models.find(a=>a.id===model),cost=aircraftSeats(a),crewed=governmentModel(a)?count:Math.min(count,Math.floor(people/cost));if(!governmentModel(a))people-=crewed*cost;return {model,role:'strike',count,crewed};});loseAircraft(s,c,id,{airWing:stores},1,{rescue:.15,airframeRescue:0});aviationLog(s,n,'The aircraft warehouse was overrun; its remaining airframes were lost.');n.airWarehousePort=null;}
   if(!n.airWarehousePort)n.airWarehousePort=chooseAirWarehouse(s,id);const hub=airWarehouse(s,id),war=Object.values(s.relations).some(r=>r.war&&[r.a,r.b].includes(id));
   for(const [port,base]of Object.entries(n.airBases)){
-   if(aviationOwner(s,port)!==id){for(const wings of [base.airWing,base.reserve])loseAircraft(s,c,id,{airWing:wings},1,{rescue:.15,airframeRescue:0});delete n.airBases[port];continue;}
-   base.supplies=Math.max(0,base.supplies-total(base.airWing)*(war?.12:.02));
+   if(aviationOwner(s,port)!==id){for(const wings of [base.airWing,base.governmentWing||[],base.reserve])loseAircraft(s,c,id,{airWing:wings},1,{rescue:.15,airframeRescue:0});delete n.airBases[port];continue;}
+   base.supplies=Math.max(0,base.supplies-total([...base.airWing,...(base.governmentWing||[])])*(war?.12:.02));
    if(landSupplied(id,port))base.supplies+=suppliesExpense(n,Math.max(0,aviationStockCapacity(s,port)-base.supplies));
   }
-  for(const port of Object.keys(PORTS))if(aviationOwner(s,port)===id&&!n.airBases[port])n.airBases[port]={airWing:[],reserve:[],supplies:0,lastSortie:-1e9,nextDispatch:-1e9};
-  if(!hub)continue;
+  for(const port of Object.keys(PORTS))if(aviationOwner(s,port)===id&&!n.airBases[port])n.airBases[port]={airWing:[],governmentWing:[],reserve:[],supplies:0,lastSortie:-1e9,nextDispatch:-1e9};
+  if(!hub)continue;governmentProduction(s,c,id);
   let budget=8;
   for(const [port,base]of Object.entries(n.airBases)){
    if(!budget||!portSpec(s,port).aircraft||now<base.nextDispatch)continue;
@@ -122,14 +127,15 @@ export function dailyAviation(s,c){
     const t=dispatchAviation(s,c,id,{destination:port,supplies:Math.min(360,aviationStockCapacity(s,port)-base.supplies)});base.nextDispatch=now+1440;if(t)budget--;
    }
   }
-  const recipients=[...n.groups.filter(g=>g.status==='active'&&g.count&&(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)>0).map(g=>({key:g.id,wings:g.airWing,capacity:(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)*g.count,carrier:!!c.classes[g.classId].air})),...Object.entries(n.airBases).map(([port,b])=>({key:port,wings:b.airWing,capacity:Math.floor(portSpec(s,port).aircraft*(s.ports[port]?.health??1)),carrier:true}))];
+  const recipients=[...n.groups.filter(g=>g.status==='active'&&g.count&&(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)>0).map(g=>({key:g.id,wings:g.airWing,capacity:(c.classes[g.classId].air+c.classes[g.classId].scoutAircraft)*g.count,carrier:!!c.classes[g.classId].air})),...Object.entries(n.airBases).map(([port,b])=>({key:port,wings:b.airWing,capacity:navalBaseCapacity(s,port),carrier:true,government:false})),...Object.entries(n.airBases).map(([port,b])=>({key:port,wings:b.governmentWing??=[],capacity:governmentCapacity(s,port),government:true,carrier:true}))];
   for(const r of recipients){if(!budget||!r.capacity||n.airTransfers.some(t=>t.destination===r.key||t.finalDestination===r.key))continue;
-   const targets=wingTargets(r.capacity,r.carrier),available=aircraftModels(c,id).filter(a=>n.aircraftUnlocked.includes(a.id)&&a.type_year<=new Date(s.day*86400000).getUTCFullYear());
+   const recipientShip=n.groups.find(g=>g.id===r.key),fits=a=>governmentModel(a)===!!r.government&&(!recipientShip||aircraftFitsShip(a,c.classes[recipientShip.classId]));
+   const targets=r.government?{scout:Math.floor(r.capacity*.4),strike:r.capacity-Math.floor(r.capacity*.4)}:wingTargets(r.capacity,r.carrier),available=operationalAircraftModels(c,id).filter(a=>fits(a)&&modelAvailable(s,n,a));
    for(const role of Object.keys(targets))if(!available.some(a=>aircraftRoleFits(a,role))){const recipient=['strike','fighter','scout'].find(role=>available.some(a=>aircraftRoleFits(a,role)));if(recipient){targets[recipient]=(targets[recipient]||0)+targets[role];delete targets[role];}}
    for(const [role,desired]of Object.entries(targets)){
     const existing=r.wings.filter(w=>w.role===role).reduce((v,w)=>v+w.count,0),spare=r.capacity-total(r.wings);const group=n.groups.find(g=>g.id===r.key),modernize=(!group||!group.atSea)&&r.wings.some(w=>w.role===role&&w.count>0);if((existing>=desired||spare<=0)&&!modernize)continue;
-    const models=aircraftModels(c,id).filter(a=>n.aircraftUnlocked.includes(a.id)&&a.type_year<=new Date(s.day*86400000).getUTCFullYear()&&aircraftRoleFits(a,role)).sort((a,b)=>b.type_year-a.type_year);
-    let sent=false;for(const a of models){const old=r.wings.find(w=>w.role===role&&w.count>0&&aircraftModels(c,id).find(m=>m.id===w.model)?.type_year<a.type_year),replace=existing>=desired||spare<=0;if(replace&&!old)continue;const sources=[...Object.entries(n.airBases).filter(([,b])=>b.reserve.some(w=>w.model===a.id&&w.count>0)).map(([p])=>p),...(freeAircraft(n)[a.id]>0?[hub]:[])];
+    const models=available.filter(a=>aircraftRoleFits(a,role)).sort((a,b)=>b.type_year-a.type_year);
+    let sent=false;for(const a of models){const old=r.wings.find(w=>w.role===role&&w.count>0&&operationalAircraftModels(c,id).find(m=>m.id===w.model)?.type_year<a.type_year),replace=existing>=desired||spare<=0;if(replace&&!old)continue;const sources=[...Object.entries(n.airBases).filter(([,b])=>b.reserve.some(w=>w.model===a.id&&w.count>0)).map(([p])=>p),...(freeAircraft(n)[a.id]>0?[hub]:[])];
      for(const source of sources){const t=dispatchAviation(s,c,id,{source,destination:r.key,model:a.id,role,count:replace?Math.min(6,old.count):Math.min(6,desired-existing,spare),replace});if(t){budget--;sent=true;break;}}if(sent)break;
     }if(sent)break;
    }

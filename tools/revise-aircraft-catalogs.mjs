@@ -9,7 +9,7 @@ for(const [id,prefix]of Object.entries(nations)){
  for(const [campaign,part]of Object.entries(data.campaigns)){
   part.aircraftReference??=structuredClone(part.aircraft);
   if(id==='JPN'&&campaign==='in_good_faith_1936'){
-   part.aircraft=structuredClone(part.aircraftReference).map(a=>({...a,basing:{carrier:true,floatplane:/multirole/.test(a.role),land:true},catalogKind:'naval'}));
+   part.aircraft=structuredClone(part.aircraftReference).map(a=>({...a,basing:{carrier:true,floatplane:/multirole/.test(a.role)||!!a.variants?.floatplane||(a.kits||[]).some(k=>/flt/.test(k)),land:true},catalogKind:'naval'}));
   }else{
    part.aircraft=[];
    for(let year=1921;year<=1950;year+=3){
@@ -27,8 +27,8 @@ for(const [id,prefix]of Object.entries(nations)){
   }
   part.armyAircraft=[];
   for(let year=1921;year<=1950;year+=3){if(id==='DEU'&&year<1936)continue;const t=year-1921;
-   for(const role of ['patrol','torpedo'])part.armyAircraft.push({id:prefix+'_shore_'+role+'_'+year,nation:id,name:id+' '+(role==='patrol'?'maritime patrol flying boat':'land-based torpedo aircraft')+' · '+year,type_year:year,role:role==='patrol'?'maritime_patrol':'maritime_strike',catalogKind:'government',generation:year,readOnly:true,
-    basing:{carrier:false,floatplane:false,land:true,flyingBoat:role==='patrol'},crew:{normal:role==='patrol'?(year<1933?4:7):(year<1933?3:5)},
+   for(const role of ['patrol','torpedo'])part.armyAircraft.push({id:prefix+'_shore_'+role+'_'+year,nation:id,name:id+' '+(role==='patrol'?(year<1936?'coastal patrol flying boat':'long-range maritime patrol'):(year<1933?'shore torpedo biplane':year<1942?'twin-engine maritime bomber':'long-range maritime strike'))+' · '+year,type_year:year,role:role==='patrol'?'maritime_patrol':'maritime_strike',catalogKind:'government',generation:year,readOnly:true,
+    basing:{carrier:false,floatplane:false,land:true,flyingBoat:role==='patrol'&&year<1942},crew:{normal:role==='patrol'?(year<1933?4:7):(year<1933?3:5)},
     cost_gold:0,weights:{empty_kg:Math.round((role==='patrol'?3500:2400)+t*210)},performance:{speed_kmh:{cruise:Math.round((role==='patrol'?145:170)+t*6)}},fuel:{combat_radius_km:Math.round(((role==='patrol'?450:320)+t*(role==='patrol'?35:23))*doctrine[id].radius)},
     notes:'Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type.'});
   }

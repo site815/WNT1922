@@ -1,3 +1,6 @@
+import { minuteAirOperations, combatAirPatrol, loseCAP, addAirLoss } from './air-operations.mjs';
+import { airConditions } from './air-conditions.mjs';
+import { initializeGovernmentAviation } from './government-aviation.mjs';
 import { initializeEconomy, closeEconomicMonth } from './economic-growth.mjs';
 import { initializeDiplomacy, beginWarWarning, commenceWar, monthlyRelations, politicsTick, historicalWarnings, formAlliance, diplomaticPressure, validPoliticalDecision, applyPoliticalDecision, dispatchPopup } from './war-politics.mjs';
 import { coastalRecon } from './shore-recon.mjs';
@@ -16,8 +19,8 @@ import { upgradeLevel, openingLevels } from './levels.mjs';
 import { PROFILES, PRIORITIES, REGIONS, fleetService, submarineAttack } from './catalog.mjs';
 import { economyFor, PROGRAMS, RULES } from './balance.mjs';
 import { campaignMinutes, canonicalMinute, setCampaignMinutes, openingTimeline, adjustEuropeanTimeline } from './campaign-clock.mjs';
-import { initializeOperations, applyStandingOrders, commissionToFleet, dailyOperations, minuteOperations, availableGroup, invalidateOperations, orderFleet, detachRepairs, setRoute, usablePorts, fleetStats, fleetPosition, MISSIONS } from './task-forces.mjs';
-import { initializeResources, dailyResources, facilityBudget, productionBlock, airPower, loseAircraft, allocateAircraft, staffAircraft, aircraftModels, aircraftPrice, orderAircraft, planeRole } from './naval-resources.mjs';
+import { initializeOperations, applyStandingOrders, commissionToFleet, dailyOperations, minuteOperations, availableGroup, sinkMerchants, invalidateOperations, orderFleet, detachRepairs, setRoute, usablePorts, fleetStats, fleetPosition, MISSIONS } from './task-forces.mjs';
+import { initializeResources, dailyResources, facilityBudget, productionBlock, airPower, loseAircraft, allocateAircraft, staffAircraft, operationalAircraftModels, aircraftModels, aircraftPrice, orderAircraft, planeRole } from './naval-resources.mjs';
 import { supplyDetails } from './logistics.mjs';
 import { contentFor, DEFAULT_CAMPAIGN } from './campaign-content.mjs';
 import { recordCasualties } from './recovery.mjs';
@@ -87,7 +90,7 @@ export function initializeCampaign(s,content){
     for(const p of [...n.projects])if(p.key==='base'){const unspent=p.remaining/p.days;for(const k of ['gold','influence','industry'])n[k]+=(p.paid[k]||0)*unspent;n.projects.splice(n.projects.indexOf(p),1);}
   }
   initializeWorld(s);initializePorts(s);
-  initializeOperations(s,content);initializeBaseAviation(s,content);
+  initializeOperations(s,content);initializeBaseAviation(s,content);initializeGovernmentAviation(s,content);
   for(const id of Object.keys(s.nations)){staffSailors(s,content,id);allocateAircraft(s,content,id);}
   organizeSupport(s,content);
   if(!s.timeline){s.timeline=openingTimeline(s.seed,s.campaignId);if(s.relations[pairKey('GBR','DEU')].war){s.timeline.polandOccurred=true;s.timeline.europeOccurred=true;}}
@@ -388,7 +391,7 @@ export function advanceMinutes(s,content,minutes,{respectPause=false}={}){
     const next=Math.min(target,minute,event),oldDay=s.day;setCampaignMinutes(s,next);
     if(s.day!==oldDay){daily(s,content);content=contentFor(content,s);}
     historicalEvents(s,content);
-    if(campaignMinutes(s)===minute){minuteOperations(s,content,(a,b,r,fa,fb,pos)=>resolveBattle(s,content,a,b,r,fa,fb,pos),(a,b,count,pos,fleet,grt)=>{recordWarRaid(s,a,b,grt);if(count>0)addAlert(s,'Merchant shipping attacked',PROFILES[a].name+' sank '+count+' merchant hulls belonging to '+PROFILES[b].name+'.','convoy',{a,b,count,grt,position:pos,fleet});});minuteAviation(s,content);coastalRecon(s,content);minutePortOperations(s,content,(id,f,port,kind,distance)=>resolvePortAction(s,content,id,f,port,kind,distance));if(minute%60===0)updatePortBlockades(s,content);s.minuteTicks=(s.minuteTicks||0)+1;decisionDeadlines(s,content);}
+    if(campaignMinutes(s)===minute){minuteOperations(s,content,(a,b,r,fa,fb,pos)=>resolveBattle(s,content,a,b,r,fa,fb,pos),(a,b,count,pos,fleet,grt)=>{recordWarRaid(s,a,b,grt);if(count>0)addAlert(s,'Merchant shipping attacked',PROFILES[a].name+' sank '+count+' merchant hulls belonging to '+PROFILES[b].name+'.','convoy',{a,b,count,grt,position:pos,fleet});});minuteAviation(s,content);coastalRecon(s,content);minutePortOperations(s,content,(id,f,port,kind,distance)=>resolvePortAction(s,content,id,f,port,kind,distance));minuteAirOperations(s,content,(id,op,pos)=>resolveAirAttack(s,content,id,op,pos));if(minute%60===0)updatePortBlockades(s,content);s.minuteTicks=(s.minuteTicks||0)+1;decisionDeadlines(s,content);}
   }
   return campaignMinutes(s)-start;
 }
@@ -476,6 +479,7 @@ export function engagementEscapeChance(weak,strong){
 export function resolveBattle(s,content,a,b,region,fleetA=null,fleetB=null,position=null){
   const pa=fleetPower(s,content,a,region,fleetA),pb=fleetPower(s,content,b,region,fleetB);if(!pa.ships||!pb.ships)return null;
   const fa=s.nations[a].fleets.find(f=>f.id===fleetA),fb=s.nations[b].fleets.find(f=>f.id===fleetB);
+  pa.total-=pa.air;pb.total-=pb.air;pa.air=0;pb.air=0;
   if(fa)pa.speed=fleetStats(s,content,a,fa).maxSpeed*Math.max(.4,fleetStats(s,content,a,fa).health);
   if(fb)pb.speed=fleetStats(s,content,b,fb).maxSpeed*Math.max(.4,fleetStats(s,content,b,fb).health);
   const wa=matchup(pa,pb),wb=matchup(pb,pa),weaker=wa<wb?a:b,weak=weaker===a?pa:pb,strong=weaker===a?pb:pa;
@@ -512,7 +516,7 @@ export function resolvePortAction(s,c,a,f,port,kind,distance=0){
   const b=portOwner(s,port);if(!s.relations[pairKey(a,b)]?.war)return null;
   const before=portSummary(s,c,port),pa=fleetPower(s,c,a,null,f.id,distance*1.852);if(!pa.ships)return null;
   const position=fleetPosition(s,f),region=Object.values(AREAS).sort((x,y)=>distanceNm(x.point,position)-distanceNm(y.point,position))[0].region;
-  const artillery=distance<=before.gunRange?before.artillery:0,air=flyBaseSorties(s,c,port,distance*1.852),aviation=air.strike;
+  pa.total-=pa.air;pa.air=0;const artillery=distance<=before.gunRange?before.artillery:0,air={...baseAirPower(s,c,port,distance*1.852),strike:0,fighters:0},aviation=0;
   if(kind==='shore'&&artillery+aviation<=0)return null;
   const pb={surface:artillery,air:aviation,sub:0,asw:100,aa:before.artillery*.2+air.fighters,scout:air.scout,total:artillery+aviation,ships:0,speed:0,supply:1};
   const va=.94+rng(s)*.12,vb=.94+rng(s)*.12,attack=(pa.air/(1+air.fighters/Math.max(300,pa.air))+(distance<=18?pa.surface*.55:0))*va;
@@ -576,3 +580,40 @@ export function chooseDecision(s,content,key,optionId,{automatic=false}={}){cons
   s.completedEvents.push(key);s.decisions=s.decisions.filter(x=>x.key!==key);addLog(s,`${d.title}: ${o.label}.`,'cabinet');s.log[0].dismissed=true;if(automatic)addAlert(s,'Deadline reached: '+d.title,o.label+'. '+o.detail,'cabinet');normalizeDecisions(s);
 }
 export function campaignScores(s,content){return Object.keys(s.nations).map(id=>{const n=s.nations[id],power=fleetPower(s,content,id).total,base=s.initial?.[id]?.power||power;const strength=Math.round(clamp(power/Math.max(1,base),0,3)*150),economy=Math.round(n.commerce*2+upgradeLevel(n.tech,'industry')*30),readinessScore=Math.round((n.training+n.morale+n.logistics)*0.8),war=Math.round(n.battlesWon*20-n.battlesLost*12+Math.min(150,n.sunkTons/1000));return {id,score:strength+economy+readinessScore+war,power,commerce:n.commerce,strength,economy,readiness:readinessScore,war};}).sort((a,b)=>b.score-a.score);}
+
+// Scheduled maritime air action. Remote aircraft cannot inflict gunfire on a
+// carrier hundreds of kilometers away; CAP and flak fight the airborne wing.
+export function resolveAirAttack(s,c,a,op,position){
+ const b=op.targetNation,n=s.nations[a],enemy=s.nations[b],f=n.fleets.find(f=>f.id===op.fleetId),target=enemy.fleets.find(f=>f.id===op.targetId),port=op.targetKind==='port'?op.targetId:null;
+ const region=Object.values(AREAS).sort((x,y)=>distanceNm(x.point,position)-distanceNm(y.point,position))[0].region,models=new Map(operationalAircraftModels(c,a).map(m=>[m.id,m]));
+ const cap=combatAirPatrol(s,c,b,{fleetId:target?.id,port}),sourcePower=f?fleetPower(s,c,a,null,f.id):{supply:Math.max(.25,s.ports[op.sourcePort]?.health??1)},distance=op.outboundKm,conditions=airConditions(s,position);
+ const quality=w=>1+Math.max(0,(models.get(w.model)?.type_year||1922)-1930)*.035;
+ const strike=op.airWing.filter(w=>w.role==='strike').reduce((v,w)=>v+w.crewed*quality(w),0),escorts=op.airWing.filter(w=>w.role==='fighter').reduce((v,w)=>v+w.crewed*quality(w),0);
+ const shore=port?portSummary(s,c,port):null,pb=target?fleetPower(s,c,b,null,target.id):{surface:0,air:0,sub:0,asw:0,aa:shore?shore.artillery*.2:30,scout:0,total:0,ships:0,speed:0,supply:shore?.coverage||1};
+ const capInterception=cap.power/(1+escorts/Math.max(1,cap.power)),flak=Math.max(0,pb.aa-cap.power*2),variation=.94+rng(s)*.12;
+ const survival=1/(1+capInterception/Math.max(5,strike)*.9+flak/Math.max(500,strike*50)*.2),proficiency=(.5+n.training/100*.65)*(.65+n.morale/100*.5)*Math.max(.25,sourcePower.supply);
+ const recentWarning=enemy.contacts.some(x=>x.nation===a&&campaignMinutes(s)-x.seenAt<360&&distanceNm(x.position,op.position)<120),surprise=port&&!recentWarning?1.2:1;
+ const attack=strike*12*proficiency*survival*conditions.launch*variation*surprise*(f?.aggressiveBattle?1.4:1);
+ const pa={surface:0,air:attack,sub:0,asw:0,aa:escorts*2,scout:0,total:attack,ships:0,speed:0,supply:sourcePower.supply};pb.air=cap.power*10;pb.surface=0;pb.sub=0;pb.asw=0;pb.total=flak+pb.air;
+ const da=damageFleet(s,c,a,region,0,pb,'air combat',null,.4,1,[]);
+ const airLoss=loseAircraft(s,c,a,op,clamp(.025+capInterception/Math.max(8,strike+escorts)*.14+flak/Math.max(1500,strike*80)*.1,.025,.65)*(f?.aggressiveBattle?1.15:1),{rescue:.25,airframeRescue:0});addAirLoss(da,airLoss);
+ let db,merchantGRT=0,merchantHulls=0;
+ if(op.targetKind==='convoy'){
+  const convoy=enemy.convoys.find(x=>x.id===op.targetId);if(!convoy)return null;
+  const loss=sinkMerchants(s,b,Math.min(convoy.count,Math.floor(attack/160+rng(s))),{details:true});merchantHulls=loss.hulls;merchantGRT=loss.grt;convoy.count-=loss.hulls;convoy.lastBattle=campaignMinutes(s);n.merchantSunk+=loss.hulls;n.merchantSunkGRT+=loss.grt;recordWarRaid(s,a,b,loss.grt);
+  db=damageFleet(s,c,b,region,0,pa,'maritime air attack',null,.4,1,[]);
+ }else{
+  const ships=port?anchoredShips(s,c,b,port):null,tonnage=port?ships.reduce((v,g)=>v+c.classes[g.classId].tons*g.count,0):fleetStats(s,c,b,target).tons;
+  const fraction=clamp(attack/Math.max(2000,tonnage*.12)*.32,0,.4);
+  db=damageFleet(s,c,b,region,fraction,pa,port?'anchorage air strike':'maritime air strike',target?.id||null,port?.8:.4,1,ships);addAirLoss(db,loseCAP(s,c,b,cap,clamp(escorts/Math.max(5,cap.power)*.08,.01,.3)));
+ }
+ let portDamage=0;if(port){portDamage=damagePort(s,port,clamp(attack/Math.max(4000,shore.combat)*.02,0,.1));for(const wings of [enemy.airBases[port]?.airWing,enemy.airBases[port]?.governmentWing])if(wings)addAirLoss(db,loseAircraft(s,c,b,{airWing:wings},clamp(attack/10000,0,.16),{rescue:.8,airframeRescue:.15}));}
+ const costA=da.planesLost*40,costB=db.tons+db.damagedTons*.65+db.planesLost*40+portDamage*60000+merchantGRT*.2,winner=costB>costA?a:b,magnitude=Math.max(costA,costB)>=Math.max(1000,Math.min(costA,costB)*2)?'major':'minor';
+ const preparation=id=>({training:s.nations[id].training,morale:s.nations[id].morale,supply:id===a?pa.supply:pb.supply,crew:1});
+ const report={id:s.nextId++,day:s.day,minute:campaignMinutes(s),kind:port?'port':'air',operation:port?'anchorage':'strike',portId:port,portDamage,portHealth:port?s.ports[port].health:1,portEquivalent:portDamage*60000,position,region,a,b,fleetA:f?.id||null,fleetB:target?.id||null,winner,magnitude,upset:false,upsetSide:null,airOperation:{source:op.sourcePort?PORTS[op.sourcePort].name:f?.name||'Naval strike',light:conditions.light,weather:conditions.weather,strikes:op.strikes,escorts:op.escorts,cap:cap.count,assembly:op.assembly,distanceKm:Math.round(distance),surprise:surprise>1,merchantHulls,merchantGRT},powerA:pa,powerB:pb,effectiveA:attack,effectiveB:pb.total,variationA:variation,variationB:1,resultA:da,resultB:db,preparationA:preparation(a),preparationB:preparation(b)};
+ n.sunkTons+=db.tons;enemy.sunkTons+=da.tons;for(const id of [a,b])s.nations[id][id===winner?'battlesWon':'battlesLost']++;
+ recordWarBattle(s,report);s.reports.unshift(report);s.reports=s.reports.slice(0,80);if(target)detachRepairs(s,c,b,target.id,position);
+ staffAircraft(s,c,a);staffAircraft(s,c,b);invalidateOperations(s);
+ if([a,b].includes(s.player))addAlert(s,(magnitude==='major'?'Major ':'Minor ')+(winner===s.player?'victory':'defeat')+' · air action',op.strikes+' strike aircraft / '+op.escorts+' escorts met '+cap.count+' CAP fighters. '+(merchantHulls?merchantHulls+' merchants sunk ('+Math.round(merchantGRT)+' GRT). ':resultComposition(db,'sunk')+' sunk; '+resultComposition(db,'damaged')+' damaged. ')+da.planesLost+' attacking and '+db.planesLost+' defending aircraft lost.','battle',{a,b,winner,reportId:report.id});
+ return report;
+}

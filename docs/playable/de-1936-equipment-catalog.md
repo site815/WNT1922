@@ -10,7 +10,7 @@
 
 ---
 
-Generated, reviewable catalog for release 0.18.2. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/de.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
+Generated, reviewable catalog for release 0.19.0. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/de.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
 
 Campaign opens 1936-01-01. Future designs are listed for planning; listing is not permission to build an obsolete or superseded line. No merchant or support hull contributes to the warship total.
 
@@ -20,296 +20,1060 @@ Provisional allocation: 60% of port aircraft slots, rounded down; only models av
 
 | Base | Aircraft slots | Stationed models and roles | Fully crewed aircraft | Aviation stores (sortie units) |
 |---|---:|---|---:|---:|
-| Kiel | 60 | 36 Seeschwalbe (scout) | 36 | 720 |
-| Wilhelmshaven | 60 | 36 Seeschwalbe (scout) | 36 | 720 |
+| Kiel | 60 | 15 DEU naval fighter · 1936 (fighter); 7 DEU observation floatplane · 1936 (scout); 14 DEU carrier strike aircraft · 1936 (strike) | 36 | 720 |
+| Wilhelmshaven | 60 | 15 DEU naval fighter · 1936 (fighter); 7 DEU observation floatplane · 1936 (scout); 14 DEU carrier strike aircraft · 1936 (strike) | 36 | 720 |
 
 ## Aircraft models
 
 Aircraft are national stores; every owned aircraft needs its full aircrew. Figures below are the exact game inputs. Generic role aircraft and procurement figures are provisional estimates, not claims of historical aircraft variants.
 
-### Seeschwalbe — `seeschwalbe`
+Other-service shore establishments fill up to 25% of base slots. They own separate aircraft and aircrews, replace losses at home monthly, and use physical ferry/merchant reinforcements. Naval base allocation is limited to the other 75%. [Operational air rules](../operational-air-warfare.md).
+
+- Kiel: 6 DEU long-range maritime patrol · 1936; 9 DEU twin-engine maritime bomber · 1936
+- Wilhelmshaven: 6 DEU long-range maritime patrol · 1936; 9 DEU twin-engine maritime bomber · 1936
+
+### DEU naval fighter · 1936 — `de_naval_fighter_1936`
 
 | Year | Role | Crew | Price (gold) | Combat radius (km) |
 |---:|---|---:|---:|---:|
-| 1933 | scout | 2 | 16 | 505 |
+| 1936 | fighter | 1 | 48 | 393 |
 
 Complete playable model:
 
 ```json
 {
-  "id": "seeschwalbe",
-  "name": "Seeschwalbe",
+  "id": "de_naval_fighter_1936",
   "nation": "DEU",
-  "designation": "C/31",
-  "type_year": 1933,
-  "role": "scout",
-  "cost_gold": 16,
-  "durability": 30,
-  "powerplant": {
-    "component": "de33aeg",
-    "count": 1,
-    "takeoff_hp": 850,
-    "refit_groups": [
-      "de40aeg"
-    ]
-  },
-  "dimensions": {
-    "span_m": 12.8,
-    "span_folded_m": 7,
-    "length_m": 11.4,
-    "wing_area_m2": 30,
-    "hangar_footprint_m2": 72
-  },
-  "weights": {
-    "empty_kg": 3035,
-    "normal_kg": 3955,
-    "max_kg": 4455,
-    "derivation": {
-      "comparator": "Arado Ar 196A-3",
-      "comparator_kg": 2990,
-      "added_kg": 135,
-      "not_carried_kg": 90,
-      "honest_kg": 3035,
-      "credit": 0,
-      "dropped_kg": 0
-    }
+  "name": "DEU naval fighter · 1936",
+  "type_year": 1936,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
   },
   "crew": {
-    "seats": 2,
-    "normal": 2,
-    "notes": "Pilot, and an observer who works the wireless."
+    "normal": 1
+  },
+  "cost_gold": 48,
+  "weights": {
+    "empty_kg": 2275
   },
   "performance": {
     "speed_kmh": {
-      "at_2000m": 260,
-      "sea_level": 263
-    },
-    "climb_ms": 6.6,
-    "ceiling_m": 4570,
-    "approach_kmh": 136
+      "cruise": 285
+    }
   },
   "fuel": {
-    "internal_l": 750,
-    "endurance_h": 6.2,
-    "ferry_km": 1515,
-    "combat_radius_km": 505
+    "combat_radius_km": 393
   },
-  "armament": [
-    {
-      "mount": "fixed forward",
-      "count": 1,
-      "rounds": 750,
-      "spec": {
-        "name": "C/30 7.92 mm machine gun",
-        "caliber_mm": 7.92,
-        "round_belted_g": 27,
-        "gun_kg": 8
-      }
-    },
-    {
-      "mount": "flexible aft",
-      "count": 1,
-      "rounds": 750,
-      "spec": {
-        "name": "C/30 7.92 mm machine gun",
-        "caliber_mm": 7.92,
-        "round_belted_g": 27,
-        "gun_kg": 8
-      }
-    }
-  ],
-  "stations": [
-    {
-      "id": "underwing",
-      "form": "underwing_rack",
-      "rating_kg": 150,
-      "racks": 2,
-      "alternatives": [
-        {
-          "count": 2,
-          "spec": {
-            "name": "SC 50 bomb",
-            "mass_kg": 50
-          }
-        },
-        {
-          "component": "de29dpc",
-          "count": 2
-        }
-      ]
-    }
-  ],
-  "equipment": [],
-  "features": [
-    "long-range wireless",
-    "direction-finding loop",
-    "homing-beacon receiver",
-    "slats and slotted flaps",
-    "sliding canopy",
-    "fixed seats",
-    "1 x fixed forward 7.92 mm + 1 x flexible aft 7.92 mm machine gun, 1,500 rounds",
-    "needs no aerodrome: catapult, fjord, estuary or lee shore"
-  ],
-  "protection": [],
-  "kits": [],
-  "possible_upgrades": [
-    "de36rad",
-    "de40det"
-  ],
-  "notes": "At as_of this is the navy's ONLY search type: 613 km reach, NO RADAR, and one raider in commission to fly it from. The reconnaissance gap is real at the start date and is not closed until 1940. Frame section 6.3 rounds the reach to 615 km; the catalog's own figure is ferry 1,840 / 3 = 613, and the catalog owns specifications.",
-  "fittings": [
-    {
-      "name": "Wireless, direction-finding loop and homing-beacon receiver",
-      "installed_kg": 75
-    }
-  ]
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
 }
 ```
 
-### Albatros — `albatros`
+### DEU carrier strike aircraft · 1936 — `de_naval_strike_1936`
 
 | Year | Role | Crew | Price (gold) | Combat radius (km) |
 |---:|---|---:|---:|---:|
-| 1940 | patrol | 4 | 30 | 905 |
+| 1936 | strike | 3 | 68 | 504 |
 
 Complete playable model:
 
 ```json
 {
-  "id": "albatros",
-  "name": "Albatros",
+  "id": "de_naval_strike_1936",
   "nation": "DEU",
-  "designation": "C/38",
-  "type_year": 1940,
-  "role": "patrol",
-  "cost_gold": 30,
-  "durability": 45,
-  "powerplant": {
-    "component": "de40aeg",
-    "count": 2,
-    "takeoff_hp": 1100
-  },
-  "dimensions": {
-    "span_m": 19.6,
-    "span_folded_m": 8.4,
-    "length_m": 15.2,
-    "wing_area_m2": 52,
-    "hangar_footprint_m2": 95
-  },
-  "weights": {
-    "empty_kg": 6080,
-    "normal_kg": 8545,
-    "max_kg": 9945,
-    "derivation": {
-      "comparator": "Lockheed Hudson Mk I",
-      "comparator_kg": 5275,
-      "added_kg": 1175,
-      "not_carried_kg": 370,
-      "honest_kg": 6080,
-      "credit": 0,
-      "dropped_kg": 0
-    }
+  "name": "DEU carrier strike aircraft · 1936",
+  "type_year": 1936,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
   },
   "crew": {
-    "seats": 4,
-    "normal": 4,
-    "notes": "Pilot, observer, wireless operator, radar operator."
+    "normal": 3
+  },
+  "cost_gold": 68,
+  "weights": {
+    "empty_kg": 3550
   },
   "performance": {
     "speed_kmh": {
-      "at_2400m": 301,
-      "sea_level": 281
-    },
-    "climb_ms": 5.8,
-    "ceiling_m": 4400,
-    "approach_kmh": 152
+      "cruise": 235
+    }
   },
   "fuel": {
-    "internal_l": 2600,
-    "endurance_h": 10.5,
-    "ferry_km": 2720,
-    "combat_radius_km": 905,
-    "with_tank": {
-      "form": "2 x C/38 drop tanks, outboard racks",
-      "liters": 3600,
-      "endurance_h": 14.7,
-      "ferry_km": 3795,
-      "combat_radius_km": 1265
+    "combat_radius_km": 504
+  },
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU observation floatplane · 1936 — `de_naval_scout_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | scout | 2 | 60 | 559 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_scout_1936",
+  "nation": "DEU",
+  "name": "DEU observation floatplane · 1936",
+  "type_year": 1936,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 60,
+  "weights": {
+    "empty_kg": 3350
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
     }
   },
-  "armament": [
-    {
-      "mount": "flexible dorsal",
-      "count": 1,
-      "rounds": 1000,
-      "spec": {
-        "name": "C/38 13 mm machine gun",
-        "caliber_mm": 13,
-        "round_belted_g": 80,
-        "gun_kg": 20
-      }
-    },
-    {
-      "mount": "flexible aft",
-      "count": 1,
-      "rounds": 1000,
-      "spec": {
-        "name": "C/30 7.92 mm machine gun",
-        "caliber_mm": 7.92,
-        "round_belted_g": 27,
-        "gun_kg": 8
-      }
+  "fuel": {
+    "combat_radius_km": 559
+  },
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### DEU naval fighter · 1939 — `de_naval_fighter_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | fighter | 1 | 52 | 427 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_fighter_1939",
+  "nation": "DEU",
+  "name": "DEU naval fighter · 1939",
+  "type_year": 1939,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 52,
+  "weights": {
+    "empty_kg": 2530
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 309
     }
-  ],
-  "stations": [
-    {
-      "id": "underwing",
-      "form": "underwing_rack",
-      "rating_kg": 400,
-      "racks": 4,
-      "alternatives": [
-        {
-          "count": 4,
-          "spec": {
-            "name": "SC 50 bomb",
-            "mass_kg": 50
-          }
-        },
-        {
-          "component": "de29dpc",
-          "count": 4
-        }
-      ]
+  },
+  "fuel": {
+    "combat_radius_km": 427
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU carrier strike aircraft · 1939 — `de_naval_strike_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | strike | 3 | 73 | 549 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_strike_1939",
+  "nation": "DEU",
+  "name": "DEU carrier strike aircraft · 1939",
+  "type_year": 1939,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 73,
+  "weights": {
+    "empty_kg": 3880
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
     }
-  ],
-  "equipment": [
-    "de36rad"
-  ],
-  "features": [
-    "long-range wireless",
-    "direction-finding loop",
-    "homing-beacon receiver",
-    "slats and slotted flaps",
-    "enclosed cabin",
-    "fixed seats",
-    "1 x flexible dorsal 13 mm + 1 x flexible aft 7.92 mm machine gun, 2,000 rounds",
-    "needs no aerodrome"
-  ],
-  "protection": [
-    "self-sealing tanks"
-  ],
-  "kits": [],
-  "possible_upgrades": [
-    "de43rad",
-    "de40det"
-  ],
-  "notes": "A single aircraft searches more ocean in a day than the whole boat fleet does in a week. NOT IN EXISTENCE at as_of — a 1940 design, and the thing that closes the reconnaissance gap.",
-  "fittings": [
-    {
-      "name": "Wireless, direction-finding loop and homing-beacon receiver",
-      "installed_kg": 75
+  },
+  "fuel": {
+    "combat_radius_km": 549
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU observation floatplane · 1939 — `de_naval_scout_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | scout | 2 | 65 | 611 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_scout_1939",
+  "nation": "DEU",
+  "name": "DEU observation floatplane · 1939",
+  "type_year": 1939,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 65,
+  "weights": {
+    "empty_kg": 3680
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
     }
-  ]
+  },
+  "fuel": {
+    "combat_radius_km": 611
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### DEU naval fighter · 1942 — `de_naval_fighter_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | fighter | 1 | 55 | 462 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_fighter_1942",
+  "nation": "DEU",
+  "name": "DEU naval fighter · 1942",
+  "type_year": 1942,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 55,
+  "weights": {
+    "empty_kg": 2785
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 333
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 462
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU carrier strike aircraft · 1942 — `de_naval_strike_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | strike | 3 | 78 | 594 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_strike_1942",
+  "nation": "DEU",
+  "name": "DEU carrier strike aircraft · 1942",
+  "type_year": 1942,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 78,
+  "weights": {
+    "empty_kg": 4210
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 594
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU observation floatplane · 1942 — `de_naval_scout_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | scout | 2 | 70 | 662 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_scout_1942",
+  "nation": "DEU",
+  "name": "DEU observation floatplane · 1942",
+  "type_year": 1942,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 70,
+  "weights": {
+    "empty_kg": 4010
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 662
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### DEU naval fighter · 1945 — `de_naval_fighter_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | fighter | 1 | 59 | 496 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_fighter_1945",
+  "nation": "DEU",
+  "name": "DEU naval fighter · 1945",
+  "type_year": 1945,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 59,
+  "weights": {
+    "empty_kg": 3040
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 357
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 496
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU carrier strike aircraft · 1945 — `de_naval_strike_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | strike | 3 | 82 | 639 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_strike_1945",
+  "nation": "DEU",
+  "name": "DEU carrier strike aircraft · 1945",
+  "type_year": 1945,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 82,
+  "weights": {
+    "empty_kg": 4540
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 639
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU observation floatplane · 1945 — `de_naval_scout_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | scout | 2 | 74 | 714 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_scout_1945",
+  "nation": "DEU",
+  "name": "DEU observation floatplane · 1945",
+  "type_year": 1945,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 74,
+  "weights": {
+    "empty_kg": 4340
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 714
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### DEU naval fighter · 1948 — `de_naval_fighter_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | fighter | 1 | 62 | 531 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_fighter_1948",
+  "nation": "DEU",
+  "name": "DEU naval fighter · 1948",
+  "type_year": 1948,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 62,
+  "weights": {
+    "empty_kg": 3295
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 381
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 531
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU carrier strike aircraft · 1948 — `de_naval_strike_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | strike | 3 | 87 | 684 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_strike_1948",
+  "nation": "DEU",
+  "name": "DEU carrier strike aircraft · 1948",
+  "type_year": 1948,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 87,
+  "weights": {
+    "empty_kg": 4870
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 684
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### DEU observation floatplane · 1948 — `de_naval_scout_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | scout | 2 | 79 | 766 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_naval_scout_1948",
+  "nation": "DEU",
+  "name": "DEU observation floatplane · 1948",
+  "type_year": 1948,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 79,
+  "weights": {
+    "empty_kg": 4670
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 766
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### DEU long-range maritime patrol · 1936 — `de_shore_patrol_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_patrol | 7 | Government managed | 1121 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_patrol_1936",
+  "nation": "DEU",
+  "name": "DEU long-range maritime patrol · 1936",
+  "type_year": 1936,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6650
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1121
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU twin-engine maritime bomber · 1936 — `de_shore_torpedo_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_strike | 5 | Government managed | 765 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_torpedo_1936",
+  "nation": "DEU",
+  "name": "DEU twin-engine maritime bomber · 1936",
+  "type_year": 1936,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 5550
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 260
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 765
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime patrol · 1939 — `de_shore_patrol_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_patrol | 7 | Government managed | 1242 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_patrol_1939",
+  "nation": "DEU",
+  "name": "DEU long-range maritime patrol · 1939",
+  "type_year": 1939,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7280
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1242
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU twin-engine maritime bomber · 1939 — `de_shore_torpedo_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_strike | 5 | Government managed | 844 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_torpedo_1939",
+  "nation": "DEU",
+  "name": "DEU twin-engine maritime bomber · 1939",
+  "type_year": 1939,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6180
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 278
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 844
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime patrol · 1942 — `de_shore_patrol_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_patrol | 7 | Government managed | 1363 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_patrol_1942",
+  "nation": "DEU",
+  "name": "DEU long-range maritime patrol · 1942",
+  "type_year": 1942,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7910
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1363
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime strike · 1942 — `de_shore_torpedo_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_strike | 5 | Government managed | 923 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_torpedo_1942",
+  "nation": "DEU",
+  "name": "DEU long-range maritime strike · 1942",
+  "type_year": 1942,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6810
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 296
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 923
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime patrol · 1945 — `de_shore_patrol_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_patrol | 7 | Government managed | 1483 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_patrol_1945",
+  "nation": "DEU",
+  "name": "DEU long-range maritime patrol · 1945",
+  "type_year": 1945,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8540
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1483
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime strike · 1945 — `de_shore_torpedo_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_strike | 5 | Government managed | 1003 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_torpedo_1945",
+  "nation": "DEU",
+  "name": "DEU long-range maritime strike · 1945",
+  "type_year": 1945,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7440
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 314
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1003
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime patrol · 1948 — `de_shore_patrol_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_patrol | 7 | Government managed | 1604 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_patrol_1948",
+  "nation": "DEU",
+  "name": "DEU long-range maritime patrol · 1948",
+  "type_year": 1948,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 9170
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1604
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### DEU long-range maritime strike · 1948 — `de_shore_torpedo_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_strike | 5 | Government managed | 1082 |
+
+Complete playable model:
+
+```json
+{
+  "id": "de_shore_torpedo_1948",
+  "nation": "DEU",
+  "name": "DEU long-range maritime strike · 1948",
+  "type_year": 1948,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8070
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 332
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1082
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
 }
 ```
 

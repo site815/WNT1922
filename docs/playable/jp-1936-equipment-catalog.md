@@ -10,7 +10,7 @@
 
 ---
 
-Generated, reviewable catalog for release 0.18.2. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/jp.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
+Generated, reviewable catalog for release 0.19.0. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/jp.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
 
 Campaign opens 1936-01-01. Future designs are listed for planning; listing is not permission to build an obsolete or superseded line. No merchant or support hull contributes to the warship total.
 
@@ -32,6 +32,17 @@ Provisional allocation: 60% of port aircraft slots, rounded down; only models av
 ## Aircraft models
 
 Aircraft are national stores; every owned aircraft needs its full aircrew. Figures below are the exact game inputs. Generic role aircraft and procurement figures are provisional estimates, not claims of historical aircraft variants.
+
+Other-service shore establishments fill up to 25% of base slots. They own separate aircraft and aircrews, replace losses at home monthly, and use physical ferry/merchant reinforcements. Naval base allocation is limited to the other 75%. [Operational air rules](../operational-air-warfare.md).
+
+- Saipan / Tanapag: No other-service maritime aircraft
+- Truk Lagoon: No other-service maritime aircraft
+- Palau / Koror: No other-service maritime aircraft
+- Kwajalein: No other-service maritime aircraft
+- Majuro: No other-service maritime aircraft
+- Kure: 6 JPN long-range maritime patrol · 1936; 9 JPN twin-engine maritime bomber · 1936
+- Sasebo: 6 JPN long-range maritime patrol · 1936; 9 JPN twin-engine maritime bomber · 1936
+- Yokosuka: 6 JPN long-range maritime patrol · 1936; 9 JPN twin-engine maritime bomber · 1936
 
 ### Hibari — `hibari_t33`
 
@@ -155,7 +166,13 @@ Complete playable model:
     "jp42dpc",
     "jp44min"
   ],
-  "notes": "Light multirole, one airframe and two undercarriages. Float wing loading afloat is 107 kg/m2, into the E13A (111) and OS2U (112) band and out of the Ar 196's (131). THE SPAN IS FIXED BY THE FOOTPRINT, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is 52 m2, the same as the Raiden, so the carriers' air groups are unchanged. The fold ratio is 2.24 -- an SB2C's -- and it is available because THE WING IS EMPTY: all 375 L is in the fuselage. DERIVED, NOT ASSERTED: one drag polar (f 0.6732, e 0.82) at eta 0.80 max / 0.50 CLIMB -- the fixed-pitch propeller, and the only airplane in this navy that does not use 0.62 -- and bsfc 0.26 kg/hp-h. Combat radius is ferry / 3; approach is the bare stall at normal weight on CLmax 1.55, no high-lift device."
+  "notes": "Light multirole, one airframe and two undercarriages. Float wing loading afloat is 107 kg/m2, into the E13A (111) and OS2U (112) band and out of the Ar 196's (131). THE SPAN IS FIXED BY THE FOOTPRINT, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is 52 m2, the same as the Raiden, so the carriers' air groups are unchanged. The fold ratio is 2.24 -- an SB2C's -- and it is available because THE WING IS EMPTY: all 375 L is in the fuselage. DERIVED, NOT ASSERTED: one drag polar (f 0.6732, e 0.82) at eta 0.80 max / 0.50 CLIMB -- the fixed-pitch propeller, and the only airplane in this navy that does not use 0.62 -- and bsfc 0.26 kg/hp-h. Combat radius is ferry / 3; approach is the bare stall at normal weight on CLmax 1.55, no high-lift device.",
+  "basing": {
+    "carrier": true,
+    "floatplane": true,
+    "land": true
+  },
+  "catalogKind": "naval"
 }
 ```
 
@@ -254,7 +271,13 @@ Complete playable model:
     "jp43can",
     "jp44rkt"
   ],
-  "notes": "Pure fighter: no recess, no station, no tank, no dive brakes and no radar. WING 20.5 m2 AT 11.8 m OF SPAN, AR 6.79, leading-edge slats and no Fowlers, so conventions 8 quotes her at CLmax 1.95 (slats alone) and the approach is the bare stall at normal weight. THE SPAN IS FIXED BY THE FOLD, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is the 52 m2 hangar footprint every Japanese air-group derivation is computed from, so span may not move without moving the carriers' capacity. AREA IS THE ONLY MANEUVER LEVER AVAILABLE AT A FIXED SPAN -- 18.0 -> 20.5 m2 takes wing loading from 146 to 128 kg/m2 and the sustained turn at 3,000 m from 23.0 to 23.9 deg/s at a 158 m radius, against an A6M2's 24.5 at 164 m, for 9 km/h and 55 km of ferry. A SMALLER WING DOES NOT FUND A FUEL CUT: at a fixed span L/Dmax goes as 1/sqrt(f) and the wing is about 40 percent of wetted area. She is below a Spitfire I of 1938 on speed and level with an A6M2 on turn while carrying armor and self-sealing that neither comparator has. DERIVED, NOT ASSERTED: one drag polar (f 0.4052, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h -- the Japanese figure, credited to the fleet's lean-cruise doctrine and NOT to the engine, which stays par. Combat radius is ferry / 3. WING STRUCTURE SCALES AS S^0.649 x AR^0.5, NOT AS A FLAT kg/m2: at a fixed span the aspect ratio falls as area grows and the two terms very nearly cancel, so 18.0 -> 20.5 m2 costs about 5 kg of airframe and not 32."
+  "notes": "Pure fighter: no recess, no station, no tank, no dive brakes and no radar. WING 20.5 m2 AT 11.8 m OF SPAN, AR 6.79, leading-edge slats and no Fowlers, so conventions 8 quotes her at CLmax 1.95 (slats alone) and the approach is the bare stall at normal weight. THE SPAN IS FIXED BY THE FOLD, NOT BY AERODYNAMICS: 5.9 m folded x 8.8 m long is the 52 m2 hangar footprint every Japanese air-group derivation is computed from, so span may not move without moving the carriers' capacity. AREA IS THE ONLY MANEUVER LEVER AVAILABLE AT A FIXED SPAN -- 18.0 -> 20.5 m2 takes wing loading from 146 to 128 kg/m2 and the sustained turn at 3,000 m from 23.0 to 23.9 deg/s at a 158 m radius, against an A6M2's 24.5 at 164 m, for 9 km/h and 55 km of ferry. A SMALLER WING DOES NOT FUND A FUEL CUT: at a fixed span L/Dmax goes as 1/sqrt(f) and the wing is about 40 percent of wetted area. She is below a Spitfire I of 1938 on speed and level with an A6M2 on turn while carrying armor and self-sealing that neither comparator has. DERIVED, NOT ASSERTED: one drag polar (f 0.4052, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h -- the Japanese figure, credited to the fleet's lean-cruise doctrine and NOT to the engine, which stays par. Combat radius is ferry / 3. WING STRUCTURE SCALES AS S^0.649 x AR^0.5, NOT AS A FLAT kg/m2: at a fixed span the aspect ratio falls as area grows and the two terms very nearly cancel, so 18.0 -> 20.5 m2 costs about 5 kg of airframe and not 32.",
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "catalogKind": "naval"
 }
 ```
 
@@ -400,7 +423,13 @@ Complete playable model:
     "jp44rad",
     "jp48rad"
   ],
-  "notes": " The catapult and crane rating is kept in step with her maximum launch weight afloat, with margin; the two move together and neither constrains the other. Radar standard, dive brakes carried, no rockets; the crew fly armored. ⚠ NO ESCORT TRADE: the nose twin is a strafing battery and the airplane has no maneuver margin against a fighter — it is the thing escorted. ⚠ IT IS THE FLEET'S OUTER SEARCH: on a tandem pair of 650-form tanks, flown off carrier decks and cruiser catapults alike, which is why the float kit was drawn for a torpedo carrier. ⚠ DERIVED, NOT ASSERTED: one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h — the Japanese figure, credited to the fleet's lean-cruise doctrine (cruising bank + engine cartridges, architecture) and NOT to the engine, which stays par. Everyone else uses 0.29. Combat radius is ferry / 3; approach is the bare stall. ⚠ FLUSH-RIVETED AND AEROFORMED THROUGHOUT, EVERY GAP SEALED — the 1933-34 hydroformed panel line applied to airplanes. This is PROCESS (Interest band), not performance. SECOND TRADE: with the recess empty she is a heavy fighter and, on her own radar, a night fighter -- decisive against bombers, shadowers and flying boats and outclassed by single-seat fighters in daylight, which is why she still has NO ESCORT TRADE and is herself the airplane escorted. It still costs her the band: at 579 km/h she is a shade over a Bf 110C and behind a Whirlwind, so the twin's speed has LEFT the Supporting band and is par. FOLD: 15.0 m folding to 8.0 m: the hinge sits 4.0 m from the centerline, about 1.2 m outboard of the structural minimum set by the nacelle and the gear bay it houses. The only real twin-engine carrier airplane with a folding wing, the Grumman F7F, folded 15.7 m to 8.15 m -- the same answer on a slightly larger machine. Folding tighter is geometric but puts a 4.6 m panel and its root bending moment on the hinge.  The third station's optional rear 7.7 mm is the legacy small-caliber pattern and has no equipment code, so it appears on the Armament row and not in the armament array. It, its 600 rounds and the crewman who works them are in max_kg and not in normal_kg. POST-RELEASE SHE IS A FIGHTER AND THE FIGURE THAT SAYS SO IS THE SUSTAINED TURN AT HER OWN CLmax 2.4 (slats AND Fowlers, which is what the printed 128 km/h approach implies): at 3,000 m and 65 percent fuel she holds 21.8 deg/s at a 173 m radius, against a Bf 109E-3's 20.7 at 188, a Spitfire I's 22.0 at 177 and an A6M2's 24.5 at 164 -- and against an F4F-4's 16.4 and a Bf 110C's 17.1. Her limits are ROLL (15 m of span, a twin, no boosted ailerons) and 40 s of trigger time on one twin, not the opponent."
+  "notes": " The catapult and crane rating is kept in step with her maximum launch weight afloat, with margin; the two move together and neither constrains the other. Radar standard, dive brakes carried, no rockets; the crew fly armored. ⚠ NO ESCORT TRADE: the nose twin is a strafing battery and the airplane has no maneuver margin against a fighter — it is the thing escorted. ⚠ IT IS THE FLEET'S OUTER SEARCH: on a tandem pair of 650-form tanks, flown off carrier decks and cruiser catapults alike, which is why the float kit was drawn for a torpedo carrier. ⚠ DERIVED, NOT ASSERTED: one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and bsfc 0.26 kg/hp-h — the Japanese figure, credited to the fleet's lean-cruise doctrine (cruising bank + engine cartridges, architecture) and NOT to the engine, which stays par. Everyone else uses 0.29. Combat radius is ferry / 3; approach is the bare stall. ⚠ FLUSH-RIVETED AND AEROFORMED THROUGHOUT, EVERY GAP SEALED — the 1933-34 hydroformed panel line applied to airplanes. This is PROCESS (Interest band), not performance. SECOND TRADE: with the recess empty she is a heavy fighter and, on her own radar, a night fighter -- decisive against bombers, shadowers and flying boats and outclassed by single-seat fighters in daylight, which is why she still has NO ESCORT TRADE and is herself the airplane escorted. It still costs her the band: at 579 km/h she is a shade over a Bf 110C and behind a Whirlwind, so the twin's speed has LEFT the Supporting band and is par. FOLD: 15.0 m folding to 8.0 m: the hinge sits 4.0 m from the centerline, about 1.2 m outboard of the structural minimum set by the nacelle and the gear bay it houses. The only real twin-engine carrier airplane with a folding wing, the Grumman F7F, folded 15.7 m to 8.15 m -- the same answer on a slightly larger machine. Folding tighter is geometric but puts a 4.6 m panel and its root bending moment on the hinge.  The third station's optional rear 7.7 mm is the legacy small-caliber pattern and has no equipment code, so it appears on the Armament row and not in the armament array. It, its 600 rounds and the crewman who works them are in max_kg and not in normal_kg. POST-RELEASE SHE IS A FIGHTER AND THE FIGURE THAT SAYS SO IS THE SUSTAINED TURN AT HER OWN CLmax 2.4 (slats AND Fowlers, which is what the printed 128 km/h approach implies): at 3,000 m and 65 percent fuel she holds 21.8 deg/s at a 173 m radius, against a Bf 109E-3's 20.7 at 188, a Spitfire I's 22.0 at 177 and an A6M2's 24.5 at 164 -- and against an F4F-4's 16.4 and a Bf 110C's 17.1. Her limits are ROLL (15 m of span, a twin, no boosted ailerons) and 40 s of trigger time on one twin, not the opponent.",
+  "basing": {
+    "carrier": true,
+    "floatplane": true,
+    "land": true
+  },
+  "catalogKind": "naval"
 }
 ```
 
@@ -549,7 +578,873 @@ Complete playable model:
     "jp44min",
     "jp48rad"
   ],
-  "notes": "Same recess, same ordnance forms, same catapult rating, same cannon, same beacon net. The catapult is how it goes — and the hole in its belly is the shape of a weight frozen in 1923. Not in production at as_of; scheduled 1944. DERIVED, NOT ASSERTED, AND ON A JET MODEL: thrust T(V,h) = 2,450 kgf x (rho/rho0)^0.885 x (1 - 0.30 M + 0.20 M^2), the ram-drag term of an early centrifugal turbojet, against the same polar form (f 0.4134, e 0.82). SPEED IS MACH-LIMITED ABOVE ABOUT 4,000 m AND THRUST-LIMITED BELOW: the printed 1,035 at 5,000 m and 970 at 10,000 m are Mach 0.90 to the kilometer, and the sea-level 1,040 is where thrust runs out. Ceiling 14,155 m fixes the lapse exponent. Range is the jet Breguet at the best-range speed (1.316 x the minimum-drag speed, L/D 0.866 x L/Dmax) on TSFC 1.30 kg/kgf-h, which reproduces the printed 1,950 km ferry."
+  "notes": "Same recess, same ordnance forms, same catapult rating, same cannon, same beacon net. The catapult is how it goes — and the hole in its belly is the shape of a weight frozen in 1923. Not in production at as_of; scheduled 1944. DERIVED, NOT ASSERTED, AND ON A JET MODEL: thrust T(V,h) = 2,450 kgf x (rho/rho0)^0.885 x (1 - 0.30 M + 0.20 M^2), the ram-drag term of an early centrifugal turbojet, against the same polar form (f 0.4134, e 0.82). SPEED IS MACH-LIMITED ABOVE ABOUT 4,000 m AND THRUST-LIMITED BELOW: the printed 1,035 at 5,000 m and 970 at 10,000 m are Mach 0.90 to the kilometer, and the sea-level 1,040 is where thrust runs out. Ceiling 14,155 m fixes the lapse exponent. Range is the jet Breguet at the best-range speed (1.316 x the minimum-drag speed, L/D 0.866 x L/Dmax) on TSFC 1.30 kg/kgf-h, which reproduces the printed 1,950 km ferry.",
+  "basing": {
+    "carrier": true,
+    "floatplane": true,
+    "land": true
+  },
+  "catalogKind": "naval"
+}
+```
+
+### JPN coastal patrol flying boat · 1921 — `jp_shore_patrol_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | maritime_patrol | 4 | Government managed | 522 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1921",
+  "nation": "JPN",
+  "name": "JPN coastal patrol flying boat · 1921",
+  "type_year": 1921,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1921,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3500
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 145
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 522
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN shore torpedo biplane · 1921 — `jp_shore_torpedo_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | maritime_strike | 3 | Government managed | 371 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1921",
+  "nation": "JPN",
+  "name": "JPN shore torpedo biplane · 1921",
+  "type_year": 1921,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1921,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 2400
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 170
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 371
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN coastal patrol flying boat · 1924 — `jp_shore_patrol_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | maritime_patrol | 4 | Government managed | 644 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1924",
+  "nation": "JPN",
+  "name": "JPN coastal patrol flying boat · 1924",
+  "type_year": 1924,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1924,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4130
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 163
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 644
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN shore torpedo biplane · 1924 — `jp_shore_torpedo_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | maritime_strike | 3 | Government managed | 451 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1924",
+  "nation": "JPN",
+  "name": "JPN shore torpedo biplane · 1924",
+  "type_year": 1924,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1924,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3030
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 188
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 451
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN coastal patrol flying boat · 1927 — `jp_shore_patrol_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | maritime_patrol | 4 | Government managed | 766 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1927",
+  "nation": "JPN",
+  "name": "JPN coastal patrol flying boat · 1927",
+  "type_year": 1927,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1927,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4760
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 181
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 766
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN shore torpedo biplane · 1927 — `jp_shore_torpedo_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | maritime_strike | 3 | Government managed | 531 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1927",
+  "nation": "JPN",
+  "name": "JPN shore torpedo biplane · 1927",
+  "type_year": 1927,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1927,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3660
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 206
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 531
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN coastal patrol flying boat · 1930 — `jp_shore_patrol_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | maritime_patrol | 4 | Government managed | 887 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1930",
+  "nation": "JPN",
+  "name": "JPN coastal patrol flying boat · 1930",
+  "type_year": 1930,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1930,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 5390
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 199
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 887
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN shore torpedo biplane · 1930 — `jp_shore_torpedo_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | maritime_strike | 3 | Government managed | 611 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1930",
+  "nation": "JPN",
+  "name": "JPN shore torpedo biplane · 1930",
+  "type_year": 1930,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1930,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4290
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 224
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 611
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN coastal patrol flying boat · 1933 — `jp_shore_patrol_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | maritime_patrol | 7 | Government managed | 1009 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1933",
+  "nation": "JPN",
+  "name": "JPN coastal patrol flying boat · 1933",
+  "type_year": 1933,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1933,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6020
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 217
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1009
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN twin-engine maritime bomber · 1933 — `jp_shore_torpedo_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | maritime_strike | 5 | Government managed | 691 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1933",
+  "nation": "JPN",
+  "name": "JPN twin-engine maritime bomber · 1933",
+  "type_year": 1933,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1933,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4920
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 242
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 691
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime patrol · 1936 — `jp_shore_patrol_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_patrol | 7 | Government managed | 1131 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1936",
+  "nation": "JPN",
+  "name": "JPN long-range maritime patrol · 1936",
+  "type_year": 1936,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6650
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1131
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN twin-engine maritime bomber · 1936 — `jp_shore_torpedo_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_strike | 5 | Government managed | 771 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1936",
+  "nation": "JPN",
+  "name": "JPN twin-engine maritime bomber · 1936",
+  "type_year": 1936,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 5550
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 260
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 771
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime patrol · 1939 — `jp_shore_patrol_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_patrol | 7 | Government managed | 1253 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1939",
+  "nation": "JPN",
+  "name": "JPN long-range maritime patrol · 1939",
+  "type_year": 1939,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7280
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1253
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN twin-engine maritime bomber · 1939 — `jp_shore_torpedo_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_strike | 5 | Government managed | 851 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1939",
+  "nation": "JPN",
+  "name": "JPN twin-engine maritime bomber · 1939",
+  "type_year": 1939,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6180
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 278
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 851
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime patrol · 1942 — `jp_shore_patrol_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_patrol | 7 | Government managed | 1375 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1942",
+  "nation": "JPN",
+  "name": "JPN long-range maritime patrol · 1942",
+  "type_year": 1942,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7910
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1375
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime strike · 1942 — `jp_shore_torpedo_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_strike | 5 | Government managed | 931 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1942",
+  "nation": "JPN",
+  "name": "JPN long-range maritime strike · 1942",
+  "type_year": 1942,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6810
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 296
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 931
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime patrol · 1945 — `jp_shore_patrol_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_patrol | 7 | Government managed | 1496 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1945",
+  "nation": "JPN",
+  "name": "JPN long-range maritime patrol · 1945",
+  "type_year": 1945,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8540
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1496
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime strike · 1945 — `jp_shore_torpedo_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_strike | 5 | Government managed | 1012 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1945",
+  "nation": "JPN",
+  "name": "JPN long-range maritime strike · 1945",
+  "type_year": 1945,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7440
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 314
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1012
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime patrol · 1948 — `jp_shore_patrol_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_patrol | 7 | Government managed | 1618 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_patrol_1948",
+  "nation": "JPN",
+  "name": "JPN long-range maritime patrol · 1948",
+  "type_year": 1948,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 9170
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1618
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### JPN long-range maritime strike · 1948 — `jp_shore_torpedo_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_strike | 5 | Government managed | 1092 |
+
+Complete playable model:
+
+```json
+{
+  "id": "jp_shore_torpedo_1948",
+  "nation": "JPN",
+  "name": "JPN long-range maritime strike · 1948",
+  "type_year": 1948,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8070
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 332
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1092
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
 }
 ```
 

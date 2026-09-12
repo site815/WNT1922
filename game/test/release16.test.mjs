@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {newGame,advanceMinutes,resolvePortAction,reserveGroup,scrapGroup} from '../src/engine.mjs';
 import {contentFor} from '../src/campaign-content.mjs';
-import {aircraftModels,aircraftSummary,staffAircraft,airPower,facilityBudget,setFacilityFunding} from '../src/naval-resources.mjs';
+import {aircraftModels,operationalAircraftModels,aircraftSummary,staffAircraft,airPower,facilityBudget,setFacilityFunding} from '../src/naval-resources.mjs';
 import {allocatedWings,baseAirPower,flyBaseSorties,freeAircraft,modelFerryKm,aviationStockCapacity} from '../src/base-aviation.mjs';
 import {dailyAviation,minuteAviation,dispatchAviation,ferryPath,shippingRisk} from '../src/aviation-transfer.mjs';
 import {validateAviation} from '../src/aviation-validation.mjs';
@@ -17,18 +17,18 @@ import {validateSave} from '../src/state-io.mjs';
 import {coastalRecon} from '../src/shore-recon.mjs';
 const bundle=JSON.parse(fs.readFileSync((process.env.WNT_TEST_PUBLIC||'game/staging')+'/content.json'));
 const start=(id='JPN',campaign='in_good_faith_1936')=>{const s=newGame(bundle,id,16031,campaign);return [s,contentFor(bundle,s),s.nations[id]];};
-function emptyAir(s,c,id){const n=s.nations[id];for(const g of n.groups)g.airWing=[];for(const b of Object.values(n.airBases)){b.airWing=[];b.reserve=[];}n.airTransfers=[];n.aircraft=Object.fromEntries(aircraftModels(c,id).map(a=>[a.id,0]));n.aviators=1000;return n;}
+function emptyAir(s,c,id){const n=s.nations[id];for(const g of n.groups)g.airWing=[];for(const b of Object.values(n.airBases)){b.airWing=[];b.governmentWing=[];b.reserve=[];}n.airTransfers=[];n.aircraft=Object.fromEntries(aircraftModels(c,id).map(a=>[a.id,0]));n.aviators=1000;return n;}
 const finish=(s,c,t)=>{setCampaignMinutes(s,t.arriveAt+1);minuteAviation(s,c);};
 
 test('all fourteen openings count real shore establishments, only period models, and conserved airframes/crews',()=>{
  for(const campaign of Object.keys(bundle.campaigns))for(const id of Object.keys(bundle.campaigns[campaign].nations)){
   const [s,c,n]=start(id,campaign),a=aircraftSummary(s,c);assert.equal(validateAviation(s,c),true);assert.equal(a.total,a.assigned+a.stationed+a.transit+a.reserve);
-  const year=new Date(s.day*86400000).getUTCFullYear();for(const w of allocatedWings(n))if(w.count)assert.ok(aircraftModels(c,id).find(a=>a.id===w.model).type_year<=year);
-  for(const port of Object.keys(n.airBases))assert.equal(portSummary(s,c,port).assignedAircraft,n.airBases[port].airWing.reduce((v,w)=>v+w.count,0));
+  const year=new Date(s.day*86400000).getUTCFullYear();for(const w of allocatedWings(n))if(w.count)assert.ok(operationalAircraftModels(c,id).find(a=>a.id===w.model).type_year<=year);
+  for(const port of Object.keys(n.airBases))assert.equal(portSummary(s,c,port).assignedAircraft,[...n.airBases[port].airWing,...n.airBases[port].governmentWing].reduce((v,w)=>v+w.count,0));
  }
 });
 test('shore reach and strike power use each stationed model, crews, condition and supplies',()=>{
- const [s,c]=start('USA'),n=emptyAir(s,c,'USA'),m=aircraftModels(c,'USA').find(a=>a.role==='dive_bomber'&&a.type_year<=1936),b=n.airBases.hawaii;
+ const [s,c]=start('USA'),n=emptyAir(s,c,'USA'),m=aircraftModels(c,'USA').find(a=>a.role==='strike'&&a.type_year===1936),b=n.airBases.hawaii;
  n.aircraft[m.id]=10;b.airWing=[{model:m.id,role:'strike',count:10,crewed:10}];b.supplies=100;
  const p=baseAirPower(s,c,'hawaii',m.fuel.combat_radius_km);assert.ok(p.strike>0);assert.equal(p.radius,m.fuel.combat_radius_km);assert.equal(baseAirPower(s,c,'hawaii',p.radius+1).strike,0);
  b.supplies=5;assert.equal(baseAirPower(s,c,'hawaii').strike,p.strike*.5);s.ports.hawaii.health=.5;assert.equal(baseAirPower(s,c,'hawaii').strike,p.strike*.25);b.airWing[0].crewed=0;assert.equal(baseAirPower(s,c,'hawaii').strike,0);

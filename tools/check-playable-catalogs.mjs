@@ -11,7 +11,7 @@ for(const c of Object.values(b.campaigns)){
  assert.deepEqual(manifest.victory.checkpoints,['1940-12-31','1945-12-31','1950-12-31']);
  for(const id of Object.keys(c.nations)){
   const p='data/playable/'+PREFIX[id]+'.json',extra=read(p),part=extra.campaigns[c.scenario.id],n=c.nations[id];assert.ok(manifest.sources.playable.includes(p));assert.equal(n.name,PROFILES[id].name);assert.equal(n.color,PROFILES[id].color);
-  assert.deepEqual(n.aircraft,part.aircraft);assert.deepEqual(n.merchants,part.merchants);assert.equal(new Set(n.designs).size,n.designs.length);
+  assert.deepEqual(n.aircraft,part.aircraft);assert.deepEqual(n.armyAircraft,part.armyAircraft);assert.deepEqual(n.merchants,part.merchants);assert.equal(new Set(n.designs).size,n.designs.length);
   const aggregate=rows=>{const totals={};for(const row of rows){const key=row.class_id+':'+(row.status||'active');totals[key]=(totals[key]||0)+row.count;}return totals;};
   assert.deepEqual(aggregate(manifest.order_of_battle[id].aggregates),aggregate(n.aggregates),'Scenario / playable opening formations: '+id);
   assert.deepEqual([...manifest.order_of_battle[id].hulls].sort(),n.hulls.map(h=>h.id).sort(),'Scenario / playable named hulls: '+id);
@@ -19,7 +19,7 @@ for(const c of Object.values(b.campaigns)){
    for(const code of spec.sensors||[]){assert.ok(c.equipment[code],'Unresolved sensor '+code);assert.ok(c.equipment[code].year<=cl.year,'Future as-launched sensor '+code);assert.equal(c.equipment[code].nation,id);}
    if(fleetService(cl)==='merchant')assert.ok(spec.merchant_grt>0);classChecks++;
   }
-  for(const a of n.aircraft){assert.equal(a.nation,id);assert.ok(a.type_year>=1900&&a.type_year<2000);assert.ok(a.crew.normal>0);assert.ok(a.cost_gold>0);aircraftChecks++;}
+  for(const a of [...n.aircraft,...n.armyAircraft]){assert.equal(a.nation,id);assert.ok(a.type_year>=1900&&a.type_year<2000);assert.ok(a.crew.normal>0);assert.ok(a.cost_gold>0||a.readOnly&&a.catalogKind==='government');assert.ok(a.basing);aircraftChecks++;}
   for(const g of openingGroups(c,id)){assert.ok(c.classes[g.classId],g.classId);assert.equal(c.classes[g.classId].nation,id);assert.ok(g.count>0);const cl=c.classes[g.classId];if(!['building','converting','trials'].includes(g.status))assert.ok(cl.year<=Number(c.scenario.start.slice(0,4)),id+' commissions future class '+cl.id);rosterChecks++;}
   const s=newGame(c,id),e=merchantEconomy(s,c,id);assert.ok(Math.abs(e.current-e.baseline)<1,'Opening merchant capacity mismatch '+id);assert.equal(e.coverage,1);assert.equal(e.economyFactor,1);
  }

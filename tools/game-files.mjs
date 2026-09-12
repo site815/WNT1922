@@ -1,5 +1,6 @@
 // Shared browser-source manifest: build and HTTP serving must agree.
 export const GAME_SOURCE_FILES=[
+  'air-conditions.mjs','aircraft-compatibility.mjs','air-operations.mjs','government-aviation.mjs',
   'economic-growth.mjs',
   'politics-validation.mjs','interface17.css','diplomacy-popup.mjs','diplomacy-history.mjs','war-politics.mjs',
   'interface16.css','bulk-fleet.mjs','resource-breakdown.mjs','base-aviation.mjs','aviation-transfer.mjs','aviation-validation.mjs','shore-recon.mjs',

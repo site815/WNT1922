@@ -10,7 +10,7 @@
 
 ---
 
-Generated, reviewable catalog for release 0.18.2. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/uk.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
+Generated, reviewable catalog for release 0.19.0. Regenerate with `node tools/export-catalog-docs.mjs game/staging`. This is a summary of the playable data; `data/playable/uk.json` owns the new literal estimates and aircraft, while the original national JSON/Markdown files own the historical and original four-program specifications. Do not independently edit generated numbers.
 
 Campaign opens 1936-01-01. Future designs are listed for planning; listing is not permission to build an obsolete or superseded line. No merchant or support hull contributes to the warship total.
 
@@ -21,458 +21,2132 @@ Provisional allocation: 60% of port aircraft slots, rounded down; only models av
 | Base | Aircraft slots | Stationed models and roles | Fully crewed aircraft | Aviation stores (sortie units) |
 |---|---:|---|---:|---:|
 | Tarawa | 0 | None | 0 | 0 |
-| Portsmouth | 60 | 36 Skua (strike) | 36 | 720 |
-| Rosyth | 60 | 36 Skua (strike) | 36 | 720 |
-| Scapa Flow | 30 | 18 Skua (strike) | 18 | 360 |
-| Gibraltar | 60 | 36 Skua (strike) | 36 | 720 |
-| Alexandria | 30 | 18 Skua (strike) | 18 | 360 |
-| Singapore | 30 | 18 Skua (strike) | 18 | 360 |
-| Freetown station | 4 | 2 Skua (strike) | 2 | 48 |
+| Portsmouth | 60 | 15 GBR naval fighter · 1936 (fighter); 7 GBR observation floatplane · 1936 (scout); 14 Skua (strike) | 36 | 720 |
+| Rosyth | 60 | 15 GBR naval fighter · 1936 (fighter); 7 GBR observation floatplane · 1936 (scout); 14 Skua (strike) | 36 | 720 |
+| Scapa Flow | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Gibraltar | 60 | 15 GBR naval fighter · 1936 (fighter); 7 GBR observation floatplane · 1936 (scout); 14 Skua (strike) | 36 | 720 |
+| Alexandria | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Singapore | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Freetown station | 4 | 2 GBR naval fighter · 1936 (fighter) | 2 | 48 |
 | Ascension anchorage | 0 | None | 0 | 0 |
-| Simon’s Town | 60 | 36 Skua (strike) | 36 | 720 |
-| Durban station | 30 | 18 Skua (strike) | 18 | 360 |
-| Mauritius station | 4 | 2 Skua (strike) | 2 | 48 |
+| Simon’s Town | 60 | 15 GBR naval fighter · 1936 (fighter); 7 GBR observation floatplane · 1936 (scout); 14 Skua (strike) | 36 | 720 |
+| Durban station | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Mauritius station | 4 | 2 GBR naval fighter · 1936 (fighter) | 2 | 48 |
 | Chagos anchorage | 0 | None | 0 | 0 |
-| Trincomalee | 30 | 18 Skua (strike) | 18 | 360 |
-| Fremantle | 30 | 18 Skua (strike) | 18 | 360 |
-| Malta / Valletta | 60 | 36 Skua (strike) | 36 | 720 |
+| Trincomalee | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Fremantle | 30 | 8 GBR naval fighter · 1936 (fighter); 4 GBR observation floatplane · 1936 (scout); 6 Skua (strike) | 18 | 360 |
+| Malta / Valletta | 60 | 15 GBR naval fighter · 1936 (fighter); 7 GBR observation floatplane · 1936 (scout); 14 Skua (strike) | 36 | 720 |
 
 ## Aircraft models
 
 Aircraft are national stores; every owned aircraft needs its full aircrew. Figures below are the exact game inputs. Generic role aircraft and procurement figures are provisional estimates, not claims of historical aircraft variants.
 
-### Skua — `skua`
+Other-service shore establishments fill up to 25% of base slots. They own separate aircraft and aircrews, replace losses at home monthly, and use physical ferry/merchant reinforcements. Naval base allocation is limited to the other 75%. [Operational air rules](../operational-air-warfare.md).
+
+- Tarawa: No other-service maritime aircraft
+- Portsmouth: 6 GBR long-range maritime patrol · 1936; 9 GBR twin-engine maritime bomber · 1936
+- Rosyth: 6 GBR long-range maritime patrol · 1936; 9 GBR twin-engine maritime bomber · 1936
+- Scapa Flow: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Gibraltar: 6 GBR long-range maritime patrol · 1936; 9 GBR twin-engine maritime bomber · 1936
+- Alexandria: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Singapore: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Freetown station: No other-service maritime aircraft
+- Ascension anchorage: No other-service maritime aircraft
+- Simon’s Town: 6 GBR long-range maritime patrol · 1936; 9 GBR twin-engine maritime bomber · 1936
+- Durban station: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Mauritius station: No other-service maritime aircraft
+- Chagos anchorage: No other-service maritime aircraft
+- Trincomalee: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Fremantle: 2 GBR long-range maritime patrol · 1936; 4 GBR twin-engine maritime bomber · 1936
+- Malta / Valletta: 6 GBR long-range maritime patrol · 1936; 9 GBR twin-engine maritime bomber · 1936
+
+### GBR naval fighter · 1921 — `uk_naval_fighter_1921`
 
 | Year | Role | Crew | Price (gold) | Combat radius (km) |
 |---:|---|---:|---:|---:|
-| 1936 | dive_bomber | 2 | 12 | 590 |
+| 1921 | fighter | 1 | 30 | 220 |
 
 Complete playable model:
 
 ```json
 {
-  "id": "skua",
-  "name": "Skua",
+  "id": "uk_naval_fighter_1921",
   "nation": "GBR",
-  "designation": "Skua",
-  "type_year": 1936,
-  "role": "dive_bomber",
-  "cost_gold": 12,
-  "durability": 30,
-  "powerplant": {
-    "count": 1,
-    "takeoff_hp": 830,
-    "spec": {
-      "layout": "9-cylinder sleeve-valve radial",
-      "displacement_l": 24.9,
-      "mass_kg": 470,
-      "hp_takeoff": 830,
-      "hp_at_3000m": 780,
-      "supercharger": "single-speed",
-      "tbo_h": 380,
-      "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
-    }
-  },
-  "dimensions": {
-    "span_m": 14,
-    "span_folded_m": 5.6,
-    "length_m": 10.4,
-    "wing_area_m2": 30,
-    "hangar_footprint_m2": 58
-  },
-  "weights": {
-    "empty_kg": 2597,
-    "normal_kg": 3690,
-    "max_kg": 4390,
-    "derivation": {
-      "comparator": "Blackburn Skua Mk II",
-      "comparator_kg": 2493,
-      "added_kg": 104,
-      "not_carried_kg": 0,
-      "honest_kg": 2597,
-      "credit": 0,
-      "dropped_kg": 0
-    }
-  },
-  "crew": {
-    "seats": 2,
-    "normal": 2,
-    "notes": "Pilot and observer/telegraphist-air-gunner; the observer's station is a wireless set and a plotting board."
-  },
-  "performance": {
-    "speed_kmh": {
-      "at_3000m": 368,
-      "with_bomb": 353,
-      "sea_level": 343
-    },
-    "climb_ms": 6.7,
-    "ceiling_m": 6660,
-    "approach_kmh": 122
-  },
-  "fuel": {
-    "internal_l": 900,
-    "endurance_h": 8.2,
-    "ferry_km": 1770,
-    "combat_radius_km": 590,
-    "with_tank": {
-      "form": "2 x Mark I drop tanks, underwing",
-      "liters": 1180,
-      "endurance_h": 9.7,
-      "ferry_km": 2185,
-      "combat_radius_km": 730
-    }
-  },
-  "armament": [
-    {
-      "mount": "cowl, synchronised",
-      "count": 2,
-      "rounds": 1600,
-      "spec": {
-        "name": "Mark II 7.7 mm machine gun",
-        "caliber_mm": 7.7,
-        "round_belted_g": 28,
-        "gun_kg": 10
-      }
-    },
-    {
-      "mount": "flexible rear ring",
-      "count": 1,
-      "rounds": 800,
-      "spec": {
-        "name": "Mark II 7.7 mm machine gun",
-        "caliber_mm": 7.7,
-        "round_belted_g": 28,
-        "gun_kg": 10
-      }
-    }
-  ],
-  "stations": [
-    {
-      "id": "centerline_crutch",
-      "form": "bomb",
-      "rating_kg": 500,
-      "alternatives": [
-        {
-          "spec": {
-            "name": "Mark I 227 kg bomb",
-            "mass_kg": 227
-          },
-          "count": 1
-        }
-      ]
-    },
-    {
-      "id": "underwing",
-      "form": "rack",
-      "rating_kg": 113,
-      "racks": 4,
-      "alternatives": [
-        {
-          "component": "uk34tnk",
-          "count": 2
-        }
-      ]
-    }
-  ],
-  "equipment": [],
-  "features": [
-    "Fowler flaps",
-    "centerline crutch (500 kg-rated, swinging): 1 x Mark I bomb",
-    "swinging centerline crutch",
-    "dive brakes",
-    "folding wings",
-    "retracting undercarriage",
-    "arrester hook",
-    "flotation gear",
-    "long-range wireless-telegraphy set and plotting board",
-    "enclosed sliding canopy",
-    "2 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,400 rounds",
-    "4 underwing racks rated 113 kg each, 2 drop tanks"
-  ],
-  "protection": [
-    "armored windscreen"
-  ],
-  "kits": [],
-  "possible_upgrades": [],
-  "notes": "THE OLDEST OF THE THREE AND THE REASON THE OTHER TWO EXIST: the first British airplane specified by the Admiralty, in 1934, for a job the Admiralty had defined - search to the horizon of the fleet's own gunnery and then attack what it finds. Two seats, a wireless set and a plotting board, dive brakes, and a bomb heavy enough to matter against a deck. WHAT SHE CANNOT DO IS FIGHT: two rifle-caliber guns forward and one aft is a scout's armament and the handbook says so. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
-  "fittings": [
-    {
-      "name": "Wireless and plotting board",
-      "installed_kg": 55
-    }
-  ]
-}
-```
-
-### Shearwater — `shearwater`
-
-| Year | Role | Crew | Price (gold) | Combat radius (km) |
-|---:|---|---:|---:|---:|
-| 1937 | torpedo_bomber | 3 | 16 | 765 |
-
-Complete playable model:
-
-```json
-{
-  "id": "shearwater",
-  "name": "Shearwater",
-  "nation": "GBR",
-  "designation": "Shearwater",
-  "type_year": 1937,
-  "role": "torpedo_bomber",
-  "cost_gold": 16,
-  "durability": 36,
-  "powerplant": {
-    "count": 1,
-    "takeoff_hp": 1000,
-    "spec": {
-      "layout": "9-cylinder radial",
-      "displacement_l": 28.7,
-      "mass_kg": 500,
-      "hp_takeoff": 1000,
-      "hp_at_3000m": 930,
-      "supercharger": "two-speed",
-      "tbo_h": 400,
-      "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
-    }
-  },
-  "dimensions": {
-    "span_m": 15.6,
-    "span_folded_m": 6.4,
-    "length_m": 11.8,
-    "wing_area_m2": 39,
-    "hangar_footprint_m2": 76
-  },
-  "weights": {
-    "empty_kg": 2505,
-    "normal_kg": 3930,
-    "max_kg": 4830,
-    "derivation": {
-      "comparator": "Nakajima B5N2",
-      "comparator_kg": 2279,
-      "added_kg": 226,
-      "not_carried_kg": 0,
-      "honest_kg": 2505,
-      "credit": 0,
-      "dropped_kg": 0
-    }
-  },
-  "crew": {
-    "seats": 3,
-    "normal": 3,
-    "notes": "Pilot, observer, telegraphist-air-gunner. The third crewman is the point of the design and the reason it is a biplane."
-  },
-  "performance": {
-    "speed_kmh": {
-      "at_3000m": 354,
-      "with_torpedo": 324,
-      "sea_level": 334
-    },
-    "climb_ms": 8.4,
-    "ceiling_m": 7500,
-    "approach_kmh": 111
-  },
-  "fuel": {
-    "internal_l": 1250,
-    "endurance_h": 10.7,
-    "ferry_km": 2290,
-    "combat_radius_km": 765,
-    "with_tank": {
-      "form": "2 x Mark I drop tanks, underwing",
-      "liters": 1530,
-      "endurance_h": 11.9,
-      "ferry_km": 2665,
-      "combat_radius_km": 890
-    }
-  },
-  "armament": [
-    {
-      "mount": "cowl, synchronised",
-      "count": 1,
-      "rounds": 1000,
-      "spec": {
-        "name": "Mark II 7.7 mm machine gun",
-        "caliber_mm": 7.7,
-        "round_belted_g": 28,
-        "gun_kg": 10
-      }
-    },
-    {
-      "mount": "flexible rear ring",
-      "count": 1,
-      "rounds": 1000,
-      "spec": {
-        "name": "Mark II 7.7 mm machine gun",
-        "caliber_mm": 7.7,
-        "round_belted_g": 28,
-        "gun_kg": 10
-      }
-    }
-  ],
-  "stations": [
-    {
-      "id": "centerline_crutch",
-      "form": "torpedo",
-      "rating_kg": 900,
-      "alternatives": [
-        {
-          "component": "uk32tor",
-          "count": 1
-        },
-        {
-          "spec": {
-            "name": "Mark I 227 kg bomb",
-            "mass_kg": 227
-          },
-          "count": 1
-        }
-      ]
-    },
-    {
-      "id": "underwing",
-      "form": "rack",
-      "rating_kg": 113,
-      "racks": 4,
-      "alternatives": [
-        {
-          "component": "uk34tnk",
-          "count": 2
-        }
-      ]
-    }
-  ],
-  "equipment": [],
-  "features": [
-    "Fowler flaps",
-    "folding wings",
-    "retracting undercarriage",
-    "arrester hook",
-    "flotation gear",
-    "long-range wireless-telegraphy set and plotting table (observer's station)",
-    "enclosed canopy, three stations",
-    "1 x cowl 7.7 mm + 1 x flexible rear 7.7 mm machine gun, 2,000 rounds",
-    "4 underwing racks rated 113 kg each, 2 drop tanks"
-  ],
-  "protection": [
-    "armored windscreen",
-    "4 mm observer's back plate"
-  ],
-  "kits": [],
-  "possible_upgrades": [],
-  "notes": "A MONOPLANE, because the Board that refused the Air Ministry over the Skua had learned it could, and because a torpedo at 350 km/h cannot be met with a wire between the wings. The torpedo is five years older than the airplane and the airframe was sized to the weapon. She still spots - the fall-of-shot corrections she passes into the fire-control table are the argument the Fisher school accepted first and has never withdrawn - but the 1937 exercises were the first in which the umpires scored a capital ship sunk by aircraft. Nine hours on internal tanks makes her the longest-legged airplane in the fleet and the search plan is built around her. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4).",
-  "fittings": [
-    {
-      "name": "Wireless and plotting board",
-      "installed_kg": 55
-    }
-  ]
-}
-```
-
-### Peregrine — `peregrine`
-
-| Year | Role | Crew | Price (gold) | Combat radius (km) |
-|---:|---|---:|---:|---:|
-| 1938 | fighter | 1 | 15 | 470 |
-
-Complete playable model:
-
-```json
-{
-  "id": "peregrine",
-  "name": "Peregrine",
-  "nation": "GBR",
-  "designation": "Peregrine",
-  "type_year": 1938,
+  "name": "GBR naval fighter · 1921",
+  "type_year": 1921,
   "role": "fighter",
-  "cost_gold": 15,
-  "durability": 32,
-  "powerplant": {
-    "count": 1,
-    "takeoff_hp": 1030,
-    "spec": {
-      "layout": "12-cylinder liquid-cooled Vee",
-      "displacement_l": 27,
-      "mass_kg": 610,
-      "hp_takeoff": 1030,
-      "hp_at_4900m": 950,
-      "supercharger": "two-speed",
-      "tbo_h": 420,
-      "note": "United Kingdom has no aero-engine SKU. The Air Ministry owns aircraft procurement and sells the Admiralty a finished airplane; there is no line in the equipment catalog to point at."
-    }
-  },
-  "dimensions": {
-    "span_m": 11.4,
-    "span_folded_m": 5.4,
-    "length_m": 9.6,
-    "wing_area_m2": 23,
-    "hangar_footprint_m2": 52
-  },
-  "weights": {
-    "empty_kg": 2288,
-    "normal_kg": 3000,
-    "max_kg": 3200,
-    "derivation": {
-      "comparator": "Supermarine Spitfire I",
-      "comparator_kg": 2049,
-      "added_kg": 239,
-      "not_carried_kg": 0,
-      "honest_kg": 2288,
-      "credit": 0,
-      "dropped_kg": 0
-    }
+  "catalogKind": "naval",
+  "generation": 1921,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
   },
   "crew": {
-    "seats": 1,
     "normal": 1
   },
+  "cost_gold": 30,
+  "weights": {
+    "empty_kg": 1000
+  },
   "performance": {
     "speed_kmh": {
-      "at_4900m": 470,
-      "at_2500m": 445,
-      "sea_level": 415
-    },
-    "climb_ms": 11.8,
-    "ceiling_m": 9350,
-    "approach_kmh": 139
+      "cruise": 165
+    }
   },
   "fuel": {
-    "internal_l": 620,
-    "endurance_h": 5.8,
-    "ferry_km": 1415,
-    "combat_radius_km": 470
+    "combat_radius_km": 220
   },
-  "armament": [
-    {
-      "mount": "wing, unsynchronised",
-      "count": 8,
-      "rounds": 2800,
-      "spec": {
-        "name": "Mark II 7.7 mm machine gun",
-        "caliber_mm": 7.7,
-        "round_belted_g": 28,
-        "gun_kg": 10
-      }
+  "notes": "Representative 1921 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1921 — `uk_naval_strike_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | strike | 2 | 44 | 280 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1921",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1921",
+  "type_year": 1921,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1921,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 44,
+  "weights": {
+    "empty_kg": 1900
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 145
     }
-  ],
-  "stations": [],
-  "equipment": [],
-  "features": [
-    "folding wings",
-    "retracting undercarriage",
-    "slotted flaps",
-    "arrester hook",
-    "enclosed sliding canopy",
-    "8 x wing 7.7 mm machine guns, 2,800 rounds",
-    "no external tanks - no rack, no crutch and no plumbing"
-  ],
-  "protection": [
-    "armored windscreen",
-    "6 mm pilot's back armor"
-  ],
-  "kits": [],
-  "possible_upgrades": [],
-  "notes": "THE FIRST BRITISH NAVAL FIGHTER THAT DOES NOT NEED AN EXCUSE, and two years late by the Admiralty's own doing. 470 km/h in 1938 beats every carrier fighter afloat - the best real one that year is an F3F biplane at 425 - and is 100 short of what the Air Ministry is putting on its own aerodromes the same spring, because a folding wing, a hook and catapult spools cost drag a land fighter does not pay. HER REAL LIMITATION IS NOT THE AIRFRAME: no fighter direction, no radar to vector from, no organization to tell her where to be, so a fleet with the best carrier fighter in the world intercepts on sight from a deck alert exactly as it did in 1918. ⚠ DERIVED, NOT ASSERTED: speed, climb, ceiling, range and endurance all fall out of one drag polar (f, e 0.82) at eta 0.80 max / 0.62 climb and 0.29 kg/hp-h cruise, on the model calibrated against the A6M2, Bf 109E-3, Spitfire I, F4F-4, Fw 190A-3, Bf 110C, Gladiator, Swordfish, Skua, Fulmar and Albacore. Combat radius is ferry / 3 (conventions 4)."
+  },
+  "fuel": {
+    "combat_radius_km": 280
+  },
+  "notes": "Representative 1921 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1921 — `uk_naval_scout_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | scout | 2 | 36 | 300 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1921",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1921",
+  "type_year": 1921,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1921,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 36,
+  "weights": {
+    "empty_kg": 1700
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 145
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 300
+  },
+  "notes": "Representative 1921 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1924 — `uk_naval_fighter_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | fighter | 1 | 34 | 252 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1924",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1924",
+  "type_year": 1924,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1924,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 34,
+  "weights": {
+    "empty_kg": 1255
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 189
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 252
+  },
+  "notes": "Representative 1924 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1924 — `uk_naval_strike_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | strike | 2 | 49 | 322 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1924",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1924",
+  "type_year": 1924,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1924,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 49,
+  "weights": {
+    "empty_kg": 2230
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 163
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 322
+  },
+  "notes": "Representative 1924 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1924 — `uk_naval_scout_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | scout | 2 | 41 | 349 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1924",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1924",
+  "type_year": 1924,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1924,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 41,
+  "weights": {
+    "empty_kg": 2030
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 163
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 349
+  },
+  "notes": "Representative 1924 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1927 — `uk_naval_fighter_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | fighter | 1 | 37 | 285 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1927",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1927",
+  "type_year": 1927,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1927,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 37,
+  "weights": {
+    "empty_kg": 1510
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 213
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 285
+  },
+  "notes": "Representative 1927 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1927 — `uk_naval_strike_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | strike | 2 | 54 | 364 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1927",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1927",
+  "type_year": 1927,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1927,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 54,
+  "weights": {
+    "empty_kg": 2560
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 181
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 364
+  },
+  "notes": "Representative 1927 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1927 — `uk_naval_scout_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | scout | 2 | 46 | 397 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1927",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1927",
+  "type_year": 1927,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1927,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 46,
+  "weights": {
+    "empty_kg": 2360
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 181
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 397
+  },
+  "notes": "Representative 1927 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1930 — `uk_naval_fighter_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | fighter | 1 | 41 | 317 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1930",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1930",
+  "type_year": 1930,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1930,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 41,
+  "weights": {
+    "empty_kg": 1765
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 237
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 317
+  },
+  "notes": "Representative 1930 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1930 — `uk_naval_strike_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | strike | 2 | 58 | 406 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1930",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1930",
+  "type_year": 1930,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1930,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 58,
+  "weights": {
+    "empty_kg": 2890
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 199
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 406
+  },
+  "notes": "Representative 1930 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1930 — `uk_naval_scout_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | scout | 2 | 50 | 446 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1930",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1930",
+  "type_year": 1930,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1930,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 50,
+  "weights": {
+    "empty_kg": 2690
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 199
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 446
+  },
+  "notes": "Representative 1930 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1933 — `uk_naval_fighter_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | fighter | 1 | 44 | 350 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1933",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1933",
+  "type_year": 1933,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1933,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 44,
+  "weights": {
+    "empty_kg": 2020
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 261
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 350
+  },
+  "notes": "Representative 1933 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1933 — `uk_naval_strike_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | strike | 3 | 63 | 448 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1933",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1933",
+  "type_year": 1933,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1933,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 63,
+  "weights": {
+    "empty_kg": 3220
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 217
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 448
+  },
+  "notes": "Representative 1933 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1933 — `uk_naval_scout_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | scout | 2 | 55 | 494 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1933",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1933",
+  "type_year": 1933,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1933,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 55,
+  "weights": {
+    "empty_kg": 3020
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 217
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 494
+  },
+  "notes": "Representative 1933 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1936 — `uk_naval_fighter_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | fighter | 1 | 48 | 382 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1936",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1936",
+  "type_year": 1936,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 48,
+  "weights": {
+    "empty_kg": 2275
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 285
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 382
+  },
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### Skua — `uk_naval_strike_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | strike | 3 | 68 | 491 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1936",
+  "nation": "GBR",
+  "name": "Skua",
+  "type_year": 1936,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 68,
+  "weights": {
+    "empty_kg": 3550
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 491
+  },
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1936 — `uk_naval_scout_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | scout | 2 | 60 | 543 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1936",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1936",
+  "type_year": 1936,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1936,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 60,
+  "weights": {
+    "empty_kg": 3350
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 543
+  },
+  "notes": "Representative 1936 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1939 — `uk_naval_fighter_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | fighter | 1 | 52 | 414 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1939",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1939",
+  "type_year": 1939,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 52,
+  "weights": {
+    "empty_kg": 2530
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 309
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 414
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1939 — `uk_naval_strike_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | strike | 3 | 73 | 533 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1939",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1939",
+  "type_year": 1939,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 73,
+  "weights": {
+    "empty_kg": 3880
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 533
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1939 — `uk_naval_scout_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | scout | 2 | 65 | 592 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1939",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1939",
+  "type_year": 1939,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1939,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 65,
+  "weights": {
+    "empty_kg": 3680
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 592
+  },
+  "notes": "Representative 1939 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1942 — `uk_naval_fighter_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | fighter | 1 | 55 | 447 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1942",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1942",
+  "type_year": 1942,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 55,
+  "weights": {
+    "empty_kg": 2785
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 333
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 447
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1942 — `uk_naval_strike_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | strike | 3 | 78 | 575 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1942",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1942",
+  "type_year": 1942,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 78,
+  "weights": {
+    "empty_kg": 4210
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 575
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1942 — `uk_naval_scout_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | scout | 2 | 70 | 640 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1942",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1942",
+  "type_year": 1942,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1942,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 70,
+  "weights": {
+    "empty_kg": 4010
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 640
+  },
+  "notes": "Representative 1942 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1945 — `uk_naval_fighter_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | fighter | 1 | 59 | 479 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1945",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1945",
+  "type_year": 1945,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 59,
+  "weights": {
+    "empty_kg": 3040
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 357
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 479
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1945 — `uk_naval_strike_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | strike | 3 | 82 | 617 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1945",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1945",
+  "type_year": 1945,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 82,
+  "weights": {
+    "empty_kg": 4540
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 617
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1945 — `uk_naval_scout_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | scout | 2 | 74 | 689 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1945",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1945",
+  "type_year": 1945,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1945,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 74,
+  "weights": {
+    "empty_kg": 4340
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 689
+  },
+  "notes": "Representative 1945 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR naval fighter · 1948 — `uk_naval_fighter_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | fighter | 1 | 62 | 512 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_fighter_1948",
+  "nation": "GBR",
+  "name": "GBR naval fighter · 1948",
+  "type_year": 1948,
+  "role": "fighter",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 1
+  },
+  "cost_gold": 62,
+  "weights": {
+    "empty_kg": 3295
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 381
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 512
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR carrier strike aircraft · 1948 — `uk_naval_strike_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | strike | 3 | 87 | 659 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_strike_1948",
+  "nation": "GBR",
+  "name": "GBR carrier strike aircraft · 1948",
+  "type_year": 1948,
+  "role": "strike",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": true,
+    "floatplane": false,
+    "land": true
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 87,
+  "weights": {
+    "empty_kg": 4870
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 659
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+}
+```
+
+### GBR observation floatplane · 1948 — `uk_naval_scout_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | scout | 2 | 79 | 737 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_naval_scout_1948",
+  "nation": "GBR",
+  "name": "GBR observation floatplane · 1948",
+  "type_year": 1948,
+  "role": "scout",
+  "catalogKind": "naval",
+  "generation": 1948,
+  "basing": {
+    "carrier": false,
+    "floatplane": true,
+    "land": true
+  },
+  "crew": {
+    "normal": 2
+  },
+  "cost_gold": 79,
+  "weights": {
+    "empty_kg": 4670
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 737
+  },
+  "notes": "Representative 1948 national-program procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+}
+```
+
+### GBR coastal patrol flying boat · 1921 — `uk_shore_patrol_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | maritime_patrol | 4 | Government managed | 486 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1921",
+  "nation": "GBR",
+  "name": "GBR coastal patrol flying boat · 1921",
+  "type_year": 1921,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1921,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3500
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 145
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 486
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR shore torpedo biplane · 1921 — `uk_shore_torpedo_1921`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1921 | maritime_strike | 3 | Government managed | 346 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1921",
+  "nation": "GBR",
+  "name": "GBR shore torpedo biplane · 1921",
+  "type_year": 1921,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1921,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 2400
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 170
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 346
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR coastal patrol flying boat · 1924 — `uk_shore_patrol_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | maritime_patrol | 4 | Government managed | 599 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1924",
+  "nation": "GBR",
+  "name": "GBR coastal patrol flying boat · 1924",
+  "type_year": 1924,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1924,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4130
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 163
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 599
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR shore torpedo biplane · 1924 — `uk_shore_torpedo_1924`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1924 | maritime_strike | 3 | Government managed | 420 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1924",
+  "nation": "GBR",
+  "name": "GBR shore torpedo biplane · 1924",
+  "type_year": 1924,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1924,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3030
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 188
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 420
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR coastal patrol flying boat · 1927 — `uk_shore_patrol_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | maritime_patrol | 4 | Government managed | 713 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1927",
+  "nation": "GBR",
+  "name": "GBR coastal patrol flying boat · 1927",
+  "type_year": 1927,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1927,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4760
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 181
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 713
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR shore torpedo biplane · 1927 — `uk_shore_torpedo_1927`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1927 | maritime_strike | 3 | Government managed | 495 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1927",
+  "nation": "GBR",
+  "name": "GBR shore torpedo biplane · 1927",
+  "type_year": 1927,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1927,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 3660
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 206
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 495
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR coastal patrol flying boat · 1930 — `uk_shore_patrol_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | maritime_patrol | 4 | Government managed | 826 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1930",
+  "nation": "GBR",
+  "name": "GBR coastal patrol flying boat · 1930",
+  "type_year": 1930,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1930,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 4
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 5390
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 199
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 826
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR shore torpedo biplane · 1930 — `uk_shore_torpedo_1930`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1930 | maritime_strike | 3 | Government managed | 569 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1930",
+  "nation": "GBR",
+  "name": "GBR shore torpedo biplane · 1930",
+  "type_year": 1930,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1930,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 3
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4290
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 224
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 569
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR coastal patrol flying boat · 1933 — `uk_shore_patrol_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | maritime_patrol | 7 | Government managed | 940 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1933",
+  "nation": "GBR",
+  "name": "GBR coastal patrol flying boat · 1933",
+  "type_year": 1933,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1933,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6020
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 217
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 940
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR twin-engine maritime bomber · 1933 — `uk_shore_torpedo_1933`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1933 | maritime_strike | 5 | Government managed | 644 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1933",
+  "nation": "GBR",
+  "name": "GBR twin-engine maritime bomber · 1933",
+  "type_year": 1933,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1933,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 4920
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 242
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 644
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime patrol · 1936 — `uk_shore_patrol_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_patrol | 7 | Government managed | 1053 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1936",
+  "nation": "GBR",
+  "name": "GBR long-range maritime patrol · 1936",
+  "type_year": 1936,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6650
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 235
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1053
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR twin-engine maritime bomber · 1936 — `uk_shore_torpedo_1936`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1936 | maritime_strike | 5 | Government managed | 718 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1936",
+  "nation": "GBR",
+  "name": "GBR twin-engine maritime bomber · 1936",
+  "type_year": 1936,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1936,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 5550
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 260
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 718
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime patrol · 1939 — `uk_shore_patrol_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_patrol | 7 | Government managed | 1166 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1939",
+  "nation": "GBR",
+  "name": "GBR long-range maritime patrol · 1939",
+  "type_year": 1939,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": true
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7280
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 253
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1166
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR twin-engine maritime bomber · 1939 — `uk_shore_torpedo_1939`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1939 | maritime_strike | 5 | Government managed | 793 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1939",
+  "nation": "GBR",
+  "name": "GBR twin-engine maritime bomber · 1939",
+  "type_year": 1939,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1939,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6180
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 278
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 793
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime patrol · 1942 — `uk_shore_patrol_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_patrol | 7 | Government managed | 1280 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1942",
+  "nation": "GBR",
+  "name": "GBR long-range maritime patrol · 1942",
+  "type_year": 1942,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7910
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 271
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1280
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime strike · 1942 — `uk_shore_torpedo_1942`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1942 | maritime_strike | 5 | Government managed | 867 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1942",
+  "nation": "GBR",
+  "name": "GBR long-range maritime strike · 1942",
+  "type_year": 1942,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1942,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 6810
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 296
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 867
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime patrol · 1945 — `uk_shore_patrol_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_patrol | 7 | Government managed | 1393 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1945",
+  "nation": "GBR",
+  "name": "GBR long-range maritime patrol · 1945",
+  "type_year": 1945,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8540
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 289
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1393
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime strike · 1945 — `uk_shore_torpedo_1945`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1945 | maritime_strike | 5 | Government managed | 942 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1945",
+  "nation": "GBR",
+  "name": "GBR long-range maritime strike · 1945",
+  "type_year": 1945,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1945,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 7440
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 314
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 942
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime patrol · 1948 — `uk_shore_patrol_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_patrol | 7 | Government managed | 1507 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_patrol_1948",
+  "nation": "GBR",
+  "name": "GBR long-range maritime patrol · 1948",
+  "type_year": 1948,
+  "role": "maritime_patrol",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 7
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 9170
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 307
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1507
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
+}
+```
+
+### GBR long-range maritime strike · 1948 — `uk_shore_torpedo_1948`
+
+| Year | Role | Crew | Price (gold) | Combat radius (km) |
+|---:|---|---:|---:|---:|
+| 1948 | maritime_strike | 5 | Government managed | 1016 |
+
+Complete playable model:
+
+```json
+{
+  "id": "uk_shore_torpedo_1948",
+  "nation": "GBR",
+  "name": "GBR long-range maritime strike · 1948",
+  "type_year": 1948,
+  "role": "maritime_strike",
+  "catalogKind": "government",
+  "generation": 1948,
+  "readOnly": true,
+  "basing": {
+    "carrier": false,
+    "floatplane": false,
+    "land": true,
+    "flyingBoat": false
+  },
+  "crew": {
+    "normal": 5
+  },
+  "cost_gold": 0,
+  "weights": {
+    "empty_kg": 8070
+  },
+  "performance": {
+    "speed_kmh": {
+      "cruise": 332
+    }
+  },
+  "fuel": {
+    "combat_radius_km": 1016
+  },
+  "notes": "Government-managed shore aviation, outside naval aircraft procurement and naval aviator totals. Representative three-year operational type; national army, air-force or shore-naval service as appropriate. No claim of a verified historical model or squadron establishment. Carrier decks and cruiser catapults cannot operate this type."
 }
 ```
 

@@ -1,3 +1,5 @@
+import { queueAirStrike } from './air-operations.mjs';
+import { airConditions, searchSector, sectorFactor } from './air-conditions.mjs';
 import { assignOpeningBases } from './opening-bases.mjs';
 import { completeScrapping } from './ship-retirement.mjs';
 import { escortEligible, escortsForConvoy, coverageAt } from './convoy-coverage.mjs';
@@ -244,6 +246,12 @@ export function recordContact(s,observer,id,f,position,stats,source='Scouting',a
 }
 export function visibleContacts(s,id=s.player,minute=campaignMinutes(s)){return (s.nations[id].contacts||[]).map(c=>{const hours=Math.max(0,(minute-c.seenAt)/60);return {...c,position:[...c.position],hours,stage:hours<=2?'Fresh':hours<=12?'Recent':hours<=48?'Uncertain':'Stale',confidence:c.baseConfidence*Math.exp(-hours/48),uncertainty:Math.min(1800,c.baseUncertainty+hours*18)};}).filter(c=>c.hours<168);}
 const metricCache=new WeakMap();export function invalidateOperations(s){metricCache.delete(s);invalidatePorts(s);invalidateSupport(s);}
+const airSearchCache=new WeakMap();
+function fleetAirSearch(s,id,f,position,wars){
+ const bucket=Math.floor(campaignMinutes(s)/15);let cache=airSearchCache.get(s);if(!cache||cache.bucket!==bucket){cache={bucket,nations:new Map(),fleets:new Map()};airSearchCache.set(s,cache);}
+ let recent=cache.nations.get(id);if(recent===undefined){recent=s.nations[id].contacts.filter(x=>campaignMinutes(s)-x.seenAt<360&&wars.has(x.nation)).sort((a,b)=>b.seenAt-a.seenAt)[0]||null;cache.nations.set(id,recent);}
+ let row=cache.fleets.get(f.id);if(!row){row={conditions:airConditions(s,position),sector:searchSector(s,f,position,recent?.position)};cache.fleets.set(f.id,row);}return row;
+}
 function metrics(s,c){let cache=metricCache.get(s);if(!cache||cache.day!==s.day){cache={day:s.day,rows:Object.entries(s.nations).flatMap(([id,n])=>n.fleets.map(f=>({id,f,stats:fleetStats(s,c,id,f)})))};metricCache.set(s,cache);}return cache.rows;}
 export function dailyOperations(s,c){
   for(const [id,n]of Object.entries(s.nations)){
@@ -310,28 +318,30 @@ export function minuteOperations(s,c,resolve,convoyReport){
   const cells=new Map();for(const row of world){const x=Math.floor((row.position[0]+180)/8),y=Math.floor((row.position[1]+90)/8),k=`${x}:${y}`;if(!cells.has(k))cells.set(k,[]);cells.get(k).push(row);}
   const acted=new Set(),wars=Object.fromEntries(Object.keys(s.nations).map(id=>[id,new Set(Object.values(s.relations).filter(r=>r.war&&[r.a,r.b].includes(id)).map(r=>r.a===id?r.b:r.a))]));
   for(const own of world){if(own.kind!=='fleet')continue;const n=s.nations[own.id],f=own.f,st=own.stats,contacts=contactIndex(n).map,canAct=!['support','repair','reinforcement'].includes(f.role)&&!['port','refuel','repair'].includes(f.phase)&&now-f.lastBattle>=720;
-    const range=(25+Math.min(180,st.airRadius*.35)+Math.min(90,st.scouts*4)+(st.radar?20:0)+upgradeLevel(n.tech,'radar')*12)*MISSIONS[f.mission].search*(1+upgradeLevel(n.tech,'intelligence')*.08);
+    const {conditions,sector}=fleetAirSearch(s,own.id,f,own.position,wars[own.id]);
+    const visual=25+(st.radar?20:0)+upgradeLevel(n.tech,'radar')*12,range=(visual+(Math.min(500,st.airRadius)+Math.min(90,st.scouts*4))*conditions.search)*MISSIONS[f.mission].search*(1+upgradeLevel(n.tech,'intelligence')*.08);
     const x=Math.floor((own.position[0]+180)/8),y=Math.floor((own.position[1]+90)/8),span=Math.ceil(range/(480*Math.max(.25,Math.cos(own.position[1]*Math.PI/180))));
-    for(let dx=-span;dx<=span;dx++)for(let dy=-1;dy<=1;dy++)for(const target of cells.get(`${(x+dx+45)%45}:${y+dy}`)||[]){
+    for(let dx=-span;dx<=span;dx++)for(let dy=-Math.max(1,Math.ceil(range/480));dy<=Math.max(1,Math.ceil(range/480));dy++)for(const target of cells.get(`${(x+dx+45)%45}:${y+dy}`)||[]){
       if(target.id===own.id)continue;
       let contact=contacts.get(target.f.id);const observed=contact?.source==='Scouting'&&now-contact.seenAt<10;
-      const eligible=canAct&&!acted.has(f.id)&&wars[own.id].has(target.id)&&(target.kind==='convoy'?f.mission==='raid'&&now-target.f.lastBattle>=720:!['port','refuel','repair'].includes(target.f.phase)&&now-f.lastBattle>=(f.role==='repair'?720:10080)&&now-target.f.lastBattle>=(['repair','support'].includes(target.f.role)?720:10080)&&!acted.has(target.f.id));
+      const eligible=canAct&&!acted.has(f.id)&&wars[own.id].has(target.id)&&(target.kind==='convoy'?f.mission==='raid'&&now-target.f.lastBattle>=720:!['port','refuel','repair'].includes(target.f.phase)&&(st.air>0||now-f.lastBattle>=(f.role==='repair'?720:10080)&&now-target.f.lastBattle>=(['repair','support'].includes(target.f.role)?720:10080))&&!acted.has(target.f.id));
       if(observed&&!eligible)continue;
       // Reject distant neighbors cheaply before the precise spherical distance.
       if(Math.abs(own.position[1]-target.position[1])*60>range*1.01)continue;
       const d=distanceNm(own.position,target.position);if(d>range)continue;
       if(!observed){const stealth=target.stats.submarines>target.stats.hulls*.5?.3:1;
-        if(operationRandom(s)<hazard(clamp((1-d/(range*1.3))*stealth,.03,.95)))contact=recordContact(s,own.id,target.id,target.f,target.position,target.stats);
+        if(operationRandom(s)<hazard(clamp((1-d/(range*1.3))*stealth*(d<=visual?1:sectorFactor(sector,own.position,target.position)*conditions.search),.001,.95)))contact=recordContact(s,own.id,target.id,target.f,target.position,target.stats);
       }
       if(!eligible||!contact||now-contact.seenAt>=120)continue;
+      if(st.air>0&&operationRandom(s)<hazard(MISSIONS[f.mission].engagement)&&!(target.kind==='convoy'&&f.mission!=='raid'))queueAirStrike(s,c,own.id,{fleetId:f.id,targetNation:target.id,targetId:target.f.id,targetKind:target.kind,position:contact.position});
       if(target.kind==='convoy'){
-        if(f.mission!=='raid'||now-f.lastBattle<720||now-target.f.lastBattle<720||d>(st.air?Math.min(160,st.airRadius):35)||operationRandom(s)>hazard(.22))continue;
+        if(f.mission!=='raid'||now-f.lastBattle<720||now-target.f.lastBattle<720||d>35||operationRandom(s)>hazard(.22))continue;
         const defenders=escortsForConvoy(world,target).reduce((v,r)=>v+convoyCombatPower(s,c,r).defense,0);
-        const attack=convoyCombatPower(s,c,own).attack;if(attack<=0||operationRandom(s)<defenders/(defenders+attack))continue;
+        const attack=convoyCombatPower(s,c,{...own,stats:{...own.stats,air:0}}).attack;if(attack<=0||operationRandom(s)<defenders/(defenders+attack))continue;
         const loss=sinkMerchants(s,target.id,Math.min(target.f.count,1+Math.floor(operationRandom(s)*Math.min(7,attack/100+1))),{details:true}),count=loss.hulls;target.f.count-=count;n.merchantSunk+=count;n.merchantSunkGRT=(n.merchantSunkGRT||0)+loss.grt;target.f.lastBattle=now;f.lastBattle=now;acted.add(f.id);convoyReport?.(own.id,target.id,count,target.position,f.id,loss.grt);continue;
       }
       const cooldown=f.role==='repair'?720:7*1440;if(now-f.lastBattle<cooldown||now-target.f.lastBattle<(['repair','support'].includes(target.f.role)?720:7*1440)||acted.has(target.f.id))continue;
-      if(d>(st.air||target.stats.air?160:45)||operationRandom(s)>hazard(MISSIONS[f.mission].engagement))continue;
+      if(d>45||operationRandom(s)>hazard(MISSIONS[f.mission].engagement))continue;
       f.lastBattle=now;target.f.lastBattle=now;acted.add(f.id);acted.add(target.f.id);
       const region=Object.values(AREAS).reduce((a,b)=>distanceNm(a.point,own.position)<distanceNm(b.point,own.position)?a:b).region;
       resolve(own.id,target.id,region,f.id,target.f.id,own.position);invalidateOperations(s);

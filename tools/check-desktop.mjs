@@ -24,6 +24,11 @@ try{
   await page.locator('[data-action="select-campaign"][data-id="'+campaign+'"]').click();await page.locator('[data-action="select-nation"][data-id="'+nation+'"]').click();await click('new');if(await page.locator('[data-action="begin"]').count())await click('begin');await page.locator('.world-map').waitFor();
   const creditData=await page.evaluate(async()=>{const m=await import('/world-political.mjs');return {date:m.POLITICAL.date,license:m.POLITICAL.license,earlier:m.POLITICAL_1922.date};});assert.equal(creditData.license,'Public domain');assert.equal(creditData.earlier,'1922-02-06');
   await page.locator('.fleet-command-row').first().click();await page.locator('.selected-manifest').waitFor();assert(await page.locator('.manifest-grid .ship-type').count()>0);
+  assert.match(await page.locator('.fleet-overview').innerText(),/CAP \d+ fighters/);
+  await page.locator('.sidebar [data-view="aircraft"]').click();await page.locator('.aircraft-models').first().waitFor();
+  assert.equal(await page.locator('[data-government-model]').count(),20);assert.equal(await page.locator('[data-government-model] button').count(),0);assert.match(await page.locator('[data-government-model] .badge').first().innerText(),/Government managed/i);
+  assert.equal(await page.locator('[data-model][data-future="true"] [data-action="air-design"]').count(),0);await page.screenshot({path:path.join(output,'desktop-aircraft-'+campaign+'.png')});
+  await page.locator('.sidebar [data-view="command"]').click();await page.locator('#fleet-mission').waitFor();
   await page.locator('#fleet-mission').selectOption('guard');await click('fleet-order');await page.waitForTimeout(400);assert.equal(await page.locator('#fleet-mission').inputValue(),'guard');
   await page.locator('.sidebar [data-view="yards"]').click();await page.locator('.yard-capacity svg').waitFor();
   for(const type of ['DD','AO','AK','CL']){if(await page.locator('[data-action="order"]:not([disabled])').count())break;if(await page.locator('#design-filter option[value="'+type+'"]').count())await page.locator('#design-filter').selectOption(type);}
@@ -36,7 +41,7 @@ try{
   await click('menu');const newWindow=desktop.waitForEvent('window');await page.locator('a[href="/third-party-notices.html"]').click();const credits=await newWindow;await credits.waitForLoadState();assert.match(await credits.locator('body').innerText(),/Kevin MacLeod/);await credits.close();await page.locator('.modal [data-action="close"]').first().click();
   await closeSaved();const stored=JSON.parse(await fs.readFile(path.join(userData,'saves/campaign.json')));assert.equal(stored.player,nation);assert.equal(stored.paused,true);assert.equal(stored.nations[nation].industryFunding,.4);assert(stored.nations[nation].groups.some(g=>g.status==='building'));
   await launch(userData);await click('continue');await page.locator('.world-map').waitFor();await page.locator('.sidebar [data-view="programs"]').click();assert.equal(await page.locator('#industryFunding').inputValue(),'40');await closeSaved();
-  result.checks.push(campaign+' '+nation+': packaged runtime without Node on PATH, sandbox, map, fleet order, ship order, funding, minute simulation, music, credits, close/save and reopen');
+  result.checks.push(campaign+' '+nation+': packaged runtime without Node on PATH, sandbox, map, CAP overview, read-only shore catalog, future-aircraft gates, fleet order, ship order, funding, minute simulation, music, credits, close/save and reopen');
  }
  assert.deepEqual(result.errors,[]);console.log(JSON.stringify(result));
 }catch(error){result.errors.push(error.stack);console.error(error);process.exitCode=1;await page?.screenshot({path:path.join(output,'desktop-failure.png')}).catch(()=>{});}

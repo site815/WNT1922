@@ -1,3 +1,4 @@
+import { queueAirStrike } from './air-operations.mjs';
 import { PORTS,NODES,HOME_PORT,distanceNm } from './world.mjs';
 import { campaignMinutes } from './campaign-clock.mjs';
 import { portOwner,portSummary } from './ports.mjs';
@@ -13,7 +14,7 @@ export function portCandidates(s,c,id,f){
  return Object.keys(PORTS).filter(port=>s.relations[key(id,portOwner(s,port))]?.war).map(port=>{
  const p=portSummary(s,c,port),distance=distanceNm(pos,NODES[port]),strength=st.surface*2+st.air*12;
  // Intelligence and harbor traffic guide a raid; a siege values the supply base itself.
- const seen=s.nations[id].contacts.some(x=>x.nation===p.owner&&distanceNm(x.position,NODES[port])<80);
+ const report=s.nations[id].anchorageReports?.[port],seen=report&&campaignMinutes(s)-report.seenAt<2880&&report.hulls>0;
  const value=f.mission==='anchorage'?(seen?3:1):p.capacity/100000;
  return {port,score:value/(1+distance/400),risk:p.combat/Math.max(1,strength)};
  }).filter(x=>f.aggressiveBattle||x.risk<1.7).sort((a,b)=>b.score-a.score).map(x=>x.port);
@@ -29,7 +30,16 @@ export function minutePortOperations(s,c,resolve){
   let port=objective,distance=objective?distanceNm(pos,NODES[objective]):Infinity;
   if(!port)for(const [candidate,p]of enemies[id]){const range=Math.max(p.aviation>0?p.airRange:0,p.artillery>0?p.gunRange:0);if(Math.abs(pos[1]-NODES[candidate][1])*60>range)continue;const d=distanceNm(pos,NODES[candidate]);if(d<range&&d<distance){port=candidate;distance=d;}}
   if(!port)continue;const p=defenses.get(port);
-  const attacking=objective&&distance<Math.max(18,st.air?Math.min(160,st.airRadius):18),inRange=distance<Math.max(p.aviation>0?p.airRange:0,p.artillery>0?p.gunRange:0);
+  const report=n.anchorageReports?.[port],scouted=report&&now-report.seenAt<2880;
+  // Carrier groups hold off the coast to search and cycle aircraft. Their
+  // escorts do not sail into the shore batteries to deliver a carrier raid.
+  if(objective&&f.role==='carrier'&&st.airRadius>0&&distance<=st.airRadius*.7&&distance>p.gunRange*1.3&&f.fuelNm>st.range*.25){
+   f.route=[[...pos]];f.departAt=f.arriveAt=now;f.phase='patrol';f.nextPlanAt=Math.max(f.nextPlanAt,now+30);
+  }
+  if(objective&&st.air>0&&scouted&&distance<=st.airRadius)queueAirStrike(s,c,id,{fleetId:f.id,targetNation:p.owner,targetId:port,targetKind:'port',operation:f.mission,position:NODES[port]});
+  const detected=s.nations[p.owner]?.contacts.find(x=>x.id===f.id&&now-x.seenAt<360);
+  if(detected&&p.aviation>0&&distance<=p.airRange)queueAirStrike(s,c,p.owner,{sourcePort:port,targetNation:id,targetId:f.id,targetKind:'fleet',position:detected.position});
+  const attacking=objective&&distance<=18,inRange=distance<=p.gunRange&&p.artillery>0;
   if(!attacking&&(!inRange||operationRandom(s)>.12||st.submarines===st.hulls))continue;
   f.nextPortAction=now+300+Math.floor(operationRandom(s)*180);
   resolve(id,f,port,attacking?f.mission:'shore',distance);

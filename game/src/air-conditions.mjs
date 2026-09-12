@@ -1,6 +1,8 @@
 import { campaignMinutes } from './campaign-clock.mjs';
 const rad=Math.PI/180,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const weatherCache=new Map();
+// One deterministic regional weather state per six hours; evaluating the UI
+// cannot consume simulation randomness or change a later battle's weather.
 export function airConditions(s,position,minute=campaignMinutes(s)){
  const [lon,lat]=position,date=new Date(minute*60000),day=Math.floor((Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())-Date.UTC(date.getUTCFullYear(),0,1))/86400000);
  const declination=23.44*Math.sin((day-80)*2*Math.PI/365)*rad,hour=((minute/60+lon/15)%24+24)%24;
