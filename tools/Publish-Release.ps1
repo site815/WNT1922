@@ -32,7 +32,7 @@ if (-not $release) {
         tag_name = $metadata.tag
         target_commitish = $commit
         name = 'WNT1922 ' + $metadata.version + ' portable beta'
-        body = Get-Content -Raw -LiteralPath 'dist/RELEASE.md'
+        body = [IO.File]::ReadAllText((Join-Path $publishRoot 'dist/RELEASE.md')).Replace('(latest.json)', '(https://github.com/site815/WNT1922/blob/' + $commit + '/dist/latest.json)')
         draft = $true
         prerelease = $false
     } | ConvertTo-Json
