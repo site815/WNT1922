@@ -66,6 +66,7 @@ test('consolidation cannot transfer ships into a command removed earlier in the 
   n.fleets.push({...structuredClone(target),id:'escort-'+i,maxRangeNm:i%2?1000:3000,phase:'refuel'});
   n.groups.push({...structuredClone(ship),id:'ship-'+i,fleetId:'escort-'+i,atSea:false});
  }
+ n.groups.push({...structuredClone(ship),id:'wreck',fleetId:'escort-0',count:0,status:'sunk',sailors:0,atSea:false});
  dailyOperations(s,c);
  const ids=new Set(n.fleets.map(f=>f.id));
  for(const g of n.groups)if(g.fleetId)assert(ids.has(g.fleetId),g.fleetId);

@@ -1617,7 +1617,8 @@ export function dailyOperations(s, c) {
             limits[f.role],
       );
       if (target && n.fleets.length > 2) {
-        for (const g of own) g.fleetId = target.id;
+        // Historical zero-count groups still need a valid command reference in saves.
+        for (const g of fleetGroups(s, id, f.id)) g.fleetId = target.id;
         target.fuelNm = Math.min(target.fuelNm, f.fuelNm);
         n.fleets = n.fleets.filter((x) => x !== f);
       }

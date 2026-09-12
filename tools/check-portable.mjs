@@ -56,7 +56,7 @@ async function launch(profile) {
     [
       "/S",
       "--test-mode",
-      ...(performanceOnly ? ["--test-rendering"] : []),
+      "--test-rendering",
       "--disable-backgrounding-occluded-windows",
       "--disable-features=CalculateNativeWinOcclusion",
       "--remote-debugging-address=127.0.0.1",
@@ -206,11 +206,23 @@ async function measureMapFrames() {
 }
 try {
   if (performanceOnly) {
-    await launch(path.join(testRoot,"rendering profile"));
-    await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();
-    await page.locator('[data-action="select-nation"][data-id="USA"]').click();
-    await page.locator('[data-action="new"]').click();
-    if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
+    const profile=path.join(testRoot,"rendering profile");
+    if(process.env.WNT_PORTABLE_PERFORMANCE_SAVE) {
+      const saved=JSON.parse(await fs.readFile(process.env.WNT_PORTABLE_PERFORMANCE_SAVE,'utf8'));
+      saved.paused=true;saved.autoPause=false;saved.controllers[saved.player]='human';
+      validateSave(saved,CATALOG);
+      await fs.mkdir(path.join(profile,'saves'),{recursive:true});
+      await fs.writeFile(path.join(profile,'saves/campaign.json'),JSON.stringify(saved));
+      result.campaignDate=new Date(saved.day*86400000).toISOString().slice(0,10);
+      await launch(profile);
+      await page.locator('[data-action="continue"]').click();
+    } else {
+      await launch(profile);
+      await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();
+      await page.locator('[data-action="select-nation"][data-id="USA"]').click();
+      await page.locator('[data-action="new"]').click();
+      if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
+    }
     await page.locator('.world-map').waitFor();
     await page.locator('#auto-pause').uncheck();
     await page.locator('#speed').selectOption('10');
