@@ -19,7 +19,7 @@ Use a new campaign for beta testing. Report the version, campaign, nation and a 
 ## Verification
 
 - 249 regression checks pass; all 14 opening states validate. Moving the remaining opening deployment rules into catalogs preserved all 14 states exactly.
-- The 1936 all-seven-AI campaign completed through 1950: 525,984 fifteen-minute ticks with saved-state, resource and fleet-reference validation every month.
+- Both all-seven-AI campaigns completed through 1950: 1,013,376 fifteen-minute ticks from 1922 and 525,984 from 1936, with saved-state, resource and fleet-reference validation at 527 monthly boundaries. An additional 35,040 ticks carried the 1936 sandbox through 1951 after the final fleet-order fixes.
 - The final portable passed both campaign menu exercises, designs, diplomacy, funding, all music files, save/reopen and a five-round surface battle with a live, scrollable report.
 - The portable includes 33 playable audio files, approximately 117 minutes in total, with track-by-track attribution.
 - A visible portable-window check on the development computer sustained 60 FPS map movement while scrolling at the 100,000× simulation setting. The largest observed UI frame gap was about 33 ms. This is a measured opening-campaign result, not a minimum hardware guarantee.
