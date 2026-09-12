@@ -16,6 +16,61 @@ import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { aircraftSeats } from '../mechanics/naval-resources.mjs';
 import { CAMPAIGNS, navyFor } from '../mechanics/land-war.mjs';
 import { readDocument } from '../worker/documents.mjs';
+import { reconcileReinforcements, fleetPosition, dailyOperations } from '../mechanics/task-forces.mjs';
+
+function reinforcementFixture() {
+ const s=newGame(CATALOG,'USA',27), c=contentFor(CATALOG,s), n=s.nations.USA, now=campaignMinutes(s);
+ const ship=structuredClone(n.groups.find(g=>c.classes[g.classId].type==='DD' && g.count));
+ const original=n.fleets.find(f=>f.id===ship.fleetId);
+ const target={...structuredClone(original),id:'parent',role:'escort',port:'norfolk',route:[[...NODES.norfolk]],phase:'refuel',departAt:now,arriveAt:now,nextPlanAt:now+720};
+ const transfer={...structuredClone(target),id:'transfer',name:'Reinforcement group',role:'reinforcement',reinforceTo:target.id,destinationPort:'norfolk'};
+ const other={...structuredClone(ship),id:'parent-ship',fleetId:target.id};
+ Object.assign(ship,{id:'transfer-ship',fleetId:transfer.id});
+ n.groups=[ship,other];n.fleets=[target,transfer];
+ return {s,c,n,ship,target,transfer};
+}
+test('reinforcements merge at a physically shared port, including during refuelling',()=>{
+ const {s,c,n,ship,target,transfer}=reinforcementFixture(), position=fleetPosition(s,transfer), sailors=ship.sailors;
+ reconcileReinforcements(s,c,'USA');
+ assert.equal(n.fleets.length,1);assert.equal(ship.fleetId,target.id);
+ assert.deepEqual(fleetPosition(s,target),position);assert.equal(ship.sailors,sailors);
+});
+test('missing and unreachable rendezvous release stranded reinforcements without teleporting',()=>{
+ for(const cause of ['missing','unreachable','captured']) {
+  const {s,c,n,transfer,target}=reinforcementFixture();
+  target.port='hawaii';target.route=[[...NODES.hawaii]];transfer.destinationPort='hawaii';
+  if(cause==='missing')n.fleets=n.fleets.filter(f=>f!==target);
+  if(cause==='unreachable')transfer.fuelNm=transfer.maxRangeNm=10;
+  if(cause==='captured')s.world.portControl.hawaii='JPN';
+  const position=fleetPosition(s,transfer);
+  reconcileReinforcements(s,c,'USA');
+  assert.equal(transfer.role,'escort',cause);assert.equal(transfer.reinforceTo,undefined);
+  assert.deepEqual(fleetPosition(s,transfer),position,cause);
+ }
+});
+test('a shared destination is not a shared position, and an engaged fleet cannot receive reinforcements',()=>{
+ for(const locked of ['passage','battle']) {
+  const {s,c,n,target,transfer,ship}=reinforcementFixture();
+  if(locked==='passage')Object.assign(transfer,{route:[[...NODES.hawaii],[...NODES.norfolk]],arriveAt:campaignMinutes(s)+1e6,phase:'reinforcing'});
+  else target.battleId='active-battle';
+  const position=fleetPosition(s,transfer);
+  reconcileReinforcements(s,c,'USA');
+  assert.equal(n.fleets.length,2);assert.equal(ship.fleetId,transfer.id);
+  assert.deepEqual(fleetPosition(s,transfer),position);
+ }
+});
+test('consolidation cannot transfer ships into a command removed earlier in the same pass',()=>{
+ const {s,c,n,ship,target}=reinforcementFixture();
+ n.fleets=[];n.groups=[];
+ for(let i=0;i<24;i++) {
+  n.fleets.push({...structuredClone(target),id:'escort-'+i,maxRangeNm:i%2?1000:3000,phase:'refuel'});
+  n.groups.push({...structuredClone(ship),id:'ship-'+i,fleetId:'escort-'+i,atSea:false});
+ }
+ dailyOperations(s,c);
+ const ids=new Set(n.fleets.map(f=>f.id));
+ for(const g of n.groups)if(g.fleetId)assert(ids.has(g.fleetId),g.fleetId);
+ assert.equal(n.groups.reduce((v,g)=>v+g.count,0),24*ship.count);
+});
 
 test('national peace and war playlists are distinct, attributed, and avoid immediate repeats',()=>{
  assert.equal(TRACKS.length,33);

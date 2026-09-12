@@ -617,13 +617,13 @@ export function balanceScreens(s, c, id) {
       escorts = screenStrength(s, c, id, f),
       need = Math.ceil(Math.max(0, screenRequirement(s, c, id, f) - escorts));
     f.needsEscorts = need;
-    if (!need || !["port", "refuel"].includes(f.phase)) continue;
+    if (!need || !["port", "refuel"].includes(f.phase) || !physicalPort(s, id, f)) continue;
     const nearby = n.fleets.filter(
       (x) =>
         x.role === "escort" &&
         !activeProvocation(s, id, x.id) &&
         ["port", "refuel"].includes(x.phase) &&
-        x.port === f.port,
+        x.port === f.port && physicalPort(s, id, x) === f.port,
     );
     let moved = 0;
     for (const donor of nearby)
@@ -652,6 +652,7 @@ export function balanceScreens(s, c, id) {
           !activeProvocation(s, id, x.id) &&
           ["port", "refuel"].includes(x.phase) &&
           x.port === f.port &&
+          physicalPort(s, id, x) === f.port &&
           !(n.airSorties || []).some((o) => o.fleetId === x.id) &&
           fleetGroups(s, id, x.id).some((g) => g.status === "active") &&
           fleetGroups(s, id, x.id)
@@ -682,6 +683,7 @@ export function balanceScreens(s, c, id) {
           x.role === "escort" &&
           !activeProvocation(s, id, x.id) &&
           ["port", "refuel"].includes(x.phase) &&
+          physicalPort(s, id, x) &&
           fleetGroups(s, id, x.id).filter(
             (g) =>
               g.status === "active" &&
@@ -789,7 +791,7 @@ export function setRoute(
   if (!NODES[target]) throw new Error("Choose a valid naval destination.");
   const now = campaignMinutes(s),
     points = plannedRoute(s, f, target, position),
-    atPort = ["port", "refuel"].includes(f.phase),
+    atPort = !!physicalPort(s, id, f),
     distance = routeLength(points),
     initial = fleetStats(s, c, id, f);
   f.maxRangeNm = initial.range;
@@ -917,6 +919,57 @@ export function nextSupplyLeg(s, id, f, target) {
   while (previous[next] && previous[next] !== start) next = previous[next];
   return next;
 }
+function physicalPort(s, id, f) {
+  if (campaignMinutes(s) < f.arriveAt) return null;
+  const position = fleetPosition(s, f);
+  return usablePorts(s, id).find(port => distanceNm(position, NODES[port]) < 1) || null;
+}
+function finishReinforcement(s, c, id, f, target = null) {
+  const n = s.nations[id], members = fleetGroups(s, id, f.id);
+  if (target) {
+    for (const g of members) g.fleetId = target.id;
+    target.fuelNm = Math.min(target.fuelNm, f.fuelNm);
+    const st = fleetStats(s, c, id, target);
+    target.speed = st.speed;
+    target.maxRangeNm = st.range;
+    target.fuelNm = Math.min(target.fuelNm, st.range);
+    n.fleets = n.fleets.filter(x => x !== f);
+  } else {
+    const ship = members.find(g => g.count && g.status === "active");
+    if (!ship) return;
+    f.role = type(c.classes[ship.classId]);
+    f.name = roles[f.role] + " " + (n.fleets.indexOf(f) + 1);
+    delete f.reinforceTo;
+    delete f.destinationPort;
+    if (f.phase === "reinforcing") f.phase = "passage";
+    if (campaignMinutes(s) >= f.arriveAt && !physicalPort(s, id, f)) f.phase = "patrol";
+    f.nextPlanAt = Math.max(campaignMinutes(s), f.arriveAt);
+  }
+  invalidateOperations(s);
+}
+export function reconcileReinforcements(s, c, id) {
+  const n = s.nations[id];
+  for (const f of [...n.fleets]) {
+    if (f.role !== "reinforcement" || f.battleId) continue;
+    const target = n.fleets.find(x => x.id === f.reinforceTo &&
+      !["repair", "reinforcement", "support"].includes(x.role) &&
+      fleetGroups(s, id, x.id).some(g => g.count && g.status === "active"));
+    if (!target) { finishReinforcement(s, c, id, f); continue; }
+    const port = physicalPort(s, id, f);
+    if (!port) continue; // Never move hulls between forces while they are travelling.
+    f.port = port;
+    const local = n.fleets.find(x => x !== f && !x.battleId &&
+      (x === target || x.role === target.role) && !activeProvocation(s, id, x.id) &&
+      physicalPort(s, id, x) === port);
+    if (local) { finishReinforcement(s, c, id, f, local); continue; }
+    // A changed or unreachable rendezvous must not strand short-range hulls forever.
+    // Test a fully fuelled departure here; refuelling itself remains in the tick handler.
+    f.destinationPort = target.port;
+    if (!usablePorts(s, id).includes(target.port) ||
+        !nextSupplyLeg(s, id, { ...f, fuelNm: f.maxRangeNm }, target.port))
+      finishReinforcement(s, c, id, f);
+  }
+}
 function chooseDestination(s, c, id, f) {
   const n = s.nations[id],
     ports = usablePorts(s, id),
@@ -929,7 +982,8 @@ function chooseDestination(s, c, id, f) {
       : HOME_PORT[id];
   const remainingHome = sailingDistance(current, base),
     waiting = n.fleets.find(
-      (x) => x.reinforceTo === f.id && x.phase === "port",
+      (x) => x.reinforceTo === f.id && ["port", "refuel"].includes(x.phase) &&
+        physicalPort(s, id, x) && nextSupplyLeg(s, id, f, x.port),
     );
   if (
     PORT_MISSIONS.includes(f.mission) &&
@@ -1199,8 +1253,11 @@ export function commissionToFleet(s, c, id, g) {
         distanceNm(fleetPosition(s, f), NODES[port]) < 25,
     );
     if (!f) {
+      const range = (c.classes[ship.classId].range || 3000) / 1.852;
+      const departure = { position: NODES[port], port, fuelNm: range, maxRangeNm: range };
       const target = operational
-        .filter((f) => f.role === role && compatible(f))
+        .filter((f) => f.role === role && compatible(f) &&
+          usablePorts(s, id).includes(f.port) && nextSupplyLeg(s, id, departure, f.port))
         .sort(
           (a, b) =>
             fleetGroups(s, id, a.id).length - fleetGroups(s, id, b.id).length,
@@ -1240,8 +1297,8 @@ export function commissionToFleet(s, c, id, g) {
           (f) =>
             f.role === "reinforcement" &&
             f.reinforceTo === target.id &&
-            f.phase === "port" &&
-            f.port === port,
+            ["port", "refuel"].includes(f.phase) &&
+            physicalPort(s, id, f) === port,
         );
         if (!f) {
           f = makeFleet(
@@ -1515,6 +1572,7 @@ export function dailyOperations(s, c) {
         delete g.fleetId;
       }
     n.fleets = n.fleets.filter((f) => !removed.has(f.id));
+    reconcileReinforcements(s, c, id);
     for (const g of n.groups)
       if (g.status === "active" && g.service === "warship" && !g.fleetId)
         commissionToFleet(s, c, id, g);
@@ -1528,17 +1586,11 @@ export function dailyOperations(s, c) {
       n.fleets.some((x) => x.reinforceTo === f.id);
     const portFleets = n.fleets.filter(
       (f) =>
-        f.phase === "port" &&
+        ["port", "refuel"].includes(f.phase) && physicalPort(s, id, f) &&
         !["repair", "reinforcement", "support"].includes(f.role) &&
         !protectedForce(f),
     );
-    const limits = {
-      carrier: 2,
-      battle: 4,
-      cruiser: 6,
-      escort: 18,
-      submarine: 14,
-    };
+    const limits = data.COMMAND_CORE_LIMITS;
     for (const f of portFleets) {
       if (!n.fleets.includes(f) || f.manual) continue;
       const own = fleetGroups(s, id, f.id).filter(
@@ -1577,9 +1629,11 @@ export function dailyOperations(s, c) {
       ).length > 20
     ) {
       for (const f of portFleets) {
+        if (!n.fleets.includes(f)) continue;
         const target = portFleets.find(
           (x) =>
             x !== f &&
+            n.fleets.includes(x) &&
             x.port === f.port &&
             x.role === f.role &&
             x.mission === f.mission &&
@@ -1599,6 +1653,7 @@ export function dailyOperations(s, c) {
     for (const f of [...n.fleets]) {
       if (
         !["port", "refuel"].includes(f.phase) ||
+        !physicalPort(s, id, f) ||
         ["repair", "reinforcement", "support"].includes(f.role) ||
         protectedForce(f)
       )
@@ -1606,13 +1661,7 @@ export function dailyOperations(s, c) {
       const members = fleetGroups(s, id, f.id).filter(
           (g) => g.status === "active" && g.count,
         ),
-        limit = {
-          submarine: 14,
-          escort: 18,
-          cruiser: 6,
-          battle: 4,
-          carrier: 2,
-        }[f.role];
+        limit = limits[f.role];
       const core = members.filter((g) => type(c.classes[g.classId]) === f.role);
       if (
         core.length > limit &&
@@ -1674,6 +1723,7 @@ export function minuteOperations(s, c, resolve, convoyReport) {
     world = [];
   for (const r of rows) {
     const { id, f, stats } = r;
+    if (!s.nations[id].fleets.includes(f)) continue;
     if (f.battleId) { world.push({ ...r, position:fleetPosition(s,f), kind:"fleet" }); continue; }
     const material = strategicFactor(s.nations[id]);
     if (f.materialFactor !== undefined && Math.abs(material - f.materialFactor) > .00001 && now < f.arriveAt) {
@@ -1697,37 +1747,31 @@ export function minuteOperations(s, c, resolve, convoyReport) {
       continue;
     }
     if (f.role === "reinforcement" && now >= f.arriveAt) {
-      if (f.destinationPort && f.targetNode !== f.destinationPort) {
+      const n = s.nations[id], target = n.fleets.find(x => x.id === f.reinforceTo);
+      const port = physicalPort(s, id, f);
+      if (!target || !usablePorts(s, id).includes(f.destinationPort)) {
+        finishReinforcement(s, c, id, f);
+      } else if (port && !target.battleId && physicalPort(s, id, target) === port) {
+        dockSailors(s, c, id, f);
+        finishReinforcement(s, c, id, f, target);
+        continue;
+      } else if (!port || port !== f.destinationPort) {
         if (f.phase !== "refuel") {
-          f.phase = "refuel";
-          f.nextPlanAt = now + 720;
+          f.phase = port ? "refuel" : "reinforcing";
+          f.nextPlanAt = port ? now + 720 : Math.min(f.nextPlanAt, now);
+          if (port) dockSailors(s, c, id, f);
         }
         if (now >= f.nextPlanAt) {
-          f.fuelNm = f.maxRangeNm;
+          if (port) f.fuelNm = f.maxRangeNm;
           const next = nextSupplyLeg(s, id, f, f.destinationPort);
           if (next) setRoute(s, c, id, f, next, { phase: "reinforcing" });
-          else f.nextPlanAt = now + 1440;
+          else finishReinforcement(s, c, id, f);
         }
         world.push({ ...r, position: fleetPosition(s, f), kind: "fleet" });
         continue;
-      }
-      const n = s.nations[id],
-        target = n.fleets.find((x) => x.id === f.reinforceTo);
-      f.phase = "port";
-      if (
-        target &&
-        distanceNm(fleetPosition(s, target), fleetPosition(s, f)) < 25
-      ) {
-        for (const g of fleetGroups(s, id, f.id)) g.fleetId = target.id;
-        n.fleets = n.fleets.filter((x) => x !== f);
-        balanceScreens(s, c, id);
-        invalidateOperations(s);
-        continue;
-      }
-      if (!target) {
-        f.role = type(c.classes[stats.active[0].classId]);
-        delete f.reinforceTo;
       } else {
+        f.phase = "port";
+        dockSailors(s, c, id, f);
         target.nextPlanAt = Math.min(target.nextPlanAt, now);
         world.push({ ...r, position: fleetPosition(s, f), kind: "fleet" });
         continue;

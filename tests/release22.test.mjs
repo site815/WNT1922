@@ -1,6 +1,7 @@
 import { POLITICAL, POLITICAL_1922 } from "../worker/map-assets.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import test from "node:test";
+import { NODES } from "../mechanics/world.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import {
@@ -328,14 +329,14 @@ test("under-screened capital groups at the same port consolidate without moving 
     };
   Object.assign(original, {
     phase: "port",
-    route: [[0, 0]],
+    route: [[...NODES.norfolk]],
     port: "norfolk",
     manual: false,
     pacificTarget: null,
   });
   Object.assign(other, {
     phase: "port",
-    route: [[0, 0]],
+    route: [[...NODES.norfolk]],
     port: "norfolk",
     manual: false,
     pacificTarget: null,
