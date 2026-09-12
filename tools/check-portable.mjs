@@ -628,7 +628,10 @@ try {
     return el.scrollTop;
   });
   assert(scrolled > 0,"Long battle details must scroll");
-  await delay(700);
+  await page.waitForFunction(before => {
+    const current=document.querySelector('.modal .battle-progress')?.innerText;
+    return current && current!==before;
+  }, phaseBefore, {timeout:5000});
   assert.equal(await page.locator('.modal .combat-calculations').evaluate(el => el.open),true);
   assert((await page.locator('.modal-body').evaluate(el => el.scrollTop)) >= scrolled - 20,"Live refresh preserves report scrolling");
   assert.notEqual(await page.locator('.modal .battle-progress').innerText(),phaseBefore,"The open battle report must update during simulation");
