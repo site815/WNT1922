@@ -20,6 +20,8 @@ import { staffAircraft } from "../mechanics/naval-resources.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
 
 const require = createRequire(import.meta.url);
+// Set WNT_PORTABLE_FRAME_ONLY=1 for a short, normally rendered map performance check.
+const performanceOnly = process.env.WNT_PORTABLE_FRAME_ONLY === "1";
 let playwright;
 try {
   playwright = require("playwright");
@@ -32,7 +34,7 @@ try {
   )("playwright");
 }
 const executable = path.resolve(
-  process.argv[2] || `dist/WNT1922-${GAME_VERSION}-portable-win-x64.exe`,
+  process.argv[2] || `.build/releases/WNT1922-${GAME_VERSION}-portable-win-x64.exe`,
 );
 const output = path.resolve("test-output/portable");
 await fs.mkdir(output, { recursive: true });
@@ -54,6 +56,9 @@ async function launch(profile) {
     [
       "/S",
       "--test-mode",
+      ...(performanceOnly ? ["--test-rendering"] : []),
+      "--disable-backgrounding-occluded-windows",
+      "--disable-features=CalculateNativeWinOcclusion",
       "--remote-debugging-address=127.0.0.1",
       `--remote-debugging-port=${port}`,
     ],
@@ -102,6 +107,8 @@ async function launch(profile) {
   page = context.pages()[0] || (await context.waitForEvent("page"));
   page.setDefaultTimeout(15000);
   await page.setViewportSize({width:1920,height:1080});
+  const displaySession = await context.newCDPSession(page);
+  await displaySession.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   page.on("pageerror", (error) => result.errors.push(error.message));
   await page.locator(".nation-card").first().waitFor();
   await page.evaluate(() => {
@@ -184,7 +191,40 @@ if (-not [PortableTestWindow]::Close($testNativeProcess.ProcessId)) { throw 'Iso
     "Temporary game files must be removed on normal exit",
   );
 }
+async function measureMapFrames() {
+  return page.evaluate(() => new Promise(resolve => {
+    const start=performance.now(),gaps=[];let last=start;
+    function frame(now) {
+      gaps.push(now-last);last=now;
+      const panel=document.querySelector('.command-side-panel');
+      if(panel)panel.scrollTop=(now-start)%500;
+      if(now-start<8000)requestAnimationFrame(frame);
+      else resolve({visible:!document.hidden,fps:1000*gaps.length/(now-start),largestFrameMs:Math.max(...gaps),mapFps:document.querySelector('.world-map')?.dataset.motionFps});
+    }
+    requestAnimationFrame(frame);
+  }));
+}
 try {
+  if (performanceOnly) {
+    await launch(path.join(testRoot,"rendering profile"));
+    await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();
+    await page.locator('[data-action="select-nation"][data-id="USA"]').click();
+    await page.locator('[data-action="new"]').click();
+    if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
+    await page.locator('.world-map').waitFor();
+    await page.locator('#auto-pause').uncheck();
+    await page.locator('#speed').selectOption('10');
+    await delay(1000);
+    result.paused=await measureMapFrames();
+    await page.locator('[data-action="pause"]').click();
+    await delay(1000);
+    result.running100000=await measureMapFrames();
+    await page.locator('[data-action="pause"]').click();
+    await page.screenshot({path:path.join(output,'map-performance.png')});
+    assert(result.running100000.fps>=20 && result.running100000.largestFrameMs<1000,
+      'Visible map responsiveness: '+JSON.stringify(result.running100000));
+    await closeSaved();
+  } else {
   for (const [campaign, nation] of process.env.WNT_PORTABLE_BATTLE_ONLY ? [] : [
     ["in_good_faith_1936", "USA"],
     ["campaign_1922", "GBR"],
@@ -428,10 +468,22 @@ try {
     await page.locator("#industryFunding").dispatchEvent("change");
     await delay(400);
     await page.locator("#auto-pause").uncheck();
+    await page.locator('.sidebar [data-view="command"]').click();
     await page.locator("#speed").selectOption("10");
     const before = await page.locator(".campaign-clock").innerText();
     await page.locator('[data-action="pause"]').click();
-    await delay(1800);
+    const responsiveness=await page.evaluate(()=>new Promise(resolve=>{
+      const start=performance.now(),gaps=[];let last=start;
+      function frame(now){gaps.push(now-last);last=now;
+        if(now-start<5000){const panel=document.querySelector('.command-side-panel');if(panel)panel.scrollTop=(now-start)%500;requestAnimationFrame(frame);}
+        else resolve({visible:!document.hidden,fps:gaps.length*1000/(now-start),largestFrameMs:Math.max(...gaps),mapFps:document.querySelector('.world-map')?.dataset.motionFps});
+      }requestAnimationFrame(frame);
+    }));
+    assert(responsiveness.largestFrameMs<2000,'The hidden test window must keep receiving simulation updates');
+    const workers=page.workers().map(w=>w.url());
+    assert(workers.some(u=>u.endsWith('/worker/simulation-worker.mjs')));
+    assert(workers.some(u=>u.endsWith('/worker/view-worker.mjs')));
+    result.checks.push({nation,hiddenWindowScheduling:responsiveness});
     await page.locator('[data-action="pause"]').click();
     assert.notEqual(await page.locator(".campaign-clock").innerText(), before);
     const music = await page.evaluate(async () => {
@@ -440,7 +492,24 @@ try {
       return module.musicStatus();
     });
     assert(music.started);
-    await delay(600);
+    assert.equal(music.nation,nation);
+    assert.equal(music.mood,'Peace');
+    await delay(1100);
+    const softened=await page.evaluate(async()=>(await import('/ui/music.mjs')).musicStatus());
+    assert(Math.abs(softened.outputVolume-softened.volume/3)<.01,'Paused music softens to one-third');
+    if(nation==='USA') {
+      const metadata=await page.evaluate(async()=>{
+        const {TRACKS}=await import('/ui/music.mjs'), results=[];
+        for(const t of TRACKS) results.push(await new Promise(resolve=>{
+          const a=new Audio('/assets/music/'+t.file);const timer=setTimeout(()=>resolve({track:t.id,error:'timeout'}),8000);
+          a.onloadedmetadata=()=>{clearTimeout(timer);resolve({track:t.id,duration:a.duration});a.removeAttribute('src');a.load();};
+          a.onerror=()=>{clearTimeout(timer);resolve({track:t.id,error:'decode'});};
+          a.preload='metadata';a.load();
+        }));return results;
+      });
+      assert(metadata.every(t=>t.duration>30 && !t.error),JSON.stringify(metadata.filter(t=>t.error)));
+      result.musicMetadata=metadata;
+    }
     assert.equal(
       await page.evaluate(
         async () => (await import("/ui/music.mjs")).musicStatus().blocked,
@@ -515,6 +584,7 @@ try {
   await fs.writeFile(path.join(battleProfile,"saves/campaign.json"),JSON.stringify(battleSave));
   await launch(battleProfile);
   await page.locator('[data-action="continue"]').click();
+  await page.waitForFunction(async()=>(await import('/ui/music.mjs')).musicStatus().mood==='War');
   await page.locator('.sidebar [data-view="aircraft"]').click();
   await page.locator('[data-action="retire-aircraft"][data-id="'+oldAircraft.model.id+'"]').click();
   await page.locator('[data-action="confirm"]').click();
@@ -560,6 +630,7 @@ try {
   assert.equal(completedBattle.reports.find(r => r.id === report.id).status,"completed");
   validateSave(completedBattle,CATALOG);
   result.checks.push("Ongoing surface battle: fifteen-minute controls, mid-stage save/reopen, five main rounds, live report updates, reserve aircraft retirement, persistent calculations/scrolling, completion and valid final save");
+  }
   assert.deepEqual(result.errors, []);
   console.log(JSON.stringify(result));
 } catch (error) {
@@ -582,7 +653,7 @@ try {
     if (child.exitCode === null) child.kill();
   }
   await fs.writeFile(
-    path.join(output, "portable-result.json"),
+    path.join(output, performanceOnly ? "performance-result.json" : "portable-result.json"),
     JSON.stringify(result, null, 2),
   );
 }

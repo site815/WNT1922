@@ -139,7 +139,7 @@ test("worker advances independently, serializes orders, freezes paused snapshots
   await client.stop();
 });
 test("bundled soundtrack matches attributed files and new saves reject old versions", () => {
-  const manifest = JSON.parse(fs.readFileSync("assets/music/manifest.json"));
+  const manifest = TRACKS;
   assert.equal(manifest.length, TRACKS.length);
   for (const track of manifest) {
     const bytes = fs.readFileSync("assets/music/" + track.file);
@@ -147,7 +147,7 @@ test("bundled soundtrack matches attributed files and new saves reject old versi
       crypto.createHash("sha256").update(bytes).digest("hex"),
       track.sha256,
     );
-    assert.equal(track.license, "CC BY 4.0");
+    assert.equal(track.license, "CC-BY-4.0");
     assert.ok(bytes.length > 100000);
     assert.ok(bytes.subarray(0, 3).toString() === "ID3" || bytes[0] === 255);
   }

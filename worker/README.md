@@ -5,6 +5,7 @@
 - `map-assets.mjs` combines public-domain geometry with documented campaign ownership and labels.
 - `simulation-worker.mjs` owns the authoritative simulation catalog and queues commands while it loads.
 - `simulation-host.mjs` processes commands, checkpoints state and publishes snapshots.
+- `view-worker.mjs` receives snapshots over a direct MessagePort and calculates read-only display summaries on a second worker. FIFO messages and UI acknowledgements keep state ordered and prevent a snapshot backlog. Simulation RNG and mutable game state remain solely on the simulation worker.
 - `simulation-runner.mjs` advances fifteen-minute steps within a bounded time budget. An overloaded computer runs at a lower actual speed rather than skipping simulation ticks. Movement is interpolated independently by the UI.
 - `desktop/` contains the Electron host, local-only file/save server, portable launcher recipe and pinned runtime/tool versions.
 

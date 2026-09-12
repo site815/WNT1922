@@ -83,9 +83,11 @@ export function staffSailors(s, c, id) {
               ? 3
               : 2;
   };
+  const compare = compareShips(c), priorities = new Map();
   const docked = n.groups
     .filter((g) => commissioned(g) && !g.atSea && !g.battleId)
-    .sort((a, b) => priority(a) - priority(b) || compareShips(c)(a, b));
+    .map(g => { priorities.set(g,priority(g)); return g; })
+    .sort((a, b) => priorities.get(a) - priorities.get(b) || compare(a, b));
   for (const g of docked) {
     const cl = c.classes[g.classId],
       perHull = Math.ceil(cl.crew * (g.status === "reserve" ? 0.15 : 1)),

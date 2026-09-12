@@ -2,8 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
-import { TRACKS } from "../ui/music.mjs";
+import { TRACKS, SOUNDTRACK, musicCredits, playlistFor } from "../ui/music.mjs";
 const manifest = JSON.parse(await fs.readFile("assets/manifest.json"));
+manifest.assets.push(...TRACKS.map(t => ({...t, path:"assets/music/" + t.file})));
 const hash = (b) => createHash("sha256").update(b).digest("hex");
 const paths = new Set();
 for (const a of manifest.assets) {
@@ -34,10 +35,18 @@ const notice = await fs.readFile(
   "assets/licenses/third-party-notices.html",
   "utf8",
 );
+assert(notice.includes('/ui/license-credits.mjs'), 'Credits must read the live music catalog');
+const credits = musicCredits();
 for (const a of music) {
-  assert(notice.includes(a.isrc), "Missing music attribution " + a.title);
-  assert(notice.includes(a.source));
+  assert(credits.includes(a.isrc), "Missing music attribution " + a.title);
+  assert(credits.includes(a.source));
 }
+for (const id of ['GBR','USA','JPN','FRA','ITA','DEU','SOV'])
+  for (const war of [false,true]) {
+    const list=playlistFor(id,war);
+    assert(list.length>=5 && list.every(Boolean), 'Incomplete soundtrack: '+id);
+  }
+assert.match(SOUNDTRACK.licenseSource, /^https:\/\/incompetech\.com\//);
 assert(
   notice.includes("10.1111/joes.12618") &&
     notice.includes("Feinstein") &&

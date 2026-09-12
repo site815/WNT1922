@@ -9,7 +9,6 @@ import { upgradeLevel } from "./levels.mjs";
 import { nearestSupplyPort } from "./logistics.mjs";
 import { fleetPosition } from "./task-forces.mjs";
 import { depotCapacity } from "./support-effects.mjs";
-export const PORT_SPECS = data.PORT_SPECS;
 export const PORT_REPAIR = data.PORT_REPAIR;
 export function initializePorts(s) {
   s.ports ??= Object.fromEntries(

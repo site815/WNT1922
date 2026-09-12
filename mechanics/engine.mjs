@@ -5,6 +5,7 @@ import { scriptedDecisions } from "./events.mjs";
 import { applyCommand } from "./game-actions.mjs";
 import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/engine.md");
+const OPENING_PORT_REGIONS = data.OPENING_PORT_REGIONS;
 export const REVIEW_YEARS = data.REVIEW_YEARS;
 import { allocateShipNames } from "./ship-naming.mjs";
 import {
@@ -77,7 +78,6 @@ import {
 } from "./ship-staffing.mjs";
 import {
   upgradeLevel,
-  openingLevels,
   facilityFactor, industryFactor,
   radarLevel,
   LEVEL_YEARS,
@@ -193,16 +193,8 @@ export function openingGroups(content, id) {
       status: row.status || "active",
       health: row.health ?? 1,
       progress,
-      region: ["vladivostok", "yokosuka", "san_diego", "hawaii"].includes(
-        row.port,
-      )
-        ? "pacific"
-        : ["sevastopol", "toulon", "taranto", "la_spezia"].includes(row.port)
-          ? "mediterranean"
-          : row.port === "brest"
-            ? "atlantic"
-            : PROFILES[id].home,
-    days: buildDays(c),
+      region: OPENING_PORT_REGIONS[row.port] || PROFILES[id].home,
+      days: buildDays(c),
       paid: { gold: 0, influence: 0, industry: 0 },
       service: fleetService(c),
       ...(fleetService(c) === "merchant"

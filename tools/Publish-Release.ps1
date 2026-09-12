@@ -1,16 +1,18 @@
-param()
+param([switch]$DraftOnly)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 $publishRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location -LiteralPath $publishRoot
-$metadata = Get-Content -Raw -LiteralPath 'dist/latest.json' | ConvertFrom-Json
+$metadata = Get-Content -Raw -LiteralPath '.build/releases/latest.json' | ConvertFrom-Json
 $packageVersion = (Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json).version
 if ($metadata.version -ne $packageVersion) { throw 'Build the current version first.' }
-$executable = Join-Path $publishRoot ('dist/' + $metadata.localFile)
+$currentFingerprint = (& node tools/source-fingerprint.mjs).Trim()
+if ($LASTEXITCODE -ne 0 -or $metadata.sourceSha256 -ne $currentFingerprint) { throw 'The sources changed since the portable was built. Rebuild and retest before publication.' }
+$executable = Join-Path $publishRoot ('.build/releases/' + $metadata.localFile)
 $digest = (Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($digest -ne $metadata.sha256 -or (Get-Item -LiteralPath $executable).Length -ne $metadata.bytes) { throw 'The executable does not match its build metadata.' }
 $status = @(git status --porcelain)
-if ($LASTEXITCODE -ne 0 -or $status.Count) { throw 'Commit and manually push the tested source and release metadata first.' }
+if ($LASTEXITCODE -ne 0 -or $status.Count) { throw 'Commit and manually push the tested source first.' }
 $commit = (git rev-parse HEAD).Trim()
 $remoteHead = git -c credential.interactive=never ls-remote origin refs/heads/main
 if ($LASTEXITCODE -ne 0 -or -not $remoteHead -or $remoteHead.Split()[0] -ne $commit) { throw 'Manually push the current commit to origin/main before publishing.' }
@@ -32,7 +34,7 @@ if (-not $release) {
         tag_name = $metadata.tag
         target_commitish = $commit
         name = 'WNT1922 ' + $metadata.version + ' portable beta'
-        body = [IO.File]::ReadAllText((Join-Path $publishRoot 'dist/RELEASE.md')).Replace('(latest.json)', '(https://github.com/site815/WNT1922/blob/' + $commit + '/dist/latest.json)')
+        body = [IO.File]::ReadAllText((Join-Path $publishRoot 'RELEASES.md'))
         draft = $true
         prerelease = $false
     } | ConvertTo-Json
@@ -42,7 +44,7 @@ $uploadUrl = $release.upload_url -replace '\{.*$', ''
 if (-not $uploadUrl.StartsWith('https://uploads.github.com/repos/site815/WNT1922/releases/')) { throw 'Unexpected release upload destination.' }
 $assets = @(
     @{ Path = $executable; Name = $metadata.downloadName; Type = 'application/octet-stream' },
-    @{ Path = (Join-Path $publishRoot ('dist/' + $metadata.downloadName + '.sha256')); Name = $metadata.downloadName + '.sha256'; Type = 'text/plain' }
+    @{ Path = (Join-Path $publishRoot ('.build/releases/' + $metadata.downloadName + '.sha256')); Name = $metadata.downloadName + '.sha256'; Type = 'text/plain' }
 )
 foreach ($asset in $assets) {
     $expectedDigest = 'sha256:' + (Get-FileHash -LiteralPath $asset.Path -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -57,8 +59,18 @@ foreach ($asset in $assets) {
     Write-Output ('Verified ' + $asset.Name + ': ' + $expectedDigest)
 }
 if ($release.draft) {
-    $body = @{ draft = $false; make_latest = 'true' } | ConvertTo-Json
+    $releaseFields = @{
+        body = [IO.File]::ReadAllText((Join-Path $publishRoot 'RELEASES.md'))
+        target_commitish = $commit
+        draft = [bool]$DraftOnly
+    }
+    if (-not $DraftOnly) { $releaseFields.make_latest = 'true' }
+    $body = $releaseFields | ConvertTo-Json
     $release = Invoke-RestMethod -Method Patch -Uri ($api + '/' + $release.id) -Headers $headers -ContentType 'application/json' -Body $body
+}
+if ($DraftOnly) {
+    Write-Output ('Release assets verified; publication deferred: ' + $release.html_url)
+    exit
 }
 $latest = Invoke-RestMethod -Uri ($api + '/latest') -Headers $headers
 if ($latest.id -ne $release.id) { throw 'The release is published, but it is not marked latest. Check the release settings.' }

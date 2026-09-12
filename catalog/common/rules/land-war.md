@@ -2,6 +2,8 @@
 
 Edit the JSON block directly. The game reads this document at startup; no export step is required.
 
+Campaigns name the actual navy supplying each side with optional `attackerNavy` or `defenderNavy` fields. `restoredOwner` controls occupation after a successful counteroffensive; otherwise original territorial ownership applies. Dated territorial changes and port-to-territory links below drive the map directly.
+
 ```json game-data
 {
   "POWERS": {
@@ -115,7 +117,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "seaWeight": 0.15,
       "baseline": 0.9,
       "counter": -9340,
-      "counterBaseline": -0.72
+      "counterBaseline": -0.72,
+      "defenderNavy": "FRA"
     },
     {
       "id": "balkans",
@@ -166,7 +169,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "initial": 0.48,
       "counter": -9916,
       "counterBaseline": -0.65,
-      "attackerNavy": "DEU"
+      "restoredOwner": "GBR"
     },
     {
       "id": "east",
@@ -193,7 +196,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "initial": 0.3,
       "counter": -9830,
       "counterBaseline": -0.6,
-      "defenderNavy": "GBR"
+      "restoredOwner": "SOV"
     },
     {
       "id": "italy",
@@ -214,8 +217,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       ],
       "days": 700,
       "seaWeight": 0.5,
-      "baseline": 0.7,
-      "defenderNavy": "DEU"
+      "baseline": 0.7
     },
     {
       "id": "germany",
@@ -261,8 +263,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "baseline": 0.3,
       "independent": true,
       "counter": -9862,
-      "counterBaseline": -0.1,
-      "defenderNavy": "USA"
+      "counterBaseline": -0.1
     },
     {
       "id": "malaya",
@@ -604,6 +605,63 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "initial": 0
     }
   ],
-  "NEUTRAL_COLOR": "#343b43"
+  "NEUTRAL_COLOR": "#343b43",
+  "TERRITORY_EVENTS": [
+    {
+      "date": "1938-03-12",
+      "territory": "c305",
+      "owner": "DEU"
+    },
+    {
+      "date": "1939-03-15",
+      "territory": "c315",
+      "owner": "DEU"
+    }
+  ],
+  "ORIGINAL_CONTROL": {
+    "c290": "c290",
+    "c291": "c290",
+    "c385": "c385",
+    "c390": "DNK",
+    "c220": "FRA",
+    "c210": "NLD",
+    "c211": "BEL",
+    "c212": "c212",
+    "c345": "c345",
+    "c350": "c350",
+    "c325": "ITA",
+    "c365w": "SOV",
+    "c255w": "DEU",
+    "c255e": "DEU",
+    "c710": "CHN",
+    "c840": "USA",
+    "c821": "GBR",
+    "c827": "GBR",
+    "c850": "NLD",
+    "c823": "GBR",
+    "c824": "GBR",
+    "c835": "GBR",
+    "c911": "GBR",
+    "c912": "GBR",
+    "c940": "GBR"
+  },
+  "PORT_TERRITORIES": {
+    "manila": "c840",
+    "singapore": "c827",
+    "alexandria": "c651",
+    "heligoland": "c255w",
+    "kiel": "c255w",
+    "brest": "c220",
+    "toulon": "c220",
+    "taranto": "c325",
+    "la_spezia": "c325",
+    "tobruk": "c620",
+    "leningrad": "c365w",
+    "sevastopol": "c365w"
+  },
+  "COALITION_WAR": [
+    "JPN",
+    "USA"
+  ]
 }
 ```

@@ -1,6 +1,7 @@
 import { strategicFactor } from "./strategic-materials.mjs";
 import { readDocument } from "../worker/documents.mjs";
 const ENGAGEMENTS = await readDocument("common/rules/engagements.md");
+const rules = (await readDocument('common/rules/air-warfare.md')).sorties;
 import { opposingProvocations, finishIncident } from "./provocation.mjs";
 import { aircraftQuality } from "./aircraft-quality.mjs";
 import { campaignMinutes } from "./campaign-clock.mjs";
@@ -32,9 +33,9 @@ const pair = (a, b) => [a, b].sort().join("-"),
   total = (rows) => rows.reduce((v, w) => v + w.count, 0);
 const cruise = (a) =>
   Math.max(
-    110,
+    rules.minimumCruiseKmh,
     a.performance?.speed_kmh?.cruise ||
-      (a.performance?.speed_kmh?.sea_level || 240) * 0.7,
+      (a.performance?.speed_kmh?.sea_level || rules.fallbackSpeedKmh) * rules.cruiseFraction,
   );
 export function airSource(s, id, op) {
   const n = s.nations[id];
@@ -104,10 +105,10 @@ function draftStrike(s, c, id, source, position, operation) {
         continue;
       const fraction =
         w.role === "fighter"
-          ? 0.35
+          ? rules.fighterEscortFraction
           : source.fleet?.aggressiveBattle
-            ? 0.9
-            : 0.75;
+            ? rules.aggressiveAttackFraction
+            : rules.attackFraction;
       const count = Math.floor(
         (w.crewed || 0) * fraction * conditions.launch * (g.health ?? 1) * strategicFactor(n),
       );
@@ -163,12 +164,12 @@ export function queueAirStrike(s, c, id, request) {
   if (
     source.fleet &&
     (source.fleet.needsEscorts ||
-      source.fleet.fuelNm < source.fleet.maxRangeNm * 0.15)
+      source.fleet.fuelNm < source.fleet.maxRangeNm * rules.minimumCarrierFuelFraction)
   )
     return false;
   if (
     source.base &&
-    now < source.base.lastSortie + 360
+    now < source.base.lastSortie + rules.baseCycleMinutes
   )
     return false;
   const draft = draftStrike(s, c, id, source, position, request.operation);
@@ -176,9 +177,9 @@ export function queueAirStrike(s, c, id, request) {
   // Allow time to assemble and return before darkness; no precision night
   // carrier operations in this deliberately abstract first implementation.
   const assembly = Math.round(
-      35 + draft.strikes * 0.3 + (100 - n.training) * 0.4,
+      rules.assemblyMinutes + draft.strikes * rules.assemblyPerAircraft + (100 - n.training) * rules.assemblyPerMissingTraining,
     ),
-    duration = assembly + (draft.distanceKm / draft.cruise) * 120 + 30;
+    duration = assembly + (draft.distanceKm / draft.cruise) * 120 + rules.recoveryAllowanceMinutes;
   if (!airConditions(s, source.position, now + duration).launch) return false;
   n.airSorties.push({
     id: "sortie-" + s.nextId++,
@@ -219,7 +220,7 @@ export function combatAirPatrol(
     for (const w of g.airWing || [])
       if (w.role === "fighter") {
         const take = Math.floor(
-          (w.crewed || 0) * 0.6 * cond.launch * (g.health ?? 1) * strategicFactor(s.nations[id]),
+          (w.crewed || 0) * rules.capFraction * cond.launch * (g.health ?? 1) * strategicFactor(s.nations[id]),
         );
         if (!take) continue;
         const a = models.get(w.model);
@@ -237,8 +238,8 @@ export function loseCAP(s, c, id, cap, fraction) {
     w.count -= take;
     w.crewed -= take;
     const part = loseAircraft(s, c, id, { airWing: [wing] }, fraction, {
-      rescue: 0.5,
-      airframeRescue: 0.08,
+      rescue: rules.capAviatorRescue,
+      airframeRescue: rules.capAirframeRescue,
     });
     w.count += wing.count;
     w.crewed += wing.crewed;
@@ -253,7 +254,7 @@ function launch(s, c, id, op) {
   if (!source) return false;
   if (op.targetKind !== "port") {
     const contact = n.contacts.find((x) => x.id === op.targetId);
-    if (!contact || now - contact.seenAt > 360) return false;
+    if (!contact || now - contact.seenAt > rules.contactMaxAgeMinutes) return false;
     op.targetPosition = [...contact.position];
   }
   const draft = draftStrike(s, c, id, source, op.targetPosition, op.operation);
@@ -262,7 +263,7 @@ function launch(s, c, id, op) {
     !airConditions(
       s,
       source.position,
-      now + (draft.distanceKm / draft.cruise) * 120 + 30,
+      now + (draft.distanceKm / draft.cruise) * 120 + rules.recoveryAllowanceMinutes,
     ).launch
   )
     return false;
@@ -287,7 +288,7 @@ function launch(s, c, id, op) {
   }
   if (source.base) {
     source.base.lastSortie = now;
-  } else source.fleet.fuelNm = Math.max(0, source.fleet.fuelNm - 5);
+  } else source.fleet.fuelNm = Math.max(0, source.fleet.fuelNm - rules.launchEnduranceNm);
   op.phase = "outbound";
   op.position = [...source.position];
   op.launchedAt = now;

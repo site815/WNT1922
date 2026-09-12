@@ -1,6 +1,7 @@
 // Documentation is the runtime database. Works in the simulation worker and Node.
 const catalogRoot = new URL("../catalog/", import.meta.url);
 const cache = new Map();
+export const loadedDocuments = () => [...cache.keys()].sort();
 
 export function parseDataDocument(text, label = "document") {
   const blocks = [

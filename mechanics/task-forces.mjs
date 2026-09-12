@@ -56,6 +56,7 @@ import {
   routeLength,
   distanceNm,
   interpolate,
+  nearestSeaNode,
 } from "./world.mjs";
 import { airPower, loseAircraft } from "./naval-resources.mjs";
 export const STRATEGY_REVISION = data.STRATEGY_REVISION;
@@ -72,7 +73,7 @@ const type = (c) =>
         : ["CA", "CL"].includes(c.type)
           ? "cruiser"
           : "escort";
-const key = (a, b) => [a, b].sort().join("-");
+const key = (a, b) => a < b ? a + '-' + b : b + '-' + a;
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 export function operationRandom(s) {
   s.operationsSeed = (Math.imul(s.operationsSeed, 1664525) + 1013904223) >>> 0;
@@ -331,19 +332,18 @@ function makeFleet(s, id, role, index, port, position, mission) {
   };
 }
 function closeNode(position) {
-  return Object.keys(NODES).reduce((a, b) =>
-    distanceNm(NODES[b], position) < distanceNm(NODES[a], position) ? b : a,
-  );
+  return nearestSeaNode(position);
 }
 export function initializeOperations(s, c) {
   if (s.strategyRevision === STRATEGY_REVISION) return s;
   s.operationsSeed ??= (s.seed ^ 0x51c017) >>> 0;
   for (const [id, n] of Object.entries(s.nations)) {
     const oldFleets = n.fleets || [],
+      theater = data.OPENING_THEATERS[id],
       origins = new Map();
     splitHulls(n);
     staffSailors(s, c, id);
-    if (id === "USA" && !oldFleets.length) {
+    if (theater && !oldFleets.length) {
       const counters = {};
       for (const g of [...n.groups].sort(
         (a, b) => c.classes[b.classId].year - c.classes[a.classId].year,
@@ -357,7 +357,8 @@ export function initializeOperations(s, c) {
         const role = type(c.classes[g.classId]),
           i = counters[role] || 0;
         counters[role] = i + 1;
-        g.region = i % 3 === 2 ? "atlantic" : "pacific";
+        g.region = i % theater.alternateEvery === theater.alternateEvery - 1
+          ? theater.alternateRegion : theater.mainRegion;
       }
     }
     const usable = n.groups.filter(
@@ -368,17 +369,12 @@ export function initializeOperations(s, c) {
         (g.atSea || fullyStaffed(g, c.classes[g.classId])),
     );
     for (const g of usable) {
-      const old = oldFleets.find((f) => f.id === g.fleetId),
-        eastern =
-          id === "GBR" && ["h-hms_barham", "h-hms_malaya"].includes(g.id);
+      const old = oldFleets.find((f) => f.id === g.fleetId);
       const port =
         old?.port ||
         g.dockPort ||
-        (eastern
-          ? "singapore"
-          : id === "USA" && g.region === "atlantic"
-            ? "norfolk"
-            : HOME_PORT[id]);
+        data.OPENING_PORT_OVERRIDES[id]?.[g.id] ||
+        (theater && g.region === theater.alternateRegion ? theater.alternatePort : HOME_PORT[id]);
       const position = old ? fleetPosition(s, old) : NODES[port],
         inPort = distanceNm(position, NODES[port]) < 25;
       const key = inPort ? port : old?.id || port;
@@ -732,10 +728,15 @@ export function balanceScreens(s, c, id) {
   }
 }
 export function usablePorts(s, id) {
+  const access = new Set([id]);
+  for (const r of Object.values(s.relations))
+    if (r.allied && !r.war) {
+      if (r.a === id) access.add(r.b);
+      else if (r.b === id) access.add(r.a);
+    }
   return Object.keys(PORTS).filter((k) => {
-    const owner = s.world?.portControl?.[k] || PORTS[k].nation,
-      r = s.relations[key(id, owner)];
-    return owner === id || (r?.allied && !r.war);
+    const owner = s.world?.portControl?.[k] || PORTS[k].nation;
+    return access.has(owner);
   });
 }
 export function plannedRoute(s, f, target, position = null) {

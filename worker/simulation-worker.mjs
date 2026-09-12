@@ -1,8 +1,13 @@
 // Install the listener before awaiting catalog imports. A browser can deliver
 // initialize while a module worker is still awaiting its documentation fetches.
 let host;
+let viewPort = null;
 const pending = [];
 onmessage = (event) => {
+  if (event.data.type === 'connect-view') {
+    viewPort = event.data.port;
+    return;
+  }
   if (host) host.receive(event.data);
   else pending.push(event.data);
 };
@@ -13,7 +18,11 @@ try {
   ]);
   host = simulationHost({
     content: CATALOG,
-    send: (message) => postMessage(message),
+    projectSnapshots: () => !viewPort,
+    send: (message) => {
+      if (viewPort && message.type === 'state') viewPort.postMessage(message);
+      else postMessage(message);
+    },
   });
   for (const message of pending) host.receive(message);
   pending.length = 0;

@@ -1,4 +1,5 @@
 import { PROFILES, NATION_ORDER } from "./catalog.mjs";
+import { navyFor } from "./land-war.mjs";
 const key = (a, b) => [a, b].sort().join("-");
 function ledger(r) {
   if (!r.record || r.record.since !== r.warSince)
@@ -41,8 +42,8 @@ export function warBalances(s, id = s.player) {
         naval = value(own) - value(enemy);
       const fronts = (s.world?.fronts || []).filter(
         (f) =>
-          [f.attacker, f.id === "france" ? "FRA" : f.defender].includes(id) &&
-          [f.attacker, f.id === "france" ? "FRA" : f.defender].includes(
+          [navyFor(f, "attacker"), navyFor(f, "defender")].includes(id) &&
+          [navyFor(f, "attacker"), navyFor(f, "defender")].includes(
             opponent,
           ),
       );

@@ -2,7 +2,7 @@ import { upgradeLevel } from "./levels.mjs";
 import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/logistics.md");
 import { portSummary } from "./ports.mjs";
-import { NODES, PORTS, seaRoute, routeLength, distanceNm } from "./world.mjs";
+import { NODES, PORTS, seaRoute, routeLength, distanceNm, nearestSeaNode } from "./world.mjs";
 import { fleetPosition, usablePorts } from "./task-forces.mjs";
 
 // Provisional distance steps, measured along the navigable sea graph.
@@ -20,14 +20,12 @@ export function nearestSupplyPort(s, id, position) {
   let nearest = null,
     distance = 100000;
   if (position) {
-    const node = Object.keys(NODES).reduce((a, b) =>
-      distanceNm(NODES[a], position) < distanceNm(NODES[b], position) ? a : b,
-    );
+    const node = nearestSeaNode(position, undefined, true);
+    const offset = distanceNm(position, NODES[node]);
     for (const port of ports) {
+      const direct = distanceNm(position, NODES[port]);
       const d =
-        distanceNm(position, NODES[port]) < 25
-          ? distanceNm(position, NODES[port])
-          : distanceNm(position, NODES[node]) + laneDistance(node, port);
+        direct < 25 ? direct : offset + laneDistance(node, port);
       if (d < distance) {
         distance = d;
         nearest = port;

@@ -20,6 +20,8 @@ foreach ($sourceArchive in $sourceLock.archives) {
 if ($LASTEXITCODE -ne 0) { throw 'Game build failed.' }
 & $releaseNode tools/audit-assets.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Asset audit failed.' }
+$sourceFingerprint = (& $releaseNode tools/source-fingerprint.mjs).Trim()
+if ($LASTEXITCODE -ne 0) { throw 'Cannot fingerprint the build sources.' }
 $outputDirectory = Join-Path $releaseRoot '.build/portable'
 $expectedDist = [IO.Path]::GetFullPath((Join-Path $releaseRoot '.build')) + [IO.Path]::DirectorySeparatorChar
 $resolvedOutput = [IO.Path]::GetFullPath($outputDirectory)
@@ -73,16 +75,17 @@ $portableLicense = Join-Path $releaseRoot 'assets/licenses/NSIS-LICENSE.txt'
 $portableLicenseText = [IO.File]::ReadAllText($portableLicense).Replace("`r`n", "`n")
 $portableOriginalLicense = [IO.File]::ReadAllText((Join-Path $portableCompilerRoot 'COPYING')).Replace("`r`n", "`n")
 if ($portableLicenseText -cne $portableOriginalLicense) { throw 'NSIS license differs from the pinned distribution.' }
-New-Item -ItemType Directory -Force -Path (Join-Path $releaseRoot 'dist') | Out-Null
-$portableOutput = Join-Path $releaseRoot ('dist/WNT1922-' + $releaseVersion + '-portable-win-x64.exe')
+New-Item -ItemType Directory -Force -Path (Join-Path $releaseRoot '.build/releases') | Out-Null
+$portableOutput = Join-Path $releaseRoot ('.build/releases/WNT1922-' + $releaseVersion + '-portable-win-x64.exe')
 & $portableCompiler /V2 "/DGAME_VERSION=$releaseVersion" "/DPACKAGE_DIRECTORY=$resolvedOutput" "/DPORTABLE_OUTPUT=$portableOutput" "/DNSIS_LICENSE=$portableLicense" (Join-Path $releaseRoot 'worker/desktop/portable.nsi')
 if ($LASTEXITCODE -ne 0) { throw 'Portable executable compilation failed.' }
 $portableHash = (Get-FileHash -LiteralPath $portableOutput -Algorithm SHA256).Hash.ToLowerInvariant()
 Set-Content -LiteralPath ($portableOutput + '.sha256') -Value ($portableHash + '  ' + [IO.Path]::GetFileName($portableOutput)) -Encoding ascii
 $downloadName = 'WNT1922-portable-win-x64.exe'
-Set-Content -LiteralPath (Join-Path $releaseRoot ('dist/' + $downloadName + '.sha256')) -Value ($portableHash + '  ' + $downloadName) -Encoding ascii
+Set-Content -LiteralPath (Join-Path $releaseRoot ('.build/releases/' + $downloadName + '.sha256')) -Value ($portableHash + '  ' + $downloadName) -Encoding ascii
 $releaseMetadata = [ordered]@{
     version = $releaseVersion
+    sourceSha256 = $sourceFingerprint
     localFile = [IO.Path]::GetFileName($portableOutput)
     downloadName = $downloadName
     bytes = (Get-Item -LiteralPath $portableOutput).Length
@@ -92,7 +95,9 @@ $releaseMetadata = [ordered]@{
     latestReleaseUrl = 'https://github.com/site815/WNT1922/releases/latest'
     downloadUrl = 'https://github.com/site815/WNT1922/releases/latest/download/' + $downloadName
 }
-$releaseMetadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $releaseRoot 'dist/latest.json') -Encoding ascii
+$finalFingerprint = (& $releaseNode tools/source-fingerprint.mjs).Trim()
+if ($LASTEXITCODE -ne 0 -or $finalFingerprint -ne $sourceFingerprint) { throw 'Source files changed while building. Rebuild before testing or publication.' }
+$releaseMetadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $releaseRoot '.build/releases/latest.json') -Encoding ascii
 foreach ($assemblyDirectory in @($resolvedOutput, $portableToolDirectory)) {
     $assemblyTarget = (Resolve-Path -LiteralPath $assemblyDirectory).Path
     if (-not $assemblyTarget.StartsWith($expectedDist,[StringComparison]::OrdinalIgnoreCase)) { throw 'Unsafe assembly cleanup directory.' }

@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { CATALOG } from "../worker/catalog-loader.mjs";
-import { parseDataDocument } from "../worker/documents.mjs";
+import { parseDataDocument, loadedDocuments } from "../worker/documents.mjs";
+import '../ui/soundtrack.mjs';
 import { newGame, monthlyIncome } from "../mechanics/engine.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
 import { PROGRAMS } from "../mechanics/balance.mjs";
@@ -16,6 +17,8 @@ const documents = (await listFiles("catalog")).filter(
 );
 for (const name of documents)
   parseDataDocument(await fs.readFile("catalog/" + name, "utf8"), name);
+assert.deepEqual(loadedDocuments(), [...documents].sort(),
+  'Every data document must be loaded by the real runtime; remove abandoned catalogs.');
 const openings = [];
 for (const [campaign, c] of Object.entries(CATALOG.campaigns))
   for (const [id, n] of Object.entries(c.nations)) {

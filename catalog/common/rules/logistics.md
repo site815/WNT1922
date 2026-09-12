@@ -1,6 +1,6 @@
 # Tactical fleet supply
 
-Supply is the distance-band factor times the endurance factor (return voyage / shortest-range hull). Oilers meeting a force ease both factors for a limited period. Each logistics research upgrade reduces the distance penalty by 5%; it also improves ship repair by 10%. National logistics is independently port access times convoy success. The resource bar shows the arithmetic mean of all task forces. Distance tables use nautical miles internally (UI converts to km).
+Supply is the distance-band factor times the endurance factor (return voyage / shortest-range hull). Oilers meeting a force ease both factors for a limited period. Each logistics research upgrade reduces the distance penalty by 5%; it also improves ship repair by 10%. National logistics is independently the average of port access and convoy performance (success rate times delivery coverage). The supply resource bar shows the arithmetic mean of all task forces. Distance tables use nautical miles internally (UI converts to km).
 
 ```json game-data
 {

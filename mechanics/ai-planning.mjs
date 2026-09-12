@@ -181,9 +181,11 @@ export function aiMission(s, id, f) {
   if (f.role === "submarine") return wars.length ? "raid" : "presence";
   if (f.role === "escort") return "guard";
   if (!wars.length) return "presence";
-  if (id === "DEU" && s.campaignId !== "campaign_1922") return "raid";
+  const doctrine = DOCTRINES[id];
+  if (doctrine.surfaceMission && s.campaignId !== doctrine.surfaceMissionExceptCampaign)
+    return doctrine.surfaceMission;
   if (f.role === "cruiser")
-    return f.salt % 3 === 0 && ["JPN", "ITA", "FRA"].includes(id)
+    return f.salt % 3 === 0 && doctrine.cruiserSiege
       ? "siege"
       : f.salt % 2
         ? "guard"

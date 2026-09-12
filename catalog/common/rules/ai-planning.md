@@ -54,7 +54,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "aviation",
         "standardization",
         "logistics"
-      ]
+      ],
+      "cruiserSiege": true
     },
     "FRA": {
       "roles": {
@@ -71,7 +72,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "asw",
         "training",
         "logistics"
-      ]
+      ],
+      "cruiserSiege": true
     },
     "ITA": {
       "roles": {
@@ -88,7 +90,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "training",
         "aviation",
         "damage_control"
-      ]
+      ],
+      "cruiserSiege": true
     },
     "DEU": {
       "roles": {
@@ -105,7 +108,9 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "standardization",
         "training",
         "damage_control"
-      ]
+      ],
+      "surfaceMission": "raid",
+      "surfaceMissionExceptCampaign": "campaign_1922"
     },
     "SOV": {
       "roles": {

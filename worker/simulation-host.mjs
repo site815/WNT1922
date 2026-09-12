@@ -7,6 +7,7 @@ export function simulationHost({
   now = () => performance.now(),
   schedule = setTimeout,
   cancel = clearTimeout,
+  projectSnapshots = true,
 }) {
   let runner = null,
     generation = 0,
@@ -22,7 +23,7 @@ export function simulationHost({
       requestId,
       generation,
       state: runner?.state || null,
-      view: runner?.state ? buildView(runner.state, runner.content) : null,
+      view: (typeof projectSnapshots === 'function' ? projectSnapshots() : projectSnapshots) && runner?.state ? buildView(runner.state, runner.content) : null,
       metrics: runner?.metrics(),
       ...extra,
     });

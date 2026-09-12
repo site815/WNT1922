@@ -237,7 +237,10 @@ function putDestination(s, c, id, t) {
           g.dockPort || n.fleets.find((f) => f.id === g.fleetId)?.port
         ];
       const old = wings.find((x) => x.role === w.role && x.model !== w.model);
-      if (old) {
+      // A ship may dock at an anchorage without an airfield. Keep its existing
+      // aircraft aboard unless there is actual shore storage for the exchange.
+      if (old && storage && aviationAccess(s,id,base ? t.destination :
+          g.dockPort || n.fleets.find(f=>f.id===g.fleetId)?.port)) {
         const count = Math.min(w.count, old.count),
           crewed = Math.min(count, old.crewed);
         addWing(storage.reserve, { ...old, count, crewed });
@@ -584,6 +587,10 @@ export function minuteAviation(s, c) {
       }
       if (t.finalDestination && t.finalDestination !== t.destination) {
         const base = n.airBases[t.destination];
+        if (!base || !aviationAccess(s,id,t.destination)) {
+          failTransfer(s,c,id,t);
+          continue;
+        }
         for (const w of t.airWing) addWing(base.reserve, w);
         t.airWing = [];
         t.done = true;

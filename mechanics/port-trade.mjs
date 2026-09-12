@@ -1,6 +1,10 @@
 import { PORTS, NODES, distanceNm } from "./world.mjs";
 import { portSpec } from "./port-catalog.mjs";
 import { fleetPosition } from "./task-forces.mjs";
+import { crewEffectiveness } from './ship-staffing.mjs';
+import { strategicFactor } from './strategic-materials.mjs';
+import { readDocument } from '../worker/documents.mjs';
+const rules = (await readDocument('common/rules/port-operations.md')).BLOCKADE;
 const owner = (s, id) => s.world?.portControl?.[id] || PORTS[id].nation;
 export function portTradeSummary(s, id) {
   let baseline = 0,
@@ -39,7 +43,7 @@ export function yardAvailability(s, id) {
   }
   return { owned, coverage: Math.min(1, available / Math.max(1, baseline)) };
 }
-// Assessed hourly; individual movements and combat still resolve every minute.
+// Assessed hourly; movements and combat use the shared fifteen-minute ticks.
 // A close hostile patrol contests access. Siege forces sustain more pressure.
 export function updatePortBlockades(s, c) {
   const forces = [];
@@ -51,11 +55,13 @@ export function updatePortBlockades(s, c) {
         if (
           g.fleetId === f.id &&
           g.count &&
+          g.service === 'warship' &&
           g.atSea &&
           ["active", "returning"].includes(g.status)
         ) {
           const cl = c.classes[g.classId];
-          power += cl.tons * g.count * g.health * (cl.type === "SS" ? 0.35 : 1);
+          power += cl.tons * g.count * g.health * crewEffectiveness(g,cl) * strategicFactor(n)
+            * (["SS","SM"].includes(cl.type) ? rules.submarineTonnageWeight : 1);
         }
       if (power) forces.push({ id, f, power, position: fleetPosition(s, f) });
     }
@@ -65,18 +71,18 @@ export function updatePortBlockades(s, c) {
     const id = owner(s, port),
       spec = portSpec(s, port);
     let attack = 0,
-      defense = spec.artillery * 8 * condition.health;
+      defense = spec.artillery * rules.artilleryWeight * condition.health;
     for (const row of forces) {
       const distance = distanceNm(row.position, NODES[port]);
-      if (distance > 65) continue;
+      if (distance > rules.radiusNm) continue;
       const r = s.relations[[id, row.id].sort().join("-")],
-        weight = Math.max(0.15, 1 - distance / 85);
+        weight = Math.max(rules.minimumDistanceWeight, 1 - distance / rules.distanceFalloffNm);
       if (r?.war)
-        attack += row.power * weight * (row.f.mission === "siege" ? 1.5 : 0.65);
+        attack += row.power * weight * (row.f.mission === "siege" ? rules.siegeWeight : rules.patrolWeight);
       else if (row.id === id || r?.allied) defense += row.power * weight;
     }
     condition.blockade = attack
-      ? Math.min(0.95, attack / (attack + defense + 15000))
+      ? Math.min(rules.maximumDisruption, attack / (attack + defense + rules.backgroundResistance))
       : 0;
   }
 }

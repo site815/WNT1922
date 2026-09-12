@@ -5,13 +5,7 @@ const data = await readDocument("common/rules/levels.md");
 export const MIN_LEVEL = data.MIN_LEVEL,
   MAX_LEVEL = data.MAX_LEVEL;
 export const upgradeLevel = (tech, key) =>
-  Math.max(0, Math.min(8, (tech?.[key] ?? 1) - 1));
-export const openingLevels = (programs, s) =>
-  Object.fromEntries(
-    Object.values(programs)
-      .filter((p) => p.level)
-      .map((p) => [p.level, s?.campaignId === "campaign_1922" ? 1 : 5]),
-  );
+  Math.max(0, Math.min(MAX_LEVEL-MIN_LEVEL, (tech?.[key] ?? MIN_LEVEL) - MIN_LEVEL));
 export const LEVEL_YEARS = data.LEVEL_YEARS;
 export const facilityFactor = (tech, key, rate) =>
   (1 + upgradeLevel(tech, key) * rate) / (1 + 4 * rate);

@@ -36,6 +36,7 @@ import { topBars } from "./top-bars.mjs";
 import { compareShips, fullyStaffed } from "../mechanics/ship-staffing.mjs";
 import {
   musicPlayback,
+  musicContext,
   musicSettings,
   unlockMusic,
   nextTrack,
@@ -190,6 +191,7 @@ function receiveSimulation(next, metrics, model) {
   const now = performance.now();
   mapMotion.accept(state, now);
   musicPlayback(!state.paused);
+  musicContext(state);
   soundSettings(state.audioEnabled, state.audioVolume);
   const cue = soundTracker.next(state);
   if (cue) playSound(cue);
@@ -1544,6 +1546,7 @@ app.addEventListener("click", async (event) => {
       await simulation.stop();
       state = null;
       musicPlayback(false);
+      musicContext(null);
       dialog = null;
       draft = null;
       content = contentFor(bundle, selectedCampaign);

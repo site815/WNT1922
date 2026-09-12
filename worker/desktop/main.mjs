@@ -128,6 +128,9 @@ async function start() {
   if (!testMode) {
     window.maximize();
     window.show();
+  } else if (process.argv.includes("--test-rendering")) {
+    // Performance checks need a real compositor surface; hidden-window RAF is throttled.
+    window.showInactive();
   }
   app.on("window-all-closed", () => app.quit());
   app.on("will-quit", () => server?.close());

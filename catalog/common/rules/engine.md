@@ -20,6 +20,17 @@ Event triggers, text and choices are read directly by mechanics/events.mjs. Cost
         "detail": "Return to the ministry with the current world intact."
       }
     ]
+  },
+  "OPENING_PORT_REGIONS": {
+    "vladivostok": "pacific",
+    "yokosuka": "pacific",
+    "san_diego": "pacific",
+    "hawaii": "pacific",
+    "sevastopol": "mediterranean",
+    "toulon": "mediterranean",
+    "taranto": "mediterranean",
+    "la_spezia": "mediterranean",
+    "brest": "atlantic"
   }
 }
 ```

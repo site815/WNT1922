@@ -1,5 +1,7 @@
 import { PORTS, NODES, distanceNm, seaRoute, routeLength } from "./world.mjs";
 import { portSpec } from "./port-catalog.mjs";
+import { readDocument } from "../worker/documents.mjs";
+const {OPENING_THEATERS} = await readDocument("common/rules/task-forces.md");
 
 // Assign only unspecified opening stations. Authored deployments stay in place;
 // subsequent moves always go through the operational route and fuel system.
@@ -34,14 +36,15 @@ export function assignOpeningBases(s, c, id) {
     .filter((r) => !r.fixed)
     .sort((a, b) => b.tons - a.tons)) {
     const origin = f.port,
-      atlantic = id === "USA" && groups.some((g) => g.region === "atlantic"),
+      theater = OPENING_THEATERS[id],
+      alternate = theater && groups.some((g) => g.region === theater.alternateRegion),
       candidates = Object.keys(PORTS).filter(
         (p) =>
           PORTS[p].nation === id &&
-          (id !== "USA" ||
-            (atlantic
-              ? NODES[p][0] > -100
-              : NODES[p][0] < -100 || NODES[p][0] > 100)) &&
+          (!theater ||
+            (alternate
+              ? NODES[p][0] > theater.dividingLongitude
+              : NODES[p][0] < theater.dividingLongitude || NODES[p][0] > theater.easternLongitude)) &&
           portSpec(s, p).tier !== "station" &&
           distanceNm(NODES[origin], NODES[p]) <= 3500,
       );
