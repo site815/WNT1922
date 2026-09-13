@@ -25,10 +25,10 @@ const start=(id="USA",campaign="in_good_faith_1936")=>{
   return [s,contentFor(CATALOG,s),s.nations[id]];
 };
 
-test("all 14 starts put 20% of actual merchants underway and show peacetime traffic",()=>{
+test("all 14 starts put 2% of actual merchants underway and show peacetime traffic",()=>{
   for(const camp of Object.keys(CATALOG.campaigns))for(const id of Object.keys(CATALOG.nations)) {
     const [s,c,n]=start(id,camp),t=convoyTraffic(s,id),e=merchantEconomy(s,c,id);
-    assert.equal(t.hullsAtSea,Math.round(n.merchant.hulls*.2),camp+id);
+    assert.equal(t.hullsAtSea,Math.round(n.merchant.hulls*.02),camp+id);
     assert.equal(t.hullsAtSea,t.targetAtSea);assert.ok(t.convoyCount>0);
     near(t.averageHulls,t.hullsAtSea/t.convoyCount);
     assert.equal(n.merchant.hulls,e.hulls);
@@ -107,9 +107,9 @@ test("Republic is a 1941 Tillman successor with consistent machinery, protection
   n.gold=n.industry=n.strategic=1e8;n.influence=500;assert.ok(orderShip(s,c,cl.id));validateSave(s,CATALOG);
 });
 
-test("mandatory dispatches pause regardless of settings, queue safely, and resume only an interrupted game",()=>{
-  const [s,c]=start();s.autoPause=false;
-  const options=[{id:'ok',label:'Acknowledge',detail:'Return to the ministry.'}];
+test("mandatory dispatches pause with autopause enabled, queue safely, and resume only an interrupted game",()=>{
+  const [s,c]=start();s.autoPause=true;
+  const options=[{id:'ok',label:'Approve',detail:'Approve the proposal.'},{id:'wait',label:'Decline',detail:'Keep current policy.'}];
   queueDecision(s,'first','First dispatch','A required response.',options);
   queueDecision(s,'second','Second dispatch','Another response.',options,{critical:true});
   assert.equal(s.paused,true);assert.match(politicalPopup(s),/First dispatch/);
@@ -141,7 +141,7 @@ test("news is shown once, stale read receipts cannot dismiss new battle results,
   addAlert(s,'Battle underway','Contact.','battle',{ongoing:true});const b=s.alerts[0],old=noticeReceipt(b);
   b.ongoing=false;b.title='Battle resolved';
   applyCommand(s,CATALOG,{type:'read-news',args:{id:b.id,receipt:old}});assert.ok(!b.dismissed);
-  queueDecision(s,'critical','Important decision','Choose.',[{id:'ok',label:'Accept',detail:'Done.'}],{critical:true});
+  queueDecision(s,'critical','Important decision','Choose.',[{id:'ok',label:'Accept',detail:'Done.'},{id:'wait',label:'Decline',detail:'No change.'}],{critical:true});
   const html=ticker.markup(alertItems(s));assert.doesNotMatch(html,/Important decision|alert-history|clear-alerts|0 alerts/);
   assert.match(politicalPopup(s),/Important decision/);
 });
@@ -151,5 +151,5 @@ test("selecting a force circles it on the chart and highlights the list without 
   assert.ok(html.includes('class="fleet-command-row selected" data-action="focus-fleet" data-id="'+f.id+'"'));
   assert.ok(html.includes('class="chart-focus" data-motion-id="'+f.id+'"'));
   assert.doesNotMatch(html,/send-inline-order|data-fleet-mission|data-fleet-aggression/);
-  assert.match(html,/Admiral control/);
+  assert.doesNotMatch(html,/Admiral control/);assert.match(html,/fleet-mission-status/);
 });

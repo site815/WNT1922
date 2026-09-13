@@ -1,4 +1,5 @@
-import { dateLabel } from "./progress-view.mjs";
+import { capitalClock } from "../mechanics/campaign-clock.mjs";
+import { activeDispatch, decisionIsChoice } from "../mechanics/alert-lifecycle.mjs";
 import { affordability, projectBlock, projectPrice } from "../mechanics/engine.mjs";
 const esc = (v) =>
   String(v ?? "").replace(
@@ -9,8 +10,10 @@ const esc = (v) =>
       ],
   );
 export function politicalPopup(s) {
-  const d = s?.decisions.find((d) => d.popup || d.critical);
+  const d = s?.decisions.find(activeDispatch);
   if (!d) return "";
+  const choice = decisionIsChoice(d), deadline=capitalClock(s,s.player,d.deadline);
+  const dismissHint=choice?'Return without deciding. The displayed default applies at the deadline.':'Acknowledge this announcement and return to the ministry.';
   return (
     '<div class="modal-backdrop dispatch-backdrop"><section class="modal diplomatic-dispatch" data-dialog-type="diplomacy" data-key="dispatch-' +
     esc(d.key) +
@@ -18,19 +21,20 @@ export function politicalPopup(s) {
     (d.kind === "war" ? "WAR DECLARATION" : "DIPLOMATIC DISPATCH") +
     '</span><h2 id="dispatch-title">' +
     esc(d.title) +
-    '</h2></div></header><div class="modal-body" data-scroll-key="dispatch-' +
+    '</h2></div><button class="close" data-action="defer-decision" data-key="'+esc(d.key)+'" aria-label="Return to ministry" title="'+dismissHint+'">×</button></header><div class="modal-body" data-scroll-key="dispatch-' +
     esc(d.key) +
     '"><p>' +
     esc(d.body) +
     "</p>" +
-    (d.deadline && d.options.some(o => o.id !== "acknowledge")
+    (choice
       ? "<small>Deadline: " +
-        dateLabel(d.deadline / 1440) +
+        esc(deadline.date+' '+deadline.time+' '+deadline.zone) +
         ". If ignored: " +
         esc(d.defaultText) +
         "</small>"
       : "") +
     '</div><footer class="dispatch-options">' +
+    (choice?'<button class="subtle" data-action="defer-decision" data-key="'+esc(d.key)+'" title="'+dismissHint+'">Return to ministry</button>':'')+
     d.options
       .map(
         (o) => {
@@ -50,7 +54,7 @@ export function politicalPopup(s) {
           '" class="' +
           (o.id === d.options[0].id ? "primary" : "") +
           '">' +
-          esc(o.label) +
+          esc(choice ? o.label : 'Return to ministry') +
           "</button>";
         },
       )

@@ -175,6 +175,7 @@ export function aiResearchScores(s, c, id, needs, shipping, yards) {
   return scores;
 }
 export function aiMission(s, id, f) {
+  if (f.role === "support") return "replenish";
   const wars = Object.values(s.relations).filter(
     (r) => r.war && [r.a, r.b].includes(id),
   );

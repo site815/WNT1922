@@ -426,7 +426,8 @@ export function alertItems(s) {
         !(s.alerts || []).some(
           (a) =>
             Math.abs(a.minute - (l.minute || l.day * 1440)) < 1 &&
-            ((a.body || "").includes(l.text) || l.kind === a.kind),
+            ((l.reportId != null && l.reportId === a.reportId) ||
+              (a.body || '').includes(l.text) || l.text === a.title + '. ' + a.body),
         ),
     )
     .map((l) => ({
@@ -436,13 +437,22 @@ export function alertItems(s) {
       body: l.text,
       kind: l.kind,
       dispatch: true,
+      shipId: l.shipId,
+      programKey: l.programKey,
+      reportId: l.reportId,
+      newsView: l.newsView,
     }));
   return [...alerts, ...dispatches, ...contactAlerts(s)].sort(
     (a, b) => b.minute - a.minute,
   );
 }
 export function alertsView(s, c, ticker = new NewsTicker(() => {})) {
-  return ticker.markup(alertItems(s));
+  const pending = s.decisions.filter(d=>d.deferred);
+  const buttons = pending.length ? '<div class="pending-decisions" aria-label="Pending choices">'+pending.map(d=>{
+    const due=capitalClock(s,s.player,d.deadline);
+    return '<button class="pending-decision" data-action="reopen-decision" data-key="'+esc(d.key)+'" title="'+esc(d.title+'. Due '+due.date+' '+due.time+'. If ignored: '+d.defaultText)+'"><strong>'+esc(d.title)+'</strong><small>Due '+esc(due.date)+'</small></button>';
+  }).join('')+'</div>' : '';
+  return ticker.markup(alertItems(s),buttons);
 }
 export function weaponDetails(c, content) {
   const raw = c.raw || {},

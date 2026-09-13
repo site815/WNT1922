@@ -14,6 +14,7 @@ const identity = (n) =>
           "ship",
           "detail-key",
           "scroll-key",
+          "motion-id",
         ].map((k) => n.getAttribute("data-" + k) || ""),
       ].join("|")
     : n.nodeName;

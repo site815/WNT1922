@@ -167,7 +167,7 @@ function finish(s,c,r) {
   const alert=s.alerts.find(a=>a.reportId===r.id);
   const title=(r.limitedIncident?"Limited naval incident · ":"")+(r.winner?r.magnitude+" "+(r.winner===s.player?"victory":"defeat"):"Inconclusive action")+" · "+REGIONS[r.region].name;
   if(alert) Object.assign(alert,{title,body,minute:now,winner:r.winner,ongoing:false,dismissed:false});
-  if([r.a,r.b].includes(s.player)) addLog(s,title+". "+body,"battle");
+  if([r.a,r.b].includes(s.player)) addLog(s,title+". "+body,"battle",{reportId:r.id});
   invalidateOperations(s);
 }
 export function progressEngagements(s,c) {

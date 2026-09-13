@@ -86,6 +86,7 @@ test('France dispatches require actual defeat; Indochina access follows the even
   s.world.control.c220='DEU';s.nextDiplomaticAt=-Infinity;politicsTick(s);
   for(const key of chain)assert.ok(s.completedEvents.includes('historical-news-'+key),key);
   assert.equal(s.world.portControl.saigon,'JPN');assert.equal(s.world.stationControl.saigon,'JPN');
-  assert.ok(s.decisions.some(d=>d.title==='Vichy France is established'&&d.forcePause));
+  assert.ok(s.alerts.some(d=>d.title==='Vichy France is established'));
+  assert.ok(!s.decisions.some(d=>d.title==='Vichy France is established'));
   const count=s.decisions.length;s.nextDiplomaticAt=-Infinity;politicsTick(s);assert.equal(s.decisions.length,count);
 });

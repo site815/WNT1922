@@ -1,7 +1,7 @@
 import { readDocument } from "../worker/documents.mjs";
 import { campaignMinutes } from "./campaign-clock.mjs";
 export const CONVOY_RULES = await readDocument("common/rules/merchant-routes.md");
-export const convoyUnderway = (v, now) => v.count > 0 && v.leg !== "unloading" && now < v.arriveAt;
+export const convoyUnderway = (v, now) => v.count > 0 && !!(v.waitingForPort || v.battleId || (v.leg !== "unloading" && now < v.arriveAt));
 export function convoyTraffic(s, id) {
   const n = s.nations[id], now = campaignMinutes(s);
   const voyages = n.convoys.filter(v => convoyUnderway(v, now));

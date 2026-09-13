@@ -6,7 +6,8 @@ export const EUROPE_OPENING = data.EUROPE_OPENING;
 import { PROFILES } from "./catalog.mjs";
 import { campaignMinutes } from "./campaign-clock.mjs";
 import { addLog, addAlert, queueDecision, fleetPower } from "./engine.mjs";
-import { invalidateOperations, syncConvoys } from "./task-forces.mjs";
+import { invalidateOperations } from "./task-forces.mjs";
+import { moveConvoys } from "./merchant-convoys.mjs";
 import { finishProvocation } from "./provocation.mjs";
 const key = (a, b) => [a, b].sort().join("-"),
   names = (ids) => ids.map((id) => PROFILES[id].name).join(" / "),
@@ -94,7 +95,8 @@ export function commenceWar(
   for (const id of [a, b]) {
     const n = s.nations[id];
     n.rival = id === a ? b : a;
-    syncConvoys(s, c, id);
+    n.convoyPlanAt = -Infinity;
+    moveConvoys(s, c, id);
     if (id !== s.player) {
       const p = fleetPower(s, c, id);
       n.priority = p.sub > p.surface ? "raid" : "presence";

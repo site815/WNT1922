@@ -186,8 +186,8 @@ test("decisions auto-pause and ignored critical demands apply their stated defau
   sim.queueDecision(s, "optional", "Optional report", "Information", [
     { id: "ok", label: "Noted", detail: "No cost." },
   ]);
-  assert.equal(s.paused, true);
-  sim.chooseDecision(s,c,"optional","ok");
+  assert.equal(s.paused, false);
+  assert.ok(s.alerts.some(a=>a.title==='Optional report'));
   const r = s.nations.JPN,
     before = r.influence;
   sim.queueDecision(
@@ -430,11 +430,12 @@ test("command and ministry views expose manifests, distinct missions, aircraft m
     fleetCompositionHover(s, c, s.nations.JPN.fleets[0]),
     /class="hover-ship /,
   );
-  assert.match(markup, /Admiral control/);
+  assert.doesNotMatch(markup, /Admiral control/);
+  assert.match(markup, /fleet-mission-status/);
   assert.ok(!markup.includes('id="fleet-area"'));
   assert.equal(
     new Set(Object.values(MISSIONS).map((m) => m.description)).size,
-    6,
+    7,
   );
   assert.match(resourcesView(s, c), /10%/);
   assert.match(weaponDetails(c.classes.kaze_t32, c), /14 cm triple/);

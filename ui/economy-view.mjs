@@ -9,6 +9,7 @@ import { strategicFactor, strategicDemand } from "../mechanics/strategic-materia
 import { warBalances } from "../mechanics/war-balance.mjs";
 import { PROFILES, NATION_ORDER } from "../mechanics/catalog.mjs";
 import { shippingPlan } from "../mechanics/merchant-convoys.mjs";
+import { CONVOY_RULES } from "../mechanics/convoy-traffic.mjs";
 const num=(v,d=0)=>Number(v||0).toLocaleString("en-US",{maximumFractionDigits:d});
 const percent=(v,d=2)=>num(v*100,d)+"%";
 export function warView(s, compact = false) {
@@ -58,8 +59,8 @@ export function economyView(s,c) {
   const trade=panel('GTP naval budget · trade funding',facts([
     ['Opening / current annual budget',num(e.startingGTP)+' / '+num(n.gtp)+' kg'],['Monthly growth',pct(g.tradeMonthly,3)],
     ['Projected budget change',signed(g.tradeMonth)+' kg / month'],['Next annual budget',num(n.gtp*(1+g.tradeMonthly))+' kg'],
-    ['Port access',pct(e.ports.coverage)],['Convoy success',pct(e.convoys.success)],['Delivery coverage',pct(e.deliveryCoverage),'Actual completed round trips / required GRT. Surplus above 100% is shown.'],
-    ['Effective delivery coverage',pct(e.effectiveDeliveryCoverage),'Capped at 100% for logistics.'],['Logistics',pct(e.logistics/100)],['Gold / industry split','80% / 20%']
+    ['Port access',pct(e.ports.coverage,0)],['Convoy success',pct(e.convoys.success,0)],['Delivery coverage',pct(e.deliveryCoverage,0),'Actual completed round trips / required GRT. Surplus above 100% is shown.'],
+    ['Effective delivery coverage',pct(e.effectiveDeliveryCoverage,0),'Capped at 100% for logistics.'],['Logistics',pct(e.logistics/100,0)],['Gold / industry split','80% / 20%']
   ])+'<p class="formula">Logistics = (port access + success × capped coverage) ÷ 2. Growth is −2% at zero logistics, zero at 50%, and '+(g.war?'2%':'0.05%')+' at 100%, interpolated. Budget changes only at month-end; no GRT conversion or immediate sinking deduction.</p>','GTP');
   const shippingPanel=panel('Merchant capacity & deliveries',facts([
     ['Civilian hulls / average size',num(e.hulls)+' / '+num(e.average,2)+' GRT'],['Fleet GRT = hulls × average',num(e.current)],
@@ -68,19 +69,19 @@ export function economyView(s,c) {
     ['Logistics / industry multipliers','× '+num(g.production.logisticsMultiplier,3)+' / × '+num(g.production.industryMultiplier,2)],
     ['Hull growth / fractional carry',num(g.merchantHullsMonth,3)+' / '+num(n.civilianShipping.carry,3)],['Average hull size growth','+0.1% / month'],
     ['Required delivery = (GDP + GTP) ÷ 2',num(e.required)+' GRT / month'],['Delivered / sunk · rolling 30 days',num(e.convoys.delivered)+' / '+num(e.convoys.sunk)+' GRT'],
-    ['Hulls at sea / 20% target',num(e.traffic.hullsAtSea)+' / '+num(e.traffic.targetAtSea)],['Moving convoys / average hulls',num(e.traffic.convoyCount)+' / '+num(e.traffic.averageHulls,2)],
+    ['Hulls at sea / '+pct(CONVOY_RULES.AT_SEA_SHARE)+' target',num(e.traffic.hullsAtSea)+' / '+num(e.traffic.targetAtSea)],['Moving convoys / average hulls',num(e.traffic.convoyCount)+' / '+num(e.traffic.averageHulls,2)],
     ['Civilian hulls delivered in campaign',num(n.civilianShipping.delivered)]
   ]),'SHIPPING');
   const facilities=panel('Industry, ports & influence',facts([
     ['Naval industry level',n.tech.industry],['Opening-calibrated multiplier','× '+num(expansion.baseline,3)],['Completed expansion bonus','+'+num((expansion.multiplier-1)*100)+'%','Each upgrade adds 15% of opening capacity; additive, not compound.'],
     ['Funding / paid operation',pct(n.industryFunding)+' / '+pct(n.industryOperating??1)],['Strategic production effectiveness',pct(f)],
     ['Total yards / spare',num(yards.capacity*365)+' / '+num(yards.spare*365)+' t / year'],['Yard bombing disruption',pct(n.industrialDamage.yards)],
-    ['Usable / opening port trade',num(e.ports.available)+' / '+num(e.ports.baseline)],['Port access',pct(e.ports.coverage)],
+    ['Usable / opening port trade',num(e.ports.available)+' / '+num(e.ports.baseline)],['Port access',pct(e.ports.coverage,0)],
     ['Influence reserve',num(n.influence)+' / 500'],['Net influence / month',signed(i.influence)],['Treaty gold / influence per month',num(i.treaty.gold)+' / '+num(i.treaty.influence)]
   ])+'<button data-action="view" data-view="programs">Funding & expansions</button>','INDUSTRY');
   const routes=panel('Automatic merchant circuits',table(['Route','Round trip','Demand / month','Moving hull target'],shipping.routes.map(r=>[esc(r.name),num(r.days,1)+' days',num(r.demand)+' GRT',num(r.hulls)]))+'<small>Surviving hulls credit their departure manifest once on returning to origin. Outbound legs and scheduled capacity are not counted as deliveries.</small>');
   const comparison=panel('Naval budgets & maritime capacity',table(['Nation','GDP budget','GTP budget','Merchant GRT','Port access','Convoy success','Coverage','Logistics'],NATION_ORDER.map(id=>{
-    const x=merchantEconomy(s,c,id),a=s.nations[id];return ['<span style="color:'+PROFILES[id].color+'">'+esc(PROFILES[id].name)+'</span>',num(a.gdp),num(a.gtp),num(x.current),pct(x.ports.coverage),pct(x.convoys.success),pct(x.deliveryCoverage),pct(x.logistics/100)];
+    const x=merchantEconomy(s,c,id),a=s.nations[id];return ['<span style="color:'+PROFILES[id].color+'">'+esc(PROFILES[id].name)+'</span>',num(a.gdp),num(a.gtp),num(x.current),pct(x.ports.coverage,0),pct(x.convoys.success,0),pct(x.deliveryCoverage,0),pct(x.logistics/100,0)];
   })));
   return '<div class="ledger-layout economy-ledger">'+budget+strategic+domestic+trade+shippingPanel+facilities+'<div class="ledger-wide">'+routes+comparison+'</div></div>';
 }

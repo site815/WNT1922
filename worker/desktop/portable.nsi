@@ -60,4 +60,16 @@ Section
   ${EndIf}
   ; Release our working directory before NSIS removes the temporary payload.
   SetOutPath "$TEMP"
+  ; Windows may retain the exited executable briefly while its final handles
+  ; close. Retry only the game directory owned by this launcher instance.
+  StrCpy $2 0
+  cleanup_retry:
+    ClearErrors
+    RMDir /r "$PLUGINSDIR\WNT1922"
+    IfErrors 0 cleanup_done
+    IntOp $2 $2 + 1
+    IntCmp $2 50 cleanup_done
+    Sleep 100
+    Goto cleanup_retry
+  cleanup_done:
 SectionEnd

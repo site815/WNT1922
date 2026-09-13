@@ -5,17 +5,17 @@ const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;",
 export class NewsTicker {
   constructor(onRead) { this.onRead=onRead; this.read=new Set(); }
   reset() { this.animation?.cancel(); this.animation=null; this.node=null; this.current=null; this.read.clear(); }
-  finish(a) { this.read.add(noticeReceipt(a)); this.onRead(a.id,noticeReceipt(a)); }
-  markup(notices) {
+  finish(a) { this.read.add(noticeReceipt(a)); return this.onRead(a.id,noticeReceipt(a)); }
+  markup(notices, pending = '') {
     const available=notices.filter(a=>!this.read.has(noticeReceipt(a)));
     this.current=available.find(a=>this.current && noticeReceipt(a)===noticeReceipt(this.current))
       || available.find(a=>this.current && a.id===this.current.id)
       || (this.current && this.current.kind!=="contact" && !this.read.has(noticeReceipt(this.current)) ? this.current : null)
       || available.at(-1) || null;
     const a=this.current;
-    return '<div class="alert-rail news-rail" aria-label="Naval news"><span class="alert-heading">NEWS</span><div class="news-viewport">'+
-      (a ? '<span class="news-message" data-key="news-'+esc(noticeReceipt(a))+'" data-preserve="true">'+
-        (a.dispatch ? esc(a.body) : '<strong>'+esc(a.title)+'</strong>'+(a.body && a.body!==a.title ? ' — '+esc(a.body) : ''))+'</span>'
+    return '<div class="alert-rail news-rail" aria-label="Naval news">'+pending+'<span class="alert-heading">NEWS</span><div class="news-viewport">'+
+      (a ? '<button type="button" class="news-message" data-action="open-news" data-id="'+esc(a.id)+'" data-key="news-'+esc(noticeReceipt(a))+'" data-preserve="true" title="Open the related report, ship or ministry panel">'+
+        (a.dispatch ? esc(a.body) : '<strong>'+esc(a.title)+'</strong>'+(a.body && a.body!==a.title ? ' — '+esc(a.body) : ''))+'</button>'
         : '<span class="news-idle">No new dispatches</span>')+'</div></div>';
   }
   refresh(root, blocked=false) {
@@ -28,9 +28,12 @@ export class NewsTicker {
         {duration:Math.max(10000,travel/42*1000),iterations:1,fill:'forwards'});
       this.animation.onfinish=()=>this.finish(a);
       node.parentElement.onpointerenter=()=>this.animation?.pause();
-      node.parentElement.onpointerleave=()=>{if(!root.querySelector('.modal-backdrop'))this.animation?.play();};
+      const resume=()=>{if(!root.querySelector('.modal-backdrop') && !node.parentElement.matches(':hover,:focus-within'))this.animation?.play();};
+      node.parentElement.onpointerleave=resume;
+      node.onfocus=()=>this.animation?.pause();
+      node.onblur=resume;
     }
-    if(blocked || node.parentElement.matches(':hover'))this.animation?.pause();
+    if(blocked || node.parentElement.matches(':hover,:focus-within'))this.animation?.pause();
     else if(this.animation?.playState==='paused')this.animation.play();
   }
 }

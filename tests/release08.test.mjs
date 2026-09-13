@@ -240,7 +240,7 @@ test("clear all retains mandatory decisions and chosen decisions produce one rec
     "mandatory",
     "Demand",
     "Choose.",
-    [{ id: "default", label: "Default", detail: "No expenditure." }],
+    [{ id: "default", label: "Default", detail: "No expenditure." },{ id: "approve", label: "Approve", detail: "Approve the request." }],
     { critical: true },
   );
   sim.queueDecision(s, "optional", "Advice", "Optional.", [

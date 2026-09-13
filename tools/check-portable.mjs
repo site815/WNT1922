@@ -10,7 +10,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { GAME_VERSION } from "../mechanics/version.mjs";
 import { verifyPackage } from "./verify-package.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
-import { newGame, queueDecision } from "../mechanics/engine.mjs";
+import { newGame, queueDecision, addLog } from "../mechanics/engine.mjs";
 import { contentFor } from "../mechanics/campaign-content.mjs";
 import { beginEngagement } from "../mechanics/engagements.mjs";
 import { fleetStats } from "../mechanics/task-forces.mjs";
@@ -98,6 +98,8 @@ async function launch(profile) {
         signal: AbortSignal.timeout(500),
       });
       if (response.ok) {
+        // The HTTP probe can answer just before the debugging socket is ready.
+        browser = await playwright.chromium.connectOverCDP(`http://127.0.0.1:${port}`,{timeout:2000});
         connected = true;
         break;
       }
@@ -108,14 +110,30 @@ async function launch(profile) {
     connected,
     "Portable game did not open its test endpoint within 60 seconds",
   );
-  browser = await playwright.chromium.connectOverCDP(
-    `http://127.0.0.1:${port}`,
-  );
   const context = browser.contexts()[0];
   page = context.pages()[0] || (await context.waitForEvent("page"));
   page.setDefaultTimeout(15000);
   await page.setViewportSize({width:1920,height:1080});
   const displaySession = await context.newCDPSession(page);
+  if (!performanceOnly) {
+    // Keep a compositor surface without letting the desktop pointer override
+    // automated hover/click tests while the player uses their own game.
+    assert(Number.isInteger(child.pid));
+    await promisify(execFile)('powershell.exe',['-NoProfile','-Command',`
+$testNativeProcess = Get-CimInstance Win32_Process -Filter "ParentProcessId = ${child.pid} AND Name = 'WNT1922.exe'"
+if (@($testNativeProcess).Count -ne 1) { throw 'Cannot identify isolated test window process.' }
+$testWindowHandle = (Get-Process -Id $testNativeProcess.ProcessId).MainWindowHandle
+if ($testWindowHandle -eq [IntPtr]::Zero) { throw 'The isolated test window has no native handle.' }
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class PortableTestPosition {
+  [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int w, int hgt, uint flags);
+}
+'@
+if (-not [PortableTestPosition]::SetWindowPos($testWindowHandle,[IntPtr]::Zero,-20000,-20000,0,0,0x0015)) { throw 'Cannot position the isolated test window.' }
+`],{windowsHide:true});
+  }
   await displaySession.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   page.on("pageerror", (error) => result.errors.push(error.message));
   await page.locator(".nation-card").first().waitFor();
@@ -233,16 +251,23 @@ try {
     }
     await page.locator('.world-map').waitFor();
 
-    await page.locator('#speed').selectOption('10');
+    await acknowledgeDispatches();
+    await page.locator('#auto-pause').uncheck();
+    await page.locator('#speed').selectOption('100');
     await delay(1000);
     result.paused=await measureMapFrames();
     await page.locator('[data-action="pause"]').click();
     await delay(1000);
-    result.running100000=await measureMapFrames();
+    result.running1000000=await measureMapFrames();
+    result.actualSpeed=await page.locator('.actual-speed').innerText();
+    await page.locator('#speed').selectOption('50');
+    result.running500000=await measureMapFrames();
+    assert.equal(await page.locator('#auto-pause').isChecked(),false);
+    assert.match(await page.locator('[data-action=pause]').innerText(),/Pause/);
     await page.locator('[data-action="pause"]').click();
     await page.screenshot({path:path.join(output,'map-performance.png')});
-    assert(result.running100000.fps>=20 && result.running100000.largestFrameMs<1000,
-      'Visible map responsiveness: '+JSON.stringify(result.running100000));
+    assert(result.running1000000.fps>=20 && result.running1000000.largestFrameMs<1000,
+      'Visible map responsiveness: '+JSON.stringify(result.running1000000));
     await closeSaved();
   } else {
   for (const [campaign, nation] of process.env.WNT_PORTABLE_BATTLE_ONLY ? [] : [
@@ -261,6 +286,26 @@ try {
     if (await page.locator('[data-action="begin"]').count())
       await page.locator('[data-action="begin"]').click();
     await page.locator(".world-map").waitFor();
+    if(nation==='USA') {
+      const bounds=await page.locator('.diplomatic-dispatch').boundingBox(),workspace=await page.locator('.workspace').boundingBox();
+      assert(bounds.x>=workspace.x && bounds.y>=workspace.y,'Dispatch leaves menus and resource bars visible');
+      assert(Math.abs(bounds.x+bounds.width/2-workspace.x-workspace.width/2)<2,'Dispatch centers in the workspace');
+      assert(Math.abs(bounds.y+bounds.height/2-workspace.y-workspace.height/2)<2,'Dispatch uses the lower workspace center');
+      assert.equal(await page.locator('.dispatch-backdrop').evaluate(el=>getComputedStyle(el).backdropFilter),'none');
+      const deadline=await page.locator('.diplomatic-dispatch .modal-body small').innerText();
+      await page.screenshot({path:path.join(output,'choice-dispatch.png')});
+      await page.locator('.dispatch-options [data-action="defer-decision"]').click();
+      await page.locator('.diplomatic-dispatch').waitFor({state:'detached'});
+      assert.match(await page.locator('[data-action="pause"]').innerText(),/Resume/);
+      await page.locator('.sidebar [data-view="fleet"]').click();
+      await page.locator('.pending-decision').click();
+      assert.equal(await page.locator('.diplomatic-dispatch .modal-body small').innerText(),deadline);
+      await page.keyboard.press('Escape');
+      await page.locator('.diplomatic-dispatch').waitFor({state:'detached'});
+      await page.locator('.pending-decision').click();
+      await page.locator('.diplomatic-dispatch').waitFor();
+      result.checks.push('Lower-centered, unblurred dispatches leave menus/resources visible; defer, reopen and Escape preserve the deadline and manual pause.');
+    }
     await acknowledgeDispatches();
     if(nation==='USA') {
       for(const action of ['continue','new']) {
@@ -442,7 +487,22 @@ try {
       await page.locator(".economy-ledger").innerText(),
       /GTP naval budget/,
     );
-    await page.screenshot({ path: path.join(output, `economy-${nation}.png`) });
+    for (const width of nation==='USA'?[1920,2560]:[1920]) {
+      await page.setViewportSize({width,height:1080});
+      await delay(250);
+      const layout=await page.evaluate(()=>({
+        width:document.documentElement.clientWidth,content:document.documentElement.scrollWidth,
+        cards:[...document.querySelectorAll('.economy-ledger > .ledger-panel')].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};}),
+        controls:[...document.querySelectorAll('.clock-controls > *')].map(e=>{const r=e.getBoundingClientRect();return {right:r.right,bottom:r.bottom};})}));
+      assert(layout.content<=layout.width+1,'No horizontal page overflow at '+width);
+      const row=layout.cards.filter(c=>Math.abs(c.y-layout.cards[0].y)<1);
+      assert(row.length===3,'Economy has three equal columns at '+width);
+      assert(Math.max(...row.map(c=>c.width))-Math.min(...row.map(c=>c.width))<1);
+      assert(Math.max(...row.map(c=>c.height))-Math.min(...row.map(c=>c.height))<1);
+      await page.screenshot({path:path.join(output,'economy-'+nation+'-'+width+'.png')});
+      result.checks.push('Aligned economy and time controls at '+width+'×1080.');
+    }
+    await page.setViewportSize({width:1920,height:1080});
     await page.locator('.sidebar [data-view="review"]').click();
     assert.match(await page.locator('.record-ledger').innerText(), /Civilian hulls built/);
     assert.doesNotMatch(await page.locator('.record-ledger').innerText(), /NaN|undefined|Infinity/);
@@ -451,6 +511,8 @@ try {
     await page.locator('.resource-bar [data-resource="STRATEGIC"]').hover();
     await page.locator(".resource-breakdown").waitFor();
     assert.match(await page.locator(".resource-breakdown").innerText(), /Actual change this month/);
+    await page.evaluate(() => document.activeElement.blur());
+    assert(await page.locator('.class-hover').isVisible(),'Unrelated focus changes retain the resource tooltip');
     await page.locator('.resource-bar [data-resource="GTP"]').hover();
     await page.waitForFunction(()=>document.querySelector('.resource-breakdown')?.textContent.includes('Opening GTP naval budget'));
     assert.match(await page.locator('.resource-breakdown').innerText(),/next GTP = current GTP/);
@@ -623,12 +685,14 @@ try {
   // A prepared save exercises the actual packaged UI during a long surface action.
   const battleProfile = path.join(testRoot, "ongoing battle profile");
   const battleSave = newGame(CATALOG, "USA", 250025, "in_good_faith_1936");
+  battleSave.log=[];battleSave.alerts=[];
+  battleSave.nations.USA.contacts=[];
   let battleContent = contentFor(CATALOG, battleSave);
   const replacement=commissionAircraft(battleSave,battleContent,automaticAircraftDraft(battleSave,battleContent,'fighter','USA'),'USA');
   battleContent=contentFor(CATALOG,battleSave);
   battleSave.nations.USA.productionModels.fighter=replacement.aircraft.id;
   battleSave.decisions = [];
-  battleSave.autoPause = false;
+  battleSave.autoPause = true;
   battleSave.paused = true;
   battleSave.speed = 0.25;
   Object.assign(battleSave.relations["JPN-USA"], { war: true, allied: false, warSince: battleSave.day });
@@ -642,13 +706,18 @@ try {
   report.mainRounds = 5;
   report.durations = [30,30,15,45,15];
   report.nextStageAt = campaignMinutes(battleSave) + 30;
+  const newsShip=battleSave.nations.USA.groups.find(g=>g.count&&g.status==='active');
+  addLog(battleSave,'Commissioning news: '+newsShip.name+'.','industry',{shipId:newsShip.id,newsView:'fleet'});
+  battleSave.log[0].minute=campaignMinutes(battleSave)-1;
+  addLog(battleSave,'A routine naval bulletin.','navy');
+  battleSave.log[0].minute=campaignMinutes(battleSave)-2;
   const oldAircraft=navalAircraftInventory(battleSave,battleContent,'USA').find(r=>r.replacement && !Object.values(battleSave.nations.USA.productionModels).includes(r.model.id));
   assert(oldAircraft);
   battleSave.nations.USA.aircraft[oldAircraft.model.id]+=12;
   battleSave.nations.USA.aviators+=12*(oldAircraft.model.crew?.normal||1);
   staffAircraft(battleSave,battleContent,'USA');
   queueDecision(battleSave,"native-dispatch-first","War in China","A major world event requires acknowledgement.",[{id:"acknowledge",label:"Acknowledge",detail:"Return to the ministry."}],{critical:true,kind:"war"});
-  queueDecision(battleSave,"native-dispatch-second","Ministry dispatch","A second dispatch tests consistent placement with longer text. Admirals are reviewing convoy protection and support deployments.",[{id:"acknowledge",label:"Acknowledge",detail:"Return to the ministry."}],{critical:true,kind:"diplomacy"});
+  queueDecision(battleSave,"native-dispatch-second","Ministry dispatch","A second war dispatch tests consistent placement with longer text. Fleets are reviewing convoy protection and support deployments.",[{id:"acknowledge",label:"Acknowledge",detail:"Return to the ministry."}],{critical:true,kind:"war"});
   validateSave(battleSave,CATALOG);
   await fs.mkdir(path.join(battleProfile,"saves"),{recursive:true});
   await fs.writeFile(path.join(battleProfile,"saves/campaign.json"),JSON.stringify(battleSave));
@@ -656,23 +725,39 @@ try {
   await page.locator('[data-action="continue"]').click();
   await page.locator('.diplomatic-dispatch').waitFor();
   const firstDispatch = await page.locator('.diplomatic-dispatch').boundingBox();
-  const firstButton = await page.locator('.diplomatic-dispatch button').boundingBox();
+  const firstButton = await page.locator('.dispatch-options [data-action="choose"]').boundingBox();
   await page.screenshot({path:path.join(output,'mandatory-dispatch.png')});
-  await page.locator('.diplomatic-dispatch button').click();
+  await page.locator('.dispatch-options [data-action="choose"]').click();
   await page.waitForFunction(()=>document.querySelector('#dispatch-title')?.textContent==='Ministry dispatch');
   assert.deepEqual(await page.locator('.diplomatic-dispatch').boundingBox(), firstDispatch);
-  assert.deepEqual(await page.locator('.diplomatic-dispatch button').boundingBox(), firstButton);
-  await page.locator('.diplomatic-dispatch button').click();
+  assert.deepEqual(await page.locator('.dispatch-options [data-action="choose"]').boundingBox(), firstButton);
+  await page.locator('.dispatch-options [data-action="choose"]').click();
   await page.locator('.diplomatic-dispatch').waitFor({state:'detached'});
   assert.match(await page.locator('[data-action=pause]').innerText(),/Resume/);
   result.checks.push('Mandatory dispatches use identical envelopes and footer positions; acknowledgements preserve manual pause.');
   await page.locator('.news-message').waitFor();
+  assert.match(await page.locator('.news-message').innerText(),/A routine naval bulletin/);
   const newsKey=await page.locator('.news-message').getAttribute('data-key');
   const railBefore=await page.locator('.news-rail').boundingBox();
   await page.locator('.news-message').evaluate(el=>el.getAnimations()[0].finish());
   await page.waitForFunction(key=>document.querySelector('.news-message')?.dataset.key!==key,newsKey);
   assert.deepEqual(await page.locator('.news-rail').boundingBox(),railBefore);
   result.checks.push('Routine ticker advances once, stores a read receipt, and keeps a fixed rail height.');
+  const clickNews = async () => {
+    await page.locator('.news-message').evaluate(el=>{
+      const animation=el.getAnimations()[0];animation.pause();animation.currentTime=el.parentElement.clientWidth/42*1000;
+    });
+    await page.locator('.news-message').click({position:{x:30,y:18}});
+  };
+  await page.waitForFunction(()=>document.querySelector('.news-message')?.textContent.includes('Commissioning news:'));
+  await clickNews();
+  await page.locator('.view-fleet .news-highlight').waitFor();
+  assert.equal(await page.locator('.news-highlight [data-ship]').getAttribute('data-ship'),newsShip.id);
+  await page.waitForFunction(()=>document.querySelector('.news-message')?.textContent.includes('Battle underway'));
+  await clickNews();
+  await page.locator('.modal .battle-progress').waitFor();
+  await page.locator('.modal header [data-action="close"]').click();
+  result.checks.push('Ticker clicks open and highlight the commissioning ship, then open the exact ongoing battle report.');
   await page.waitForFunction(async()=>(await import('/ui/music.mjs')).musicStatus().mood==='War');
   await page.locator('.sidebar [data-view="aircraft"]').click();
   await page.locator('.superseded-aircraft summary').click();
@@ -687,6 +772,7 @@ try {
   await page.locator('.modal header [data-action="close"]').click();
   await page.locator('[data-action="step-minute"]').click();
   await page.waitForFunction(() => document.querySelector('.report-card .battle-progress progress')?.value === 50);
+  assert((await page.evaluate(()=>window.testNotices)).includes('Time advanced 15 minutes.')); 
   await closeSaved();
   const savedBattle = JSON.parse(await fs.readFile(path.join(battleProfile,"saves/campaign.json")));
   assert.equal(campaignMinutes(savedBattle),report.startedAt+15,"Normal window close must save the latest fifteen-minute step");

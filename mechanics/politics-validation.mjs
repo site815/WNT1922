@@ -75,6 +75,7 @@ export function validatePolitics(s) {
   for (const d of s.decisions) {
     if (
       (d.popup !== undefined && typeof d.popup !== "boolean") ||
+      (d.deferred !== undefined && typeof d.deferred !== "boolean") ||
       (d.forcePause !== undefined && typeof d.forcePause !== "boolean")
     )
       fail();

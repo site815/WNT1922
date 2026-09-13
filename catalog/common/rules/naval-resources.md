@@ -34,6 +34,14 @@ Each naval production line starts on automatic modernization. Automatic lines se
     [
       10,
       "Very fast · 100,000×"
+    ],
+    [
+      50,
+      "Maximum · 500,000×"
+    ],
+    [
+      100,
+      "Maximum · 1,000,000×"
     ]
   ],
   "CLOSED_LINES": {

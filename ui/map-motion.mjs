@@ -4,6 +4,7 @@ import { mapPoint, linePath, polygonPath } from "./projection.mjs";
 import { coverageAt, escortCircle } from "../mechanics/convoy-coverage.mjs";
 import { uiModel } from "../mechanics/queries.mjs";
 import { remainingRoute } from "./command-view.mjs";
+import { movingMarkerLayout } from "./marker-layout.mjs";
 
 // Interpolate only between received simulation states. There is no prediction
 // of unprocessed combat or enemy movement, and this clock never mutates a save.
@@ -36,6 +37,8 @@ export class MapMotion {
     this.windowAt = 0;
     this.fps = 0;
     this.cpuMs = 0;
+    this.markerOffsets = new Map();
+    this.lastPaint = 0;
   }
   accept(state, at = performance.now()) {
     if (this.current?.state !== state) {
@@ -52,7 +55,7 @@ export class MapMotion {
           this.previous.state.campaignId !== state.campaignId ||
           campaignMinutes(this.previous.state) > campaignMinutes(state))
       )
-        this.previous = null;
+        { this.previous = null; this.markerOffsets.clear(); }
     }
     this.refresh();
   }
@@ -64,6 +67,17 @@ export class MapMotion {
       ui = this.chart(),
       minute = visualMinute(this.previous, this.current, now),
       rotation = ui.rotation || 0;
+    const scale = 1 / (ui.zoom || 1), locations = new Map();
+    const items = [...svg.querySelectorAll('.fleet-marker.own, .convoy-marker')].flatMap(element => {
+      const id = element.dataset.motionId, force = visualFleet(this.previous, this.current, id, minute);
+      if (!force) return [];
+      const point = mapPoint(fleetPosition(s,force,minute),rotation);
+      locations.set(id,point);
+      return [{id,point,radius:element.classList.contains('convoy-marker')?8:12,
+        initial:[Number(element.dataset.markerOffsetX || 0)/scale,Number(element.dataset.markerOffsetY || 0)/scale]}];
+    });
+    const offsets = movingMarkerLayout(items,this.markerOffsets,scale,this.lastPaint ? now-this.lastPaint : 16);
+    this.lastPaint = now;
     for (const element of svg.querySelectorAll("[data-motion-id]")) {
       const f = visualFleet(
         this.previous,
@@ -76,9 +90,19 @@ export class MapMotion {
         continue;
       }
       element.removeAttribute("visibility");
-      const point = mapPoint(fleetPosition(s, f, minute), rotation),
-        dx = point[0] - Number(element.dataset.motionX),
+      const point = locations.get(f.id) || mapPoint(fleetPosition(s, f, minute), rotation);
+      let dx = point[0] - Number(element.dataset.motionX),
         dy = point[1] - Number(element.dataset.motionY);
+      const offset = offsets.get(f.id);
+      if (offset && element.classList.contains('marker-location')) {
+        const line = element.querySelector('line');
+        line.setAttribute('x2',Number(element.dataset.motionX)+offset[0]);
+        line.setAttribute('y2',Number(element.dataset.motionY)+offset[1]);
+        element.style.opacity = Math.min(1,Math.hypot(...offset)/2);
+      } else if (offset && element.matches('.fleet-marker.own, .convoy-marker')) {
+        dx += offset[0]-Number(element.dataset.markerOffsetX || 0);
+        dy += offset[1]-Number(element.dataset.markerOffsetY || 0);
+      }
       element.setAttribute(
         "transform",
         "translate(" + dx.toFixed(4) + " " + dy.toFixed(4) + ")",

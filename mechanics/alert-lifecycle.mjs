@@ -2,6 +2,10 @@ import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/alert-lifecycle.md");
 import { campaignMinutes } from "./campaign-clock.mjs";
 export const RESULT_ALERT_MINUTES = data.RESULT_ALERT_MINUTES;
+export const DECISION_DEFAULT_DAYS = data.DECISION_DEFAULT_DAYS;
+export const decisionIsChoice = d => d.options.length > 1 || d.options.some(o =>
+  Object.keys(o).some(key => !['id','label','detail'].includes(key)));
+export const activeDispatch = d => d.forcePause && !d.deferred;
 export const noticeReceipt = a => String(a.id)+":"+(a.resolvedAt ?? (a.ongoing ? "ongoing" : "notice"));
 export function trimAlerts(s) {
   const active = s.alerts.filter((a) => a.frontId && a.resolvedAt == null);

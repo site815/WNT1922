@@ -65,7 +65,7 @@ test("all fourteen starts derive shipping demand from product and assign only re
     const [s,c,n]=start(id,campaign),p=shippingPlan(s,c,id),e=merchantEconomy(s,c,id);
     near(p.required,(n.gdp+e.gtp)/2);assert.ok(p.routes.length>0);
     assert.ok(n.convoys.length>0);assert.ok(p.assigned<=n.merchant.hulls);
-    near(p.hullsAtSea,Math.round(n.merchant.hulls*.2));
+    near(p.hullsAtSea,Math.round(n.merchant.hulls*.02));
     assert.match(resourceHover(s,c,"SHIPPING"),/round trip|round-trip/);
     validateSave(s,CATALOG);
   }

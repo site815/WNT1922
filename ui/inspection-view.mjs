@@ -221,7 +221,7 @@ export function fleetReadinessHover(s, c, f) {
       ],
     ]) +
     fleetHoverManifest(s, c, f) +
-    "<small>Distance and endurance use stepped penalties. Logistics research reduces the distance penalty; nearby support adds relief to both factors, capped at 100%. National logistics applies up to a 20% penalty; empty strategic reserves halve supply. Click to center and highlight this force. The admiral controls its orders.</small>"
+    "<small>Distance and endurance use stepped penalties. Logistics research reduces the distance penalty; nearby support adds relief to both factors, capped at 100%. National logistics applies up to a 20% penalty; empty strategic reserves halve supply. Click to center and highlight this force.</small>"
   );
 }
 function fleetHoverManifest(s, c, f) {

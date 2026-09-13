@@ -5,6 +5,12 @@ Edit the JSON block directly. The game reads this document at startup; no export
 ```json game-data
 {
   "MISSIONS": {
+    "replenish": {
+      "name": "Fleet replenishment",
+      "description": "Carry fuel and supplies between friendly ports and operating fleets. Avoid combat and withdraw from known threats; support ships remain vulnerable in transit.",
+      "search": 0.25,
+      "engagement": 0
+    },
     "guard": {
       "name": "Escort shipping",
       "description": "Accompany friendly convoys, screen against submarines and intercept threats to shipping.",
@@ -12,7 +18,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "engagement": 0.1
     },
     "presence": {
-      "name": "Reconnaissance patrol",
+      "name": "Recon patrol",
       "description": "Search sea lanes, update intelligence and shadow contacts while preserving the force.",
       "search": 1.5,
       "engagement": 0.04

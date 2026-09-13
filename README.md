@@ -8,7 +8,7 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.30.0 clarifies naval budgets and strategic materials, rebuilds Economy & Trade and Naval Record, and keeps time controls and resource cells stable. Aircraft production can automatically select new models; catalogs use one AO support type, distinct government aircraft and 1948 jets. Conditional French defeat, Vichy and Indochina events follow the campaign. It also includes the news ticker, peacetime convoys, revised supply and the 1941 Republic-class Tillman successor. This is a local portable test build until publication is requested; the links above open the last published release. Start a new campaign for beta testing.
+Version 0.32.0 targets 2% of merchant hulls at sea in approximately ten convoys, adds 500,000× and 1,000,000× speed ceilings, and restores optional Autopause. With Autopause unchecked, simulation mode continues through events and in the background. AO groups have a dedicated replenishment mission. Map leaders adjust smoothly per unit, economy panels use a consistent grid, and time-step confirmations report elapsed time. The portable test build remains local until release publication is requested; the links above open the last published release. Start a new campaign for beta testing.
 
 ## Edit and build
 

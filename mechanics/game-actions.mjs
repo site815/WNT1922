@@ -2,8 +2,9 @@ import { orderBulkFleet } from "./bulk-fleet.mjs";
 import { retireAircraft } from "./aircraft-inventory.mjs";
 import * as sim from "./engine.mjs";
 import { TICK_MINUTES } from "./campaign-clock.mjs";
+import { campaignMinutes } from "./campaign-clock.mjs";
 import { contentFor } from "./campaign-content.mjs";
-import { noticeReceipt } from "./alert-lifecycle.mjs";
+import { noticeReceipt, activeDispatch } from "./alert-lifecycle.mjs";
 import { contactAlerts } from "./contact-alerts.mjs";
 import { commissionDraft } from "./designer.mjs";
 import { commissionAircraft } from "./aircraft-designer.mjs";
@@ -27,6 +28,8 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     "dismiss-alert",
     "read-news",
     "clear-alerts",
+    "defer-decision",
+    "reopen-decision",
   ];
   if (session.includes(type) && actor !== s.player)
     throw Error("Only the local session controls time and interface settings.");
@@ -36,9 +39,9 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     case "pause":
       if (
         (args.value === false || (args.value === undefined && s.paused)) &&
-        s.decisions.some((d) => d.forcePause)
+        s.autoPause && s.decisions.some(activeDispatch)
       )
-        throw Error("Acknowledge the diplomatic dispatch before resuming.");
+        throw Error("Acknowledge or return to ministry from the dispatch before resuming.");
       s.paused = args.value ?? !s.paused;
       delete s.pauseReason;
       delete s.resumeAfterDecision;
@@ -48,18 +51,21 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
         throw Error("Unknown simulation speed.");
       s.speed = args.value;
       break;
-    case "step":
-      if (s.decisions.some((d) => d.forcePause))
+    case "step": {
+      if (s.autoPause && s.decisions.some(activeDispatch))
         throw Error(
-          "Acknowledge the diplomatic dispatch before stepping time.",
+          "Acknowledge or return to ministry from the dispatch before stepping time.",
         );
       if (!s.paused) throw Error("Pause the game before stepping time.");
       if (![TICK_MINUTES, 360].includes(args.minutes)) throw Error("Invalid time step.");
+      const before = campaignMinutes(s);
       s.paused = false;
       sim.advanceMinutes(s, bundle, args.minutes, { respectPause: true });
       s.paused = true;
       delete s.resumeAfterDecision;
-      break;
+      const elapsed = campaignMinutes(s) - before;
+      return { receipt: `Time advanced ${elapsed >= 60 && elapsed % 60 === 0 ? elapsed / 60 + " hours" : elapsed + " minutes"}.${elapsed < args.minutes ? " Paused for a dispatch." : ""}` };
+    }
     case "settings":
       for (const [key, value] of Object.entries(args)) {
         if (
@@ -75,6 +81,12 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
         )
           s[key] = value;
         else throw Error("Invalid game setting.");
+      }
+      if (args.autoPause === false) {
+        for (const d of s.decisions) d.deferred = true;
+        if (s.pauseReason && s.resumeAfterDecision) s.paused = false;
+        delete s.pauseReason;
+        delete s.resumeAfterDecision;
       }
       break;
     case "funding":
@@ -95,6 +107,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
           s,
           r.ship.name + " draft registered. " + r.fee + " gold paid.",
           "industry",
+          { newsView: 'yards' },
         );
       return { name: r.ship.name, fee: r.fee };
     }
@@ -109,6 +122,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
             r.fee +
             " gold paid.",
           "industry",
+          { newsView: 'aircraft' },
         );
       return { name: r.aircraft.name, fee: r.fee };
     }
@@ -146,6 +160,12 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
       break;
     case "dismiss-alert":
       sim.dismissNotice(s, c, args.id);
+      break;
+    case "defer-decision":
+      sim.deferDecision(s, c, args.key);
+      break;
+    case "reopen-decision":
+      sim.reopenDecision(s, args.key);
       break;
     case "read-news": {
       const notice = s.alerts.find(a=>String(a.id)===String(args.id))

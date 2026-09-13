@@ -1,5 +1,6 @@
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
 import { shippingPlan } from "../mechanics/merchant-convoys.mjs";
+import { CONVOY_RULES } from "../mechanics/convoy-traffic.mjs";
 import { ECONOMY } from "../mechanics/economy-rules.mjs";
 import { strategicFactor, strategicDemand } from "../mechanics/strategic-materials.mjs";
 import { uiModel } from "../mechanics/queries.mjs";
@@ -118,7 +119,7 @@ export function resourceHover(s, c, key) {
     ]:[
       ["Opening GTP naval budget",num(e.startingGTP)+" kg"],
       ["Current GTP naval budget",num(e.gtp)+" kg fine-gold equivalent"],
-      ["Logistics",pct(e.logistics/100)],["Monthly GTP growth",pct(g.tradeMonthly)],
+      ["Logistics",pct(e.logistics/100,0)],["Monthly GTP growth",pct(g.tradeMonthly)],
       flow("Projected GTP change / month",g.tradeMonth),
       ["Next GTP = current × (1 + growth)",num(n.gtp*(1+g.tradeMonthly))],
       ["Gold / industry split","80% / 20%"],
@@ -157,21 +158,21 @@ export function resourceHover(s, c, key) {
       ),
       flow("Blockade loss", -e.ports.blocked),
       ["Usable trade points", num(e.ports.available)],
-      ["Port access = min(1, usable / opening)", pct(e.ports.coverage)],
+      ["Port access = min(1, usable / opening)", pct(e.ports.coverage,0)],
     ];
     note="Formula: usable port trade = Σ(charted trade × condition × (1 − blockade)). Access = min(100%, usable / opening trade requirement).";
   } else if (key === "LOGISTICS") {
-    rows=[["Merchant hulls at sea / 20% target",num(e.traffic.hullsAtSea)+" / "+num(e.traffic.targetAtSea)],
+    rows=[["Merchant hulls at sea / "+pct(CONVOY_RULES.AT_SEA_SHARE)+" target",num(e.traffic.hullsAtSea)+" / "+num(e.traffic.targetAtSea)],
       ["Convoys at sea",num(e.traffic.convoyCount)],
       ["Average hulls per moving convoy",num(e.traffic.averageHulls,1)],
-      ["Port access = usable / opening trade",pct(e.ports.coverage)],
+      ["Port access = usable / opening trade",pct(e.ports.coverage,0)],
       ["Delivered GRT · rolling 30 days",num(e.convoys.delivered)],["Sunk GRT · rolling 30 days",num(e.convoys.sunk)],
       ["Required GRT = (GDP + GTP) ÷ 2",num(e.required)],
-      ["Success = delivered / (delivered + sunk)",pct(e.convoys.success)],
-      ["Coverage = delivered / required",pct(e.deliveryCoverage)],
-      ["Effective coverage = min(100%, coverage)",pct(e.effectiveDeliveryCoverage)],
-      ["Convoy performance = success × effective coverage",pct(e.convoyPerformance)],
-      ["Logistics = (port access + convoy performance) ÷ 2",pct(e.logistics/100)]];
+      ["Success = delivered / (delivered + sunk)",pct(e.convoys.success,0)],
+      ["Coverage = delivered / required",pct(e.deliveryCoverage,0)],
+      ["Effective coverage = min(100%, coverage)",pct(e.effectiveDeliveryCoverage,0)],
+      ["Convoy performance = success × effective coverage",pct(e.convoyPerformance,0)],
+      ["Logistics = (port access + convoy performance) ÷ 2",pct(e.logistics/100,0)]];
     note="Delivery coverage may exceed 100%; only its contribution to logistics is capped. No observed voyages gives 100% success, but delivery coverage starts at zero until actual round trips complete. Peace always assumes 100% success; deliveries still count. Sinkings enter the 30-day ledger immediately. Logistics also multiplies fleet supply by 0.8 + 0.2 × logistics fraction.";
   } else if (key === "SUPPLY") {
     rows = [

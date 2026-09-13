@@ -93,7 +93,7 @@ export function organizeSupport(s, c) {
               ).length),
           role: "support",
           supportKind: kind,
-          mission: "guard",
+          mission: "replenish",
           manual: false,
           aggressiveBattle: false,
           port,

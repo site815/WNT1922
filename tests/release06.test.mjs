@@ -313,6 +313,7 @@ test("admirals choose enemy ports for raid and siege and produce minute-stamped 
 test("dismissed dispatches stay dismissed and mandatory defaults apply exactly once", () => {
   const s = start(),
     c = contentFor(b, s);
+  s.autoPause = true;
   const log = s.log[0];
   sim.dismissNotice(s, c, "dispatch-" + log.id);
   assert.ok(!alertItems(s).some((a) => a.id === "dispatch-" + log.id));
@@ -324,11 +325,16 @@ test("dismissed dispatches stay dismissed and mandatory defaults apply exactly o
     "Treaty demand",
     "Respond.",
     [{ id: "deny", label: "Deny", detail: "Lose 5 influence.", influence: 5 }],
-    { critical: true, target: "USA", defaultOption: "deny" },
+    { critical: true, target: "USA", defaultOption: "deny", deadline: campaignMinutes(s) + 15 },
   );
   assert.match(politicalPopup(s), /Treaty demand/);
   sim.dismissNotice(s, c, "required-test");
   sim.dismissNotice(s, c, "required-test");
+  assert.equal(r.influence, before);
+  assert.equal(s.decisions[0].deferred, true);
+  sim.advanceMinutes(s,c,15);
+  assert.equal(r.influence, before - 5);
+  sim.advanceMinutes(s,c,15);
   assert.equal(r.influence, before - 5);
   assert.equal(s.decisions.length, 0);
 });

@@ -4,6 +4,32 @@
 
 Open the latest release and download **WNT1922-portable-win-x64.exe** from Assets. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
 
+## Version 0.32.0 — portable test build
+
+- 2% merchant sailing target, approximately ten physical convoys; real round-trip delivery accounting is preserved.
+- 500,000× and 1,000,000× requested speeds use bounded worker slices and report actual speed. No simulation ticks are skipped.
+- Autopause defaults on. Unchecked simulation mode continues through events and loss of focus; pending choices retain deadline defaults. Manual pauses are preserved.
+- AO groups use Fleet replenishment. AI recognizes multirole aircraft when evaluating replacement needs; shared design and procurement commands are exercised for all seven nations.
+- Stable per-unit map leaders ease apart and retract as traffic changes. Economy cards align on equal grid tracks; time controls keep fixed slots and report actual elapsed steps.
+
+Validation: 286 regression cases covered, all 14 catalog starts validated, and the self-contained EXE passed native interaction/save checks at 1920×1080 and 2560×1080. An eight-second visible map sample at the 1,000,000× setting produced 59.5 map FPS and about 251,513× actual simulation speed on the test computer; the 500,000× sample produced 59.2 map FPS. These are local measurements, not hardware guarantees.
+
+Source synchronization is manual. This executable is local until Release publication is requested.
+
+## Version 0.31.1 — local portable test build
+
+- Merchant dispatchers target 5% of registered hulls at sea, with smaller numbers of convoy groups. Waiting port calls are hidden from the chart. Deliveries still require actual completed round trips; reducing traffic therefore reduces shipping throughput rather than granting artificial delivery credit.
+- Enemy destinations close immediately on declaration. Outbound and unloading convoys divert physically to home or an accessible alternative, without delivery credit. Return voyages from already completed port calls can finish. If no refuge is accessible, merchants hold their current position until one opens.
+- Only war announcements and choices interrupt play. Return to ministry acknowledges war news or leaves a choice pending until its original deadline: 14 days by default, with event-specific deadlines preserved. Pending choices remain accessible beside the news ticker; reopening pauses again. Deferring or answering resumes only a game that the dispatch interrupted. Defaults apply once, even after saving and reopening.
+- All other information uses the one-pass, clickable ticker. Battle news opens its exact report; commissioning news opens and highlights the ship in Fleet register; research, contacts, land fronts and other news link to the appropriate screen. Unrelated notices on the same tick are retained.
+- Popup envelopes are centered in the workspace, below the resource/news bars and clear of the menu, with no blur. Mission and status share one fleet-card line; redundant Admiral control text is removed and Reconnaissance patrol is shortened to Recon patrol.
+- Resource and ship tooltips stay open when a control elsewhere loses focus during a refresh.
+- The portable launcher retries removal of its own temporary payload briefly after exit, allowing Windows to release the executable's last handles.
+
+Verification: 280 regression checks pass, 86 live catalog documents and all 14 starting states validate, and all 250 packaged source files match the workspace. The final executable passed both campaign menu exercises, deferred-choice deadlines and reopening, fixed popup placement, resource hovers, clickable commissioning and battle news, production, all 33 music tracks, saving and reopening. A five-round surface battle verified live updates, preserved report scrolling and expanded calculations, reserve-aircraft retirement, completion and a valid final save. Every normal exit removed the temporary game payload. Automated windows run offscreen to avoid interfering with the player's active session.
+
+Requires a new campaign. Portable output remains local; source pushes and GitHub Release publication are manual.
+
 ## Version 0.30.0 — local portable test build
 
 - GDP and GTP are explicitly labeled **GDP naval budget** and **GTP naval budget**, annual ministry allocations in fine-gold equivalents. Strategic-resource hovers and the rebuilt economic ledger show the full formula, actual contributions, expenses and monthly changes. Naval Record consolidates fleet readiness, deliveries, combat and merchant losses, recovery schedules, national scores and archived reviews.

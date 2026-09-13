@@ -52,7 +52,7 @@ const demand = (s, key) =>
     key,
     "Mandatory " + key,
     "A test demand.",
-    [{ id: "ok", label: "Respond", detail: "Settle the demand." }],
+    [{ id: "ok", label: "Respond", detail: "Settle the demand." },{ id: "decline", label: "Decline", detail: "Keep current policy." }],
     { critical: true },
   );
 

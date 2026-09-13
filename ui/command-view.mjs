@@ -1,4 +1,5 @@
 import { nationAtWar } from "../mechanics/economy-rules.mjs";
+import { convoyUnderway } from "../mechanics/convoy-traffic.mjs";
 import { uiModel, displayedFleet } from "../mechanics/queries.mjs";
 import { portSummary } from "../mechanics/ports.mjs";
 import { PROFILES, NATION_ORDER } from "../mechanics/catalog.mjs";
@@ -266,8 +267,7 @@ export function commandView(s, content, ui = {}, data = {}) {
       rotation,
     )}"/>`;
   const markerLocation = (id, x, y, px, py) =>
-    Math.hypot(x - px, y - py) > 1
-      ? '<g class="marker-location" style="color:' +
+      '<g class="marker-location" style="color:' +
         PROFILES[s.player].color +
         '" data-motion-id="' +
         id +
@@ -289,15 +289,14 @@ export function commandView(s, content, ui = {}, data = {}) {
         py +
         '" r="' +
         1.1 * scale +
-        '"/></g>'
-      : "";
+        '"/></g>';
   const ownMarkers = fleets
     .map(({ f: ship, stats: st }) => {
       const position = fleetPosition(s, ship),
         [x, y] = place(position, 12 * scale, ship.id),
         [px, py] = project(position),
         active = ship.id === f?.id && !contact && !convoy;
-      return `${markerLocation(ship.id, x, y, px, py)}<g class="fleet-marker own ${active ? "selected" : ""}" role="button" tabindex="0" aria-label="${esc(ship.name)}: ${st.hulls} ships" data-action="select-fleet" data-id="${ship.id}" data-fleet-hover="${ship.id}" data-motion-id="${ship.id}" data-motion-x="${px}" data-motion-y="${py}" style="color:${PROFILES[s.player].color}"><circle cx="${x}" cy="${y}" r="${12 * scale}" class="map-hit"/><path transform="translate(${x},${y}) scale(${scale})" d="M0,-7 L7,5 L0,2 L-7,5 Z"/>${active ? `<circle cx="${x}" cy="${y}" r="${11 * scale}" class="selection-ring"/>` : ""}</g>`;
+      return `${markerLocation(ship.id, x, y, px, py)}<g class="fleet-marker own ${active ? "selected" : ""}" role="button" tabindex="0" aria-label="${esc(ship.name)}: ${st.hulls} ships" data-action="select-fleet" data-id="${ship.id}" data-fleet-hover="${ship.id}" data-motion-id="${ship.id}" data-motion-x="${px}" data-motion-y="${py}" data-marker-offset-x="${x-px}" data-marker-offset-y="${y-py}" style="color:${PROFILES[s.player].color}"><circle cx="${x}" cy="${y}" r="${12 * scale}" class="map-hit"/><path transform="translate(${x},${y}) scale(${scale})" d="M0,-7 L7,5 L0,2 L-7,5 Z"/>${active ? `<circle cx="${x}" cy="${y}" r="${11 * scale}" class="selection-ring"/>` : ""}</g>`;
     })
     .join("");
   const contactPositions = new Map(),
@@ -342,12 +341,12 @@ export function commandView(s, content, ui = {}, data = {}) {
       .join("") +
     "</g>";
   const convoys = n.convoys
-    .filter((v) => v.count)
+    .filter((v) => convoyUnderway(v, campaignMinutes(s)))
     .map((v) => {
       const position = fleetPosition(s, v),
-        [x, y] = place(position, 8 * scale),
+        [x, y] = place(position, 8 * scale, v.id),
         [px, py] = project(position);
-      return `${markerLocation(v.id, x, y, px, py)}<g class="convoy-marker" style="color:${PROFILES[s.player].color}" role="button" tabindex="0" data-action="select-convoy" data-id="${v.id}" data-map-hover="convoy:${v.id}" data-motion-id="${v.id}" data-motion-x="${px}" data-motion-y="${py}" aria-label="${esc(v.name)}: ${v.count} merchants">${`<circle class="convoy-cover-ring ${coverage.convoys.find((row) => row.id === v.id)?.defense > 0 ? "covered" : "exposed"}" cx="${x}" cy="${y}" r="${8 * scale}"/>`}<rect x="${x - 4 * scale}" y="${y - 3 * scale}" width="${8 * scale}" height="${6 * scale}"/></g>`;
+      return `${markerLocation(v.id, x, y, px, py)}<g class="convoy-marker" style="color:${PROFILES[s.player].color}" role="button" tabindex="0" data-action="select-convoy" data-id="${v.id}" data-map-hover="convoy:${v.id}" data-motion-id="${v.id}" data-motion-x="${px}" data-motion-y="${py}" data-marker-offset-x="${x-px}" data-marker-offset-y="${y-py}" aria-label="${esc(v.name)}: ${v.count} merchants">${`<circle class="convoy-cover-ring ${coverage.convoys.find((row) => row.id === v.id)?.defense > 0 ? "covered" : "exposed"}" cx="${x}" cy="${y}" r="${8 * scale}"/>`}<rect x="${x - 4 * scale}" y="${y - 3 * scale}" width="${8 * scale}" height="${6 * scale}"/></g>`;
     })
     .join("");
   const ports = Object.entries(PORTS)
@@ -385,10 +384,9 @@ export function commandView(s, content, ui = {}, data = {}) {
           esc(ship.name) +
           '</strong><span class="fleet-composition">' +
           fleetComposition(st, content) +
-          "</span><small>" +
-          esc(fleetStatus(s, ship)) +
+          '</span><small class="fleet-mission-status" title="'+esc((MISSIONS[ship.mission]?.description || '')+' '+fleetStatus(s,ship))+'">' +
+          '<span>'+esc(MISSIONS[ship.mission]?.name || 'Fleet support')+'</span> · <span>'+esc(fleetStatus(s,ship))+'</span>' +
           "</small></div>" +
-          '<small class="admiral-mission" title="The admiral chooses missions, routes and engagement policy automatically.">' + esc(MISSIONS[ship.mission]?.name || "Fleet support") + " · Admiral control</small>" +
           "</article>"
         );
       })

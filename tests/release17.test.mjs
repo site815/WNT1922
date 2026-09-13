@@ -32,7 +32,7 @@ test("war announcements pause, survive reload and restore the previous running s
       c = contentFor(bundle, s);
     s.decisions = [];
     s.paused = paused;
-    s.autoPause = false;
+    s.autoPause = true;
     commenceWar(s, c, "JPN", "USA");
     assert.equal(s.paused, true);
     assert.throws(

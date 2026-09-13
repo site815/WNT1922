@@ -69,7 +69,7 @@ export function syncConvoys(s,c,id,{force=false}={}) {
   for(const v of n.convoys) if(!v.aviationTransfer && !existing.has(v.routeKey)) v.retire=true;
   let free=Math.max(0,n.merchant.hulls-n.convoys.reduce((v,x)=>v+x.count,0));
   const initial=!n.convoysMobilized; n.convoysMobilized=true;
-  const packet = Math.max(ECONOMY.CONVOY_PACKET, Math.ceil(plan.targetAtSea/data.TARGET_ACTIVE_CONVOYS));
+  const packet = Math.max(1, Math.ceil(plan.targetAtSea/data.TARGET_ACTIVE_CONVOYS));
   for(const r of plan.routes) {
     let needed=Math.min(Math.max(0,plan.targetAtSea-convoyTraffic(s,id).hullsAtSea),
       Math.max(0,r.hulls-n.convoys.filter(v=>v.routeKey===r.key && convoyUnderway(v,now)).reduce((v,x)=>v+x.count,0)));
@@ -113,10 +113,17 @@ export function moveConvoys(s,c,id) {
   const n=s.nations[id], now=campaignMinutes(s);
   for(const v of n.convoys) {
     if(v.aviationTransfer || !v.count || v.battleId) continue;
-    if(!tradeable(s,id,v.port) || !tradeable(s,id,v.targetNode)) {
+    if(v.waitingForPort || !tradeable(s,id,v.port) || !tradeable(s,id,v.targetNode)) {
       const ports=usablePorts(s,id);
-      if(!ports.length) { v.aborted=true; continue; }
+      if(!ports.length) {
+        if (!v.waitingForPort) {
+          v.route=[fleetPosition(s,v)]; v.departAt=now; v.arriveAt=now;
+          v.aborted=true; v.retire=true; v.waitingForPort=true;
+        }
+        continue;
+      }
       const home=ports.includes(v.port)?v.port:closeNode(fleetPosition(s,v),ports);
+      delete v.waitingForPort;
       v.aborted=true; v.retire=true; v.leg="returning"; v.port=home;
       convoyRoute(s,v,home);
     }

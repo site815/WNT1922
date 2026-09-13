@@ -18,7 +18,7 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 | Program prices and durations | [common/rules/balance.md](common/rules/balance.md) |
 | All nine research-level explanations | [common/rules/research-tree.md](common/rules/research-tree.md) |
 | Economic growth and historical series | `common/rules/economy.md` and `common/rules/historical-gdp-data.md` |
-| Monthly shipping demand, 20% moving pool and automatic round-trip routes | `common/rules/merchant-routes.md` |
+| Monthly shipping demand, 2% moving pool and automatic round-trip routes | `common/rules/merchant-routes.md` |
 | Naval battle stages, durations and repeated main engagements | `common/rules/battle-stages.md` |
 | Significant actions, morale changes and tonnage-based war score | `common/rules/campaign-impact.md` |
 | Civilian hull rebuilding, logistics multipliers and average merchant GRT | `common/rules/merchant-economy.md`; `economy.md` defines GTP and home-region output access |

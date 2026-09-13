@@ -1237,7 +1237,7 @@ td .subtle {
   position: fixed;
   inset: 0;
   background: #040b12cc;
-  backdrop-filter: blur(5px);
+  backdrop-filter: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8547,11 +8547,21 @@ body:has(.view-command) #toast {
 .news-message { display: inline-block; white-space: nowrap; will-change: transform; font-size: 14px; }
 .news-message strong { color: #e9d8ae; font-weight: 600; }
 .news-idle { color: var(--muted); font-size: 13px; }
-.admiral-mission { display:block; color:var(--muted); margin-top:4px; }
+.news-viewport > .news-message { height:38px; min-height:0; width:max-content; max-width:none; padding:0; margin:0; border:0; background:transparent; box-shadow:none; text-align:left; line-height:38px; color:var(--text); }
+.news-viewport > .news-message:hover,.news-viewport > .news-message:focus-visible { color:var(--gold); text-decoration:underline; }
+.pending-decisions { display:flex; flex:0 1 auto; max-width:48%; min-width:0; gap:6px; overflow:hidden; }
+.pending-decision { min-width:0; max-width:260px; height:32px; min-height:32px; padding:2px 8px; border-color:var(--gold); text-align:left; }
+.pending-decision strong,.pending-decision small { display:block; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; line-height:1.15; }
+.pending-decision strong { font-size:12px; }
+.pending-decision small { font-size:10px; color:var(--muted); }
+.news-highlight { outline:2px solid var(--gold); outline-offset:-2px; background:#66532050; }
+.world-command .command-side-panel .fleet-command-row { padding:5px 8px; }
+.world-command .command-side-panel .fleet-command-row .fleet-mission-status { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:1px 0 0; line-height:1.25; }
+.fleet-mission-status > span { display:inline; }
 
 /* Fixed envelopes by dialog family keep headings and footer actions stationary. */
-.modal-backdrop:not(.report-backdrop) { align-items: flex-start; padding: min(10vh,80px) 18px 18px; }
-.modal[data-dialog-type] { height: min(580px,80dvh); max-height: calc(100dvh - 110px); }
+.modal-backdrop:not(.report-backdrop),.modal-backdrop.report-backdrop { inset:var(--dialog-top,0px) 0 0 var(--dialog-left,0px); align-items:center; justify-content:center; padding:16px; background:#040b1240; backdrop-filter:none; }
+.modal[data-dialog-type] { height: min(580px,80dvh); max-height: calc(100dvh - var(--dialog-top,0px) - 32px); }
 .modal[data-dialog-type="confirm"], .modal[data-dialog-type="new"] { height: min(340px,78dvh); }
 .modal[data-dialog-type="order"] { height: min(430px,80dvh); }
 .modal[data-dialog-type="diplomacy"] { width:min(780px,calc(100vw - 36px)); max-width:780px; height:min(460px,80dvh); }
@@ -8562,10 +8572,10 @@ body:has(.view-command) #toast {
 .modal[data-dialog-type] > footer > button { min-width:126px; min-height:44px; font-size:14px; line-height:1.2; margin:0; }
 .modal[data-dialog-type] > footer > .subtle { margin-right:auto; }
 .modal[data-dialog-type] > footer > .primary { order:2; }
-.report-backdrop .modal[data-dialog-type="report"] { height:calc(100dvh - 150px); max-height:calc(100dvh - 150px); max-width:1120px; }
+.report-backdrop .modal[data-dialog-type="report"] { height:calc(100dvh - var(--dialog-top,0px) - 32px); max-height:calc(100dvh - var(--dialog-top,0px) - 32px); max-width:1120px; }
 @media(max-height:650px) {
-  .modal-backdrop:not(.report-backdrop) { padding-top:18px; }
-  .modal[data-dialog-type] { max-height:calc(100dvh - 36px); }
+  .modal-backdrop:not(.report-backdrop) { padding:8px; }
+  .modal[data-dialog-type] { max-height:calc(100dvh - var(--dialog-top,0px) - 16px); }
   .modal[data-dialog-type] > header { min-height:60px; }
 }
 /* Resource rates and map inspections share stable, readable dimensions. */
@@ -8616,7 +8626,7 @@ body:has(.view-command) #toast {
 .retired-model-row { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:6px 0; }
 .class-hover.resource-hover:has([data-breakdown="STRATEGIC"]) { width:min(890px,94vw); }
 .resource-breakdown[data-breakdown="STRATEGIC"] dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:22px; }
-.ledger-layout { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:start; }
+.ledger-layout { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:stretch; }
 .ledger-panel { padding:12px 14px; min-width:0; }
 .ledger-panel h2 { margin:0 0 8px; font-size:17px; }
 .ledger-panel h3 { margin:10px 0 5px; font-size:14px; }
@@ -8629,7 +8639,7 @@ body:has(.view-command) #toast {
 .ledger-panel th,.ledger-panel td { padding:5px 6px; text-align:right; font-variant-numeric:tabular-nums; }
 .ledger-panel th:first-child,.ledger-panel td:first-child { text-align:left; }
 .ledger-wide { grid-column:1/-1; display:grid; gap:10px; }
-.economy-ledger > .ledger-panel:first-child { grid-column:span 2; }
+.economy-ledger > .ledger-panel:first-child { grid-column:auto; }
 .record-intro { margin:0 0 8px; font-size:12px; color:var(--muted); }
 .record-ledger .casualty-ledger h3 { display:none; }
 .view-economy .workspace-inner,.view-review .workspace-inner { overflow-y:auto; }
@@ -8638,3 +8648,11 @@ body:has(.view-command) #toast {
   .economy-ledger > .ledger-panel:first-child { grid-column:auto; }
   .record-ledger > .ledger-panel:nth-child(3) { grid-column:1/-1; }
 }
+
+/* Time controls occupy fixed slots, with the setting aligned to their center. */
+.autopause-control { display:inline-flex; align-items:center; justify-content:center; gap:5px; height:28px; white-space:nowrap; font-size:12px; }
+.autopause-control input { margin:0; width:14px; height:14px; }
+.clock-controls { flex-shrink:0; }
+.time-bar .actual-speed { width:122px; min-width:122px; max-width:122px; }
+.economy-ledger .ledger-panel { display:flex; flex-direction:column; }
+.economy-ledger .ledger-panel > .formula { margin-top:auto; padding-top:10px; }

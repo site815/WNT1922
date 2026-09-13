@@ -59,7 +59,7 @@ import {
   aiResearchScores,
   aiDoctrine,
 } from "./ai-planning.mjs";
-import { recordFrontAlert, trimAlerts } from "./alert-lifecycle.mjs";
+import { recordFrontAlert, trimAlerts, DECISION_DEFAULT_DAYS, decisionIsChoice, activeDispatch } from "./alert-lifecycle.mjs";
 import { updatePortBlockades, yardAvailability } from "./port-trade.mjs";
 import { completeScrapping } from "./ship-retirement.mjs";
 import { resultComposition } from "./composition.mjs";
@@ -466,13 +466,14 @@ export function rng(s) {
 export function buildDays(c) {
   return c.buildDays || RULES.buildDays[c.type] || RULES.buildDays.default;
 }
-export function addLog(s, text, kind = "navy") {
+export function addLog(s, text, kind = "navy", extra = {}) {
   s.log.unshift({
     id: s.nextId++,
     day: s.day,
     minute: campaignMinutes(s),
     text,
     kind,
+    ...extra,
   });
   s.log = s.log.slice(0, 140);
 }
@@ -499,15 +500,20 @@ export function queueDecision(s, key, title, body, options, meta = {}) {
     queue = decisionQueue(s, actor),
     completed = decisionHistory(s, actor);
   if (completed.includes(key) || queue.some((d) => d.key === key)) return;
-  const d = { key, title, body, options, day: s.day, critical: false, ...meta };
-  if (actor === s.player) { d.popup = true; d.forcePause = true; }
-  if (d.critical) {
-    d.deadline ??= campaignMinutes(s) + 14 * 1440;
-    d.defaultOption ??= options.at(-1).id;
-    d.defaultText ??= options.find((o) => o.id === d.defaultOption).detail;
+  const d = { key, title, body, options, day: s.day, ...meta };
+  if (!decisionIsChoice(d) && d.kind !== 'war') {
+    completed.push(key);
+    if (actor === s.player) addAlert(s, title, body, d.kind || 'info');
+    return;
   }
+  d.critical = true;
+  d.deferred = actor === s.player && !s.autoPause;
+  d.deadline ??= campaignMinutes(s) + DECISION_DEFAULT_DAYS * 1440;
+  d.defaultOption ??= options.at(-1).id;
+  d.defaultText ??= options.find((o) => o.id === d.defaultOption).detail;
+  if (actor === s.player) { d.popup = true; d.forcePause = true; }
   queue.push(d);
-  if (actor === s.player && (d.critical || d.popup) && (s.autoPause || d.forcePause)) {
+  if (actor === s.player && s.autoPause && (d.critical || d.popup)) {
     if (!s.paused) s.resumeAfterDecision = true;
     s.paused = true;
     s.pauseReason ??= d.key;
@@ -526,41 +532,36 @@ function validDecision(s, d) {
 function normalizeDecisions(s) {
   s.alerts ??= [];
   for (const d of [...s.decisions]) {
-    if (d.key.startsWith("war-") && d.options.some((o) => o.priority)) {
-      addAlert(
-        s,
-        d.title,
-        "Your fleets continue their individual missions. Select a force on the command chart to change its orders.",
-        "war",
-      );
-      s.decisions = s.decisions.filter((x) => x !== d);
-      s.completedEvents.push(d.key);
-      continue;
-    }
-    if (d.critical === undefined) {
-      d.critical = false;
-      if (d.title === "Disputed naval intelligence") {
-        d.kind = "inspection";
-        d.target ??= s.nations[s.player].rival;
-        d.critical = true;
-        d.deadline = campaignMinutes(s) + 14 * 1440;
-        d.defaultOption = "deny";
-        d.defaultText = "Access denied; lose up to 5 influence.";
-      }
-    }
     if (!validDecision(s, d)) {
       s.decisions = s.decisions.filter((x) => x !== d);
       s.completedEvents.push(d.key);
     }
   }
-  if (s.pauseReason && !s.decisions.some((d) => d.key === s.pauseReason)) {
-    const pending = s.decisions.find((d) => d.critical || d.popup);
+  if (s.pauseReason && !s.decisions.some((d) => d.key === s.pauseReason && activeDispatch(d))) {
+    const pending = s.decisions.find(activeDispatch);
     if (pending) s.pauseReason = pending.key;
     else {
       if (s.resumeAfterDecision) s.paused = false;
       delete s.pauseReason;
       delete s.resumeAfterDecision;
     }
+  }
+}
+export function deferDecision(s, c, key) {
+  const d = s.decisions.find(d => d.key === key);
+  if (!d) throw Error('That dispatch is no longer pending.');
+  if (!decisionIsChoice(d)) return chooseDecision(s, c, key, d.defaultOption);
+  d.deferred = true;
+  normalizeDecisions(s);
+}
+export function reopenDecision(s, key) {
+  const d = s.decisions.find(d => d.key === key);
+  if (!d) throw Error('That decision is no longer pending.');
+  d.deferred = false;
+  if (s.autoPause) {
+    if (!s.paused) s.resumeAfterDecision = true;
+    s.paused = true;
+    s.pauseReason = key;
   }
 }
 function decisionDeadlines(s, c) {
@@ -1046,11 +1047,7 @@ export function setTreatyPolicy(s, policy, id = s.player) {
 export function dismissNotice(s, c, id) {
   const d = s.decisions.find((d) => d.key === id);
   if (d) {
-    if (d.critical) chooseDecision(s, c, id, d.defaultOption);
-    else {
-      s.decisions = s.decisions.filter((x) => x !== d);
-      s.completedEvents.push(d.key);
-    }
+    deferDecision(s, c, id);
     return;
   }
   const a = s.alerts.find((a) => String(a.id) === String(id));
@@ -1090,8 +1087,7 @@ function completeProject(s, content, n, p) {
     n.morale = clamp(n.morale + MORALE.training, 0, MORALE.ceiling);
   }
   if (n.id === s.player) {
-    addLog(s, `${p.name} completed.`, "industry");
-    addAlert(s, "Program complete", p.name + " completed.", "industry");
+    addLog(s, `${p.name} completed.`, "industry", { programKey: p.key, newsView: 'programs' });
   }
 }
 export function yardLoad(s, content, id = s.player) {
@@ -1166,6 +1162,7 @@ function daily(s, content) {
               s,
               `${deliveredCount} × ${g.baseName || g.name} ${service === "merchant" ? "entered merchant service" : "commissioned"}.`,
               "industry",
+              { shipId: g.id, newsView: 'fleet' },
             );
         }
       }
@@ -1189,7 +1186,7 @@ function daily(s, content) {
             g.status = "active";
             commissionToFleet(s, content, id, g);
             if (id === s.player)
-              addLog(s, `${g.name} returned to service after repairs.`);
+              addLog(s, `${g.name} returned to service after repairs.`, 'navy', { shipId: g.id, newsView: 'fleet' });
           }
         }
       }
@@ -1258,11 +1255,13 @@ function historicalEvents(s, content) {
     t.polandOccurred = true;
     const event = EUROPE_OPENING.invasion;
     addLog(s, event.log, "war");
+    s.log[0].dismissed = true;
     addAlert(
       s,
       event.title,
       event.body,
       "war",
+      { popupKey: event.key },
     );
     dispatchPopup(
       s,
@@ -1420,7 +1419,7 @@ export function aiTurn(s, content, id) {
       year = yearOf(s);
     for (const role of ["fighter", "strike", "scout"]) {
       const models = content.nations[id].aircraft.filter(
-          (a) => planeRole(a) === role && a.type_year <= year,
+          (a) => [role, "multirole"].includes(planeRole(a)) && a.type_year <= year,
         ),
         latest = Math.max(1922, ...models.map((a) => a.type_year));
       if (
