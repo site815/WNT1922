@@ -165,8 +165,6 @@ const typeOrder = [
   "SS",
   "SM",
   "AO",
-  "AD",
-  "AV",
   "AK",
 ];
 const liveShips = (stats) =>
@@ -206,9 +204,7 @@ export function commandView(s, content, ui = {}, data = {}) {
     supply = f ? fleets.find((r) => r.f === f).supply : null,
     power = f ? fleets.find((r) => r.f === f).power : null;
   const contact = contacts.find((c) => c.id === ui.contactId),
-    convoy = n.convoys.find((c) => c.id === ui.convoyId),
-    mission = ui.mission || f?.mission || "guard",
-    unequal = ui.aggressiveBattle ?? f?.aggressiveBattle ?? false;
+    convoy = n.convoys.find((c) => c.id === ui.convoyId);
   const zoom = ui.zoom || 1,
     rotation = ui.rotation || 0,
     width = 1200 / zoom,
@@ -346,7 +342,7 @@ export function commandView(s, content, ui = {}, data = {}) {
       .join("") +
     "</g>";
   const convoys = n.convoys
-    .filter((v) => v.count && nationAtWar(s, s.player))
+    .filter((v) => v.count)
     .map((v) => {
       const position = fleetPosition(s, v),
         [x, y] = place(position, 8 * scale),
@@ -378,15 +374,6 @@ export function commandView(s, content, ui = {}, data = {}) {
     ' forces</span></div><div class="fleet-command-list" data-scroll-key="naval-commands">' +
     fleets
       .map(({ f: ship, stats: st }) => {
-        const order = ui.orders?.[ship.id],
-          mission = order?.mission || ship.mission,
-          aggressive = order?.aggressive ?? ship.aggressiveBattle,
-          canOrder = !["repair", "reinforcement", "support"].includes(
-            ship.role,
-          ),
-          blocked = canOrder
-            ? fleetMissionBlock(s, content, s.player, ship, mission)
-            : "";
         return (
           '<article class="fleet-command-row ' +
           (ship.id === ui.fleetId ? "selected" : "") +
@@ -401,36 +388,7 @@ export function commandView(s, content, ui = {}, data = {}) {
           "</span><small>" +
           esc(fleetStatus(s, ship)) +
           "</small></div>" +
-          (canOrder
-            ? '<div class="inline-fleet-orders"><select aria-label="Mission for ' +
-              esc(ship.name) +
-              '" data-fleet-mission="' +
-              ship.id +
-              '">' +
-              Object.entries(MISSIONS)
-                .map(
-                  ([id, m]) =>
-                    '<option value="' +
-                    id +
-                    '" ' +
-                    (id === mission ? "selected" : "") +
-                    ">" +
-                    m.name +
-                    "</option>",
-                )
-                .join("") +
-              '</select><button data-action="send-inline-order" data-id="' +
-              ship.id +
-              '" ' +
-              (blocked
-                ? 'disabled title="' + esc(blocked) + '"'
-                : 'title="Transmit this fleet mission"') +
-              '>Send</button><label class="check-label" title="Accept greater risk and press attacks longer."><input type="checkbox" data-fleet-aggression="' +
-              ship.id +
-              '" ' +
-              (aggressive ? "checked" : "") +
-              ">Seek aggressive battle</label></div>"
-            : "") +
+          '<small class="admiral-mission" title="The admiral chooses missions, routes and engagement policy automatically.">' + esc(MISSIONS[ship.mission]?.name || "Fleet support") + " · Admiral control</small>" +
           "</article>"
         );
       })

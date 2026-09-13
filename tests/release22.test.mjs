@@ -96,7 +96,7 @@ test("all fourteen starts have period levels, named inherited hulls and an abstr
       validateSave(s, b);
     }
 });
-test("1922 naval catalogs retain only opening designs or existing plans; 1936 keeps future generations", () => {
+test("1922 combat catalogs retain opening designs or plans; recurring support and 1936 designs have future generations", () => {
   for (const id of Object.keys(b.nations)) {
     const [s, c] = start(id, "campaign_1922"),
       n = c.nations[id],
@@ -109,13 +109,13 @@ test("1922 naval catalogs retain only opening designs or existing plans; 1936 ke
     assert.ok(
       n.designs.every(
         (k) =>
-          c.classes[k].year <= 1922 ||
+          c.classes[k].type === "AO" || c.classes[k].year <= 1922 ||
           owned.has(k) ||
           c.classes[k].raw.plan_year <= 1922,
       ),
     );
     const newer = b.campaigns.in_good_faith_1936;
-    assert.ok(newer.nations[id].aircraft.some((a) => a.type_year > 1936));
+    assert.equal(newer.nations[id].aircraft.some((a) => a.type_year > 1936),id === "JPN");
   }
 });
 

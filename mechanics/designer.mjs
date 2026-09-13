@@ -34,7 +34,7 @@ export function designLimits(year, role) {
             ? 15000
             : sub
               ? 3500
-              : ["AO", "AD"].includes(role)
+              : role === "AO"
                 ? 30000
                 : 5500,
     maxCaliber: capital
@@ -58,7 +58,7 @@ export function designLimits(year, role) {
           : 300000
         : ["CA", "CL"].includes(role)
           ? 150000
-          : ["AO", "AD"].includes(role)
+          : role === "AO"
             ? 50000
             : 90000,
   };
@@ -85,7 +85,7 @@ export function evaluateDesign(recipe, nation) {
     throw Error("Give the class a name of 2–70 characters.");
   const limits = designLimits(year, role),
     sub = role === "SS",
-    support = ["AO", "AD"].includes(role),
+    support = role === "AO",
     capital = ["BB", "BC"].includes(role);
   const bounds = {
     hp: [sub ? 200 : 2000, limits.maxHP],
@@ -134,7 +134,6 @@ export function evaluateDesign(recipe, nation) {
       DD: 0.04,
       SS: 0.04,
       AO: 0.25,
-      AD: 0.25,
     }[role],
     base = {
       BB: 16000,
@@ -144,8 +143,7 @@ export function evaluateDesign(recipe, nation) {
       CL: 2700,
       DD: 650,
       SS: 300,
-      AO: 4200,
-      AD: 5000,
+      AO: 5000,
     }[role];
   const machinery =
       r.hp * (sub ? 0.035 : role === "DD" ? 0.014 : year < 1930 ? 0.026 : 0.02),
@@ -237,7 +235,7 @@ export function evaluateDesign(recipe, nation) {
     ...normalizeClass(raw, {}),
     custom: true,
     service: support ? "support" : "warship",
-    supportKind: role === "AO" ? "oiler" : role === "AD" ? "depot" : undefined,
+    supportHybrid: support,
     scoutAircraft: r.features.includes("catapult") ? 2 : 0,
     notes:
       "Ministry component design; calculated displacement, endurance and performance.",
@@ -278,8 +276,7 @@ export function automaticDraft(s, c, role = "DD", id = s.player) {
     CL: [65000, 152, 8, 8, 65, 25, 12, 1000, 0],
     DD: [36000, 127, 4, 8, 0, 0, 6, 450, 0],
     SS: [2200, 100, 1, 6, 0, 0, 2, 200, 0],
-    AO: [10000, 100, 2, 0, 0, 0, 4, 800, 0],
-    AD: [12000, 127, 4, 0, 20, 10, 8, 1200, 0],
+    AO: [12000, 127, 4, 0, 20, 10, 8, 1200, 0],
   }[role];
   const r = {
     kind: "ship",

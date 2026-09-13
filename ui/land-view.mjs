@@ -63,7 +63,7 @@ export function strategicAirView(s, c, ui = {}, data = {}) {
   const n = s.nations[s.player],
     damage = n.industrialDamage || {},
     panel =
-      '<div class="panel-title"><h2>Strategic air campaigns</h2></div><p>Industry disruption <b>' +
+      '<div class="panel-title"><h2>Strategic air</h2></div><p>Industry disruption <b>' +
       pct(damage.industry) +
       "</b><br>Yard disruption <b>" +
       pct(damage.yards) +

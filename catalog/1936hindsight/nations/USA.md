@@ -754,12 +754,10 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "astoria_ca26",
     "farragut_dd34",
     "dolphin_ss31",
-    "us_depot_1922",
-    "us_oiler_1922",
-    "us_depot_1932",
-    "us_oiler_1932",
-    "us_depot_1942",
-    "us_oiler_1942"
+    "us_support_1922",
+    "us_support_1932",
+    "us_support_1942",
+    "republic_bb41"
   ],
   "support": [],
   "merchants": {

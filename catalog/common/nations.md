@@ -52,6 +52,11 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "color": "#bdc5d0",
     "home": "atlantic",
     "rival": "GBR"
-  }
+  },
+  "designs": [
+    "undefined_support_1922",
+    "undefined_support_1932",
+    "undefined_support_1942"
+  ]
 }
 ```

@@ -46,6 +46,7 @@ export function initializeGovernmentAviation(s, c) {
     );
     n.governmentAviators = 0;
     n.governmentLosses = { planes: 0, crews: 0, rescued: 0 };
+    n.governmentRetired = 0;
     n.governmentMonth = s.day;
     const models = currentGovernmentModels(s, c, id);
     for (const [port, b] of Object.entries(n.airBases || {})) {
@@ -77,6 +78,7 @@ export function initializeGovernmentAviation(s, c) {
 export function governmentProduction(s, c, id) {
   const n = s.nations[id],
     date = new Date(s.day * 86400000);
+  retireGovernmentAircraft(s, c, id);
   if (
     date.getUTCDate() !== 1 ||
     n.governmentMonth === s.day ||
@@ -89,52 +91,16 @@ export function governmentProduction(s, c, id) {
       .reduce((v, p) => v + governmentCapacity(s, p), 0),
     current = currentGovernmentModels(s, c, id),
     models = new Map(operationalAircraftModels(c, id).map((a) => [a.id, a]));
-  // Retire old government reserves, never deployed aircraft or a shipment.
-  for (const [port, b] of Object.entries(n.airBases))
-    for (const w of b.reserve)
-      if (
-        governmentModel(models.get(w.model)) &&
-        current.some(
-          (a) =>
-            a.role === models.get(w.model).role &&
-            a.type_year > models.get(w.model).type_year,
-        )
-      ) {
-        n.governmentAircraft[w.model] -= w.count;
-        n.governmentAviators -= w.crewed * aircraftSeats(models.get(w.model));
-        w.count = 0;
-        w.crewed = 0;
-      }
-  for (const [model, count] of Object.entries(freeAircraft(n))) {
-    const old = models.get(model);
-    if (
-      !count ||
-      !governmentModel(old) ||
-      !current.some((a) => a.role === old.role && a.type_year > old.type_year)
-    )
-      continue;
-    n.governmentAircraft[model] -= count;
-    n.governmentAviators = Math.max(
-      0,
-      n.governmentAviators - count * aircraftSeats(old),
-    );
-  }
+  /* Monthly procurement replaces retired aircraft through the normal warehouse
+     and physical reinforcement routes. It does not create a free replacement. */
   for (const a of currentGovernmentModels(s, c, id)) {
     const desired = Math.ceil(capacity * GOVERNMENT_SHARES[a.role] * 1.25),
       owned = operationalAircraftModels(c, id)
         .filter((m) => governmentModel(m) && m.role === a.role)
         .reduce((v, m) => v + (n.governmentAircraft[m.id] || 0), 0);
-    // Keep a bounded reserve of the current generation, including during a
-    // modernization; older stored aircraft are retired by their own service.
-    const requested = Math.max(
-      0,
-      Math.min(
-        Math.ceil(capacity / 12),
-        desired - (n.governmentAircraft[a.id] || 0),
-        Math.ceil(capacity * 2) - owned,
-      ),
-    );
-const materials = aircraftMaterialCost(a), gold = a.cost_gold || 0, industry = (a.weights?.empty_kg || 2500) / 80;
+    const requested = Math.max(0, Math.min(Math.ceil(capacity / 12),
+      desired - (n.governmentAircraft[a.id] || 0), Math.ceil(capacity * 2) - owned));
+    const materials = aircraftMaterialCost(a), gold = a.cost_gold || 0, industry = (a.weights?.empty_kg || 2500) / 80;
     const count = Math.max(0, Math.floor(Math.min(requested * strategicFactor(n), n.strategic / materials,
       gold ? n.gold / gold : Infinity, n.industry / industry)));
     n.strategic -= count * materials;
@@ -143,5 +109,30 @@ const materials = aircraftMaterialCost(a), gold = a.cost_gold || 0, industry = (
     n.industry -= count * industry;
     n.governmentAircraft[a.id] += count;
     n.governmentAviators += count * aircraftSeats(a);
+  }
+}
+export function retireGovernmentAircraft(s, c, id) {
+  const n = s.nations[id], current = currentGovernmentModels(s, c, id),
+    models = new Map(operationalAircraftModels(c, id).map(a => [a.id, a]));
+  const obsolete = model => governmentModel(models.get(model)) &&
+    current.some(a => a.role === models.get(model).role && a.type_year > models.get(model).type_year);
+  const retire = (model, count, crewed) => {
+    n.governmentAircraft[model] -= count;
+    n.governmentAviators = Math.max(0, n.governmentAviators - crewed * aircraftSeats(models.get(model)));
+    n.governmentRetired = (n.governmentRetired || 0) + count;
+  };
+  // Grounded wings retire immediately. Flights and transports retain their real
+  // aircraft until they return; the next daily pass retires those arrivals.
+  for (const [port, b] of Object.entries(n.airBases))
+    for (const w of [...b.reserve, ...(b.governmentWing || [])])
+      if (
+        obsolete(w.model)
+      ) {
+        retire(w.model, w.count, w.crewed);
+        w.count = 0;
+        w.crewed = 0;
+      }
+  for (const [model, count] of Object.entries(freeAircraft(n))) {
+    if (count && obsolete(model)) retire(model, count, count);
   }
 }

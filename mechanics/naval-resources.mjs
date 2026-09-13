@@ -93,6 +93,7 @@ export function initializeResources(s, c) {
     initializeRecovery(n);
     initializeTraining(s, n);
     n.industryFunding ??= c.nations[id].starting.funding;
+    n.productionAutomatic ??= Object.fromEntries(["fighter","strike","scout"].map(role=>[role,data.AUTOMATIC_PRODUCTION_DEFAULT]));
     if (n.aircraft) {
       for (const a of models) n.aircraft[a.id] ??= 0;
       n.aviatorsYear ??= economyFor(s, id).aviatorsYear;
@@ -606,6 +607,7 @@ export function dailyResources(s, c, log) {
       return amount;
     };
     trainPersonnel(s, n, fund);
+    updateProductionModels(s, c, id);
     const plan = aircraftProductionPlan(s, c, id);
     n.aircraftOutput = 0;
     for (const { model, aircraft: a } of plan.choices) {
@@ -666,6 +668,23 @@ export function setProductionModel(s, c, role, model, id = s.player) {
       "Choose an available model suitable for this production role.",
     );
   n.productionModels[role] = model;
+  n.productionAutomatic[role] = false;
+}
+export function updateProductionModels(s, c, id = s.player) {
+  const n = s.nations[id];
+  for (const role of ["fighter", "strike", "scout"]) {
+    if (!n.productionAutomatic[role]) continue;
+    const choices = aircraftModels(c, id)
+      .filter(a => modelAvailable(s, n, a) && [role, "multirole"].includes(planeRole(a)))
+      .sort((a, b) => b.type_year - a.type_year || aircraftQuality(b, role) - aircraftQuality(a, role) || a.id.localeCompare(b.id));
+    n.productionModels[role] = choices[0]?.id || null;
+  }
+}
+export function setProductionAutomatic(s, c, role, enabled, id = s.player) {
+  if (!["fighter", "strike", "scout"].includes(role) || typeof enabled !== "boolean")
+    throw Error("Choose a production line and automatic setting.");
+  s.nations[id].productionAutomatic[role] = enabled;
+  updateProductionModels(s, c, id);
 }
 export function loseAircraft(
   s,

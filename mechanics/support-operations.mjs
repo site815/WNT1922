@@ -19,6 +19,7 @@ import {
 import { staffSailors, fullyStaffed, dockSailors } from "./ship-staffing.mjs";
 import { portSummary } from "./ports.mjs";
 import { nearestSupplyPort } from "./logistics.mjs";
+import { SUPPORT_RULES as rules } from "./support-effects.mjs";
 const operational = (g) => g.count > 0 && g.status === "active";
 const closeNode = (position, allowed = Object.keys(NODES)) =>
   allowed.reduce((a, b) =>
@@ -70,11 +71,7 @@ export function organizeSupport(s, c) {
         c.classes[g.classId].crew > 0 &&
         fullyStaffed(g, c.classes[g.classId]),
     )) {
-      const kind = c.classes[g.classId].supportHybrid
-          ? "oiler"
-          : c.classes[g.classId].type === "AD"
-            ? "depot"
-            : "oiler",
+      const kind = "support",
         port = g.dockPort || HOME_PORT[id];
       let f = n.fleets.find(
         (f) =>
@@ -82,14 +79,14 @@ export function organizeSupport(s, c) {
           f.supportKind === kind &&
           f.phase === "port" &&
           f.port === port &&
-          auxiliaries(s, c, id, f).length < 4,
+          auxiliaries(s, c, id, f).length < rules.GROUP_HULLS,
       );
       if (!f) {
         const now = campaignMinutes(s);
         f = {
           id: "support-" + id + "-" + s.nextId++,
           name:
-            (kind === "depot" ? "Depot group " : "Replenishment group ") +
+            "Fleet support group " +
             (1 +
               n.fleets.filter(
                 (f) => f.role === "support" && f.supportKind === kind,
@@ -158,13 +155,13 @@ function supportDestination(s, c, id, f) {
   const position = fleetPosition(s, f),
     base = closeNode(position, ports);
   if (
-    f.fuelNm < f.maxRangeNm * 0.3 ||
-    auxiliaries(s, c, id, f).some((g) => g.health < 0.75)
+    f.fuelNm < f.maxRangeNm * rules.REFUEL_BELOW ||
+    auxiliaries(s, c, id, f).some((g) => g.health < rules.REPAIR_BELOW)
   ) {
     delete f.supportTarget;
     return base;
   }
-  if (f.supportKind === "depot") {
+  const supportPort = () => {
     const demand = {};
     for (const other of n.fleets) {
       if (["support", "repair", "reinforcement"].includes(other.role)) continue;
@@ -173,7 +170,7 @@ function supportDestination(s, c, id, f) {
         demand[port] = (demand[port] || 0) + fleetStats(s, c, id, other).tons;
     }
     const bonus = auxiliaries(s, c, id, f).reduce(
-      (v, g) => v + c.classes[g.classId].tons * g.count * g.health * 3,
+      (v, g) => v + c.classes[g.classId].tons * g.count * g.health * rules.PORT_CAPACITY_PER_TON,
       0,
     );
     const ranked = ports
@@ -200,7 +197,7 @@ function supportDestination(s, c, id, f) {
       : ports.includes(f.targetNode)
         ? f.targetNode
         : base;
-  }
+  };
   if ((f.supportCargo || 0) < 1) return base;
   const targets = n.fleets
     .filter(
@@ -208,7 +205,7 @@ function supportDestination(s, c, id, f) {
         !["support", "repair", "reinforcement", "submarine"].includes(x.role) &&
         !["port", "refuel", "returning", "repair"].includes(x.phase) &&
         fleetStats(s, c, id, x).hulls &&
-        x.fuelNm < x.maxRangeNm * 0.9,
+        x.fuelNm < x.maxRangeNm * rules.TARGET_FUEL_BELOW,
     )
     .map((x) => ({
       f: x,
@@ -220,7 +217,7 @@ function supportDestination(s, c, id, f) {
     .sort((a, b) => b.need - a.need);
   if (!targets.length) {
     delete f.supportTarget;
-    return base;
+    return supportPort();
   }
   const target = targets[0].f;
   f.supportTarget = target.id;
@@ -258,7 +255,7 @@ export function minuteSupport(s, c, id, f) {
   }
   if (f.phase === "port" && ports.includes(f.port)) {
     for (const g of ships)
-      if (g.health < 0.75) {
+      if (g.health < rules.REPAIR_BELOW) {
         g.status = "repair";
         g.dockPort = f.port;
         delete g.fleetId;
@@ -267,27 +264,21 @@ export function minuteSupport(s, c, id, f) {
       invalidateOperations(s);
       return;
     }
-    f.supportCargo =
-      f.supportKind === "oiler"
-        ? ships.reduce(
-            (v, g) => v + c.classes[g.classId].tons * g.count * g.health * 2,
-            0,
-          )
-        : 0;
+    f.supportCargo = ships.reduce(
+      (v, g) => v + c.classes[g.classId].tons * g.count * g.health * rules.CARGO_PER_TON, 0);
     f.fuelNm = f.maxRangeNm;
   }
   const target = n.fleets.find((x) => x.id === f.supportTarget);
   if (
-    f.supportKind === "oiler" &&
     target &&
     f.phase !== "port" &&
     (f.nextReplenishment || -1e9) <= now &&
-    distanceNm(position, fleetPosition(s, target)) <= 40
+    distanceNm(position, fleetPosition(s, target)) <= rules.MEETING_RANGE_NM
   ) {
     const st = fleetStats(s, c, id, target),
       missing = Math.max(0, 1 - target.fuelNm / Math.max(1, target.maxRangeNm)),
       fraction = Math.min(
-        0.35,
+        rules.TRANSFER_MAX_FRACTION,
         missing,
         (f.supportCargo || 0) / Math.max(1, st.tons),
       );
@@ -298,9 +289,9 @@ export function minuteSupport(s, c, id, f) {
       );
       f.supportCargo = Math.max(0, f.supportCargo - st.tons * fraction);
       f.deliveredCargo = (f.deliveredCargo || 0) + st.tons * fraction;
-      target.replenishedUntil = now + 3 * 1440;
-      target.replenishmentRelief = Math.min(0.15, fraction * 0.6);
-      f.nextReplenishment = now + 1440;
+      target.replenishedUntil = now + rules.RELIEF_MINUTES;
+      target.replenishmentRelief = Math.min(rules.RELIEF_MAX, fraction * rules.RELIEF_PER_FUEL_FRACTION);
+      f.nextReplenishment = now + rules.TRANSFER_INTERVAL_MINUTES;
       invalidateOperations(s);
     }
   }

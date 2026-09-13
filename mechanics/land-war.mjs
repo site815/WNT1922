@@ -6,6 +6,7 @@ import { campaignMinutes } from "./campaign-clock.mjs";
 import { fleetPosition, fleetStats } from "./task-forces.mjs";
 import { distanceNm, interpolate, PORTS, NODES, ISLANDS } from "./world.mjs";
 import { portOwner, invalidatePorts } from "./ports.mjs";
+import { applyTerritoryMorale } from './campaign-impact.mjs';
 // These are strategic campaign corridors, not individual land units. Balance is deliberately tunable.
 export const POWERS = Object.fromEntries(
   Object.entries(data.POWERS).map(([id, p]) => [
@@ -121,6 +122,7 @@ export function updateFrontNotice(
 export function dailyWorld(s, c, alert = () => {}) {
   initializeWorld(s);
   const w = s.world;
+  const resolved = [];
   const forces = Object.entries(s.nations).flatMap(([id, n]) =>
     n.fleets
       .filter((f) => !["repair", "reinforcement", "support"].includes(f.role))
@@ -275,7 +277,11 @@ export function dailyWorld(s, c, alert = () => {}) {
         (outcome === "Occupied"
           ? "attacking forces secure the campaign"
           : "defenders drive the attack back");
-      w.changes.unshift({ day: s.day, front: f.id, title });
+      const change = { day: s.day, front: f.id, title };
+      w.changes.unshift(change);
+      resolved.push({change,territories:f.territories.map(territory=>({territory,
+        previous:w.control[territory] || data.ORIGINAL_CONTROL[territory] ||
+          ISLANDS.find(island=>'island-'+island.node===territory)?.owner || f.defender}))});
       w.changes = w.changes.slice(0, 40);
       if (f.island && s.ports?.[f.port]) {
         s.ports[f.port].health = Math.max(0, s.ports[f.port].health - 0.15);
@@ -304,6 +310,8 @@ export function dailyWorld(s, c, alert = () => {}) {
   for (const island of ISLANDS)
     if (w.control["island-" + island.node])
       w.portControl[island.node] = w.control["island-" + island.node];
+  for (const {change,territories} of resolved)
+    change.moraleChanges = applyTerritoryMorale(s,territories.map(t=>({...t,owner:w.control[t.territory] || t.previous})));
   invalidatePorts(s);
 }
 // Clip a territory against the advancing front in geographic coordinates before projection.

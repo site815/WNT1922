@@ -200,18 +200,14 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "mare_cv32",
     "mare_ss28",
     "mare_bb38",
-    "ita_program_oiler",
-    "it_depot_1922",
-    "it_oiler_1922",
-    "it_depot_1932",
-    "it_oiler_1932",
-    "it_depot_1942",
-    "it_oiler_1942"
+    "it_support_1932",
+    "it_support_1922",
+    "it_support_1942"
   ],
   "support": [
     {
       "id": "support-ITA",
-      "class_id": "ita_program_oiler",
+      "class_id": "it_support_1932",
       "count": 4,
       "status": "active"
     }

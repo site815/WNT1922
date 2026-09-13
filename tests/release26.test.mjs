@@ -1,3 +1,4 @@
+import { automaticAircraftDraft, commissionAircraft } from "../mechanics/aircraft-designer.mjs";
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CATALOG } from '../worker/catalog-loader.mjs';
@@ -44,7 +45,7 @@ test('all 14 starts store authored GTP; monthly trade and hull-size growth are i
   n.convoyRecord=[];close(s,c,id,false);near(n.gtp,grown*.98);
  }
 });
-test('industry expansions add opening capacity and positive hull growth, never compound or amplify decline',()=>{
+test('industry expansions add opening capacity and civilian hull production, without compounding',()=>{
  for(const campaign of Object.keys(CATALOG.campaigns)) {
   const [s,c,n]=start('USA',campaign);recordConvoy(s,'USA',{delivered:1e7});
   const base={industry:monthlyIncome(s,c).industry,yards:yardLoad(s,c).capacity,hulls:growthOutlook(s,c).merchantHullsMonth,trade:growthOutlook(s,c).tradeMonthly};
@@ -52,17 +53,19 @@ test('industry expansions add opening capacity and positive hull growth, never c
   near(monthlyIncome(s,c).industry,base.industry*1.3);near(yardLoad(s,c).capacity,base.yards*1.3);
   near(growthOutlook(s,c).merchantHullsMonth,base.hulls*1.3);near(growthOutlook(s,c).tradeMonthly,base.trade);
   for(const p of Object.values(s.ports))p.health=0;n.convoyRecord=[];
-  near(growthOutlook(s,c).merchantMonthly,-.02);near(growthOutlook(s,c).tradeMonthly,-.02);
+  near(growthOutlook(s,c).merchantHullsMonth,.5*1.3);near(growthOutlook(s,c).tradeMonthly,-.02);
  }
 });
-test('ALB Japan grows 1.073 hulls per full peaceful month at full logistics; average size adds no GTP multiplier',()=>{
+test('ALB Japan builds two hulls per full month at sufficient capacity and full logistics; size adds no GTP multiplier',()=>{
  const [s,c,n]=start();recordConvoy(s,'JPN',{delivered:1e7});
- near(growthOutlook(s,c).merchantHullsMonth,1.073);const before=n.merchant.hulls,gtp=n.gtp;
- close(s,c,'JPN');near(n.merchant.hulls+n.civilianShipping.carry,before*1.0005);near(n.gtp,gtp*1.0005);
+ near(growthOutlook(s,c).merchantHullsMonth,2);const before=n.merchant.hulls,gtp=n.gtp;
+ close(s,c,'JPN');near(n.merchant.hulls+n.civilianShipping.carry,before+2);near(n.gtp,gtp*1.0005);
 });
 test('superseded naval reserve retirement conserves deployed airframes and personnel and is actor-scoped',()=>{
  for(const id of ['USA','GBR']) {
-  const [s,c]=start('USA'),n=s.nations[id];
+  let [s,c]=start('USA'); const n=s.nations[id];
+  setCampaignMinutes(s,Date.UTC(1937,0,1)/60000);
+  commissionAircraft(s,c,automaticAircraftDraft(s,c,'fighter',id),id); c=contentFor(CATALOG,s);
   const old=navalAircraftInventory(s,c,id).find(r=>r.replacement);assert.ok(old,id+' has a superseded model');
   const model=old.model.id;n.aircraft[model]+=20;
   const port=Object.values(n.airBases)[0];port.reserve.push({model,role:'fighter',count:4,crewed:0});

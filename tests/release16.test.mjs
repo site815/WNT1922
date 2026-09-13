@@ -99,25 +99,25 @@ test("all fourteen openings count real shore establishments, only period models,
     }
 });
 test("shore reach and strike power use each stationed model, crews, condition and strategic materials", () => {
-  const [s, c] = start("USA"),
-    n = emptyAir(s, c, "USA"),
-    m = aircraftModels(c, "USA").find(
-      (a) => a.role === "strike" && a.type_year === 1936,
+  const [s, c] = start("JPN"),
+    n = emptyAir(s, c, "JPN"),
+    m = aircraftModels(c, "JPN").find(
+      (a) => a.role.includes("multirole"),
     ),
-    b = n.airBases.hawaii;
+    b = n.airBases.yokosuka;
   n.aircraft[m.id] = 10;
   b.airWing = [{ model: m.id, role: "strike", count: 10, crewed: 10 }];
   n.strategic = 700; n.strategicDailyDemand = 100;
-  const p = baseAirPower(s, c, "hawaii", m.fuel.combat_radius_km);
+  const p = baseAirPower(s, c, "yokosuka", m.fuel.combat_radius_km);
   assert.ok(p.strike > 0);
   assert.equal(p.radius, m.fuel.combat_radius_km);
-  assert.equal(baseAirPower(s, c, "hawaii", p.radius + 1).strike, 0);
+  assert.equal(baseAirPower(s, c, "yokosuka", p.radius + 1).strike, 0);
   n.strategic = 350;
-  assert.equal(baseAirPower(s, c, "hawaii").strike, p.strike * 0.5);
-  s.ports.hawaii.health = 0.5;
-  assert.equal(baseAirPower(s, c, "hawaii").strike, p.strike * 0.25);
+  assert.equal(baseAirPower(s, c, "yokosuka").strike, p.strike * 0.5);
+  s.ports.yokosuka.health = 0.5;
+  assert.equal(baseAirPower(s, c, "yokosuka").strike, p.strike * 0.25);
   b.airWing[0].crewed = 0;
-  assert.equal(baseAirPower(s, c, "hawaii").strike, 0);
+  assert.equal(baseAirPower(s, c, "yokosuka").strike, 0);
 });
 test("base sorties use national materials and require preparation time", () => {
   const [s, c, n] = start();

@@ -198,10 +198,10 @@ test("battle notices expire at exactly 48 game hours including an open reading s
     minute = campaignMinutes(s);
   setCampaignMinutes(s, minute + 2879);
   assert.equal(alertVisible(s, notice), true);
-  assert.match(alertsView(s, c, notice.id, reading), /alert-detail/);
+  assert.match(alertsView(s, c), /Recent battle/);
   setCampaignMinutes(s, minute + 2880);
   assert.equal(alertItems(s).length, 0);
-  assert.doesNotMatch(alertsView(s, c, notice.id, reading), /alert-detail/);
+  assert.doesNotMatch(alertsView(s, c), /alert-detail/);
   assert.equal(alertVisible(s, { kind: "war", minute }), true);
   assert.equal(alertVisible(s, { kind: "convoy", minute }), false);
 });
@@ -252,7 +252,7 @@ test("land simulation emits associated front notices, retained outside the twelv
   assert.ok(a);
   assert.equal(a.resolvedAt, null);
   for (let i = 0; i < 15; i++) addAlert(s, "Dispatch " + i, "Routine.");
-  assert.match(alertsView(s, c, null), /Poland: fighting underway/);
+  assert.match(alertsView({...s,log:[],alerts:[a]}, c), /Poland: fighting underway/);
 });
 test("convoy overlay and combat use the same active, same-nation escorts and coverage radius", () => {
   const make = (

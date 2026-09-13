@@ -224,9 +224,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
       "class_id": "maru_depot_t23",
       "count": 10,
       "status": "active",
-      "notes": "Standard Maru naval replenishment and depot conversions.",
+      "notes": "Standard Maru AO conversions combine replenishment, repair workshops and fleet stores.",
       "id": "a-JPN-11",
-      "name": "Maru depot conversions"
+      "name": "Maru AO support ships"
     }
   ],
   "merchants": {

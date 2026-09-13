@@ -18,8 +18,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "SS",
     "SM",
     "AO",
-    "AD",
-    "AV",
     "AK"
   ]
 }

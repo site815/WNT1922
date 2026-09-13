@@ -368,12 +368,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "wolf_typ7",
     "hai_typ9",
     "schwertwal_typ21",
-    "de_depot_1922",
-    "de_oiler_1922",
-    "de_depot_1932",
-    "de_oiler_1932",
-    "de_depot_1942",
-    "de_oiler_1942"
+    "de_support_1922",
+    "de_support_1932",
+    "de_support_1942"
   ],
   "support": [],
   "merchants": {

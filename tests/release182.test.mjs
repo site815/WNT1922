@@ -110,19 +110,19 @@ test("all fourteen catalogs use naval support generations and exclude civilian c
         assert.equal(shipOrderBlock(s, c, hybrid.id), "");
         assert.ok(
           n.fleets.some(
-            (f) => f.role === "support" && f.supportKind === "oiler",
+            (f) => f.role === "support" && f.supportKind === "support",
           ),
         );
       } else
-        for (const type of ["AD", "AO"])
+        for (const type of ["AO"])
           assert.deepEqual(
             designs
               .filter(
                 (cl) =>
-                  cl.type === type && /Fleet (depot|oiler) ·/.test(cl.name),
+                  cl.type === type && /Fleet support ship ·/.test(cl.name),
               )
-              .map((cl) => cl.year),
-            campaign === "campaign_1922" ? [1922] : [1922, 1932, 1942],
+              .map((cl) => cl.year).sort((a,b)=>a-b),
+            [1922, 1932, 1942],
           );
     }
 });

@@ -4,6 +4,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
 
 Campaigns name the actual navy supplying each side with optional `attackerNavy` or `defenderNavy` fields. `restoredOwner` controls occupation after a successful counteroffensive; otherwise original territorial ownership applies. Dated territorial changes and port-to-territory links below drive the map directly.
 
+Completed occupation or liberation changes morale under [campaign-impact.md](campaign-impact.md), once per actual ownership change. Home economic shares in [economy.md](economy.md) lose productive access when occupied; overseas islands and colonies have no direct GDP effect. Port blockade denies usable trade without changing ownership, whereas occupation transfers the port.
+
 ```json game-data
 {
   "POWERS": {
@@ -619,6 +621,9 @@ Campaigns name the actual navy supplying each side with optional `attackerNavy` 
     }
   ],
   "ORIGINAL_CONTROL": {
+    "c620": "ITA",
+    "c616": "FRA",
+    "c651": "GBR",
     "c290": "c290",
     "c291": "c290",
     "c385": "c385",

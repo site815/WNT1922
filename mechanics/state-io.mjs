@@ -226,7 +226,7 @@ export function validateSave(value, content) {
     if (
       n.civilianShipping !== undefined &&
       (!plain(n.civilianShipping) ||
-        !finite(n.civilianShipping.carry, -1e9, 1) ||
+        !finite(n.civilianShipping.carry, 0, 1) ||
         !Number.isInteger(n.civilianShipping.delivered) ||
         !amount(n.civilianShipping.delivered) ||
         !amount(n.civilianShipping.grt))
@@ -622,11 +622,11 @@ export function validateSave(value, content) {
           fail();
       }
       for (const f of n.fleets) {
-        if (f.role === "support" && !["depot", "oiler"].includes(f.supportKind))
+        if (f.role === "support" && f.supportKind !== "support")
           fail();
         if (
           (f.supportKind !== undefined &&
-            !["depot", "oiler"].includes(f.supportKind)) ||
+            f.supportKind !== "support") ||
           (f.supportDestination !== undefined &&
             !NODES[f.supportDestination]) ||
           (f.supportTarget !== undefined && !identifier(f.supportTarget)) ||
@@ -700,6 +700,9 @@ export function validateSave(value, content) {
           (v) => Number.isInteger(v) && amount(v),
         ) ||
         !plain(n.productionModels) ||
+        !plain(n.productionAutomatic) ||
+        Object.keys(n.productionAutomatic).sort().join() !== "fighter,scout,strike" ||
+        !Object.values(n.productionAutomatic).every(v => typeof v === "boolean") ||
         !plain(n.airProductionCarry)
       )
         fail();

@@ -18,14 +18,18 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 | Program prices and durations | [common/rules/balance.md](common/rules/balance.md) |
 | All nine research-level explanations | [common/rules/research-tree.md](common/rules/research-tree.md) |
 | Economic growth and historical series | `common/rules/economy.md` and `common/rules/historical-gdp-data.md` |
-| Monthly shipping demand and automatic round-trip routes | `common/rules/merchant-routes.md` |
+| Monthly shipping demand, 20% moving pool and automatic round-trip routes | `common/rules/merchant-routes.md` |
 | Naval battle stages, durations and repeated main engagements | `common/rules/battle-stages.md` |
+| Significant actions, morale changes and tonnage-based war score | `common/rules/campaign-impact.md` |
+| Civilian hull rebuilding, logistics multipliers and average merchant GRT | `common/rules/merchant-economy.md`; `economy.md` defines GTP and home-region output access |
 | Ports, lanes, capitals and island campaigns | `common/rules/world.md`, `port-catalog.md`, `land-war.md`; national documents specify opening ports; `task-forces.md` supplies theater allocation and fallback basing |
 | Diplomatic exchanges and treaty costs | `common/rules/diplomacy-rules.md` and `treaty-policy.md` |
 | 1922 carrier conversions, replacement dispositions and early carrier preferences | [1922/rules.md](1922/rules.md) |
 | AI national fleet preferences | `common/rules/ai-planning.md`, with scenario overrides in each nation's opening document |
 | Formal campaign review years | [common/rules/engine.md](common/rules/engine.md) |
 | Ministry events and decisions | [common/events.md](common/events.md) and each campaign's `events.md` |
+| Hybrid fleet support and supply multipliers | `common/rules/support-operations.md`, `logistics.md` |
+| News lifecycle and mandatory dispatches | `common/rules/alert-lifecycle.md`; major/routine event priority is in `war-politics.md` |
 | Historical political events | [common/rules/war-politics.md](common/rules/war-politics.md) |
 | Map names and territorial ownership | Each campaign's `map.md`; geometry is in `assets/maps/geometry.json` |
 | Design features and limits | `common/rules/designer.md` and `aircraft-designer.md` |
@@ -33,6 +37,6 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 
 The [manifest](manifest.md) lists campaign inputs. Shared ships have one definition. Campaign-specific ships must not duplicate shared IDs. References use stable ship, aircraft, nation and port IDs; changing an ID requires changing references to it.
 
-Ship `tons` are standard displacement; merchant GRT is registered volume, not displacement. Displayed ranges are kilometers. Some navigation calculations use nautical miles internally and convert at their boundaries. GDP and GTP are annual ministry bases in kilograms of fine-gold equivalent. Both have authored opening values and grow monthly. GTP changes only through monthly logistics growth: merchant losses reduce shipping capacity and eventual delivery performance, without directly subtracting GTP.
+Ship `tons` are standard displacement; merchant GRT is registered volume, not displacement. Displayed ranges are kilometers. Some navigation calculations use nautical miles internally and convert at their boundaries. GDP means GDP naval budget and GTP means GTP naval budget: annual domestic-funded and trade-funded ministry allocations in kilograms of fine-gold equivalent, not whole national products. Both have authored opening values and grow monthly. GTP changes only through monthly logistics growth: merchant losses reduce shipping capacity and eventual delivery performance, without directly subtracting GTP.
 
 Rules in `common/rules/` contain static tables and balance values. Calculations and state transitions live in the corresponding `mechanics/*.mjs` file. National differences must be authored here, rather than implemented as different rules for the human player.

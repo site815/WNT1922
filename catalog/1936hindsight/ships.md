@@ -2249,7 +2249,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "us39rad",
         "us43rad"
       ],
-      "notes": "Drawn to fill a 350 m graving dock with nothing to spare. Six twin turrets cost more than four triples for the same twelve barrels, and the Board accepted it. The heaviest anti-aircraft ship afloat, and beneath the heavy battery the close-in layer is forty-eight machine guns and nothing else."
+      "notes": "Drawn to fill a 350 m graving dock with nothing to spare. Four triple turrets carry twelve 546 mm guns. The forty-gun dual-purpose battery is backed by forty-eight close-range machine guns."
     }
   },
   "ranger_cv29": {
@@ -5905,7 +5905,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "id": "maru_depot_t23",
     "nation": "JPN",
     "name": "Standard Maru fleet tender",
-    "type": "AD",
+    "type": "AO",
     "category": "support",
     "tons": 4700,
     "cost": 530,
@@ -5932,7 +5932,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "id": "maru_depot_t23",
       "name": "Standard Maru fleet tender",
       "nation": "JPN",
-      "type": "AD",
+      "type": "AO",
       "treaty_category": "exempt",
       "generation": "standardized",
       "design_year": 1923,
@@ -6125,909 +6125,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "buildable": true,
     "supportHybrid": true,
     "buildUntil": 1951
-  },
-  "rn_fleet_oiler": {
-    "id": "rn_fleet_oiler",
-    "nation": "GBR",
-    "name": "Fast fleet oiler",
-    "type": "AO",
-    "category": "support",
-    "tons": 0,
-    "cost": 0,
-    "year": 1930,
-    "durability": 0,
-    "speed": 0,
-    "range": 0,
-    "shp": 0,
-    "caliber": 0,
-    "barrels": 0,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 0,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 0,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "rn_fleet_oiler",
-      "nation": "GBR",
-      "name": "Fast fleet oiler",
-      "type": "AO",
-      "design_year": 1930
-    },
-    "service": "support",
-    "notes": "Count-only support entry: 16 oilers in Fisher’s Ghost §3.1. Tonnage, machinery, crew and maintenance costs are not yet cataloged.",
-    "buildable": false,
-    "unknownSpecs": true
-  },
-  "uk_depot_1932": {
-    "id": "uk_depot_1932",
-    "nation": "GBR",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_depot_1932",
-      "nation": "GBR",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "uk_oiler_1932": {
-    "id": "uk_oiler_1932",
-    "nation": "GBR",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_oiler_1932",
-      "nation": "GBR",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "uk_depot_1942": {
-    "id": "uk_depot_1942",
-    "nation": "GBR",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_depot_1942",
-      "nation": "GBR",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "uk_oiler_1942": {
-    "id": "uk_oiler_1942",
-    "nation": "GBR",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_oiler_1942",
-      "nation": "GBR",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "us_depot_1932": {
-    "id": "us_depot_1932",
-    "nation": "USA",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_depot_1932",
-      "nation": "USA",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "us_oiler_1932": {
-    "id": "us_oiler_1932",
-    "nation": "USA",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_oiler_1932",
-      "nation": "USA",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "us_depot_1942": {
-    "id": "us_depot_1942",
-    "nation": "USA",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_depot_1942",
-      "nation": "USA",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "us_oiler_1942": {
-    "id": "us_oiler_1942",
-    "nation": "USA",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_oiler_1942",
-      "nation": "USA",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "de_depot_1932": {
-    "id": "de_depot_1932",
-    "nation": "DEU",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_depot_1932",
-      "nation": "DEU",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "de_oiler_1932": {
-    "id": "de_oiler_1932",
-    "nation": "DEU",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_oiler_1932",
-      "nation": "DEU",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "de_depot_1942": {
-    "id": "de_depot_1942",
-    "nation": "DEU",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_depot_1942",
-      "nation": "DEU",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "de_oiler_1942": {
-    "id": "de_oiler_1942",
-    "nation": "DEU",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_oiler_1942",
-      "nation": "DEU",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
   },
   "ecole_ss28": {
     "id": "ecole_ss28",
@@ -7383,364 +6480,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "sensors": []
     },
     "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
-  },
-  "fra_program_oiler": {
-    "id": "fra_program_oiler",
-    "nation": "FRA",
-    "name": "La Revanche de l'École fleet oiler",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 3120,
-    "year": 1930,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 8,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 228,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fra_program_oiler",
-      "nation": "FRA",
-      "name": "La Revanche de l'École fleet oiler",
-      "type": "AO",
-      "design_year": 1930,
-      "displacement": {
-        "standard_tons": 6500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 8
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 228,
-      "cost_gold": 3120,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
-    "service": "support"
-  },
-  "fr_depot_1932": {
-    "id": "fr_depot_1932",
-    "nation": "FRA",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_depot_1932",
-      "nation": "FRA",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "fr_oiler_1932": {
-    "id": "fr_oiler_1932",
-    "nation": "FRA",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_oiler_1932",
-      "nation": "FRA",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "fr_depot_1942": {
-    "id": "fr_depot_1942",
-    "nation": "FRA",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_depot_1942",
-      "nation": "FRA",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "fr_oiler_1942": {
-    "id": "fr_oiler_1942",
-    "nation": "FRA",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_oiler_1942",
-      "nation": "FRA",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
   },
   "mare_bb29": {
     "id": "mare_bb29",
@@ -8161,364 +6900,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "sensors": []
     },
     "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
-  },
-  "ita_program_oiler": {
-    "id": "ita_program_oiler",
-    "nation": "ITA",
-    "name": "Mare Nostrum fleet oiler",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 3120,
-    "year": 1930,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 8,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 228,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "ita_program_oiler",
-      "nation": "ITA",
-      "name": "Mare Nostrum fleet oiler",
-      "type": "AO",
-      "design_year": 1930,
-      "displacement": {
-        "standard_tons": 6500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 8
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 228,
-      "cost_gold": 3120,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
-    "service": "support"
-  },
-  "it_depot_1932": {
-    "id": "it_depot_1932",
-    "nation": "ITA",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_depot_1932",
-      "nation": "ITA",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "it_oiler_1932": {
-    "id": "it_oiler_1932",
-    "nation": "ITA",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_oiler_1932",
-      "nation": "ITA",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "it_depot_1942": {
-    "id": "it_depot_1942",
-    "nation": "ITA",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_depot_1942",
-      "nation": "ITA",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "it_oiler_1942": {
-    "id": "it_oiler_1942",
-    "nation": "ITA",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_oiler_1942",
-      "nation": "ITA",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
   },
   "ocean_bb28": {
     "id": "ocean_bb28",
@@ -9009,363 +7390,194 @@ Edit the JSON block directly. The game reads this document at startup; no export
     },
     "notes": "Alternate-history program, authored for In Good Faith. Provisional engineering and procurement estimates."
   },
-  "sov_program_oiler": {
-    "id": "sov_program_oiler",
-    "nation": "SOV",
-    "name": "Krasny Okean fleet oiler",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 3120,
-    "year": 1930,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
+  "republic_bb41": {
+    "id": "republic_bb41",
+    "nation": "USA",
+    "name": "Republic class",
+    "type": "BB",
+    "category": "capital_ship",
+    "tons": 200000,
+    "cost": 145000,
+    "year": 1941,
+    "durability": 25000,
+    "speed": 32,
+    "range": 15000,
+    "shp": 522000,
+    "caliber": 546,
+    "barrels": 18,
     "tubes": 0,
     "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
+    "belt": 483,
+    "deck": 320,
     "air": 0,
-    "aa": 8,
-    "scoutAircraft": 0,
+    "aa": 48,
+    "scoutAircraft": 4,
     "sonar": false,
     "radar": false,
-    "crew": 228,
+    "crew": 9800,
     "submergedSpeed": 0,
     "provisioned": 0,
     "raw": {
-      "id": "sov_program_oiler",
-      "nation": "SOV",
-      "name": "Krasny Okean fleet oiler",
-      "type": "AO",
-      "design_year": 1930,
+      "id": "republic_bb41",
+      "name": "Republic class",
+      "parent_class": "columbia_bb32",
+      "changes": "The Tillman program reaches its largest design: six triple 546 mm turrets, three forward and three aft in superfiring tiers. Columbia armor is retained, with an enlarged machinery plant for 32 knots.",
+      "nation": "USA",
+      "type": "BB",
+      "treaty_category": "capital_ship",
+      "generation": "fast_battleship",
+      "design_year": 1941,
+      "as_launched_year": 1945,
+      "cost_gold": 145000,
+      "durability": 25000,
       "displacement": {
-        "standard_tons": 6500
+        "empty_tons": 188000,
+        "standard_tons": 200000,
+        "full_load_tons": 222000
+      },
+      "dimensions": {
+        "length_m": 420,
+        "beam_m": 53,
+        "draft_m": 15.5
       },
       "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
+        "plant": "Geared turbines, 28 boilers and 8 shafts in separated machinery units",
+        "shp": 522000,
+        "speed_kn": 32,
+        "range_km": 15000,
+        "range_at_kn": 12,
+        "fuel": "oil"
       },
+      "fuel": {
+        "oil_tons": 22000,
+        "avgas_tons": 50
+      },
+      "batteries": [
+        {
+          "role": "main",
+          "mounts": 6,
+          "barrels_per_mount": 3,
+          "arrangement": "3 forward / 3 aft; three superfiring tiers at each end",
+          "rounds_per_gun": 100,
+          "rounds_total": 1800,
+          "firing_time_min": 83,
+          "component": "us29gun"
+        },
+        {
+          "role": "secondary",
+          "mounts": 20,
+          "barrels_per_mount": 2,
+          "arrangement": "10 per side",
+          "rounds_per_gun": 350,
+          "rounds_total": 14000,
+          "firing_time_min": 19,
+          "component": "us34sec",
+          "ammunition": "us25shl"
+        }
+      ],
       "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
         "aa_battery": [
           {
-            "caliber_mm": 40,
-            "count": 8
+            "count": 48,
+            "caliber_mm": 12.7,
+            "mounts": "single machine gun",
+            "rounds_per_gun": 2000,
+            "firing_time_min": 3.5
           }
         ]
       },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
       "aviation": {
-        "aircraft_capacity": 0
+        "catapults": 2,
+        "catapult_rating_t": 2.8,
+        "aircraft_capacity": 4,
+        "catapult": "us23cat"
       },
-      "complement": 228,
-      "cost_gold": 3120,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "notes": "Hypothetical program fleet oiler. Excluded from warship and merchant totals.",
-    "service": "support"
-  },
-  "su_depot_1932": {
-    "id": "su_depot_1932",
-    "nation": "SOV",
-    "name": "Fleet depot · 1932",
-    "type": "AD",
-    "category": "other",
-    "tons": 6500,
-    "cost": 4100,
-    "year": 1932,
-    "durability": 542,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 330,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "su_depot_1932",
-      "nation": "SOV",
-      "name": "Fleet depot · 1932",
-      "type": "AD",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 9000
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
+      "protection": {
+        "belt_mm": 483,
+        "deck_mm": 320,
+        "barbette_mm": 560,
+        "turret_mm": 650,
+        "torpedo_defense": 7,
+        "features": [
+          "belt inclined 15 deg",
+          "torpedo defense 10.0 m deep",
+          "quadruple bottom",
+          "deck in three layers: 70 mm decapping, 210 mm main, 40 mm splinter, full thickness over the machinery and magazine width and tapered outboard",
+          "torpedo defense liquid loaded"
         ]
       },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 330,
-      "cost_gold": 4100,
-      "treaty_category": "other",
-      "sensors": []
+      "provisions": [
+        {
+          "interface": "barbette_ring",
+          "count": 6,
+          "fitted": 6,
+          "state": "fitted"
+        },
+        {
+          "interface": "secondary_base_ring",
+          "count": 20,
+          "fitted": 20,
+          "state": "fitted"
+        },
+        {
+          "interface": "director_tower",
+          "count": 2,
+          "fitted": 2,
+          "state": "fitted"
+        },
+        {
+          "interface": "magazine_5in",
+          "count": 1,
+          "fitted": 1,
+          "state": "fitted"
+        },
+        {
+          "interface": "radar_search_position",
+          "count": 0,
+          "fitted": 0,
+          "state": "reserved",
+          "notes": "None. The hull is worked for no equipment that does not yet exist — every later fit is structural work at structural prices."
+        },
+        {
+          "interface": "dp_director_seat",
+          "count": 6,
+          "fitted": 6,
+          "state": "fitted",
+          "notes": "Fitted, not provisioned: the fleet does not provision."
+        },
+        {
+          "interface": "cannon_position",
+          "count": 0,
+          "fitted": 0,
+          "state": "reserved",
+          "notes": "None. Anti-aircraft and light armament are whatever the last appropriation funded."
+        }
+      ],
+      "sensors": [
+        "us27dir",
+        "us34dir"
+      ],
+      "complement": 9800,
+      "possible_upgrades": [
+        "us45sec",
+        "us36can",
+        "us41can",
+        "us43shl",
+        "us36dir",
+        "us40dir",
+        "us44dir",
+        "us39rad",
+        "us43rad"
+      ],
+      "notes": "The Tillman program reaches its largest design: six triple 546 mm turrets, three forward and three aft in superfiring tiers. Columbia armor is retained, with an enlarged machinery plant for 32 knots.",
+      "design_estimate": {
+        "method": "Reference displacement to the two-thirds power, speed cubed; same propulsion coefficient as Columbia",
+        "reference_class": "columbia_bb32",
+        "formula": "198000 × (200000 / 142000)^(2/3) × (32 / 25)^3 = 521742 shp; rounded to 522000 shp",
+        "limitations": "Alternate-history design estimate, not a validated engineering or stability calculation. Cost, dimensions, crew and durability are provisional game balance."
+      }
     },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "su_oiler_1932": {
-    "id": "su_oiler_1932",
-    "nation": "SOV",
-    "name": "Fleet oiler · 1932",
-    "type": "AO",
-    "category": "other",
-    "tons": 7500,
-    "cost": 3500,
-    "year": 1932,
-    "durability": 625,
-    "speed": 16,
-    "range": 18520,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 190,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "su_oiler_1932",
-      "nation": "SOV",
-      "name": "Fleet oiler · 1932",
-      "type": "AO",
-      "design_year": 1932,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 14500
-      },
-      "propulsion": {
-        "speed_kn": 16,
-        "range_nm": 10000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 190,
-      "cost_gold": 3500,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1941,
-    "notes": "Provisional 1932 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "su_depot_1942": {
-    "id": "su_depot_1942",
-    "nation": "SOV",
-    "name": "Fleet depot · 1942",
-    "type": "AD",
-    "category": "other",
-    "tons": 7500,
-    "cost": 4800,
-    "year": 1942,
-    "durability": 625,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 360,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "su_depot_1942",
-      "nation": "SOV",
-      "name": "Fleet depot · 1942",
-      "type": "AD",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 7500,
-        "full_load_tons": 10000
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 360,
-      "cost_gold": 4800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "su_oiler_1942": {
-    "id": "su_oiler_1942",
-    "nation": "SOV",
-    "name": "Fleet oiler · 1942",
-    "type": "AO",
-    "category": "other",
-    "tons": 8500,
-    "cost": 4200,
-    "year": 1942,
-    "durability": 708,
-    "speed": 18,
-    "range": 20372,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 4,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 220,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "su_oiler_1942",
-      "nation": "SOV",
-      "name": "Fleet oiler · 1942",
-      "type": "AO",
-      "design_year": 1942,
-      "displacement": {
-        "standard_tons": 8500,
-        "full_load_tons": 15500
-      },
-      "propulsion": {
-        "speed_kn": 18,
-        "range_nm": 11000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 40,
-            "count": 4
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 220,
-      "cost_gold": 4200,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1951,
-    "notes": "Provisional 1942 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+    "notes": "The Tillman program reaches its largest design: six triple 546 mm turrets, three forward and three aft in superfiring tiers. Columbia armor is retained, with an enlarged machinery plant for 32 knots."
   }
 }
 ```

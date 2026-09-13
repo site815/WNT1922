@@ -165,7 +165,7 @@ export function fleetStats(s, c, id, f) {
   for (const g of active) {
     const cl = c.classes[g.classId],
       a = airPower(s, c, id, g),
-      effective = g.count * g.health * crewEffectiveness(g, cl) * strategicFactor(s.nations[id]),
+      effective = g.count * g.health * crewEffectiveness(g, cl),
       sub = type(cl) === "submarine";
     hulls += g.count;
     tons += cl.tons * g.count;

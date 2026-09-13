@@ -22,20 +22,7 @@ export function pacificOpening(s, c) {
     prepared: false,
   };
   const plan = s.pacificOpening,
-    n = s.nations[data.nation],
-    access = data.stagingAccess;
-  if (
-    now >= Date.parse(access.date) / 60000 &&
-    !s.completedEvents.includes(access.event)
-  ) {
-    s.completedEvents.push(access.event);
-    if (aviationOwner(s, access.port) === access.owner) {
-      s.world.stationControl ??= {};
-      s.world.stationControl[access.port] = data.nation;
-      s.world.portControl[access.port] = data.nation;
-      invalidateOperations(s);
-    }
-  }
+    n = s.nations[data.nation];
   if (now < opening - data.deploymentDays * 1440) return;
   if (!plan.prepared) {
     const choices = n.fleets

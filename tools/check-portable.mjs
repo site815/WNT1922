@@ -10,7 +10,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { GAME_VERSION } from "../mechanics/version.mjs";
 import { verifyPackage } from "./verify-package.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
-import { newGame } from "../mechanics/engine.mjs";
+import { newGame, queueDecision } from "../mechanics/engine.mjs";
 import { contentFor } from "../mechanics/campaign-content.mjs";
 import { beginEngagement } from "../mechanics/engagements.mjs";
 import { fleetStats } from "../mechanics/task-forces.mjs";
@@ -18,6 +18,7 @@ import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
 import { staffAircraft } from "../mechanics/naval-resources.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
+import { automaticAircraftDraft, commissionAircraft } from "../mechanics/aircraft-designer.mjs";
 
 const require = createRequire(import.meta.url);
 // Set WNT_PORTABLE_FRAME_ONLY=1 for a short, normally rendered map performance check.
@@ -41,6 +42,13 @@ await fs.mkdir(output, { recursive: true });
 const testRoot = await fs.mkdtemp(path.join(output, "portable test "));
 const result = { version: GAME_VERSION, executable, checks: [], errors: [] };
 let child, browser, page, finished, unpacked;
+async function acknowledgeDispatches() {
+  for (let i=0; i<12 && await page.locator(".diplomatic-dispatch").count(); i++) {
+    await page.locator(".diplomatic-dispatch [data-action=choose]:not(:disabled)").last().click();
+    await delay(250);
+  }
+  assert.equal(await page.locator(".diplomatic-dispatch").count(),0);
+}
 async function unusedPort() {
   const server = net.createServer();
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -224,7 +232,7 @@ try {
       if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
     }
     await page.locator('.world-map').waitFor();
-    await page.locator('#auto-pause').uncheck();
+
     await page.locator('#speed').selectOption('10');
     await delay(1000);
     result.paused=await measureMapFrames();
@@ -253,6 +261,28 @@ try {
     if (await page.locator('[data-action="begin"]').count())
       await page.locator('[data-action="begin"]').click();
     await page.locator(".world-map").waitFor();
+    await acknowledgeDispatches();
+    if(nation==='USA') {
+      for(const action of ['continue','new']) {
+        await page.locator('.sidebar [data-view="fleet"]').click();
+        await page.locator('#fleet-filter').selectOption('reserve');
+        await page.locator('#fleet-search').fill('reset test');
+        await page.locator('[data-action="menu"]').click();
+        await page.locator('[data-action="title-screen"]').click();
+        await page.locator('[data-action="'+action+'"]').click();
+        if(action==='new' && await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
+        await page.locator('.world-map').waitFor();
+        await acknowledgeDispatches();
+        await page.locator('.sidebar [data-view="fleet"]').click();
+        assert.equal(await page.locator('#fleet-filter').inputValue(),'all');
+        assert.equal(await page.locator('#fleet-search').inputValue(),'');
+      }
+      await page.locator('.sidebar [data-view="command"]').click();
+    }
+    assert.equal(await page.locator(".news-rail").count(),1);
+    const cells=await page.locator('.resource-bar > div').evaluateAll(rows=>rows.map(x=>{const b=x.getBoundingClientRect();return {width:b.width,height:b.height};}));
+    assert(Math.max(...cells.map(x=>x.width))-Math.min(...cells.map(x=>x.width))<1,'Resource cells use equal widths');
+    assert(cells.every(x=>x.height===55),'Resource cells keep the compact fixed height');
     for (const key of ["YARDS", "SAILORS", "AVIATORS", "AIRCRAFT"]) {
       const counter = page.locator('[data-resource="' + key + '"] strong');
       assert.match(await counter.innerText(), /^[\d,]+\([+−][\d,]+\)$/);
@@ -304,6 +334,12 @@ try {
       .getAttribute("value");
     assert(newModel);
     await fighterLine.selectOption(newModel);
+    await page.waitForFunction(() => !document.querySelector('[data-production-automatic="fighter"]').checked);
+    assert.equal(await page.locator('[data-production-automatic="fighter"]').isChecked(),false);
+    await page.locator('[data-production-automatic="fighter"]').check();
+    await page.waitForFunction(() => document.querySelector('[data-production-automatic="fighter"]').checked);
+    assert.equal(await page.locator('[data-production-automatic="fighter"]').isChecked(),true);
+    await fighterLine.selectOption(newModel);
     await page
       .locator('[data-aircraft="' + newModel + '"]')
       .first()
@@ -329,6 +365,11 @@ try {
     await page.locator('.world-map [data-action="select-fleet"][data-id="'+firstFleet+'"]').first().dispatchEvent('click',{bubbles:true,detail:1});
     await delay(450);
     assert.equal(await page.locator('.fleet-command-row.selected').getAttribute('data-id'),firstFleet);
+    const visibleSelection=await page.locator('.fleet-command-row.selected').evaluate(el=>{
+      const r=el.getBoundingClientRect(),p=el.closest('.command-side-panel').getBoundingClientRect();
+      return r.top>=p.top && r.bottom<=p.bottom;
+    });
+    assert(visibleSelection,'Map selection scrolls its highlighted row into view');
     await page.mouse.move(260, 180);
     const rowLayout = await page
       .locator(".fleet-command-row")
@@ -342,14 +383,8 @@ try {
       "Fleet controls must fit inside each row",
     );
     await page.screenshot({ path: path.join(output, `orders-${nation}.png`) });
-    const fleetRow = page.locator(".fleet-command-row").first();
-    await fleetRow.locator("[data-fleet-mission]").selectOption("guard");
-    await fleetRow.locator('[data-action="send-inline-order"]').click();
-    await delay(400);
-    assert.equal(
-      await fleetRow.locator("[data-fleet-mission]").inputValue(),
-      "guard",
-    );
+    assert.equal(await page.locator("[data-fleet-mission],[data-fleet-aggression],[data-action=send-inline-order]").count(),0);
+    assert.equal(await page.locator("[data-action=alert-history]").count(),0);
     const count = await page.locator(".fleet-command-row").count();
     await page
       .locator('.world-map [data-action="select-port"]')
@@ -395,7 +430,7 @@ try {
     await page.locator('.sidebar [data-view="airwar"]').click();
     assert.match(
       await page.locator(".command-side-panel").innerText(),
-      /Strategic air campaigns/,
+      /Strategic air/,
     );
     assert(
       (await page.locator(".political-territory").count()) > 100,
@@ -404,19 +439,31 @@ try {
     await page.screenshot({ path: path.join(output, `airwar-${nation}.png`) });
     await page.locator('.sidebar [data-view="economy"]').click();
     assert.match(
-      await page.locator(".economy-growth").innerText(),
-      /GTP/,
+      await page.locator(".economy-ledger").innerText(),
+      /GTP naval budget/,
     );
     await page.screenshot({ path: path.join(output, `economy-${nation}.png`) });
-    await page.locator('[data-resource="STRATEGIC"]').hover();
+    await page.locator('.sidebar [data-view="review"]').click();
+    assert.match(await page.locator('.record-ledger').innerText(), /Civilian hulls built/);
+    assert.doesNotMatch(await page.locator('.record-ledger').innerText(), /NaN|undefined|Infinity/);
+    await page.screenshot({ path: path.join(output, `naval-record-${nation}.png`) });
+    await page.locator('.sidebar [data-view="economy"]').click();
+    await page.locator('.resource-bar [data-resource="STRATEGIC"]').hover();
     await page.locator(".resource-breakdown").waitFor();
     assert.match(await page.locator(".resource-breakdown").innerText(), /Actual change this month/);
     await page.locator('.resource-bar [data-resource="GTP"]').hover();
-    await page.waitForFunction(()=>document.querySelector('.resource-breakdown')?.textContent.includes('Authored opening GTP'));
+    await page.waitForFunction(()=>document.querySelector('.resource-breakdown')?.textContent.includes('Opening GTP naval budget'));
     assert.match(await page.locator('.resource-breakdown').innerText(),/next GTP = current GTP/);
     const tipBox=await page.locator('.class-hover').boundingBox(),resourceBox=await page.locator('.resource-bar').boundingBox();
     assert(tipBox.y>=resourceBox.y+resourceBox.height,'Resource explanations must stay below resource controls');
     await page.screenshot({path:path.join(output,'gtp-hover-'+nation+'.png')});
+    for (const [key,formula] of [['GDP','home access'],['SHIPPING','Shortfall'],['MORALE','Significant victory']]) {
+      await page.locator('.resource-bar [data-resource="'+key+'"]').hover();
+      await page.waitForFunction(text=>document.querySelector('.resource-breakdown')?.textContent.includes(text),formula);
+      const layout=await page.locator('.class-hover').evaluate(el=>({height:el.clientHeight,content:el.scrollHeight}));
+      assert(layout.content<=layout.height+2,key+' derivation must fit its hover');
+      await page.screenshot({path:path.join(output,key.toLowerCase()+'-hover-'+nation+'.png')});
+    }
     await page.locator('.resource-bar [data-resource="AIRCRAFT"]').hover();
     await page.locator('.resource-aircraft-types').waitFor();
     assert.match(await page.locator('.resource-aircraft-types').innerText(),/Reserve/);
@@ -479,11 +526,15 @@ try {
     await page.locator("#industryFunding").fill("40");
     await page.locator("#industryFunding").dispatchEvent("change");
     await delay(400);
-    await page.locator("#auto-pause").uncheck();
+
     await page.locator('.sidebar [data-view="command"]').click();
     await page.locator("#speed").selectOption("10");
     const before = await page.locator(".campaign-clock").innerText();
+    const controlGeometry=async()=>page.locator('.actual-speed,.pause-control,.step-control').evaluateAll(rows=>rows.map(x=>{const b=x.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height};}));
+    const pausedControls=await controlGeometry();
     await page.locator('[data-action="pause"]').click();
+    await page.waitForFunction(()=>document.querySelector('[data-action="step-six-hours"]')?.disabled);
+    assert.deepEqual(await controlGeometry(),pausedControls,'Time control dimensions and positions do not change during play');
     const responsiveness=await page.evaluate(()=>new Promise(resolve=>{
       const start=performance.now(),gaps=[];let last=start;
       function frame(now){gaps.push(now-last);last=now;
@@ -496,7 +547,9 @@ try {
     assert(workers.some(u=>u.endsWith('/worker/simulation-worker.mjs')));
     assert(workers.some(u=>u.endsWith('/worker/view-worker.mjs')));
     result.checks.push({nation,hiddenWindowScheduling:responsiveness});
-    await page.locator('[data-action="pause"]').click();
+    await acknowledgeDispatches();
+    if ((await page.locator('[data-action="pause"]').innerText()).includes('Pause'))
+      await page.locator('[data-action="pause"]').click();
     assert.notEqual(await page.locator(".campaign-clock").innerText(), before);
     const music = await page.evaluate(async () => {
       const module = await import("/ui/music.mjs");
@@ -564,13 +617,16 @@ try {
     assert.equal(await page.locator("#industryFunding").inputValue(), "40");
     await closeSaved();
     result.checks.push(
-      `${campaign} ${nation}: one EXE, embedded runtime without Node on PATH, exact payload hashes, fleet order, five-action diplomacy, bilateral trade cooldown, automatic strongest-force provocation, funding, fifteen-minute simulation, music, credits, close/save, temporary cleanup and reopen`,
+      `${campaign} ${nation}: one EXE, embedded runtime without Node on PATH, exact payload hashes, admiral-controlled fleet selection, five-action diplomacy, bilateral trade cooldown, automatic strongest-force provocation, funding, fifteen-minute simulation, music, credits, close/save, temporary cleanup and reopen`,
     );
   }
   // A prepared save exercises the actual packaged UI during a long surface action.
   const battleProfile = path.join(testRoot, "ongoing battle profile");
   const battleSave = newGame(CATALOG, "USA", 250025, "in_good_faith_1936");
-  const battleContent = contentFor(CATALOG, battleSave);
+  let battleContent = contentFor(CATALOG, battleSave);
+  const replacement=commissionAircraft(battleSave,battleContent,automaticAircraftDraft(battleSave,battleContent,'fighter','USA'),'USA');
+  battleContent=contentFor(CATALOG,battleSave);
+  battleSave.nations.USA.productionModels.fighter=replacement.aircraft.id;
   battleSave.decisions = [];
   battleSave.autoPause = false;
   battleSave.paused = true;
@@ -591,13 +647,35 @@ try {
   battleSave.nations.USA.aircraft[oldAircraft.model.id]+=12;
   battleSave.nations.USA.aviators+=12*(oldAircraft.model.crew?.normal||1);
   staffAircraft(battleSave,battleContent,'USA');
+  queueDecision(battleSave,"native-dispatch-first","War in China","A major world event requires acknowledgement.",[{id:"acknowledge",label:"Acknowledge",detail:"Return to the ministry."}],{critical:true,kind:"war"});
+  queueDecision(battleSave,"native-dispatch-second","Ministry dispatch","A second dispatch tests consistent placement with longer text. Admirals are reviewing convoy protection and support deployments.",[{id:"acknowledge",label:"Acknowledge",detail:"Return to the ministry."}],{critical:true,kind:"diplomacy"});
   validateSave(battleSave,CATALOG);
   await fs.mkdir(path.join(battleProfile,"saves"),{recursive:true});
   await fs.writeFile(path.join(battleProfile,"saves/campaign.json"),JSON.stringify(battleSave));
   await launch(battleProfile);
   await page.locator('[data-action="continue"]').click();
+  await page.locator('.diplomatic-dispatch').waitFor();
+  const firstDispatch = await page.locator('.diplomatic-dispatch').boundingBox();
+  const firstButton = await page.locator('.diplomatic-dispatch button').boundingBox();
+  await page.screenshot({path:path.join(output,'mandatory-dispatch.png')});
+  await page.locator('.diplomatic-dispatch button').click();
+  await page.waitForFunction(()=>document.querySelector('#dispatch-title')?.textContent==='Ministry dispatch');
+  assert.deepEqual(await page.locator('.diplomatic-dispatch').boundingBox(), firstDispatch);
+  assert.deepEqual(await page.locator('.diplomatic-dispatch button').boundingBox(), firstButton);
+  await page.locator('.diplomatic-dispatch button').click();
+  await page.locator('.diplomatic-dispatch').waitFor({state:'detached'});
+  assert.match(await page.locator('[data-action=pause]').innerText(),/Resume/);
+  result.checks.push('Mandatory dispatches use identical envelopes and footer positions; acknowledgements preserve manual pause.');
+  await page.locator('.news-message').waitFor();
+  const newsKey=await page.locator('.news-message').getAttribute('data-key');
+  const railBefore=await page.locator('.news-rail').boundingBox();
+  await page.locator('.news-message').evaluate(el=>el.getAnimations()[0].finish());
+  await page.waitForFunction(key=>document.querySelector('.news-message')?.dataset.key!==key,newsKey);
+  assert.deepEqual(await page.locator('.news-rail').boundingBox(),railBefore);
+  result.checks.push('Routine ticker advances once, stores a read receipt, and keeps a fixed rail height.');
   await page.waitForFunction(async()=>(await import('/ui/music.mjs')).musicStatus().mood==='War');
   await page.locator('.sidebar [data-view="aircraft"]').click();
+  await page.locator('.superseded-aircraft summary').click();
   await page.locator('[data-action="retire-aircraft"][data-id="'+oldAircraft.model.id+'"]').click();
   await page.locator('[data-action="confirm"]').click();
   await delay(450);
@@ -617,7 +695,11 @@ try {
   await page.locator('[data-action="continue"]').click();
   await page.locator('.sidebar [data-view="reports"]').click();
   assert.equal(await page.locator('.report-card .battle-progress progress').first().evaluate(el => el.value),50);
-  await page.locator('[data-action="step-hour"]').click();
+  for(let step=0;step<4;step++) {
+    const prior=await page.locator('.campaign-clock').innerText();
+    await page.locator('[data-action="step-minute"]').click();
+    await page.waitForFunction(text=>document.querySelector('.campaign-clock')?.innerText!==text,prior);
+  }
   await page.waitForFunction(() => document.querySelector('.report-card .battle-progress strong')?.textContent.includes('Main engagement'));
   await page.locator('[data-action="pause"]').click();
   await page.locator('.report-card').first().click();

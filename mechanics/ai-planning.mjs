@@ -119,11 +119,11 @@ export function aiHullScore(s, c, id, cl, needs = aiNeeds(s, c, id)) {
     d = aiDoctrine(s, id),
     count = needs.counts[role] || 0;
   if (fleetService(cl) === "merchant") return 0;
-  if (["AO", "AD"].includes(role)) {
+  if (role === "AO") {
     const surface = s.nations[id].fleets.filter((f) =>
         ["carrier", "battle", "cruiser"].includes(f.role),
       ).length,
-      target = Math.max(1, Math.ceil(surface / (role === "AO" ? 4 : 6)));
+      target = Math.max(1, Math.ceil(surface / 4));
     return count < target ? 2 + (target - count) * 2 : 0;
   }
   let weight = d.roles[role] || 0;

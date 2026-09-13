@@ -8,8 +8,11 @@ Catalog availability is determined directly by each ship's year or aircraft's ty
 
 The resource bar shows yards, sailors, aviators and aircraft as total(+reserve). Yard figures are usable and spare tons/year. Personnel reserves are total trained minus required complements; a negative value means a staffing deficit. Aircraft reserve excludes embarked, stationed and in-transit aircraft. Personnel recoveries remain separate until their return date.
 
+Each naval production line starts on automatic modernization. Automatic lines select the newest available model for their role (including eligible multirole designs), breaking equal-year ties by role suitability. Choosing a model manually locks that line; Auto restores modernization. Production consumes ordinary resources and never creates airframes merely by switching model. In 1936 only opening naval models and explicitly designated scenario progressions remain; later additions require commissioned designs.
+
 ```json game-data
 {
+  "AUTOMATIC_PRODUCTION_DEFAULT": true,
   "SYSTEMS_REVISION": 2,
   "SPEEDS": [
     [
@@ -44,7 +47,8 @@ The resource bar shows yards, sailors, aviators and aircraft as total(+reserve).
     "hecht_typ2": "wolf_typ7",
     "wolf_typ7": "hai_typ9",
     "hai_typ9": "schwertwal_typ21",
-    "seeadler_raider": "atlantis_raider"
+    "seeadler_raider": "atlantis_raider",
+    "columbia_bb32": "republic_bb41"
   }
 }
 ```

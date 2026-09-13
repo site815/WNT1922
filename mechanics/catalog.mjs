@@ -18,7 +18,7 @@ export const fleetService = (c) =>
   c.service ||
   (["AK", "AM"].includes(c.type)
     ? "merchant"
-    : ["AO", "AD", "AV"].includes(c.type)
+    : c.type === "AO"
       ? "support"
       : "warship");
 

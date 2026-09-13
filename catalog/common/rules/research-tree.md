@@ -66,7 +66,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "Coordinate fuel deliveries with expected fleet movements and convoy arrivals.",
       "Pre-position machinery spares and repair parties at the busiest naval bases.",
       "Introduce standard maintenance schedules and rotating workshop detachments.",
-      "Coordinate depot ships, oilers and shore workshops under regional supply staffs.",
+      "Coordinate AO support ships and shore workshops under regional supply staffs.",
       "Inspect critical machinery before failure and organize interchangeable repair teams.",
       "Maintain alternate supply schedules for damaged ports and interrupted routes.",
       "Run a unified maintenance network with contingency stocks and fleet repair planning."

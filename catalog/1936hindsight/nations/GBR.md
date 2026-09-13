@@ -657,18 +657,15 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "county_ca24",
     "sabre_dd22",
     "sturgeon_ss23",
-    "uk_depot_1922",
-    "uk_oiler_1922",
-    "uk_depot_1932",
-    "uk_oiler_1932",
-    "uk_depot_1942",
-    "uk_oiler_1942"
+    "uk_support_1922",
+    "uk_support_1932",
+    "uk_support_1942"
   ],
   "support": [
     {
       "id": "support-gbr-oilers",
       "name": "Fast fleet oiler train",
-      "class_id": "rn_fleet_oiler",
+      "class_id": "uk_support_1932",
       "count": 16,
       "status": "active",
       "notes": "Sixteen fleet oilers are explicitly present in Fisher's Ghost §3.1. Individual specifications and tonnage have not yet been authored; this is a support register entry.",

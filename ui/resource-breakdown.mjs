@@ -6,7 +6,7 @@ import { uiModel } from "../mechanics/queries.mjs";
 import { monthlyIncome, yardLoad, supply } from "../mechanics/engine.mjs";
 import { aircraftSummary } from "../mechanics/naval-resources.mjs";
 import { sailorSummary } from "../mechanics/ship-staffing.mjs";
-import { merchantEconomy } from "../mechanics/merchant-economy.mjs";
+import { merchantEconomy, MERCHANT_RULES } from "../mechanics/merchant-economy.mjs";
 import { economyFor, RULES } from "../mechanics/balance.mjs";
 import { upgradeLevel, facilityFactor, industryFactor, industryExpansion } from "../mechanics/levels.mjs";
 import { PORTS } from "../mechanics/world.mjs";
@@ -16,6 +16,7 @@ import { yardAvailability } from "../mechanics/port-trade.mjs";
 import { trainingDescription } from "../mechanics/personnel-training.mjs";
 import { awaitingRecovery } from "../mechanics/recovery.mjs";
 import { growthOutlook } from "../mechanics/economic-growth.mjs";
+import { MORALE, SIGNIFICANCE, dailyMoraleRecovery } from '../mechanics/campaign-impact.mjs';
 const esc = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -50,9 +51,10 @@ export function resourceHover(s, c, key) {
     const domesticShare = gold ? ECONOMY.GDP_GOLD_SHARE : strategic ? ECONOMY.STRATEGIC_OUTPUT_SHARE * b.strategicModifier : 1 - ECONOMY.GDP_GOLD_SHARE;
     const tradeShare = gold ? ECONOMY.GTP_GOLD_SHARE : strategic ? ECONOMY.STRATEGIC_OUTPUT_SHARE * b.tradeStrategicModifier : 1 - ECONOMY.GTP_GOLD_SHARE;
     rows=[["Current reserve",num(n[field])],
-      flow("GDP contribution / month",b.gdp*domesticShare/12),
-      flow("Bombing loss of GDP output",-(b.gdp-b.productiveGDP)*domesticShare/12),
-      flow("GTP contribution / month",b.gtp*tradeShare/12)];
+      flow("GDP naval budget / month",b.gdp*domesticShare/12),
+      flow("Occupied home output unavailable",-b.gdp*b.home.unavailable*domesticShare/12),
+      flow("Bombing loss of accessible GDP output",-b.gdp*b.home.access*n.industrialDamage.industry*domesticShare/12),
+      flow("GTP naval budget / month",b.gtp*tradeShare/12)];
     if (!gold && !strategic) {
       const gross=b.industryYear/12, facilities=industryFactor(s), expansion=industryExpansion(s);
       rows.push(flow("Opening facility calibration",gross*(expansion.baseline-1)),
@@ -64,11 +66,19 @@ export function resourceHover(s, c, key) {
     if(gold) rows.push(flow("Fleet upkeep",-i.upkeep),flow("Treaty policy",-treaty.gold));
     if(strategic) {
       const demand=strategicDemand(s,c,s.player);
-      rows.push(["Domestic resource modifier","× "+num(b.strategicModifier,2)],
+      title="Strategic materials · national reserve";
+      rows.push(["Productive GDP naval budget",num(b.productiveGDP,2)+" kg gold equivalent / year"],
+        ["GTP naval budget",num(b.gtp,2)+" kg gold equivalent / year"],
+        ["Output coefficient",pct(ECONOMY.STRATEGIC_OUTPUT_SHARE)],
+        ["Annual gross = "+num(ECONOMY.STRATEGIC_OUTPUT_SHARE,4)+" × (productive GDP × domestic modifier + GTP × trade modifier)",num(b.strategicYear,2)],
+        ["Monthly gross = annual ÷ 12",num(i.strategic,2)],
+        ["Domestic resource modifier","× "+num(b.strategicModifier,2)],
         ["Trade resource modifier","× "+num(b.tradeStrategicModifier,3)],
+        ["Trade modifier formula","min(1, "+num(b.gtp)+" ÷ "+num(b.gdp)+")"],
         flow("Fleet operations / month",-demand.ships*strategicFactor(n)),
         flow("Aviation operations / month",-demand.aviation*strategicFactor(n)),
-        ["Immediate operating effectiveness",pct(strategicFactor(n))],
+        ["Movement / aviation / production effectiveness",pct(strategicFactor(n))],
+        ["Naval supply multiplier · empty reserves halve supply",n.strategic>0?"× 1":"× 0.5"],
         ["Operations used in campaign",num(n.strategicSpent.operations)],
         ["Production used in campaign",num(n.strategicSpent.production)]);
     }
@@ -85,50 +95,58 @@ export function resourceHover(s, c, key) {
         flow("Port repairs requested / day",-ports));
       if(gold)rows.push(flow("Ship repairs requested / day",-n.groups.filter(g=>g.status==="repair"&&g.health<1).reduce((v,g)=>v+c.classes[g.classId].cost*g.count*.0001,0)));
     }
-    note="Formula: annual gold = productive GDP × 20% + GTP × 80%; annual industry = (productive GDP × 80% + GTP × 20%) × facility factor × funding × paid operation × strategic effectiveness. Annual strategic = 5% × (productive GDP × national modifier + GTP × min(1, GTP/GDP)). Divide by 12 for monthly gross, then subtract the listed costs. Industry expansion adds 15% of opening output per upgrade. Monthly projections use current funding and selected models. Output arrives daily. Orders, research, diplomacy, repairs and government aircraft replacements are additional; actual monthly change includes all spending. Strategic is shared nationally and shortages apply immediately to ships, aircraft and production. Below seven days of operating requirements, effectiveness falls toward 20%.";
+    note="Formula: annual gold = productive GDP × 20% + GTP × 80%; annual industry = (productive GDP × 80% + GTP × 20%) × facility factor × funding × paid operation × strategic effectiveness. Strategic is an abstract stock, not a physical fuel mass. GDP and GTP refer to naval budgets, not total national products. Annual strategic = 5% × (productive GDP × national modifier + GTP × min(1, GTP/GDP)). Divide by 12 for monthly gross, then subtract the listed costs. Industry expansion adds 15% of opening output per upgrade. Monthly projections use current funding and selected models. Output arrives daily. Orders, research, diplomacy, repairs and government aircraft replacements are additional; actual monthly change includes all spending. Strategic is shared nationally and shortages apply immediately to ships, aircraft and production. Below seven days of operating requirements, effectiveness falls toward 20%.";
   } else if(key==="INFLUENCE") {
     rows=[["Current / maximum",num(n.influence)+" / 500"],flow("Monthly ministry allocation",RULES.influencePerMonth),
       flow("Government organization",upgradeLevel(n.tech,"influence")),flow("Treaty policy",-treaty.influence),
       flow("Net / month",i.influence),flow("Actual change this month",n.influence-n.monthAccount.opening.influence)];
     note="Diplomacy, inspections, orders and research spend influence separately. Influence is capped at 500.";
   } else if(key==="GDP" || key==="GTP") {
+    title=key+" naval budget · annual gold equivalent";
     const g=growthOutlook(s,c);
     rows=key==="GDP"?[
-      ["Authored opening GDP",num(c.nations[s.player].economy.gdp)+" kg"],
-      ["Current annual ministry GDP",num(n.gdp)+" kg fine-gold equivalent"],
+      ["Opening GDP naval budget",num(c.nations[s.player].economy.gdp)+" kg"],
+      ["Current GDP naval budget",num(n.gdp)+" kg fine-gold equivalent"],
+      ["Accessible home economy",pct(b.home.access)],
+      ...b.home.regions.map(r=>[r.name+' · '+pct(r.share),r.accessible?'Accessible':'Occupied · '+r.owner]),
       ["Bombing disruption",pct(n.industrialDamage.industry)],
-      ["Productive GDP = GDP × (1 − disruption)",num(b.productiveGDP)],
+      ["Productive GDP = GDP × home access × (1 − disruption)",num(b.productiveGDP)],
       ["Normal monthly growth",pct(g.normal)],
       ["Net monthly GDP growth",pct(g.monthly)],flow("Projected GDP change / month",n.gdp*g.monthly),
       ["Gold / industry split","20% / 80%"],
       ["Domestic strategic modifier","× "+num(b.strategicModifier,2)]
     ]:[
-      ["Authored opening GTP",num(e.startingGTP)+" kg"],
-      ["Current annual ministry GTP",num(e.gtp)+" kg fine-gold equivalent"],
+      ["Opening GTP naval budget",num(e.startingGTP)+" kg"],
+      ["Current GTP naval budget",num(e.gtp)+" kg fine-gold equivalent"],
       ["Logistics",pct(e.logistics/100)],["Monthly GTP growth",pct(g.tradeMonthly)],
       flow("Projected GTP change / month",g.tradeMonth),
       ["Next GTP = current × (1 + growth)",num(n.gtp*(1+g.tradeMonthly))],
       ["Gold / industry split","80% / 20%"],
       ["Strategic modifier = min(1, GTP / GDP)","× "+num(b.tradeStrategicModifier,3)]
     ];
-    note=key==="GDP"?"Formula: next GDP = current GDP × (1 + net monthly growth). Below 50% disruption, normal growth × (1 − 2 × disruption); at or above 50%, −2% × (2 × disruption − 1). Thus 50% gives zero, 75% gives −1%, 100% gives −2%. Normal growth follows national history in peace or +1% in war. Partial opening months are prorated. Bombing also reduces current production until repaired."
+    note=key==="GDP"?"Formula: next GDP = current GDP × (1 + net monthly growth). Below 50% disruption, normal growth × (1 − 2 × disruption); at or above 50%, −2% × (2 × disruption − 1). Thus 50% gives zero, 75% gives −1%, 100% gives −2%. Normal growth follows national history in peace or +1% in war. Home occupation denies output rather than reducing stored GDP or transferring it to the occupier; liberation restores access. Britain and Japan count as home economies. Bombing also reduces output until repaired; repairs do not refund past GDP contraction. Merchant losses, blockade and overseas islands have no direct GDP deduction."
       :"Formula: next GTP = current GTP × (1 + logistics growth). At logistics L below 50%: growth = −2% × (1 − 2L); at or above 50%: growth = (2L − 1) × "+(g.war?"2%":"0.05%")+". GTP changes only at month-end. It is an authored economic base, not a GRT conversion. Sinkings and port damage affect logistics; they do not directly subtract GTP.";
   } else if(key==="SHIPPING") {
     const g=growthOutlook(s,c);
-    rows=[["Civilian hulls",num(e.hulls)],["Average hull volume",num(e.average)+" GRT"],
+    rows=[["Civilian hulls",num(e.hulls)],
+      [e.estimated?"Provisional opening register":"Opening merchant register",num(e.baseline)+" GRT / "+num(e.openingHulls)+" hulls"],
+      ["Opening average = register GRT ÷ hulls",num(e.openingAverage,3)+" GRT"],
+      ["Current average hull volume",num(e.average,3)+" GRT"],
       ["Total GRT = hulls × average size",num(e.current)+" GRT"],
-      ["Logistics growth rate / month",pct(g.tradeMonthly)],
-      ["Industry bonus to positive growth","× "+num(g.expansion.multiplier,2)],
-      ["Effective hull growth / month",pct(g.merchantMonthly)],flow("Expected hulls / full month",g.merchantHullsMonth),
-      ["Fractional / deferred hull change",num(n.civilianShipping.carry,3)],
+      ["Fleet requirement = opening GRT × current / opening GTP",num(g.production.requiredGRT)+" GRT"],
+      ["Shortfall = max(0, 1 − actual / requirement)",pct(g.production.shortfall)],
+      ["Base = "+MERCHANT_RULES.HULLS_SUFFICIENT+" + "+(MERCHANT_RULES.HULLS_MAX_SHORTAGE-MERCHANT_RULES.HULLS_SUFFICIENT)+" × shortfall",num(g.production.baseHulls,3)+" hulls / month"],
+      ["Logistics / industry multipliers","× "+num(g.production.logisticsMultiplier,3)+" / × "+num(g.expansion.multiplier,2)],
+      flow("Expected hulls = base × both multipliers",g.merchantHullsMonth),
+      ["Fractional new hulls",num(n.civilianShipping.carry,3)],
       ["Average size growth / month",pct(g.sizeMonthly)],
-      ["At sea",num(n.convoys.reduce((v,x)=>v+x.count,0))+" hulls"],
+      ["At sea / target",num(e.traffic.hullsAtSea)+" / "+num(e.traffic.targetAtSea)+" hulls"],
       ["Last monthly hull change",signed(n.civilianShipping.last?.hulls||0)],
       ["Delivered / sunk · last 30 days",num(e.convoys.delivered)+" / "+num(e.convoys.sunk)+" GRT"],
       ["Merchant hulls lost",num(n.merchantLost)],
       ["Required GRT = (GDP + GTP) ÷ 2",num(e.required)+" / month"],
       ["Assigned round-trip capacity / month",num(shippingPlan(s,c,s.player).monthlyCapacity)]];
-    note="Formula: monthly hull change = hulls × logistics growth × (1 + 15% × industry upgrades since opening), with the industry bonus applied only to positive growth. Fractions carry forward; retirements wait for hulls to return. Average size × 1.001 each full month. Convoys move real round trips in peace and war; deliveries count on return. GTP is a separate economic base.";
+    note="Formula: new hulls = base production × logistics multiplier × industry multiplier. Logistics gives × "+MERCHANT_RULES.LOGISTICS_MIN_PRODUCTION+" at 0%, × "+MERCHANT_RULES.LOGISTICS_NEUTRAL_PRODUCTION+" at 50%, × "+MERCHANT_RULES.LOGISTICS_MAX_PRODUCTION+" at 100%, linear between points. Industry adds 15% per upgrade since opening. Fractions carry forward; no percentage retirements. Average size × "+(1+g.sizeMonthly)+" monthly. Fleet capacity requirement uses the nation's opening GTP/GRT benchmark; monthly voyage demand uses (GDP + GTP) ÷ 2. Neither is a physical gold-to-volume conversion. GTP growth remains separate.";
   } else if (key === "PORT TRADE") {
     rows = [
       ["Opening access requirement", num(e.ports.baseline)],
@@ -143,14 +161,18 @@ export function resourceHover(s, c, key) {
     ];
     note="Formula: usable port trade = Σ(charted trade × condition × (1 − blockade)). Access = min(100%, usable / opening trade requirement).";
   } else if (key === "LOGISTICS") {
-    rows=[["Port access = usable / opening trade",pct(e.ports.coverage)],
+    rows=[["Merchant hulls at sea / 20% target",num(e.traffic.hullsAtSea)+" / "+num(e.traffic.targetAtSea)],
+      ["Convoys at sea",num(e.traffic.convoyCount)],
+      ["Average hulls per moving convoy",num(e.traffic.averageHulls,1)],
+      ["Port access = usable / opening trade",pct(e.ports.coverage)],
       ["Delivered GRT · rolling 30 days",num(e.convoys.delivered)],["Sunk GRT · rolling 30 days",num(e.convoys.sunk)],
       ["Required GRT = (GDP + GTP) ÷ 2",num(e.required)],
       ["Success = delivered / (delivered + sunk)",pct(e.convoys.success)],
-      ["Coverage = min(1, delivered / required)",pct(e.deliveryCoverage)],
-      ["Convoy performance = success × coverage",pct(e.convoyPerformance)],
+      ["Coverage = delivered / required",pct(e.deliveryCoverage)],
+      ["Effective coverage = min(100%, coverage)",pct(e.effectiveDeliveryCoverage)],
+      ["Convoy performance = success × effective coverage",pct(e.convoyPerformance)],
       ["Logistics = (port access + convoy performance) ÷ 2",pct(e.logistics/100)]];
-    note="Both halves are capped at 100%. No observed voyages gives 100% success, but delivery coverage starts at zero until actual round trips complete. Peace always assumes 100% success; deliveries still count. Sinkings enter the 30-day ledger immediately. Fleet supply is separate.";
+    note="Delivery coverage may exceed 100%; only its contribution to logistics is capped. No observed voyages gives 100% success, but delivery coverage starts at zero until actual round trips complete. Peace always assumes 100% success; deliveries still count. Sinkings enter the 30-day ledger immediately. Logistics also multiplies fleet supply by 0.8 + 0.2 × logistics fraction.";
   } else if (key === "SUPPLY") {
     rows = [
       ["Fleet average", pct(v?.averageSupply ?? supply(s,c,s.player))],
@@ -162,7 +184,7 @@ export function resourceHover(s, c, key) {
         ]),
     ];
     note =
-      "Arithmetic mean of task-force supply. Each force uses distance to the closest accessible supply port and its shortest-range hull’s endurance. Nearby operational support eases distance penalties. National trade and strategic reserves do not change this tactical supply statistic.";
+      "Arithmetic mean of task-force supply. Each force uses distance to the closest accessible supply port and its shortest-range hull’s endurance. Nearby operational support eases distance penalties. Multiply distance × endurance × (0.8 + 0.2 × national logistics fraction) × strategic supply factor. Strategic supply is ×1 with stock remaining or ×0.5 at zero. The naval combat formula applies this supply once.";
   } else if (key === "TRAINING") {
     rows = [
       ["Current training", num(n.training) + "%"],
@@ -178,14 +200,16 @@ export function resourceHover(s, c, key) {
   } else if (key === "MORALE") {
     rows = [
       ["Current morale", num(n.morale) + "%"],
-      flow("Daily return toward 75", (75 - n.morale) * 0.0006),
-      flow("Fleet victory", 3),
-      flow("Fleet defeat", -5),
-      ["Shore result changes", "+1 / −2"],
+      flow("Daily return toward "+MORALE.recoveryTarget, dailyMoraleRecovery(n)),
+      flow("Significant victory", MORALE.victory),
+      flow("Significant defeat", MORALE.defeat),
+      ["Minor action / draw", "No battle morale change"],
+      ["Territory gain / loss", signed(MORALE.territoryGain)+" / "+signed(MORALE.territoryLoss)],
+      ["Home region gain / loss", signed(MORALE.homeGain)+" / "+signed(MORALE.homeLoss)],
+      flow("Training upgrade",MORALE.training),flow("Unpaid fleet / month",MORALE.unpaidFleet),
       ["Combat = 0.65 + morale fraction × 0.5", "× " + num(0.65 + (n.morale / 100) * 0.5, 3)],
     ];
-    note =
-      "Training upgrades add 3 morale; unpaid fleets lose 3 monthly. Events can change it. Current morale includes the accumulated effects of past events and combat.";
+    note = "A completed action is significant at combined losses of "+num(SIGNIFICANCE.navalSunkTons)+" naval tons sunk, "+num(SIGNIFICANCE.navalDamageTons)+" damage-equivalent tons, "+num(SIGNIFICANCE.aircraftLost)+" aircraft destroyed, or "+num(SIGNIFICANCE.merchantGRT)+" merchant GRT sunk. Morale applies once after completion. Territory morale requires ownership to change; each resolved campaign counts once per government. Authored events can also change morale.";
   } else if (key === "YARDS") {
     const y = v?.yards || yardLoad(s, c);
     rows = [
@@ -265,7 +289,7 @@ export function resourceHover(s, c, key) {
       "Formula: reserve = total − embarked − stationed − in transit/airborne. Naval inventory conserves airframes across ships, bases, transfers, combat sorties and reserve. Other-service maritime aircraft and crews have a separate government establishment. New models replace older qualified models when a delivery route is available.";
   }
   return (
-    '<div class="resource-breakdown"><span class="eyebrow">RESOURCE ACCOUNT</span><h3>' +
+    '<div class="resource-breakdown" data-breakdown="'+esc(key)+'"><span class="eyebrow">RESOURCE ACCOUNT</span><h3>' +
     esc(title) +
     "</h3><dl>" +
     rows

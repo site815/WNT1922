@@ -98,9 +98,7 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "TB": "Torpedo boat",
     "AM": "Merchant ship",
     "AK": "Merchant ship",
-    "AO": "Fleet oiler",
-    "AD": "Depot ship",
-    "AV": "Aviation tender"
+    "AO": "Fleet support ship"
   },
   "SERVICES": {
     "warship": "Warships",

@@ -2,7 +2,7 @@ import { PORTS, NODES, distanceNm } from "./world.mjs";
 import { portSpec } from "./port-catalog.mjs";
 import { fleetPosition } from "./task-forces.mjs";
 import { crewEffectiveness } from './ship-staffing.mjs';
-import { strategicFactor } from './strategic-materials.mjs';
+import { supplyDetails } from './logistics.mjs';
 import { readDocument } from '../worker/documents.mjs';
 const rules = (await readDocument('common/rules/port-operations.md')).BLOCKADE;
 const owner = (s, id) => s.world?.portControl?.[id] || PORTS[id].nation;
@@ -60,10 +60,10 @@ export function updatePortBlockades(s, c) {
           ["active", "returning"].includes(g.status)
         ) {
           const cl = c.classes[g.classId];
-          power += cl.tons * g.count * g.health * crewEffectiveness(g,cl) * strategicFactor(n)
+          power += cl.tons * g.count * g.health * crewEffectiveness(g,cl)
             * (["SS","SM"].includes(cl.type) ? rules.submarineTonnageWeight : 1);
         }
-      if (power) forces.push({ id, f, power, position: fleetPosition(s, f) });
+      if (power) forces.push({ id, f, power:power*supplyDetails(s,c,id,f).factor, position: fleetPosition(s, f) });
     }
   for (const port of Object.keys(PORTS)) {
     const condition = s.ports?.[port];

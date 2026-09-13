@@ -1,4 +1,5 @@
 import { beginEngagement, progressEngagements } from "./engagements.mjs";
+import { MORALE, changeMorale, dailyMoraleRecovery, navalWarScore } from './campaign-impact.mjs';
 import { strategicFactor, strategicDemand, shipMaterialCost } from "./strategic-materials.mjs";
 import { HISTORICAL_WARS, EUROPE_OPENING } from "./war-politics.mjs";
 import { scriptedDecisions } from "./events.mjs";
@@ -499,13 +500,14 @@ export function queueDecision(s, key, title, body, options, meta = {}) {
     completed = decisionHistory(s, actor);
   if (completed.includes(key) || queue.some((d) => d.key === key)) return;
   const d = { key, title, body, options, day: s.day, critical: false, ...meta };
+  if (actor === s.player) { d.popup = true; d.forcePause = true; }
   if (d.critical) {
     d.deadline ??= campaignMinutes(s) + 14 * 1440;
     d.defaultOption ??= options.at(-1).id;
     d.defaultText ??= options.find((o) => o.id === d.defaultOption).detail;
   }
   queue.push(d);
-  if (actor === s.player && d.critical && (s.autoPause || d.forcePause)) {
+  if (actor === s.player && (d.critical || d.popup) && (s.autoPause || d.forcePause)) {
     if (!s.paused) s.resumeAfterDecision = true;
     s.paused = true;
     s.pauseReason ??= d.key;
@@ -552,7 +554,7 @@ function normalizeDecisions(s) {
     }
   }
   if (s.pauseReason && !s.decisions.some((d) => d.key === s.pauseReason)) {
-    const pending = s.decisions.find((d) => d.critical);
+    const pending = s.decisions.find((d) => d.critical || d.popup);
     if (pending) s.pauseReason = pending.key;
     else {
       if (s.resumeAfterDecision) s.paused = false;
@@ -670,10 +672,10 @@ export function fleetPower(
     // terms before the shared count multiplier to keep grouped and split fleets equal.
     p.air =
       ((a.strike * 12 + a.fighters * 3) / g.count) *
-      (1 + upgradeLevel(n.tech, "aviation") * 0.04);
+      (1 + upgradeLevel(n.tech, "aviation") * 0.04) * strategicFactor(n);
     p.scout =
-      (c.radar ? 25 : 5) + a.scout / g.count + (radarLevel(n.tech) || 0) * 8;
-    p.aa += (a.fighters * 2) / g.count;
+      (c.radar ? 25 : 5) + a.scout / g.count * strategicFactor(n) + (radarLevel(n.tech) || 0) * 8;
+    p.aa += (a.fighters * 2) / g.count * strategicFactor(n);
     const crew = crewEffectiveness(g, c);
     p.surface *= crew;
     p.sub *= crew;
@@ -685,7 +687,6 @@ export function fleetPower(
       g.health *
       training *
       morale *
-      strategicFactor(n) *
       logistics *
       (1 + radarLevel(n.tech) * 0.08);
     for (const key of ["surface", "air", "sub", "asw", "aa", "scout"])
@@ -1086,7 +1087,7 @@ function completeProject(s, content, n, p) {
     n.aviatorsYear = economyFor(s, n.id).aviatorsYear * facilityFactor(n.tech, "pilots", 0.3);
   if (p.key === "training") {
     n.training = clamp(n.training + 9, 0, 100);
-    n.morale = clamp(n.morale + 3, 0, 100);
+    n.morale = clamp(n.morale + MORALE.training, 0, MORALE.ceiling);
   }
   if (n.id === s.player) {
     addLog(s, `${p.name} completed.`, "industry");
@@ -1206,7 +1207,7 @@ function daily(s, content) {
       20,
       100,
     );
-    n.morale = clamp(n.morale + (75 - n.morale) * 0.0006, 10, 100);
+    changeMorale(n,dailyMoraleRecovery(n));
   }
   repairPorts(s);
   repairIndustry(s);
@@ -1389,7 +1390,7 @@ function monthly(s, content) {
     n.gold = Math.max(0, n.gold - income.upkeep - income.treaty.gold);
     n.influence = clamp(n.influence + income.influence, 0, 500); // Industry output and its running expense are credited daily.
     if (n.gold < 1) {
-      n.morale = clamp(n.morale - 3, 10, 100);
+      changeMorale(n,MORALE.unpaidFleet);
     }
     n.exposure = 0; // Concealment is charged transparently by the proportional treaty ledger.
   }
@@ -1777,7 +1778,7 @@ export function damageFleet(
     });
   }
   const support = n.fleets.find(
-    (f) => f.id === fleetId && f.supportKind === "oiler",
+    (f) => f.id === fleetId && f.role === "support",
   );
   if (support && supportBefore > 0)
     support.supportCargo *=
@@ -2184,9 +2185,9 @@ export function chooseDecision(
   if (o.program) startProject(s, o.program, actor);
   else
     spend(n, {
-      gold: automatic && d.kind === "inspection" ? Math.min(n.gold, o.gold || 0) : o.gold || 0,
+      gold: (automatic || optionId === d.defaultOption) && d.kind === "inspection" ? Math.min(n.gold, o.gold || 0) : o.gold || 0,
       influence:
-        automatic && d.kind === "inspection"
+        (automatic || optionId === d.defaultOption) && d.kind === "inspection"
           ? Math.min(n.influence, o.influence || 0)
           : o.influence || 0,
       industry: o.industry || 0,
@@ -2211,6 +2212,7 @@ export function chooseDecision(
     return;
   }
   s.decisions = remaining;
+  for (const a of s.alerts) if (a.popupKey === key) a.dismissed = true;
   addLog(s, `${d.title}: ${o.label}.`, "cabinet");
   s.log[0].dismissed = true;
   if (automatic)
@@ -2235,11 +2237,7 @@ export function campaignScores(s, content) {
         readinessScore = Math.round(
           (n.training + n.morale + supply(s, content, id) * 100) * 0.8,
         ),
-        war = Math.round(
-          n.battlesWon * 20 -
-            n.battlesLost * 12 +
-            Math.min(150, n.sunkTons / 1000),
-        );
+        war = navalWarScore(n);
       return {
         id,
         score: strength + economy + readinessScore + war,

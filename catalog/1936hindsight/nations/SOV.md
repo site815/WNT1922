@@ -260,18 +260,14 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "ocean_ss29",
     "ocean_bb34",
     "ocean_cv38",
-    "sov_program_oiler",
-    "su_depot_1922",
-    "su_oiler_1922",
-    "su_depot_1932",
-    "su_oiler_1932",
-    "su_depot_1942",
-    "su_oiler_1942"
+    "su_support_1932",
+    "su_support_1922",
+    "su_support_1942"
   ],
   "support": [
     {
       "id": "support-SOV",
-      "class_id": "sov_program_oiler",
+      "class_id": "su_support_1932",
       "count": 6,
       "status": "active"
     }

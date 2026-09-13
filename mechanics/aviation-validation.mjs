@@ -49,6 +49,7 @@ export function validateAviation(s, c) {
         (v) => Number.isInteger(v) && amount(v),
       ) ||
       !amount(n.governmentAviators) ||
+      !amount(n.governmentRetired) ||
       !n.governmentLosses ||
       !["planes", "crews", "rescued"].every(
         (k) =>

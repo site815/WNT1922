@@ -1,3 +1,4 @@
+import { politicalPopup } from "../ui/diplomacy-popup.mjs";
 import { syncConvoys } from "../mechanics/task-forces.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import { POLITICAL as political } from "../worker/map-assets.mjs";
@@ -179,13 +180,14 @@ test("aircraft models become selectable on their catalog date and are continuous
   assert.doesNotThrow(() => setProductionModel(s, c, "strike", "raiden_t39"));
   assert.doesNotThrow(() => validateSave(s, c));
 });
-test("only critical demands auto-pause and ignored demands apply their stated default", () => {
+test("decisions auto-pause and ignored critical demands apply their stated default", () => {
   const s = start();
   s.autoPause = true;
   sim.queueDecision(s, "optional", "Optional report", "Information", [
     { id: "ok", label: "Noted", detail: "No cost." },
   ]);
-  assert.equal(s.paused, false);
+  assert.equal(s.paused, true);
+  sim.chooseDecision(s,c,"optional","ok");
   const r = s.nations.JPN,
     before = r.influence;
   sim.queueDecision(
@@ -210,8 +212,8 @@ test("only critical demands auto-pause and ignored demands apply their stated de
     },
   );
   assert.equal(s.paused, true);
-  assert.match(alertsView(s, c, "demand"), /Deadline:/);
-  assert.match(alertsView(s, c, "demand"), /If ignored:/);
+  assert.match(politicalPopup(s), /Deadline:/);
+  assert.match(politicalPopup(s), /If ignored:/);
   s.paused = false;
   s.autoPause = false;
   sim.advanceMinutes(s, c, 15);
@@ -276,7 +278,7 @@ test("opening task forces stay within 2-20 commands and carrier groups have dest
     const s = start(id),
       n = s.nations[id],
       operational = n.fleets.filter(
-        (f) => !["repair", "reinforcement"].includes(f.role),
+        (f) => !["repair", "reinforcement", "support"].includes(f.role),
       );
     assert.ok(operational.length >= 2 && operational.length <= 20);
     for (const f of operational.filter((f) => f.role === "carrier"))
@@ -423,12 +425,12 @@ test("command and ministry views expose manifests, distinct missions, aircraft m
       political,
     );
   assert.match(markup, /Naval commands/);
-  assert.match(markup, /send-inline-order/);
+  assert.doesNotMatch(markup, /send-inline-order|data-fleet-mission|data-fleet-aggression/);
   assert.match(
     fleetCompositionHover(s, c, s.nations.JPN.fleets[0]),
     /class="hover-ship /,
   );
-  assert.match(markup, /Seek aggressive battle/);
+  assert.match(markup, /Admiral control/);
   assert.ok(!markup.includes('id="fleet-area"'));
   assert.equal(
     new Set(Object.values(MISSIONS).map((m) => m.description)).size,

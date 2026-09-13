@@ -7,6 +7,7 @@ import '../ui/soundtrack.mjs';
 import { newGame, monthlyIncome } from "../mechanics/engine.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
 import { PROGRAMS } from "../mechanics/balance.mjs";
+import { ECONOMY } from '../mechanics/economy-rules.mjs';
 import { LEVELS } from "../mechanics/research-tree.mjs";
 import { aircraftSummary } from "../mechanics/naval-resources.mjs";
 import { POLITICAL, POLITICAL_1922 } from "../worker/map-assets.mjs";
@@ -76,6 +77,13 @@ for (const [key, p] of Object.entries(PROGRAMS)) {
   assert(p.days > 0 && p.gold >= 0 && p.industry >= 0 && p.influence >= 0);
 }
 for (const map of [POLITICAL, POLITICAL_1922]) {
+  for (const [id,regions] of Object.entries(ECONOMY.GDP_HOME_REGIONS)) {
+    assert(Math.abs(regions.reduce((sum,r)=>sum+r.share,0)-1)<1e-9,id+' home economic shares');
+    for (const r of regions) {
+      assert(r.share>0 && r.share<=1 && r.name);
+      assert(map.features.some(f=>f.id===r.territory),id+' missing home territory '+r.territory);
+    }
+  }
   assert.equal(map.license, "Public domain");
   assert.equal(
     new Set(map.features.map((f) => f.id)).size,

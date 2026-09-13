@@ -1,6 +1,8 @@
 # Automatic merchant circuits
 
-Monthly demand is (GDP + GTP) / 2 GRT. This is a transport requirement, separate from the annual economic bases. Allocate civilian hulls to meet each route's share, accounting for sailing time at 10 knots and 12 hours in the destination port. Count the surviving GRT once, on return to the origin; the outbound arrival is not another delivery. No fixed fraction of the fleet must be at sea. Opening voyages are staggered; replacement hulls only join at the origin. Insufficient hulls create an explicit capacity shortfall.
+Monthly demand is (GDP + GTP) / 2 GRT. Merchant dispatchers maintain a target of 20% of registered hulls moving at sea, rounded to the nearest whole hull, in both peace and war. Route weights divide this moving pool, independently of demand. The rest remain available for port calls and relief sailings. Ships travel at 10 knots and spend at least 12 hours at their destination. Return departures get priority; hulls can split only in port. Opening voyages are staggered, and replacements depart from their origin. Closed ports, blocked routes, transport diversions or battles can temporarily prevent the target from being met.
+
+Count surviving manifest GRT once, when the physical round trip returns to the origin. Partial voyages and diversions earn no deliveries. Delivered GRT / required GRT is displayed without a cap, so surplus shipping is visible. For effective logistics, delivery coverage is capped at 100% before multiplying by convoy success. The moving pool uses adaptive packet sizes to limit map and simulation overhead, without creating extra hulls.
 
 Routes are representative commercial circuits through the shared navigable sea-lane graph. Naval ports represent their surrounding commercial harbors. The additional terminals are merchant-only coastal approaches, not fleet supply bases. Enemy destinations close; a diverted or abandoned voyage earns no delivered GRT. Route weights are provisional, not historical cargo statistics. Sea routing remains abstract: there is no canal or individual cargo manifest simulation.
 
@@ -208,6 +210,8 @@ Historical context: [Royal Canadian Navy account of Atlantic convoys](https://ww
         10
       ]
     ]
-  }
+  },
+  "AT_SEA_SHARE": 0.2,
+  "TARGET_ACTIVE_CONVOYS": 24
 }
 ```

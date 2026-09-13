@@ -739,8 +739,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "m_class_ss_rn",
     "k_class_ss_rn",
     "courageous_1922_cv",
-    "uk_depot_1922",
-    "uk_oiler_1922"
+    "uk_support_1922",
+    "uk_support_1932",
+    "uk_support_1942"
   ],
   "merchants": {
     "hulls": 8579,

@@ -822,8 +822,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "clemson",
     "wickes",
     "s_class_ss_usn",
-    "us_depot_1922",
-    "us_oiler_1922"
+    "us_support_1922",
+    "us_support_1932",
+    "us_support_1942"
   ],
   "merchants": {
     "hulls": 3779,

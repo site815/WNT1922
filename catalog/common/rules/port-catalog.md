@@ -17,7 +17,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "dock": 0,
       "tier": "base",
       "trade": 40,
-      "note": "Saigon naval support and southern Indochina airfields. Japanese basing begins in July 1941."
+      "note": "Saigon naval support and southern Indochina airfields. Japanese access follows the southern Indochina concession event, from July 1941 if its political prerequisites occur."
     },
     "takao": {
       "capacity": 100000,

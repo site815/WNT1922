@@ -291,18 +291,14 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "ecole_cl29",
     "ecole_cv31",
     "ecole_ss37",
-    "fra_program_oiler",
-    "fr_depot_1922",
-    "fr_oiler_1922",
-    "fr_depot_1932",
-    "fr_oiler_1932",
-    "fr_depot_1942",
-    "fr_oiler_1942"
+    "fr_support_1932",
+    "fr_support_1922",
+    "fr_support_1942"
   ],
   "support": [
     {
       "id": "support-FRA",
-      "class_id": "fra_program_oiler",
+      "class_id": "fr_support_1932",
       "count": 4,
       "status": "active"
     }

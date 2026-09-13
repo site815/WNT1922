@@ -105,12 +105,12 @@ test("future catalog countdowns never authorize purchases or silently fund quali
   const before = JSON.stringify(s);
   assert.throws(() => orderShip(s, c, future.id), /Development opens/);
   assert.equal(JSON.stringify(s), before);
-  const plane = c.nations.USA.aircraft.find((a) => a.type_year > 1936);
+  const plane = c.nations.JPN.aircraft.find((a) => a.type_year > 1936);
   assert.throws(
-    () => orderAircraft(s, c, plane.id, 1, "USA"),
+    () => orderAircraft(s, c, plane.id, 1, "JPN"),
     /Development opens/,
   );
-  const html = aircraftCatalogView(s, c);
+  const html = aircraftCatalogView({...s,player:"JPN"}, c);
   assert.ok(
     html.indexOf('class="aircraft-production"') <
       html.indexOf('class="aircraft-models"'),

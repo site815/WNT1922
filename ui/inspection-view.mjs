@@ -192,7 +192,7 @@ export function fleetReadinessHover(s, c, f) {
     list([
       ["Training / morale", num(n.training) + "% / " + num(n.morale) + "%"],
       ["Supply", num(supply.factor * 100) + "%"],
-      ["Supply = distance factor × endurance factor", num(supply.distanceFactor*100)+"% × "+num(supply.enduranceFactor*100)+"%"],
+      ["Supply = distance × endurance × logistics × strategic", [supply.distanceFactor,supply.enduranceFactor,supply.logisticsFactor,supply.strategicSupplyFactor].map(v=>num(v*100)+"%").join(" × ")],
       ["Closest supply port", esc(supply.portName)],
       ["Sea-route distance / shortest hull range", num(supply.distance*1.852)+" / "+num(supply.rangeKm)+" km"],
       ["Endurance used = 2 × distance / range", num(supply.enduranceUsed*100)+"%"],
@@ -221,7 +221,7 @@ export function fleetReadinessHover(s, c, f) {
       ],
     ]) +
     fleetHoverManifest(s, c, f) +
-    "<small>Distance and endurance use stepped penalties. Logistics research reduces the distance penalty; nearby support adds relief to both factors, capped at 100%. Click to center. Mission controls remain in the fleet list.</small>"
+    "<small>Distance and endurance use stepped penalties. Logistics research reduces the distance penalty; nearby support adds relief to both factors, capped at 100%. National logistics applies up to a 20% penalty; empty strategic reserves halve supply. Click to center and highlight this force. The admiral controls its orders.</small>"
   );
 }
 function fleetHoverManifest(s, c, f) {
@@ -301,7 +301,7 @@ export function fleetCompositionHover(s, c, f) {
     esc(fleetStatus(s, f)) +
     "</p>" +
     fleetHoverManifest(s, c, f) +
-    "<small>Fuel endurance is the shared fleet limit. Click to center; mission controls remain in the fleet list.</small>"
+    "<small>Fuel endurance is the shared fleet limit. Click to center and highlight this force; admirals control missions.</small>"
   );
 }
 export function classHover(c) {
@@ -385,7 +385,7 @@ export function shipDetails(s, c, id) {
         f
           ? f.role === "support"
             ? "Automatic " +
-              (f.supportKind === "depot" ? "depot deployment" : "replenishment")
+              (f.supportTarget ? "fleet replenishment" : "port support")
             : f.role === "repair"
               ? "Return for repair"
               : f.role === "reinforcement"
@@ -502,7 +502,7 @@ export function portPopup(s, c, id, { parts = false } = {}) {
           "Supply capacity / demand",
           num(p.capacity) + " / " + num(p.demand) + " t",
         ],
-        ["Depot supply contribution", num(p.depotSupport) + " t"],
+        ["Fleet support contribution", num(p.depotSupport) + " t"],
         [
           "Trade capacity",
           num(p.effectiveTrade, 1) + " / " + num(p.trade) + " trade points",
@@ -580,7 +580,7 @@ export function portPopup(s, c, id, { parts = false } = {}) {
       num(PORT_REPAIR.healthPerDay * 100, 1) +
       " percentage points per day after 24 hours without attack. Land campaigns determine occupation. Capacities and battery profiles are provisional.</p><p>" +
       esc(p.gunBasis) +
-      "</p><p>Supply = intact facility capacity + depot support. Trade = charted trade × facility condition × (1 − blockade). Combat power = artillery + aviation. Aviation reach is the longest combat radius of qualified stationed aircraft. Full crews, weather and national strategic materials govern sorties; ferries and merchant transports deliver replacements.</p>" +
+      "</p><p>Supply = intact facility capacity + crewed support ships. Trade = charted trade × facility condition × (1 − blockade). Combat power = artillery + aviation. Aviation reach is the longest combat radius of qualified stationed aircraft. Full crews, weather and national strategic materials govern sorties; ferries and merchant transports deliver replacements.</p>" +
       (p.baseAviation?.heldReason
         ? "<p>" + esc(p.baseAviation.heldReason) + "</p>"
         : "");

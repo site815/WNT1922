@@ -79,7 +79,8 @@ test("all 126 doctrine levels agree with engine availability and future work has
   s.campaignId = "in_good_faith_1936";
   s.day = Date.parse("1936-01-01") / 86400000;
   const c = contentFor(bundle, s),
-    model = c.nations.GBR.aircraft.find((a) => a.type_year > 1936);
+    model = c.nations.JPN.aircraft.find((a) => a.type_year > 1936);
+  s.player = "JPN";
   const p = aircraftPrice(s, c, model.id, 1, s.player);
   assert.equal(p.days, 90);
   assert.match(aircraftBlock(s, c, model.id), /Development opens/);
@@ -93,13 +94,13 @@ test("all 126 doctrine levels agree with engine availability and future work has
     p,
   );
 });
-test("every campaign and navy can order both support types without adding opening warships", () => {
+test("every campaign and navy can order the combined support type without adding opening warships", () => {
   for (const campaign of ["campaign_1922", "in_good_faith_1936"])
     for (const id of ["GBR", "USA", "JPN", "FRA", "ITA", "DEU", "SOV"]) {
       const s = start(id, campaign),
         c = contentFor(bundle, s),
         before = sim.fleetSummary(s, c).total;
-      for (const type of ["AD", "AO"]) {
+      for (const type of ["AO"]) {
         const cl = c.nations[id].designs
           .map((id) => c.classes[id])
           .find(
@@ -152,7 +153,7 @@ test("coastal defense reports name the action and shore forces instead of None",
 function deliverSupport(s, c, type) {
   const n = s.nations[s.player];
   n.crew = 1e7;
-  const id = sim.orderShip(s, c, "us_" + type + "_1932"),
+  const id = sim.orderShip(s, c, "us_support_1932"),
     g = n.groups.find((g) => g.id === id);
   g.status = "active";
   g.dockPort = "hawaii";
@@ -190,7 +191,7 @@ test("depots provide only local, crewed capacity and can be destroyed at anchor"
     [g],
   );
   assert.equal(g.status, "sunk");
-  assert.equal(result.sunkComposition.AD, 1);
+  assert.equal(result.sunkComposition.AO, 1);
   assert.ok(result.sailorsLost + result.sailorsRescued > 0);
   assert.equal(portSummary(s, c, "hawaii").capacity, before);
   validateSave(s, bundle);

@@ -13,7 +13,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "industry": 2400,
       "days": 180,
       "max": 9,
-      "effect": "Each upgrade adds 15% of opening industrial output and yard capacity, plus 15% of the positive monthly merchant-hull growth rate. Bonuses add; they do not compound.",
+      "effect": "Each upgrade adds 15% of opening industrial output and yard capacity, plus 15% to civilian hull production after its shortage and logistics factors. Bonuses add; they do not compound.",
       "level": "industry"
     },
     "training": {

@@ -300,7 +300,7 @@ test("naval industry funding scales paid output and yard capacity without consum
     const n = s.nations.SOV;
     n.gold = 1e6;
     n.industry = 10000;
-    n.productionModels = { fighter: null, strike: null, scout: null };
+    n.productionModels={fighter:null,strike:null,scout:null}; n.productionAutomatic={fighter:false,strike:false,scout:false};
     n.crewYear = n.aviatorsYear = 0;
     dailyResources(s, c, () => {});
   }
@@ -361,7 +361,7 @@ test("funding panels include expansions and ministry dispatches appear in the to
   sim.addLog(s, "Regression dispatch", "cabinet");
   const dispatch = alertItems(s).find((a) => a.body === "Regression dispatch");
   assert.ok(dispatch);
-  assert.match(alertsView(s, c, dispatch.id), /Regression dispatch/);
+  assert.match(alertsView({...s,alerts:[],log:[s.log[0]]}, c), /Regression dispatch/);
   assert.ok(productionBlock(s, c, "courbet", "FRA"));
   assert.doesNotMatch(html, /overseas base/i);
 });

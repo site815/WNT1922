@@ -360,8 +360,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "minekaze",
     "momi",
     "kaichu",
-    "jp_depot_1922",
-    "jp_oiler_1922"
+    "jp_support_1922",
+    "jp_support_1932",
+    "jp_support_1942"
   ],
   "merchants": {
     "hulls": 2033,

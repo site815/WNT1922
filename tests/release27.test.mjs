@@ -180,7 +180,8 @@ test('separate simulation and display workers preserve command order, views, rej
  const client=new SimulationClient({createWorker:()=>bridge('simulation-worker.mjs'),
    createViewWorker:()=>bridge('view-worker.mjs'),onState:(s,m,v)=>frames.push({s,m,v}),onError:e=>errors.push(e)});
  try {
-   await client.start(CATALOG,newGame(CATALOG,'USA',27));
+   const opening=newGame(CATALOG,'USA',27); opening.decisions=[];
+   await client.start(CATALOG,opening);
    await Promise.all([
      client.dispatch({type:'funding',args:{field:'schoolFunding',value:.2}}),
      client.dispatch({type:'funding',args:{field:'schoolFunding',value:.8}})
@@ -188,9 +189,9 @@ test('separate simulation and display workers preserve command order, views, rej
    assert.equal(frames.at(-1).s.nations.USA.schoolFunding,.8);
    await assert.rejects(client.dispatch({type:'funding',args:{field:'schoolFunding',value:99}}));
    const before=frames.at(-1).s.minuteTicks || 0;
-   await client.dispatch({type:'step',args:{minutes:60}});
+   await client.dispatch({type:'step',args:{minutes:360}});
    const saved=await client.snapshot();validateSave(saved,CATALOG);
-   assert.equal(saved.minuteTicks,before+4);
+   assert.equal(saved.minuteTicks,before+24);
    assert(frames.every(f=>f.v?.fleets && f.v?.economy));
    assert.equal(errors.length,0);
  } finally {await client.stop();}

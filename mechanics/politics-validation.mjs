@@ -78,7 +78,7 @@ export function validatePolitics(s) {
       (d.forcePause !== undefined && typeof d.forcePause !== "boolean")
     )
       fail();
-    if (d.popup && (!d.critical || !d.forcePause || d.options.length !== 1))
+    if (d.popup && (!d.forcePause || !d.options.length))
       fail();
   }
   return true;

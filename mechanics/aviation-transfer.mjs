@@ -7,6 +7,7 @@ const data = await readDocument("common/rules/aviation-transfer.md");
 import { aircraftFitsShip, aircraftBasing } from "./aircraft-compatibility.mjs";
 import {
   governmentProduction,
+  retireGovernmentAircraft,
   governmentCapacity,
   navalBaseCapacity,
 } from "./government-aviation.mjs";
@@ -694,7 +695,7 @@ export function dailyAviation(s, c) {
           lastSortie: -1e9,
           nextDispatch: -1e9,
         };
-    if (!hub) continue;
+    if (!hub) { retireGovernmentAircraft(s,c,id); continue; }
     governmentProduction(s, c, id);
     let budget = 8;
     const recipients = [

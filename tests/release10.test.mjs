@@ -51,7 +51,7 @@ test("Contact alerts refresh known information, expire at staleness, and do not 
   assert.equal(contactAlerts(s).length, 0);
   assert.equal(visibleContacts(s)[0].stage, "Stale");
   assert.doesNotMatch(
-    alertsView(s, c, id, entry),
+    alertsView(s, c),
     /class="alert-detail"/,
     "An open alert must expire too",
   );

@@ -104,7 +104,7 @@ export function commenceWar(
   const title = names([a, b]) + ": war begins",
     body =
       reason +
-      " Review fleet missions, convoy protection, repairs and industrial funding.";
+      " Admirals are directing fleet operations. Review convoy protection, repairs and industrial funding.";
   const popupKey = "declaration-" + s.nextId++;
   addLog(s, title + ". " + reason, "war");
   s.log[0].dismissed = true;
@@ -139,11 +139,23 @@ export function politicsTick(s) {
   for (const event of [...PACT_EVENTS, ...WORLD_NEWS]) {
     const id = "historical-news-" + event.id;
     if (s.completedEvents.includes(id)) continue;
-    if (now < event.at) {
-      next = Math.min(next, event.at);
+    const eventAt = event.at + (event.followEuropeanOffset ? (s.timeline?.offsetDays || 0) * 1440 : 0);
+    if (now < eventAt) {
+      next = Math.min(next, eventAt);
       continue;
     }
+    if (event.requiresNews && !s.completedEvents.includes('historical-news-' + event.requiresNews)) continue;
+    if (event.requiresTerritory && s.world?.control?.[event.requiresTerritory.id] !== event.requiresTerritory.owner) continue;
     s.completedEvents.push(id);
+    if (event.stationAccess) {
+      const access=event.stationAccess;
+      if ((s.world.portControl[access.port] || access.previous) === access.previous) {
+        s.world.stationControl ??= {};
+        s.world.stationControl[access.port]=access.owner;
+        s.world.portControl[access.port]=access.owner;
+        invalidateOperations(s);
+      }
+    }
     if (event.members) {
       if (
         event.members.some((a) =>
@@ -167,8 +179,10 @@ export function politicsTick(s) {
     }
     const title = event.name || event.title;
     addLog(s, title + ". " + event.body, "diplomacy");
-    s.log[0].dismissed = true;
-    dispatchPopup(s, "dispatch-" + id, title, event.body);
+    if (event.importance === "major" || event.members?.includes(s.player) || event.affectedNations?.includes(s.player)) {
+      s.log[0].dismissed = true;
+      dispatchPopup(s, "dispatch-" + id, title, event.body, event.alertKind || "diplomacy");
+    }
   }
   s.nextDiplomaticAt = next;
 }

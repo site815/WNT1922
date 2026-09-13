@@ -165,8 +165,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "chacal",
     "lagrange",
     "requin",
-    "fr_depot_1922",
-    "fr_oiler_1922"
+    "fr_support_1922",
+    "fr_support_1932",
+    "fr_support_1942"
   ],
   "merchants": {
     "hulls": 1662,

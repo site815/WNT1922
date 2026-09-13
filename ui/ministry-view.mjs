@@ -1,5 +1,7 @@
+import { NewsTicker } from "./news-ticker.mjs";
 import { battleProgress } from "./battle-progress.mjs";
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
+import { currentGovernmentModels } from "../mechanics/government-aviation.mjs";
 import { strategicFactor } from "../mechanics/strategic-materials.mjs";
 import { basingText } from "../mechanics/aircraft-compatibility.mjs";
 import { alertVisible } from "../mechanics/alert-lifecycle.mjs";
@@ -197,7 +199,7 @@ export function resourcesView(s, c) {
         (spending.find((r) => r.key === key).strategic ? "</b></span><span>Strategic / month <b>−" + num(spending.find((r) => r.key === key).strategic / 12) : "") +
         "</b></span></div>" +
         '<div class="facility-expansion"><p class="facility-effect">' +
-        PROGRAMS[key].effect + (key==='industry' ? '</p><p class="facility-bonus" title="Each completed expansion adds 15% of opening capacity. Two upgrades give +30%, not +32.25%. Merchant bonuses apply to positive hull growth only.">Since opening: +'+num((industryExpansion(s).multiplier-1)*100)+'% output, yards and positive hull growth · '+industryExpansion(s).upgrades+' upgrades'+(price.level<9?' · Next: +'+num((industryExpansion(s).multiplier-1+industryExpansion(s).rate)*100)+'%':'') : '') +
+        PROGRAMS[key].effect + (key==='industry' ? '</p><p class="facility-bonus" title="Each completed expansion adds 15% of opening capacity. Two upgrades give +30%, not +32.25%. Civilian production applies this bonus after its shortage and logistics factors.">Since opening: +'+num((industryExpansion(s).multiplier-1)*100)+'% output, yards and civilian hull production · '+industryExpansion(s).upgrades+' upgrades'+(price.level<9?' · Next: +'+num((industryExpansion(s).multiplier-1+industryExpansion(s).rate)*100)+'%':'') : '') +
         '</p><strong title="' +
         esc(levelHint(key, price.level)) +
         '">Level ' +
@@ -260,7 +262,7 @@ export function aircraftCatalogView(s, c) {
             [role, "multirole"].includes(planeRole(a)),
         );
         return (
-          "<label><span>" +
+          '<div class="production-line"><label><span>' +
           role +
           '</span><select id="production-' +
           role +
@@ -288,12 +290,13 @@ export function aircraftCatalogView(s, c) {
                 "</option>",
             )
             .join("") +
-          "</select></label>"
+          '</select></label><label class="production-auto" title="Automatically select the newest available model for this role. Choosing a model manually turns this off for this line."><input type="checkbox" data-production-automatic="' + role + '" ' + (n.productionAutomatic[role] ? 'checked' : '') + '>Auto · newest model</label></div>'
         );
       })
       .join("") +
     "</div>";
   const catalog = [...models]
+    .filter(a => !inventory.get(a.id).replacement)
     .sort((a, b) => a.type_year - b.type_year || a.name.localeCompare(b.name))
     .map((a) => {
       const stock=inventory.get(a.id);
@@ -347,7 +350,9 @@ export function aircraftCatalogView(s, c) {
     '% funding</span><button data-action="view" data-view="programs" title="Set factory funding or expand aircraft factories in Facilities & research.">Factory funding & expansion</button></div>' +
     lines +
     "</section>";
+  const currentGovernment = new Set(currentGovernmentModels(s,c,s.player).map(a=>a.id));
   const government = (c.nations[s.player].armyAircraft || [])
+    .filter(a => currentGovernment.has(a.id) || a.type_year > new Date(s.day*86400000).getUTCFullYear())
     .map((a) => {
       const future = a.type_year > new Date(s.day * 86400000).getUTCFullYear();
       return (
@@ -379,8 +384,9 @@ export function aircraftCatalogView(s, c) {
     '<section class="panel aircraft-catalog">' +
     production +
     '<p class="panel-note">Newer qualified aircraft replace older wings of the same role in port. Aircraft ferry between reachable bases and carriers; distant reinforcements travel by merchant transport. Replaced aircraft enter local reserve.</p><div class="aircraft-models">' +
-    catalog +
-    '</div><details class="government-aircraft" data-detail-key="government-aircraft"><summary>Army, shore & strategic aircraft</summary><p class="panel-note">National service types selected at three-year equipment reviews. Patrols, maritime strikes, fighters and strategic bombers operate automatically. Government establishments occupy 25% of base slots, use separate crews, and replace losses monthly at home. Reinforcements must ferry or travel by safe merchant route; national strategic materials limit operations. No ministry production orders.</p><div class="aircraft-models">' +
+    catalog + '</div>' +
+    ([...inventory.values()].some(r=>r.replacement&&r.owned)?'<details class="superseded-aircraft"><summary>Superseded naval reserves</summary>'+[...inventory.values()].filter(r=>r.replacement&&r.owned).map(r=>'<div class="retired-model-row"><span data-aircraft="'+r.model.id+'">'+esc(r.model.name)+' · '+num(r.owned)+' owned / '+num(r.reserve)+' reserve</span><button data-action="retire-aircraft" data-id="'+r.model.id+'" '+(r.block?'disabled title="'+esc(r.block)+'"':'')+'>Retire reserves</button></div>').join('')+'</details>':'') +
+    '<details class="government-aircraft" data-detail-key="government-aircraft"><summary>Army, shore & strategic aircraft</summary><p class="panel-note">Only current and genuinely future government models are listed. An unchanged model continues in service; it is not redeveloped every three years. Superseded grounded aircraft retire immediately; flights and shipments retire on return. Patrols, maritime strikes, fighters and strategic bombers operate automatically. Government establishments occupy 25% of base slots, use separate crews, and replace losses monthly at home. Reinforcements must ferry or travel by safe merchant route; national strategic materials limit operations. No ministry production orders.</p><div class="aircraft-models">' +
     government +
     "</div></details></section>"
   );
@@ -435,51 +441,8 @@ export function alertItems(s) {
     (a, b) => b.minute - a.minute,
   );
 }
-export function alertsView(s, c, selected, reading = null) {
-  const list = alertItems(s),
-    decisions = s.decisions;
-  const d = decisions.find((d) => !d.popup && d.key === selected),
-    a =
-      (reading &&
-      !["contact", "land", "battle"].includes(reading.kind) &&
-      String(reading.id) === String(selected) &&
-      list.some((a) => String(a.id) === String(selected))
-        ? reading
-        : null) || list.find((a) => String(a.id) === String(selected));
-  let detail = "";
-  if (d) {
-    const clock = d.deadline ? capitalClock(s, s.player, d.deadline) : null;
-    detail = `<span class="eyebrow">${d.critical ? "ACTION REQUIRED" : "CABINET ADVICE"}</span><h2>${esc(d.title)}</h2><p>${esc(d.body)}</p>${clock ? `<p class="deadline"><strong>Deadline: ${clock.date} ${clock.time} · ${clock.zone}</strong><br>If ignored: ${esc(d.defaultText)}</p>` : ""}<div class="decision-options inline-options">${d.options
-      .map((o) => {
-        const price = o.program
-            ? projectPrice(s, o.program)
-            : {
-                gold: o.gold || 0,
-                influence:
-                  (o.influence || 0) +
-                  (d.key === "expiry" && o.id === "renew" ? 30 : 0),
-                industry: o.industry || 0,
-              },
-          block =
-            (o.program ? projectBlock(s, o.program) : "") ||
-            affordability(s.nations[s.player], price);
-        return `<button data-action="choose" data-key="${d.key}" data-id="${o.id}" ${block ? "disabled" : ""} title="${esc(block)}"><strong>${esc(o.label)}</strong><span>${esc(o.detail)}</span>${block ? `<small>${esc(block)}</small>` : ""}</button>`;
-      })
-      .join(
-        "",
-      )}</div><button data-action="dismiss-alert" data-id="${d.key}" class="subtle">${d.critical ? "Dismiss and apply default…" : "Dismiss advice"}</button>`;
-  } else if (a) {
-    const report =
-      a.report || (a.reportId && s.reports.find((r) => r.id === a.reportId));
-    detail = `<span class="eyebrow">${esc(a.kind)} · ${capitalClock(s, s.player, a.minute).date} ${capitalClock(s, s.player, a.minute).time}</span><h2>${esc(a.title)}</h2><p>${esc(a.body)}</p>${report ? battleDetails(report,s) : ""}${a.contactId ? '<p class="panel-note">This alert expires after 48 hours without an update.</p><button data-action="locate-contact" data-id="' + a.contactId + '">Locate on chart</button> ' : ""}<button data-action="dismiss-alert" data-id="${a.id}" class="subtle">Dismiss alert</button>`;
-  }
-  const critical = decisions.filter((d) => d.critical).length,
-    recent = new Set(list.filter((a) => !a.contactId).slice(0, 12)),
-    rail = list.filter(
-      (a) =>
-        a.contactId || (a.frontId && a.resolvedAt == null) || recent.has(a),
-    );
-  return `<div class="alert-rail" aria-label="Admiralty alerts"><span class="alert-heading ${critical ? "urgent" : ""}">${critical ? critical + " ACTION REQUIRED" : "ALERTS"}</span><div class="alert-chips" data-scroll-key="alert-chips">${decisions.map((d) => `<span class="alert-chip"><button class="${d.critical ? "critical" : ""} ${selected === d.key ? "selected" : ""}" data-action="open-alert" data-id="${d.key}">${d.critical ? "! " : ""}${esc(d.title)}${d.deadline ? " · " + num(Math.max(0, (d.deadline - campaignMinutes(s)) / 60)) + "h left" : ""}</button><button class="dismiss-chip" data-action="dismiss-alert" data-id="${d.key}" aria-label="Dismiss ${esc(d.title)}">×</button></span>`).join("")}${rail.map((a) => `<span class="alert-chip"><button class="${a.ongoing ? "ongoing" : a.kind === "battle" && a.winner ? (a.winner === s.player ? "won" : "lost") : ""} ${String(selected) === String(a.id) ? "selected" : ""}" data-action="open-alert" data-id="${a.id}">${esc(a.title)}</button><button class="dismiss-chip" data-action="dismiss-alert" data-id="${a.id}" aria-label="Dismiss ${esc(a.title)}">×</button></span>`).join("")}${!decisions.length && !list.length ? "<span>No outstanding alerts</span>" : ""}</div><button data-action="clear-alerts" title="Clear optional alerts; mandatory decisions remain">Clear all optional</button><button data-action="alert-history" title="View the alert history">${list.length} alerts</button></div>${detail ? `<section class="alert-detail" data-key="alert-${selected}" data-scroll-key="alert-detail" ${a && !["contact", "land", "battle"].includes(a.kind) ? 'data-preserve="true"' : ""} aria-live="polite"><button data-action="close-alert" class="close" aria-label="Collapse alert">×</button>${detail}</section>` : ""}`;
+export function alertsView(s, c, ticker = new NewsTicker(() => {})) {
+  return ticker.markup(alertItems(s));
 }
 export function weaponDetails(c, content) {
   const raw = c.raw || {},

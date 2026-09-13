@@ -7,8 +7,8 @@ These modules have no DOM, browser storage or screen controls. The same world st
 | Area | Modules |
 | --- | --- |
 | Campaign lifecycle and shared action effects | engine, game-actions, campaign-content, state-io |
-| Economy, trade and yards | balance, economy-rules, economic-growth, historical-gdp, merchant-economy, merchant-convoys, port-trade, strategic-materials |
-| Timed naval engagements | engagements; damage exchanges in engine |
+| Economy, trade and yards | balance, domestic-economy, economy-rules, economic-growth, historical-gdp, merchant-economy, merchant-convoys, convoy-traffic, port-trade, strategic-materials |
+| Timed naval engagements, morale and scoring | engagements, campaign-impact; damage exchanges in engine |
 | Fleet organization, movement and supply | task-forces, operations, logistics, support-operations, support-effects |
 | Air operations and physical inventories | naval-resources, aircraft-inventory, air-operations, base-aviation, aviation-transfer, government-aviation, strategic-air |
 | Personnel and losses | personnel-training, ship-staffing, recovery, ship-retirement |

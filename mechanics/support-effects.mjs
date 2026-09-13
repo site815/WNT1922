@@ -2,6 +2,8 @@ import { PORTS, NODES, HOME_PORT, distanceNm } from "./world.mjs";
 import { campaignMinutes } from "./campaign-clock.mjs";
 import { fleetPosition } from "./task-forces.mjs";
 import { fullyStaffed } from "./ship-staffing.mjs";
+import { readDocument } from "../worker/documents.mjs";
+export const SUPPORT_RULES = await readDocument("common/rules/support-operations.md");
 const snapshots = new WeakMap();
 export function invalidateSupport(s) {
   snapshots.delete(s);
@@ -17,7 +19,7 @@ export function depotCapacity(s, c, port) {
     for (const g of n.groups) {
       const cl = c.classes[g.classId];
       if (
-        cl.type !== "AD" ||
+        cl.type !== "AO" ||
         g.service !== "support" ||
         g.status !== "active" ||
         g.atSea ||
@@ -34,7 +36,7 @@ export function depotCapacity(s, c, port) {
         (f && distanceNm(fleetPosition(s, f), NODES[base]) > 25)
       )
         continue;
-      capacity[base] = (capacity[base] || 0) + cl.tons * g.count * g.health * 3;
+      capacity[base] = (capacity[base] || 0) + cl.tons * g.count * g.health * SUPPORT_RULES.PORT_CAPACITY_PER_TON;
     }
   }
   snapshots.set(s, { minute, capacity });
@@ -46,7 +48,7 @@ export function replenishmentRelief(s, f) {
         0,
         Math.min(
           1,
-          ((f.replenishedUntil || -1e9) - campaignMinutes(s)) / (3 * 1440),
+          ((f.replenishedUntil || -1e9) - campaignMinutes(s)) / SUPPORT_RULES.RELIEF_MINUTES,
         ),
       ) * (f.replenishmentRelief || 0)
     : 0;

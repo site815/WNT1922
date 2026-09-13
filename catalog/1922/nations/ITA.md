@@ -171,8 +171,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "curtatone",
     "palestro",
     "provana",
-    "it_depot_1922",
-    "it_oiler_1922"
+    "it_support_1922",
+    "it_support_1932",
+    "it_support_1942"
   ],
   "merchants": {
     "hulls": 893,

@@ -114,8 +114,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "novik_series",
     "bars_1915",
     "aurora_1903",
-    "su_depot_1922",
-    "su_oiler_1922"
+    "su_support_1922",
+    "su_support_1932",
+    "su_support_1942"
   ],
   "merchants": {
     "hulls": 100,

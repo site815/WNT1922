@@ -41,7 +41,7 @@ test("all fourteen product bases, allocations, modifiers and opening budgets agr
     validateSave(s,CATALOG);
   }
 });
-test("convoys mobilize enough merchants for monthly product demand and losses reduce convoy performance without immediately changing GTP without changing GDP or fleet supply",()=>{
+test("convoys use real hulls and logistics changes supply without immediately changing product bases",()=>{
   const [s,c,n]=start();war(s);syncConvoys(s,c,"JPN");
   const total=()=>n.convoys.reduce((v,x)=>v+x.count,0);
   assert.ok(total()>0 && total()<=n.merchant.hulls);
@@ -51,11 +51,11 @@ test("convoys mobilize enough merchants for monthly product demand and losses re
   assert.equal(n.merchant.hulls,hulls-losses);assert.equal(lost.hulls,losses);
   near(merchantEconomy(s,c).gtp,before.gtp);
   near(convoyRecord(s,"JPN").success,30/(30+losses));near(merchantEconomy(s,c).logistics,50*(1+30/(30+losses)*Math.min(1,before.average*30/before.required)));
-  assert.equal(n.gdp,gdp);near(supply(s,c,"JPN"),tactical);
+  assert.equal(n.gdp,gdp);near(supply(s,c,"JPN"),tactical*(.8+.2*merchantEconomy(s,c).logistics/100)/(.8+.2*before.logistics/100));
   assert.ok(total()>0 && total()<=n.merchant.hulls);
   for(const r of Object.values(s.relations))r.war=false;
   syncConvoys(s,c,"JPN");assert.ok(n.convoys.length>0);assert.equal(convoyRecord(s,"JPN").success,1);
-  assert.doesNotMatch(commandView(s,c),/class="convoy-marker"/);
+  assert.match(commandView(s,c),/class="convoy-marker"/);
 });
 test("convoy successes and losses expire at their exact thirty-day timestamps",()=>{
   const [s]=start();war(s);recordConvoy(s,"JPN",{delivered:300});
@@ -77,7 +77,7 @@ test("port loss affects trade once, while bombing affects domestic production an
   setCampaignMinutes(s,Date.parse("1936-03-01")/60000);closeEconomicMonth(s,c,"USA");near(n.gdp,gdp*1.002**2);
   assert.ok(e.goldYear>economyFor(s,"USA").goldYear);
 });
-test("merchant growth uses the requested logistics curve and hull fractions, with size growth separate",()=>{
+test("GTP retains its percentage curve while merchant production uses a separate logistics multiplier",()=>{
   for(const active of [false,true]){
     near(tradeHullGrowth(0,active),-.02);near(tradeHullGrowth(.25,active),-.01);
     near(tradeHullGrowth(.5,active),0);near(tradeHullGrowth(.75,active),active?.01:.00025);
@@ -86,23 +86,23 @@ test("merchant growth uses the requested logistics curve and hull fractions, wit
   const [s,c,n]=start();war(s);
   const count=n.merchant.hulls,average=merchantEconomy(s,c).average;
   setCampaignMinutes(s,Date.parse("1936-02-01")/60000);recordConvoy(s,"JPN",{delivered:1e7});closeEconomicMonth(s,c,"JPN");
-  near(n.merchant.hulls+n.civilianShipping.carry,count*1.02);
+  near(n.merchant.hulls+n.civilianShipping.carry,count+2);
   assert.ok(merchantEconomy(s,c).average>average);
   recordConvoy(s,"JPN",{sunk:10000});
   const before=n.merchant.hulls+n.civilianShipping.carry;
   setCampaignMinutes(s,Date.parse("1936-03-01")/60000);for(const p of Object.values(s.ports))p.health=0;closeEconomicMonth(s,c,"JPN");
-  assert.ok(n.merchant.hulls+n.civilianShipping.carry<before);
+  assert.ok(n.merchant.hulls+n.civilianShipping.carry>before,'civilian yards still build at poor logistics');
 });
-test("strategic exhaustion immediately reduces ships, aircraft and production without changing tactical supply",()=>{
+test("strategic exhaustion halves naval supply once and separately limits aviation, movement and production",()=>{
   const [s,c,n]=start(), f=n.fleets.find(x=>x.role==="carrier");
-  const original={power:fleetPower(s,c).total, speed:fleetStats(s,c,"JPN",f).speed, air:baseAirPower(s,c,"yokosuka").strike,
+  const original={power:fleetPower(s,c).surface, speed:fleetStats(s,c,"JPN",f).speed, air:baseAirPower(s,c,"yokosuka").strike,
     yards:yardLoad(s,c).capacity,industry:monthlyIncome(s,c).industry,supply:supply(s,c,"JPN")};
   n.strategic=0;
   const factor=ECONOMY.STRATEGIC_EMERGENCY_FACTOR;near(strategicFactor(n),factor);
-  near(fleetPower(s,c).total,original.power*factor);near(fleetStats(s,c,"JPN",f).speed,original.speed*factor);
+  near(fleetPower(s,c).surface,original.power*.5);near(fleetStats(s,c,"JPN",f).speed,original.speed*factor);
   near(baseAirPower(s,c,"yokosuka").strike,original.air*factor);
   near(yardLoad(s,c).capacity,original.yards*factor);near(monthlyIncome(s,c).industry,original.industry*factor);
-  near(supply(s,c,"JPN"),original.supply);
+  near(supply(s,c,"JPN"),original.supply*.5);
   assert.equal("aviationSuppliesSpent" in n,false);
 });
 test("material changes rebase a moving route without jumping to a different position",()=>{
@@ -127,7 +127,7 @@ test("ship and aircraft orders consume strategic materials atomically for every 
 });
 test("daily product credits and naval-industry running expenses conserve the resource accounts",()=>{
   const [s,c,n]=start();n.gold=n.industry=n.strategic=1e6;n.crewYear=n.aviatorsYear=0;
-  n.productionModels={fighter:null,strike:null,scout:null};const e=economyFor(s,"JPN"),before={gold:n.gold,industry:n.industry,strategic:n.strategic};
+  n.productionModels={fighter:null,strike:null,scout:null}; n.productionAutomatic={fighter:false,strike:false,scout:false};const e=economyFor(s,"JPN"),before={gold:n.gold,industry:n.industry,strategic:n.strategic};
   const budget=facilityBudget(s,c),demand=strategicDemand(s,c,"JPN");dailyResources(s,c,()=>{});
   near(n.gold-before.gold,(e.goldYear-budget.gold)/12/31);
   near(n.industry-before.industry,e.industryYear*n.industryFunding/12/31);

@@ -65,7 +65,7 @@ test("all fourteen starts derive shipping demand from product and assign only re
     const [s,c,n]=start(id,campaign),p=shippingPlan(s,c,id),e=merchantEconomy(s,c,id);
     near(p.required,(n.gdp+e.gtp)/2);assert.ok(p.routes.length>0);
     assert.ok(n.convoys.length>0);assert.ok(p.assigned<=n.merchant.hulls);
-    assert.ok(p.monthlyCapacity>=p.required*.98);
+    near(p.hullsAtSea,Math.round(n.merchant.hulls*.2));
     assert.match(resourceHover(s,c,"SHIPPING"),/round trip|round-trip/);
     validateSave(s,CATALOG);
   }
@@ -75,6 +75,7 @@ test("peacetime GRT is credited exactly once after the outward and return voyage
   const v=n.convoys[0],hulls=v.count;n.convoys=[v];n.convoyPlanAt=campaignMinutes(s)+1e8;
   setCampaignMinutes(s,v.arriveAt);moveConvoys(s,c,"USA");
   assert.equal(v.leg,"unloading");assert.equal(convoyRecord(s,"USA").delivered,0);
+  n.convoys=[v]; n.convoyPlanAt=-1e9;
   setCampaignMinutes(s,v.readyAt);moveConvoys(s,c,"USA");
   assert.equal(v.leg,"returning");assert.equal(convoyRecord(s,"USA").delivered,0);
   setCampaignMinutes(s,v.arriveAt);const expected=hulls*averageMerchantGRT(s,"USA");moveConvoys(s,c,"USA");

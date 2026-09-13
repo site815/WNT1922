@@ -1,4 +1,7 @@
+import { navalRecordView } from "./naval-record.mjs";
+import { NewsTicker } from "./news-ticker.mjs";
 import { battleProgress } from "./battle-progress.mjs";
+import { SCORE_NAVAL_TONS_PER_POINT } from '../mechanics/campaign-impact.mjs';
 import { politicalPopup } from "./diplomacy-popup.mjs";
 import { bulkPlan } from "../mechanics/bulk-fleet.mjs";
 import { resourceHover } from "./resource-breakdown.mjs";
@@ -109,6 +112,7 @@ import { saveCampaign, loadCampaign, writeRecovery } from "./save-client.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 
 const app = document.querySelector("#app");
+const newsTicker = new NewsTicker((id, receipt) => { if(state) void mutate({type:"read-news",args:{id,receipt}}, "", true); });
 let fleetSelection = new Set();
 let fleetSearch = "",
   viewPages = {},
@@ -276,7 +280,7 @@ const CONTROL_HINTS = {
     "Commit resources now; the program completes after its development time.",
   develop: "Fund the design before ordering this class.",
   order:
-    "Choose hull quantity and review the shared yard load before committing resources. Depot ships (AD) and oilers (AO) are in this catalog.",
+    "Choose hull quantity and review the shared yard load before committing resources. Fleet support ships (AO) are in this catalog.",
   reserve:
     "Order an active ship home to enter reserve, or recommission a reserve hull.",
   scrap:
@@ -291,11 +295,12 @@ const CONTROL_HINTS = {
     "Transmit the selected mission. Admirals choose routes, targets and engagements.",
   "clear-alerts": "Clear optional notices only; mandatory decisions remain.",
   "step-minute": "Advance one fifteen-minute simulation tick.",
-  "step-hour": "Advance exactly sixty simulated minutes.",
+  "step-six-hours": "Advance six simulated hours. Available while paused.",
 };
 function renderPass() {
   if (!state) {
     mapMotion.refresh();
+    newsTicker.reset();
     renderStart();
     return;
   }
@@ -312,7 +317,7 @@ function renderPass() {
   const tabs = [
     ["command", "01", "Command Map"],
     ["land", "02", "Land campaigns"],
-    ["airwar", "03", "Strategic air campaigns"],
+    ["airwar", "03", "Strategic air"],
     ["yards", "04", "Ship catalog"],
     ["aircraft", "05", "Aircraft catalog"],
     ["fleet", "06", "Fleet register"],
@@ -324,9 +329,10 @@ function renderPass() {
   ];
   updateDOM(
     app,
-    `<div class="game-shell"><aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics)}${alertsView(state, content, selectedAlert, readingAlert)}<main class="workspace view-${view}" data-record="overview"><div class="workspace-inner" data-scroll-key="workspace-${view}">${viewHTML()}</div></main></div></div>${modalHTML()}`,
+    `<div class="game-shell"><aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics)}${alertsView(state, content, newsTicker)}<main class="workspace view-${view}" data-record="overview"><div class="workspace-inner" data-scroll-key="workspace-${view}">${viewHTML()}</div></main></div></div>${modalHTML()}`,
   );
   mapMotion.refresh();
+  newsTicker.refresh(app, !!app.querySelector(".modal-backdrop"));
   const dispatch = app.querySelector(".diplomatic-dispatch");
   if (dispatch && !dispatch.contains(document.activeElement))
     dispatch.querySelector("button")?.focus({ preventScroll: true });
@@ -438,10 +444,7 @@ function focusMap(kind, id, zoom = false) {
   render();
   if (chart.fleetId) requestAnimationFrame(() => {
     const row=[...app.querySelectorAll('.fleet-command-row')].find(x=>x.dataset.id===chart.fleetId);
-    if (row) {
-      const list=row.closest('.fleet-command-list');
-      if (list) list.scrollTop=Math.max(0,row.offsetTop-list.offsetTop-list.clientHeight/2+row.clientHeight/2);
-    }
+    row?.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
   });
 }
 function commandView() {
@@ -952,21 +955,7 @@ function reportsView() {
       : '<section class="panel empty"><h2>No engagements yet</h2><p>Fleet encounters, anchorage raids and coastal defense actions will be recorded here.</p></section>')
   );
 }
-function reviewView() {
-  const scores = sim.campaignScores(state, content);
-  return `${heading("AN OPEN-ENDED CAMPAIGN", "Naval record")}<p class="record-intro" title="Scores reflect growth from the opening fleet, trade and industry, preparation and battle results. Formal reviews preserve a snapshot; the sandbox continues afterward.">Live national standings · ${sim.REVIEW_YEARS.find((year) => !state.reviews.some((r) => r.year === year)) ? "Next archived review: 31 December " + sim.REVIEW_YEARS.find((year) => !state.reviews.some((r) => r.year === year)) : "All formal reviews complete · continuing sandbox"}</p><section class="panel"><div class="table-scroll"><table><thead><tr><th>Government</th><th>Score</th><th>Fleet growth</th><th>Economy</th><th>Readiness</th><th>War results</th></tr></thead><tbody>${scores.map((r) => `<tr class="${r.id === state.player ? "player-row" : ""}"><td>${PROFILES[r.id].name}${r.id === state.player ? " · your ministry" : ""}</td><td><strong>${number(r.score)}</strong></td><td>${r.strength}</td><td>${r.economy}</td><td>${r.readiness}</td><td>${r.war}</td></tr>`).join("")}</tbody></table></div></section><div class="lower-grid" data-reviews="${state.reviews.length}"><section class="panel"><h2>Campaign reviews</h2>${state.reviews.length ? state.reviews.map((r) => `<div class="review-row"><strong>${r.year}</strong><div>${r.scores.map((p, i) => `<span>${i + 1}. ${PROFILES[p.id].name}: ${p.score}</span>`).join("")}</div></div>`).join("") : `<p>Your first archived review is on 31 December ${sim.REVIEW_YEARS[0]}.</p>`}</section><section class="panel"><h2>Your naval record</h2><div class="overview-metrics">${[
-    [player().delivered, "warships delivered"],
-    [player().battlesWon, "engagements won"],
-    [number(player().sunkTons), "enemy tons sunk"],
-    [number(player().lostTons), "own tons lost"],
-    [number(player().merchantSunkGRT), "enemy merchant GRT sunk"],
-    [number(player().merchantLostGRT), "own merchant GRT lost"],
-  ]
-    .map(([v, k]) => `<div><strong>${v}</strong><span>${k}</span></div>`)
-    .join(
-      "",
-    )}</div></section></div><section class="panel recovery-panel">${casualtyView(player())}</section>`;
-}
+function reviewView() { return navalRecordView(state, content); }
 
 function modalHTML() {
   const urgent = politicalPopup(state);
@@ -1082,23 +1071,13 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Give missions.</strong> Select a fleet and transmit its mission. Admirals arrange escorts, routes, convoy protection and refueling. Seek aggressive battle accepts unfavorable odds and presses attacks longer, increasing damage and risk.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag around the Equal Earth globe; scroll to zoom. Squares are your merchant convoys. Escort coverage is always shown: green rings have nearby operational escorts, red dashed rings are exposed. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. Home resets the map. Land fronts respond to sustained naval supply.</li><li><strong>Watch alerts.</strong> Decisions and reports appear in the top bar. Critical demands show a deadline and default outcome. Optional auto-pause applies only to those demands and resumes after you resolve them, unless you paused manually. Battle notices expire after 48 game hours. Assault notices stay during fighting, then expire 48 hours after resolution; battle reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; 1–5 choose speeds from 2,500× to 100,000×. The simulation advances in fifteen-minute ticks. Hiding this tab pauses the game. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
-  }
-  if (dialog.type === "alerts") {
-    title = "Admiralty alert history";
-    body =
-      alertItems(state)
-        .map(
-          (a) =>
-            `<article class="history-alert"><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${a.contactId ? btn("Locate on chart", "locate-contact", `data-id="${a.contactId}"`) : ""}${a.reportId ? btn("Battle details", "report", `data-id="${a.reportId}"`) : ""}</article>`,
-        )
-        .join("") || "<p>No reports yet.</p>";
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag around the Equal Earth globe; scroll to zoom. Squares are your merchant convoys. Escort coverage is always shown: green rings have nearby operational escorts, red dashed rings are exposed. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. Home resets the map. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> Decisions and major world events pause play and open a dispatch. Acknowledge or choose a response to resume automatically unless you had already paused. Routine news passes once through the ticker; hover to hold it for reading. Permanent battle reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; 1–5 choose speeds from 2,500× to 100,000×. The simulation advances in fifteen-minute ticks. Hiding this tab pauses the game. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
     body = `<p>${PROFILES[state.player].name} · ${smallDate(state.day)}</p><div class="menu-actions">${btn("Export save file", "export")}${btn("Import save file", "import")}${btn("Return to navy selection", "title-screen")}${btn("How to play", "help")}${btn("Toggle full window / fullscreen", "fullscreen")}</div>${musicCredits()}<p><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Third-party licenses and credits</a></p><p class="panel-note">Saves: %APPDATA%/WNT1922/saves. The previous disk save is kept as campaign.backup.json.</p>`;
   }
-  return `<div class="modal-backdrop ${dialog.type === "report" ? "report-backdrop" : ""}"><section data-key="dialog-${dialog.type}-${dialog.id || dialog.ship || ""}" class="modal ${dialog.type === "report" ? "wide" : ""}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header><h2 id="dialog-title">${esc(title)}</h2><button data-action="close" class="close" aria-label="Close dialog">×</button></header><div class="modal-body" data-scroll-key="modal-body" >${body}</div><footer>${actions ? btn("Cancel", "close", 'class="subtle"') + actions : btn("Close", "close")}</footer></section></div>`;
+  return `<div class="modal-backdrop ${dialog.type === "report" ? "report-backdrop" : ""}"><section data-key="dialog-${dialog.type}-${dialog.id || dialog.ship || ""}" class="modal ${dialog.type === "report" ? "wide" : ""}" data-dialog-type="${dialog.type}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header><h2 id="dialog-title">${esc(title)}</h2><button data-action="close" class="close" aria-label="Close dialog">×</button></header><div class="modal-body" data-scroll-key="modal-body" >${body}</div><footer>${actions ? btn("Cancel", "close", 'class="subtle"') + actions : btn("Close", "close")}</footer></section></div>`;
 }
 function openDialog(value) {
   hideClassHover();
@@ -1136,7 +1115,19 @@ async function persist(quiet = false) {
   }
   if (state) liveRender();
 }
+function resetSessionViews() {
+  fleetSelection.clear();
+  fleetFilter = "all";
+  fleetSearch = "";
+  designFilter = "all";
+  viewPages = {};
+  chart = { zoom: 1, cx: 600, cy: 300, rotation: 0 };
+  draft = null;
+  selectedAlert = readingAlert = null;
+  newsTicker.reset();
+}
 async function begin() {
+  resetSessionViews();
   content = contentFor(bundle, selectedCampaign);
   state = sim.newGame(
     content,
@@ -1145,6 +1136,7 @@ async function begin() {
   );
   draft = null;
   chart = { zoom: 1, cx: 600, cy: 300, rotation: 0 };
+  newsTicker.reset();
   view = "command";
   dialog = null;
   selectedAlert = null;
@@ -1250,7 +1242,7 @@ app.addEventListener("click", async (event) => {
       return;
     }
     if (action === "continue") {
-      fleetSelection.clear();
+      resetSessionViews();
       state = validateSave(saved, bundle);
       content = contentFor(bundle, state);
       view = "command";
@@ -1353,27 +1345,6 @@ app.addEventListener("click", async (event) => {
       focusMap("fleet", id);
       return;
     }
-    if (action === "send-inline-order") {
-      const f = player().fleets.find((f) => f.id === id),
-        o = chart.orders?.[id] || {};
-      if (
-        await mutate(
-          {
-            type: "fleet-order",
-            args: {
-              id,
-              mission: o.mission || f.mission,
-              aggressive: o.aggressive ?? f.aggressiveBattle,
-            },
-          },
-          "Fleet orders transmitted.",
-        )
-      ) {
-        if (chart.orders) delete chart.orders[id];
-        render();
-      }
-      return;
-    }
     if (action === "command-list") {
       selectChart();
       render();
@@ -1441,59 +1412,6 @@ app.addEventListener("click", async (event) => {
       focusMap("convoy", id);
       return;
     }
-    if (action === "open-alert") {
-      const entry = alertItems(state).find((a) => String(a.id) === String(id));
-      readingAlert = entry
-        ? structuredClone({
-            ...entry,
-            report: state.reports.find((r) => r.id === entry.reportId),
-          })
-        : null;
-      selectedAlert = String(selectedAlert) === id ? null : id;
-      render();
-      return;
-    }
-    if (action === "close-alert") {
-      selectedAlert = null;
-      render();
-      return;
-    }
-    if (action === "dismiss-alert") {
-      const d = state.decisions.find((d) => d.key === id);
-      if (d?.critical) {
-        openDialog({
-          type: "confirm",
-          title: "Accept the default outcome?",
-          body:
-            d.title +
-            ". Dismissing this mandatory demand applies: " +
-            d.defaultText,
-          label: "Apply default and dismiss",
-          command: { type: "dismiss-alert", args: { id } },
-        });
-      } else {
-        await mutate({ type: "dismiss-alert", args: { id } }, "", true);
-        selectedAlert = null;
-        render();
-      }
-      return;
-    }
-    if (action === "clear-alerts") {
-      await mutate(
-        { type: "clear-alerts" },
-        "Optional alerts cleared. Mandatory decisions retained.",
-        true,
-      );
-      if (!state.decisions.some((d) => d.key === selectedAlert))
-        selectedAlert = null;
-      render();
-      return;
-    }
-    if (action === "alert-history") {
-      dialog = { type: "alerts" };
-      render();
-      return;
-    }
     if (action === "sound-toggle") {
       await mutate(
         { type: "settings", args: { audioEnabled: !state.audioEnabled } },
@@ -1514,10 +1432,10 @@ app.addEventListener("click", async (event) => {
       render();
       return;
     }
-    if (action === "step-minute" || action === "step-hour") {
+    if (action === "step-minute" || action === "step-six-hours") {
       mutate({
         type: "step",
-        args: { minutes: action === "step-minute" ? 15 : 60 },
+        args: { minutes: action === "step-minute" ? 15 : 360 },
       });
       return;
     }
@@ -1696,17 +1614,6 @@ app.addEventListener("input", (event) => {
 });
 app.addEventListener("change", async (event) => {
   const t = event.target;
-  if (t.dataset.fleetMission || t.dataset.fleetAggression) {
-    const id = t.dataset.fleetMission || t.dataset.fleetAggression;
-    chart.orders ??= {};
-    chart.orders[id] ??= {};
-    chart.orders[id][t.dataset.fleetMission ? "mission" : "aggressive"] = t
-      .dataset.fleetMission
-      ? t.value
-      : t.checked;
-    render();
-    return;
-  }
   if (t.dataset.draftFeature && draft) {
     draft.features = t.checked
       ? [...draft.features, t.dataset.draftFeature]
@@ -1740,11 +1647,6 @@ app.addEventListener("change", async (event) => {
     render();
     return;
   }
-  if (t.id === "fleet-mission") {
-    chart.mission = t.value;
-    render();
-  }
-  if (t.id === "aggressive-battle") chart.aggressiveBattle = t.checked;
   if (t.dataset.funding)
     await mutate(
       {
@@ -1761,6 +1663,9 @@ app.addEventListener("change", async (event) => {
       },
       "Aircraft production order transmitted.",
     );
+  if (t.dataset.productionAutomatic)
+    await mutate({ type: "production-automatic", args: { role: t.dataset.productionAutomatic, enabled: t.checked } },
+      t.checked ? "Automatic aircraft modernization enabled." : "Production line holds its chosen model.");
   if (t.id === "sound-enabled" || t.id === "sound-volume")
     await mutate(
       {
@@ -1796,12 +1701,6 @@ app.addEventListener("change", async (event) => {
     viewPages.design = 0;
     render();
   }
-  if (t.id === "auto-pause")
-    await mutate(
-      { type: "settings", args: { autoPause: t.checked } },
-      "",
-      true,
-    );
   if (t.id === "order-count") {
     dialog.count = sim.clamp(Math.trunc(Number(t.value) || 1), 1, 20);
     render();
@@ -1995,7 +1894,7 @@ function importCampaign() {
           label: "Load campaign",
           imported: true,
           run: async () => {
-            fleetSelection.clear();
+            resetSessionViews();
             state = imported;
             view = "command";
             dialog = null;

@@ -1,3 +1,4 @@
+import { politicalPopup } from "../ui/diplomacy-popup.mjs";
 import { resolvePortActionToEnd } from "./battle-helper.mjs";
 import { syncConvoys } from "../mechanics/task-forces.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
@@ -325,7 +326,7 @@ test("dismissed dispatches stay dismissed and mandatory defaults apply exactly o
     [{ id: "deny", label: "Deny", detail: "Lose 5 influence.", influence: 5 }],
     { critical: true, target: "USA", defaultOption: "deny" },
   );
-  assert.match(alertsView(s, c, "required-test"), /Dismiss and apply default/);
+  assert.match(politicalPopup(s), /Treaty demand/);
   sim.dismissNotice(s, c, "required-test");
   sim.dismissNotice(s, c, "required-test");
   assert.equal(r.influence, before - 5);

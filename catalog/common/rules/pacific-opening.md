@@ -21,12 +21,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
   "strikeWindowHours": 36,
   "maxCarrierForces": 3,
   "minAircraft": 8,
-  "minHealth": 0.8,
-  "stagingAccess": {
-    "date": "1941-07-28T00:00:00Z",
-    "event": "indochina-airfields",
-    "port": "saigon",
-    "owner": "FRA"
-  }
+  "minHealth": 0.8
 }
 ```

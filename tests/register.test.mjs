@@ -35,7 +35,7 @@ test("merchant, support and warship opening registers are disjoint for every nat
   assert.ok(!s.nations.JPN.groups.some((g) => g.service === "merchant"));
 
   assert.equal(sim.supportSummary(s, content, "GBR").total, 16);
-  assert.equal(sim.supportSummary(s, content, "GBR").unknownTonnage, 16);
+  assert.equal(sim.supportSummary(s, content, "GBR").unknownTonnage, 0);
 });
 
 test("merchant counts cannot inflate naval power, displacement, crew demand, supply or upkeep", () => {

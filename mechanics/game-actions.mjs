@@ -3,11 +3,15 @@ import { retireAircraft } from "./aircraft-inventory.mjs";
 import * as sim from "./engine.mjs";
 import { TICK_MINUTES } from "./campaign-clock.mjs";
 import { contentFor } from "./campaign-content.mjs";
+import { noticeReceipt } from "./alert-lifecycle.mjs";
+import { contactAlerts } from "./contact-alerts.mjs";
 import { commissionDraft } from "./designer.mjs";
 import { commissionAircraft } from "./aircraft-designer.mjs";
 import {
   setFacilityFunding,
   setProductionModel,
+  setProductionAutomatic,
+  updateProductionModels,
   SPEEDS,
 } from "./naval-resources.mjs";
 
@@ -21,6 +25,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     "step",
     "settings",
     "dismiss-alert",
+    "read-news",
     "clear-alerts",
   ];
   if (session.includes(type) && actor !== s.player)
@@ -48,7 +53,8 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
         throw Error(
           "Acknowledge the diplomatic dispatch before stepping time.",
         );
-      if (![TICK_MINUTES, 60].includes(args.minutes)) throw Error("Invalid time step.");
+      if (!s.paused) throw Error("Pause the game before stepping time.");
+      if (![TICK_MINUTES, 360].includes(args.minutes)) throw Error("Invalid time step.");
       s.paused = false;
       sim.advanceMinutes(s, bundle, args.minutes, { respectPause: true });
       s.paused = true;
@@ -77,6 +83,9 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     case "production":
       setProductionModel(s, c, args.role, args.model, actor);
       break;
+    case "production-automatic":
+      setProductionAutomatic(s, c, args.role, args.enabled, actor);
+      break;
     case "retire-aircraft":
       return retireAircraft(s,c,args.id,actor);
     case "commission-draft": {
@@ -91,6 +100,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     }
     case "commission-aircraft": {
       const r = commissionAircraft(s, c, args.recipe, actor);
+      updateProductionModels(s, contentFor(bundle, s), actor);
       if (actor === s.player)
         sim.addLog(
           s,
@@ -137,6 +147,14 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     case "dismiss-alert":
       sim.dismissNotice(s, c, args.id);
       break;
+    case "read-news": {
+      const notice = s.alerts.find(a=>String(a.id)===String(args.id))
+        || s.log.map(l=>({...l,id:"dispatch-"+l.id})).find(l=>l.id===args.id)
+        || contactAlerts(s).find(a=>a.id===args.id);
+      // A finished ticker must not consume a later battle/assault resolution.
+      if(notice && noticeReceipt(notice)===args.receipt) sim.dismissNotice(s,c,args.id);
+      break;
+    }
     case "clear-alerts":
       sim.clearOptionalAlerts(s, c);
       break;

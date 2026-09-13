@@ -12,8 +12,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "CL": "Light cruiser",
     "DD": "Destroyer",
     "SS": "Submarine",
-    "AO": "Fleet oiler",
-    "AD": "Depot ship"
+    "AO": "Fleet support ship"
   },
   "SHIP_FEATURES": {
     "sonar": {

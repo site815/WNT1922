@@ -1455,150 +1455,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       }
     }
   },
-  "uk_depot_1922": {
-    "id": "uk_depot_1922",
-    "nation": "GBR",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_depot_1922",
-      "nation": "GBR",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "uk_oiler_1922": {
-    "id": "uk_oiler_1922",
-    "nation": "GBR",
-    "name": "Fleet oiler · 1922",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 2800,
-    "year": 1922,
-    "durability": 542,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 160,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "uk_oiler_1922",
-      "nation": "GBR",
-      "name": "Fleet oiler · 1922",
-      "type": "AO",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 160,
-      "cost_gold": 2800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
   "delaware": {
     "id": "delaware",
     "nation": "USA",
@@ -2419,150 +2275,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "notes": "Deliveries continue through 1925; approximate count in commission. Displayed as S-boat class, the USN's own term for these hulls, so the name does not collide with the Royal Navy S class destroyers (naming law: class names must not collide across navies)."
       }
     }
-  },
-  "us_depot_1922": {
-    "id": "us_depot_1922",
-    "nation": "USA",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_depot_1922",
-      "nation": "USA",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "us_oiler_1922": {
-    "id": "us_oiler_1922",
-    "nation": "USA",
-    "name": "Fleet oiler · 1922",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 2800,
-    "year": 1922,
-    "durability": 542,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 160,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "us_oiler_1922",
-      "nation": "USA",
-      "name": "Fleet oiler · 1922",
-      "type": "AO",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 160,
-      "cost_gold": 2800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
   },
   "kawachi": {
     "id": "kawachi",
@@ -4400,150 +4112,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "notes": "Two hundred and twenty-seven tons, one gun and a coastal radius. They are on the establishment because the Treaty counts hulls and not capability, and they are the reason a German naval officer of 1922 could go to sea at all."
     }
   },
-  "de_depot_1922": {
-    "id": "de_depot_1922",
-    "nation": "DEU",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_depot_1922",
-      "nation": "DEU",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "de_oiler_1922": {
-    "id": "de_oiler_1922",
-    "nation": "DEU",
-    "name": "Fleet oiler · 1922",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 2800,
-    "year": 1922,
-    "durability": 542,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 160,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "de_oiler_1922",
-      "nation": "DEU",
-      "name": "Fleet oiler · 1922",
-      "type": "AO",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 160,
-      "cost_gold": 2800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
   "courbet": {
     "id": "courbet",
     "nation": "FRA",
@@ -5206,150 +4774,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "design_year": 1922,
       "notes": "1922 program ocean-going boats. No hulls at scenario start."
     }
-  },
-  "fr_depot_1922": {
-    "id": "fr_depot_1922",
-    "nation": "FRA",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_depot_1922",
-      "nation": "FRA",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "fr_oiler_1922": {
-    "id": "fr_oiler_1922",
-    "nation": "FRA",
-    "name": "Fleet oiler · 1922",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 2800,
-    "year": 1922,
-    "durability": 542,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 160,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "fr_oiler_1922",
-      "nation": "FRA",
-      "name": "Fleet oiler · 1922",
-      "type": "AO",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 160,
-      "cost_gold": 2800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
   },
   "dante_alighieri": {
     "id": "dante_alighieri",
@@ -6034,150 +5458,6 @@ Edit the JSON block directly. The game reads this document at startup; no export
       }
     }
   },
-  "it_depot_1922": {
-    "id": "it_depot_1922",
-    "nation": "ITA",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_depot_1922",
-      "nation": "ITA",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "it_oiler_1922": {
-    "id": "it_oiler_1922",
-    "nation": "ITA",
-    "name": "Fleet oiler · 1922",
-    "type": "AO",
-    "category": "other",
-    "tons": 6500,
-    "cost": 2800,
-    "year": 1922,
-    "durability": 542,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 160,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "it_oiler_1922",
-      "nation": "ITA",
-      "name": "Fleet oiler · 1922",
-      "type": "AO",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 160,
-      "cost_gold": 2800,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
   "sevastopol_1914": {
     "id": "sevastopol_1914",
     "nation": "SOV",
@@ -6522,91 +5802,19 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "sensors": []
     }
   },
-  "su_depot_1922": {
-    "id": "su_depot_1922",
-    "nation": "SOV",
-    "name": "Fleet depot · 1922",
-    "type": "AD",
-    "category": "other",
-    "tons": 5500,
-    "cost": 3400,
-    "year": 1922,
-    "durability": 458,
-    "speed": 14,
-    "range": 16668,
-    "shp": 0,
-    "caliber": 100,
-    "barrels": 2,
-    "tubes": 0,
-    "torpedoRange": 8,
-    "belt": 0,
-    "deck": 0,
-    "air": 0,
-    "aa": 2,
-    "scoutAircraft": 0,
-    "sonar": false,
-    "radar": false,
-    "crew": 300,
-    "submergedSpeed": 0,
-    "provisioned": 0,
-    "raw": {
-      "id": "su_depot_1922",
-      "nation": "SOV",
-      "name": "Fleet depot · 1922",
-      "type": "AD",
-      "design_year": 1922,
-      "displacement": {
-        "standard_tons": 5500,
-        "full_load_tons": 8000
-      },
-      "propulsion": {
-        "speed_kn": 14,
-        "range_nm": 9000
-      },
-      "armament": {
-        "main_battery": {
-          "caliber_mm": 100,
-          "count": 2
-        },
-        "torpedo_tubes": {
-          "count": 0
-        },
-        "aa_battery": [
-          {
-            "caliber_mm": 7.7,
-            "count": 2
-          }
-        ]
-      },
-      "protection": {
-        "belt_mm": 0,
-        "deck_mm": 0
-      },
-      "aviation": {
-        "aircraft_capacity": 0
-      },
-      "complement": 300,
-      "cost_gold": 3400,
-      "treaty_category": "other",
-      "sensors": []
-    },
-    "service": "support",
-    "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction depot with workshops, spare parts and accommodation. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
-  },
-  "su_oiler_1922": {
-    "id": "su_oiler_1922",
-    "nation": "SOV",
-    "name": "Fleet oiler · 1922",
+  "uk_support_1922": {
+    "id": "uk_support_1922",
+    "nation": "GBR",
+    "name": "Fleet support ship · 1922",
     "type": "AO",
     "category": "other",
-    "tons": 6500,
-    "cost": 2800,
+    "tons": 7500,
+    "cost": 3800,
     "year": 1922,
-    "durability": 542,
+    "durability": 625,
     "speed": 14,
-    "range": 16668,
-    "shp": 0,
+    "range": 18000,
+    "shp": 9000,
     "caliber": 100,
     "barrels": 2,
     "tubes": 0,
@@ -6618,22 +5826,24 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "scoutAircraft": 0,
     "sonar": false,
     "radar": false,
-    "crew": 160,
+    "crew": 340,
     "submergedSpeed": 0,
     "provisioned": 0,
     "raw": {
-      "id": "su_oiler_1922",
-      "nation": "SOV",
-      "name": "Fleet oiler · 1922",
+      "id": "uk_support_1922",
+      "nation": "GBR",
+      "name": "Fleet support ship · 1922",
       "type": "AO",
       "design_year": 1922,
       "displacement": {
-        "standard_tons": 6500,
-        "full_load_tons": 13500
+        "standard_tons": 7500,
+        "full_load_tons": 12500
       },
       "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
         "speed_kn": 14,
-        "range_nm": 9000
+        "shp": 9000,
+        "range_km": 18000
       },
       "armament": {
         "main_battery": {
@@ -6657,14 +5867,1529 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "aviation": {
         "aircraft_capacity": 0
       },
-      "complement": 160,
-      "cost_gold": 2800,
+      "complement": 340,
+      "cost_gold": 3800,
       "treaty_category": "other",
-      "sensors": []
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
     },
     "service": "support",
     "buildUntil": 1931,
-    "notes": "Provisional 1922 new-construction naval fuel oiler. Generic period fit, not a claim of a historical class. Naval support is separate from warship displacement and merchant GRT. No opening hulls are added."
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "uk_support_1932": {
+    "id": "uk_support_1932",
+    "nation": "GBR",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "uk_support_1932",
+      "nation": "GBR",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "uk_support_1942": {
+    "id": "uk_support_1942",
+    "nation": "GBR",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "uk_support_1942",
+      "nation": "GBR",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "us_support_1922": {
+    "id": "us_support_1922",
+    "nation": "USA",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "us_support_1922",
+      "nation": "USA",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "us_support_1932": {
+    "id": "us_support_1932",
+    "nation": "USA",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "us_support_1932",
+      "nation": "USA",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "us_support_1942": {
+    "id": "us_support_1942",
+    "nation": "USA",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "us_support_1942",
+      "nation": "USA",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "jp_support_1922": {
+    "id": "jp_support_1922",
+    "nation": "JPN",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "jp_support_1922",
+      "nation": "JPN",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "jp_support_1932": {
+    "id": "jp_support_1932",
+    "nation": "JPN",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "jp_support_1932",
+      "nation": "JPN",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "jp_support_1942": {
+    "id": "jp_support_1942",
+    "nation": "JPN",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "jp_support_1942",
+      "nation": "JPN",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "fr_support_1922": {
+    "id": "fr_support_1922",
+    "nation": "FRA",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "fr_support_1922",
+      "nation": "FRA",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "fr_support_1932": {
+    "id": "fr_support_1932",
+    "nation": "FRA",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "fr_support_1932",
+      "nation": "FRA",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "fr_support_1942": {
+    "id": "fr_support_1942",
+    "nation": "FRA",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "fr_support_1942",
+      "nation": "FRA",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "it_support_1922": {
+    "id": "it_support_1922",
+    "nation": "ITA",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "it_support_1922",
+      "nation": "ITA",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "it_support_1932": {
+    "id": "it_support_1932",
+    "nation": "ITA",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "it_support_1932",
+      "nation": "ITA",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "it_support_1942": {
+    "id": "it_support_1942",
+    "nation": "ITA",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "it_support_1942",
+      "nation": "ITA",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "de_support_1922": {
+    "id": "de_support_1922",
+    "nation": "DEU",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "de_support_1922",
+      "nation": "DEU",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "de_support_1932": {
+    "id": "de_support_1932",
+    "nation": "DEU",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "de_support_1932",
+      "nation": "DEU",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "de_support_1942": {
+    "id": "de_support_1942",
+    "nation": "DEU",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "de_support_1942",
+      "nation": "DEU",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "su_support_1922": {
+    "id": "su_support_1922",
+    "nation": "SOV",
+    "name": "Fleet support ship · 1922",
+    "type": "AO",
+    "category": "other",
+    "tons": 7500,
+    "cost": 3800,
+    "year": 1922,
+    "durability": 625,
+    "speed": 14,
+    "range": 18000,
+    "shp": 9000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 340,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "su_support_1922",
+      "nation": "SOV",
+      "name": "Fleet support ship · 1922",
+      "type": "AO",
+      "design_year": 1922,
+      "displacement": {
+        "standard_tons": 7500,
+        "full_load_tons": 12500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 14,
+        "shp": 9000,
+        "range_km": 18000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 2
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 340,
+      "cost_gold": 3800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1931,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "su_support_1932": {
+    "id": "su_support_1932",
+    "nation": "SOV",
+    "name": "Fleet support ship · 1932",
+    "type": "AO",
+    "category": "other",
+    "tons": 8500,
+    "cost": 4700,
+    "year": 1932,
+    "durability": 708,
+    "speed": 16,
+    "range": 20000,
+    "shp": 14000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 4,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 380,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "su_support_1932",
+      "nation": "SOV",
+      "name": "Fleet support ship · 1932",
+      "type": "AO",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 8500,
+        "full_load_tons": 14500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 16,
+        "shp": 14000,
+        "range_km": 20000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 4
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 380,
+      "cost_gold": 4700,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "buildUntil": 1941,
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
+  },
+  "su_support_1942": {
+    "id": "su_support_1942",
+    "nation": "SOV",
+    "name": "Fleet support ship · 1942",
+    "type": "AO",
+    "category": "other",
+    "tons": 9500,
+    "cost": 5800,
+    "year": 1942,
+    "durability": 792,
+    "speed": 18,
+    "range": 22000,
+    "shp": 20000,
+    "caliber": 100,
+    "barrels": 2,
+    "tubes": 0,
+    "torpedoRange": 8,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 6,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 420,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "su_support_1942",
+      "nation": "SOV",
+      "name": "Fleet support ship · 1942",
+      "type": "AO",
+      "design_year": 1942,
+      "displacement": {
+        "standard_tons": 9500,
+        "full_load_tons": 16500
+      },
+      "propulsion": {
+        "plant": "Oil-fired machinery with auxiliary workshops and replenishment gear",
+        "speed_kn": 18,
+        "shp": 20000,
+        "range_km": 22000
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 100,
+          "count": 2
+        },
+        "torpedo_tubes": {
+          "count": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 7.7,
+            "count": 6
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 420,
+      "cost_gold": 5800,
+      "treaty_category": "other",
+      "sensors": [],
+      "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications."
+    },
+    "service": "support",
+    "notes": "Naval auxiliary combining fuel tanks, workshops and fleet stores. Admirals send support groups to replenish forces at sea or strengthen an accessible base. Generic period fit; these are provisional scenario specifications.",
+    "supportHybrid": true
   }
 }
 ```

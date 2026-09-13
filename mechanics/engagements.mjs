@@ -9,6 +9,7 @@ import { PROFILES, REGIONS } from "./catalog.mjs";
 import { resultComposition } from "./composition.mjs";
 import { finishIncident, opposingProvocations } from "./provocation.mjs";
 import { recordWarBattle } from "./war-balance.mjs";
+import { applyBattleMorale } from './campaign-impact.mjs';
 const rules = await readDocument("common/rules/battle-stages.md");
 export const BATTLE_STAGES = rules.STAGES;
 const zeroPower = () => ({surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:0,supply:1});
@@ -145,7 +146,8 @@ function finish(s,c,r) {
   const costA=a.tons+a.damagedTons*.65+a.planesLost*40,
     costB=b.tons+b.damagedTons*.65+b.planesLost*40+r.portEquivalent+(r.merchantGRT||r.airOperation?.merchantGRT||0)*.2;
   r.winner=costA===costB?null:costA<costB?r.a:r.b;
-  r.magnitude=!r.winner?"inconclusive":Math.max(costA,costB)>=Math.max(1000,Math.min(costA,costB)*2)?"major":"minor";
+  applyBattleMorale(s,r);
+  r.magnitude=!r.winner?"inconclusive":r.significantAction && Math.max(costA,costB)>=Math.min(costA,costB)*2?"major":"minor";
   r.status="completed"; r.completedAt=now;
   for(const [id,fid] of [[r.a,r.fleetA],[r.b,r.fleetB]]) {
     const n=s.nations[id], f=n.fleets.find(f=>f.id===fid);
@@ -156,8 +158,7 @@ function finish(s,c,r) {
     }
     if(r.order.kind==="air" && id===r.b && f && !f.battleId && f.role!=="repair")
       detachRepairs(s,c,id,f.id,fleetPosition(s,f));
-    if(r.winner) { n[id===r.winner?"battlesWon":"battlesLost"]++;
-      n.morale=Math.max(10,Math.min(100,n.morale+(id===r.winner?3:-5))); }
+    if(r.winner) n[id===r.winner?"battlesWon":"battlesLost"]++;
     for(const v of n.convoys) if(v.battleId===r.id) {delete v.battleId; delete v.battleStarted;}
   }
   if(r.limitedIncident) finishIncident(s,r.a,r.fleetA,r.b,r.fleetB,r);

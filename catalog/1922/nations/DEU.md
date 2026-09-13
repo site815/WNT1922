@@ -190,8 +190,9 @@ Edit the JSON block directly. This document is read by the game; no export is re
     "gazelle_cl",
     "v1_dd",
     "a_boat_tb",
-    "de_depot_1922",
-    "de_oiler_1922"
+    "de_support_1922",
+    "de_support_1932",
+    "de_support_1942"
   ],
   "merchants": {
     "hulls": 1090,

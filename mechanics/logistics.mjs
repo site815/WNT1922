@@ -4,6 +4,7 @@ const data = await readDocument("common/rules/logistics.md");
 import { portSummary } from "./ports.mjs";
 import { NODES, PORTS, seaRoute, routeLength, distanceNm, nearestSeaNode } from "./world.mjs";
 import { fleetPosition, usablePorts } from "./task-forces.mjs";
+import { merchantEconomy } from "./merchant-economy.mjs";
 
 // Provisional distance steps, measured along the navigable sea graph.
 export const SUPPLY_BANDS = data.SUPPLY_BANDS;
@@ -70,10 +71,16 @@ export function supplyDetails(s, c, id, f = null) {
       (ENDURANCE_BANDS.find((b) => enduranceUsed <= b.fraction)?.factor ||
         0.2) + replenishmentRelief(s, f),
     );
-  // Tactical supply never multiplies national trade, GDP or strategic logistics.
-  const factor = Math.max(0, Math.min(1, distanceFactor * enduranceFactor));
+  const nationalLogistics = merchantEconomy(s, c, id).logistics;
+  const logisticsFactor = 1 - data.NATIONAL_LOGISTICS_MAX_PENALTY * (1 - nationalLogistics / 100);
+  const strategicSupplyFactor = n.strategic > 0 ? 1 : data.EMPTY_STRATEGIC_SUPPLY_FACTOR;
+  const factor = Math.max(0, Math.min(1,
+    distanceFactor * enduranceFactor * logisticsFactor * strategicSupplyFactor));
   return {
     factor,
+    nationalLogistics,
+    logisticsFactor,
+    strategicSupplyFactor,
     rangeKm: Number.isFinite(rangeNm) ? rangeNm * 1.852 : 0,
     enduranceUsed,
     enduranceFactor,

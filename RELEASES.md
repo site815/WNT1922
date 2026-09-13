@@ -4,6 +4,40 @@
 
 Open the latest release and download **WNT1922-portable-win-x64.exe** from Assets. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
 
+## Version 0.30.0 — local portable test build
+
+- GDP and GTP are explicitly labeled **GDP naval budget** and **GTP naval budget**, annual ministry allocations in fine-gold equivalents. Strategic-resource hovers and the rebuilt economic ledger show the full formula, actual contributions, expenses and monthly changes. Naval Record consolidates fleet readiness, deliveries, combat and merchant losses, recovery schedules, national scores and archived reviews.
+- Pause/resume, actual-speed and time-step controls retain fixed dimensions. +15m and +6h remain visible but disabled during play; stepping always requires pause and respects mandatory dispatches. Resource cells use equal widths and a shorter fixed height. Fleet filters, searches, selections and pagination reset on new, continued and imported campaigns. Strategic air has a shorter menu label.
+- Naval aircraft production defaults to Auto per role. New available models replace the selected production model unless the line was changed manually; Auto can be restored. Switching never grants free aircraft. Generic old/future 1936 naval catalogs are removed: Tillman USA retains F1/O1, other navies retain their opening designs, and ALB Japan keeps its designated progression. Players and AI commission later aircraft normally.
+- All support hulls use the single AO classification, combining replenishment and local workshop support. There is no separate AD category.
+- Government catalogs contain distinct models, without cloned three-year reissues. Superseded grounded aircraft retire; flights and shipments retire after arrival. Replacements still consume resources and travel normally. The 1948 fighter review uses jets, with Japan's Kikka interceptor and Italy's accelerated Vampire procurement explicitly marked as alternate history.
+- Added conditional French defeat, Vichy, northern/southern Indochina and Vichy-zone occupation dispatches. They follow actual mainland control and their prerequisite events. Southern Indochina grants the Saigon station at the event, replacing the former late Pacific-opening transfer. France remains one playable naval ministry; no historical announcement fabricates ship losses.
+
+Verification: 273 regression checks pass, all 14 opening states validate, and the portable's 249 packaged source files match the workspace. The executable passed both campaign menu exercises, automatic/manual aircraft production, session-filter resets, the rebuilt ledgers, fixed resource and time-control sizing, diplomacy, all 33 music files, saving and reopening. A five-round surface battle verified live report updates, reserve-aircraft retirement, persistent expanded calculations and scrolling, and a valid final save. A focused 24-check recheck also passed after the final display-label corrections.
+
+Requires a new campaign. Portable output remains local; GitHub Release publication is separate from source pushes.
+
+## Version 0.29.0 — local test build
+
+- Routine notices pass once through a slow news ticker; hover holds the message. Decisions and major world events, including the war in China, pause play and open mandatory dispatches. Acknowledgement resumes only an interrupted game. Popups use fixed envelopes and consistent footer positions. The alert counter and obsolete auto-pause toggle are removed.
+- Merchant traffic is visible in peace and war. Dispatchers keep 20% of registered hulls sailing, subject to available routes and operational interruptions; ships call at ports and return physically. Deliveries count surviving manifest GRT once on completing the round trip. Displayed delivery coverage may exceed 100%; the logistics contribution stays capped. Hovers show hulls at sea, convoy count and average hulls per convoy.
+- One AUX support type combines local depot work and physical replenishment at sea. Every navy receives 1922/1932/1942 catalog generations except ALB Japan, which retains its Standard Maru hybrid. Existing opening support counts are preserved; the United Kingdom's incomplete oilers now have operational specifications.
+- Fleet supply multiplies distance, hull endurance, national logistics and strategic availability. Logistics gives no penalty at 100%, 10% at 50%, and 20% at zero. Empty strategic reserves halve supply and replace the old direct naval combat penalty; movement, aviation and production retain their own constraints.
+- The 1941 Republic class adds a 200,000-ton Tillman successor with six triple 546 mm turrets and Columbia armor. A Columbia-calibrated displacement/speed estimate gives 521,742 shp, rounded to 522,000 shp, for 32 knots. This is an alternate-history design estimate with provisional cost and machinery assumptions.
+- Task-force order and aggressive-battle controls are removed. Admirals choose missions, routes and engagements. Clicking a fleet circles it on the chart and highlights its list entry; hover retains readiness and ship details.
+
+Requires a new campaign. The only distribution is the self-contained portable Windows executable. This version remains local until publication is requested.
+
+## Version 0.28.0
+
+- Civilian hull production uses each nation's opening GTP/GRT benchmark. Base output ranges from one hull/month with sufficient capacity to ten after a complete loss. Logistics multiplies output by 0.5 at 0%, 1 at 50% and 2 at 100%; industry upgrades add 15% each. Fractional hulls carry forward. This replaces percentage hull growth and retirement; GTP growth and 0.1% monthly average ship-size growth remain separate.
+- Minor naval actions no longer change national morale. Significant completed actions use shared loss thresholds; territorial occupation and liberation affect the actual governments involved. Training, funding, event and recovery effects remain.
+- The campaign war score counts enemy naval tonnage sunk, without victory-count points or the former score cap. Reports show their morale result.
+- Occupied home economic regions deny their share of productive GDP. Liberation restores access; bombing remains a separate damage multiplier. Overseas islands have no direct GDP effect. Blockade denies port access; occupation transfers ports and their trade contribution.
+- Shipping, GDP, morale and resource hovers explain the calculations. All coefficients and home-region shares are read from the live Markdown catalogs; 85 data documents and all 14 starts validate.
+
+Requires a new campaign. Local portable output stays in `.build/releases/`; this version is not uploaded until publication is requested.
+
 ## Version 0.27.0
 
 - 33 licensed music tracks, with distinct national selections and separate peace/war playlists. Changes fade smoothly; paused music remains at one-third volume.
@@ -16,7 +50,7 @@ Open the latest release and download **WNT1922-portable-win-x64.exe** from Asset
 
 Use a new campaign for beta testing. Report the version, campaign, nation and a save with any issue. Large gameplay changes remain proposals until approved.
 
-## Verification
+### Version 0.27.0 verification
 
 - 249 regression checks pass; all 14 opening states validate. Moving the remaining opening deployment rules into catalogs preserved all 14 states exactly.
 - Both all-seven-AI campaigns completed through 1950: 1,013,376 fifteen-minute ticks from 1922 and 525,984 from 1936, with saved-state, resource and fleet-reference validation at 527 monthly boundaries. An additional 35,040 ticks carried the 1936 sandbox through 1951 after the final fleet-order fixes.
@@ -25,11 +59,3 @@ Use a new campaign for beta testing. Report the version, campaign, nation and a 
 - A visible portable-window check on the development computer sustained 60 FPS map movement while scrolling at the 100,000× simulation setting. The largest observed UI frame gap was about 33 ms. This is a measured opening-campaign result, not a minimum hardware guarantee.
 - A larger 1945 wartime save measured approximately 51 FPS map movement while scrolling, with a largest UI frame gap of 133 ms.
 - A 30-day headless opening-campaign benchmark improved from 19.6 to 8.8 seconds. A separate seven-day wartime route-cache comparison improved from 6.64 to 5.94 seconds and produced an identical final saved state. Fifteen-minute ticks are preserved; overloaded machines run more slowly.
-
-## Balance proposals from the audit
-
-These are proposals, not changes to the selected economic rules:
-
-- Add a small civilian shipping reconstruction mechanism after severe merchant losses. Percentage growth alone cannot rebuild a merchant fleet once it reaches zero hulls.
-- Scale national morale and campaign credit by the significance of an engagement. A small air or convoy action currently uses the same fixed morale change as a major fleet battle.
-- Define how occupation and national defeat affect productive GDP and continued naval resistance. Port occupation already affects shipping access; national economic growth currently follows the chosen growth and bombing rules even after extensive land losses.
