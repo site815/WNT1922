@@ -772,7 +772,7 @@ try {
   await page.locator('.modal header [data-action="close"]').click();
   await page.locator('[data-action="step-minute"]').click();
   await page.waitForFunction(() => document.querySelector('.report-card .battle-progress progress')?.value === 50);
-  assert((await page.evaluate(()=>window.testNotices)).includes('Time advanced 15 minutes.')); 
+  assert((await page.evaluate(()=>window.testNotices)).includes('Time advanced 15 minutes.'));
   await closeSaved();
   const savedBattle = JSON.parse(await fs.readFile(path.join(battleProfile,"saves/campaign.json")));
   assert.equal(campaignMinutes(savedBattle),report.startedAt+15,"Normal window close must save the latest fifteen-minute step");

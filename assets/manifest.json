@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "checked": "2026-09-12",
+  "checked": "2026-09-13",
   "scope": "Redistributed non-music assets. Music attribution and hashes are read directly from catalog/common/music.md. The Windows runtime has its own pinned lock and bundled license notices.",
   "assets": [
     {
@@ -51,7 +51,33 @@
     "soundEffects": "Synthesized by ui/sound.mjs; no external recordings.",
     "icons": "Authored SVG and CSS in the game; no downloaded icon packs.",
     "fonts": "System font stacks only; no font files redistributed.",
-    "projection": "Locally implemented Equal Earth equations; no PROJ library or United Nations map artwork redistributed."
+    "projection": "Locally implemented Equal Earth equations; no PROJ library or United Nations map artwork redistributed.",
+    "recognitionStudies": [
+      {
+        "path": "assets/recognition/studies/raiden-type39.png",
+        "origin": "Original image generated for WNT1922 with the built-in image tool",
+        "status": "Draft study; not integrated into the game UI",
+        "notes": "assets/recognition/studies/README.md",
+        "sha256": "bd586144c4e7bce797708534c4ce8f51bac985833ef9efee838c033817b61f4a",
+        "bytes": 697386
+      },
+      {
+        "path": "assets/recognition/studies/tillman-class.png",
+        "origin": "Original image generated for WNT1922 with the built-in image tool",
+        "status": "Draft study; not integrated into the game UI",
+        "notes": "assets/recognition/studies/README.md",
+        "sha256": "c8985c6bf24c22abfa093254154661b1b4d3d4a7e19b9df5734f0b6f7c7be074",
+        "bytes": 1161770
+      },
+      {
+        "path": "assets/recognition/studies/maya-class.png",
+        "origin": "Original image generated for WNT1922 with the built-in image tool",
+        "status": "Draft study; not integrated into the game UI",
+        "notes": "assets/recognition/studies/README.md",
+        "sha256": "f2bae04aa42c4de41a4ac9e633d118c63f25937905f469a17d39124e0dbaa7df",
+        "bytes": 1172037
+      }
+    ]
   },
   "excluded": [
     "Retired CShapes archives and derivatives",

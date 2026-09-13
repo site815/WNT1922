@@ -22,6 +22,16 @@ for (const a of manifest.assets) {
   assert.match(a.source, /^https:\/\//);
   assert.match(a.licenseUrl, /^https:\/\//);
 }
+for (const a of manifest.originalAssets.recognitionStudies || []) {
+  assert(!paths.has(a.path), 'Duplicate original study ' + a.path);
+  assert(a.path.startsWith('assets/recognition/studies/') && a.path.endsWith('.png'));
+  const bytes = await fs.readFile(a.path);
+  assert.equal(hash(bytes), a.sha256, 'Changed original study: ' + a.path);
+  assert.equal(bytes.length, a.bytes);
+  assert.equal(a.status, 'Draft study; not integrated into the game UI');
+  assert((await fs.readFile(a.notes,'utf8')).includes(path.basename(a.path)));
+  paths.add(a.path);
+}
 const music = manifest.assets.filter((a) => a.path.endsWith(".mp3"));
 assert.deepEqual(
   music.map((a) => path.basename(a.path)).sort(),

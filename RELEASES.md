@@ -4,6 +4,12 @@
 
 Open the latest release and download **WNT1922-portable-win-x64.exe** from Assets. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
 
+## Version 0.32.1 — portable beta
+
+This release packages the completed v0.32 gameplay/UI update and preserves the unfinished recognition-art work for development on another computer. It includes all source catalogs and required offline assets; no browser, Node.js, installation or internet connection is needed to play.
+
+Three original recognition studies (Raiden, Tillman and Maya), the drawing standard, generation briefs and remaining work are committed to the repository. The studies are not yet displayed by the game, and the broader artwork pass remains unfinished. Build caches and generated test profiles are disposable; normal player saves remain local to their computer.
+
 ## Version 0.32.0 — portable test build
 
 - 2% merchant sailing target, approximately ten physical convoys; real round-trip delivery accounting is preserved.

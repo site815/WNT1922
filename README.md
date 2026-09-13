@@ -8,7 +8,7 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.32.0 targets 2% of merchant hulls at sea in approximately ten convoys, adds 500,000× and 1,000,000× speed ceilings, and restores optional Autopause. With Autopause unchecked, simulation mode continues through events and in the background. AO groups have a dedicated replenishment mission. Map leaders adjust smoothly per unit, economy panels use a consistent grid, and time-step confirmations report elapsed time. The portable test build remains local until release publication is requested; the links above open the last published release. Start a new campaign for beta testing.
+Version 0.32.1 targets 2% of merchant hulls at sea in approximately ten convoys, adds 500,000× and 1,000,000× speed ceilings, and restores optional Autopause. With Autopause unchecked, simulation mode continues through events and in the background. AO groups have a dedicated replenishment mission. Map leaders adjust smoothly per unit, economy panels use a consistent grid, and time-step confirmations report elapsed time. The latest portable beta is distributed through the release links above. Start a new campaign for beta testing.
 
 ## Edit and build
 
@@ -27,6 +27,21 @@ node --test --test-isolation=none --test-skip-pattern="all selectable countries|
 ```
 
 The two additional long-campaign tests can be run by omitting the skip pattern. `node tools/playthrough.mjs campaign_1922` and `node tools/playthrough.mjs in_good_faith_1936` exercise all seven AI navies through 1950, checking saves and fleet/inventory references every month; append `--resume` to continue a checkpoint. `node tools/check.mjs` checks every live catalog and all 14 opening states. `node tools/check-portable.mjs` tests the packaged executable when the optional Playwright test driver is available; that driver is not shipped.
+
+## Continue on another computer
+
+Install Git and Node.js 24 or later, then clone this repository:
+
+```powershell
+git clone https://github.com/site815/WNT1922.git
+cd WNT1922
+.\Build.cmd
+.\Play-WNT1922.cmd
+```
+
+All source, catalogs, required assets, license notices, build tools and unfinished recognition-art studies are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
+
+The remaining artwork task is documented in [the recognition standard and work status](assets/recognition/README.md). Three studies are preserved with their available generation briefs; the complete art catalog and UI integration are unfinished.
 
 ## Source layout
 
