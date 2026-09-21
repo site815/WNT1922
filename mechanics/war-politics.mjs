@@ -9,6 +9,7 @@ import { addLog, addAlert, queueDecision, fleetPower } from "./engine.mjs";
 import { invalidateOperations } from "./task-forces.mjs";
 import { moveConvoys } from "./merchant-convoys.mjs";
 import { finishProvocation } from "./provocation.mjs";
+import { initializeDiplomaticOffers, expireDiplomaticOffers } from './diplomatic-exchange.mjs';
 const key = (a, b) => [a, b].sort().join("-"),
   names = (ids) => ids.map((id) => PROFILES[id].name).join(" / "),
   at = (iso) => Date.parse(iso) / 60000;
@@ -29,6 +30,7 @@ export function dispatchPopup(s, key, title, body, kind = "diplomacy") {
   );
 }
 export function initializeDiplomacy(s) {
+  initializeDiplomaticOffers(s);
   if (s.diplomacyRevision === 2) return;
   s.diplomacyRevision = 2;
   s.pacts = [];
@@ -89,6 +91,7 @@ export function commenceWar(
     if ([a, b].includes(p.nation) && [a, b].includes(p.target))
       finishProvocation(s, p);
   r.war = true;
+  expireDiplomaticOffers(s);
   endAlliance(s, a, b);
   r.warSince = s.day;
   r.truceUntil = s.day;

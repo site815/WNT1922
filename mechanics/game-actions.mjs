@@ -158,6 +158,8 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     case "treaty":
       sim.setTreatyPolicy(s, args.policy, actor);
       break;
+    case "diplomatic-offer":
+      return sim.respondDiplomaticOffer(s,c,args.id,args.accept,actor);
     case "dismiss-alert":
       sim.dismissNotice(s, c, args.id);
       break;

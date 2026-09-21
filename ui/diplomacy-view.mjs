@@ -14,6 +14,7 @@ import { NATION_ORDER, PROFILES } from "../mechanics/catalog.mjs";
 import { timedProgress, dateLabel } from "./progress-view.mjs";
 import { warBalances } from "../mechanics/war-balance.mjs";
 import { activePacts } from "../mechanics/war-politics.mjs";
+import { diplomaticOffersView } from './diplomatic-offers-view.mjs';
 const esc = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -43,6 +44,7 @@ export function diplomaticHint(s, c, target, action) {
     (Object.keys(r.gain).length ? " → " + diplomaticCost(r.gain) : "") +
     '. Available every ' + r.days + ' days, separately for this action and country. ' +
     (r.effects.length ? 'Treaty effects: ' + r.effects.map(e => e.label + ': ' + diplomaticEffectLabel(e)).join('; ') + '. ' : 'Standard terms; no active treaty modifier. ') +
+    (Object.keys(r.partnerPrice || {}).length ? PROFILES[target].name + ' pays ' + diplomaticCost(r.partnerPrice) + ' and receives ' + diplomaticCost(r.partnerGain) + '. Both ministries exchange existing stock and gold; the partner can refuse to protect its reserves. Settlement is immediate and does not count as merchant delivery or GDP/GTP income. ' : '') +
     (action === 'sellStrategic' ? 'Exports use your stored strategic materials. ' : '') +
     (action === "provoke"
       ? "Automatically send the strongest ready task force for 90 days. An overlap locks both forces into pursuit of one limited battle, even after deployment expires. Admirals use normal routes, supply, scouting and aircraft cycles. A new order cancels deployment without refund. Selected force: " + (readyProvocationFleet(s, c, target)?.name || "none ready") + "."
@@ -225,6 +227,7 @@ export function diplomacyView(s, c) {
       .join("");
   return (
     '<div class="view-heading"><div><span class="eyebrow">GOVERNMENTS & TREATIES</span><h1>Diplomacy</h1></div></div>' +
+    diplomaticOffersView(s,c) +
     treaty +
     '<div class="pact-summary">' +
     activePacts(s)

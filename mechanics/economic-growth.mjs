@@ -45,8 +45,10 @@ export function closeEconomicMonth(s,c,id) {
   n.lastEconomicGrowth={day:s.day,rate,tradeRate,merchantHulls:done,logistics:g.shipping.logistics};
   account.last={start:previous,end:s.day,
     goldFlows:{...account.goldFlows},
+    diplomaticFlows:{...account.diplomaticFlows},
     ...Object.fromEntries(Object.entries(balances(n)).map(([k,v])=>[k,v-account.opening[k]]))};
   account.start=s.day;
   account.opening=balances(n);
   account.goldFlows={};
+  account.diplomaticFlows={};
 }

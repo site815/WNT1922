@@ -8,6 +8,7 @@ import { monthlyIncome, supply, yardLoad } from "../mechanics/engine.mjs";
 import { sailorSummary } from "../mechanics/ship-staffing.mjs";
 import { merchantEconomy } from "../mechanics/merchant-economy.mjs";
 import { warBalances } from "../mechanics/war-balance.mjs";
+import { dailyMoraleRecovery } from "../mechanics/campaign-impact.mjs";
 import { musicStatus } from "./music.mjs";
 const esc = (v) =>
   String(v ?? "").replace(
@@ -48,7 +49,7 @@ export function topBars(s, c, m = {}) {
   const changes={GOLD:monthly(income.netGold),INFLUENCE:monthly(income.influence),INDUSTRY:monthly(income.netIndustry),STRATEGIC:monthly(income.netStrategic),
     GDP:monthly(n.gdp*growth.monthly),GTP:monthly(growth.tradeMonth),SHIPPING:[(growth.merchantHullsMonth>=0?'+':'−')+num(Math.abs(growth.merchantHullsMonth),2)+' /mo',growth.merchantHullsMonth],
     'PORT TRADE':[pct(e.ports.coverage)+' access',0],LOGISTICS:[pct(e.deliveryCoverage)+' delivered',0],SUPPLY:['Fleet average',0],
-    TRAINING:daily(-.0025/(1+upgradeLevel(n.tech,'training')*.2)),MORALE:daily((75-n.morale)*.0006),
+    TRAINING:daily(-Math.min(Math.max(0,n.training-20),.0025/(1+upgradeLevel(n.tech,'training')*.2))),MORALE:daily(dailyMoraleRecovery(n)),
     YARDS:['Tons / year',0],
     SAILORS:['+'+compact(n.crewYear*n.schoolFunding/12)+' /mo trained',0],
     AVIATORS:['+'+compact(n.aviatorsYear*n.aviatorFunding/4)+' /quarter',0],

@@ -1,17 +1,20 @@
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
-import { goldAccount } from '../mechanics/gold-accounting.mjs';
+import { goldAccount, diplomacyAccount } from '../mechanics/gold-accounting.mjs';
 import { shippingPlan } from "../mechanics/merchant-convoys.mjs";
 import { CONVOY_RULES } from "../mechanics/convoy-traffic.mjs";
 import { ECONOMY } from "../mechanics/economy-rules.mjs";
 import { strategicFactor, strategicDemand } from "../mechanics/strategic-materials.mjs";
 import { uiModel } from "../mechanics/queries.mjs";
+import { supplyDetails } from "../mechanics/logistics.mjs";
+import { SUPPORT_RULES } from "../mechanics/support-effects.mjs";
+import { usablePorts } from "../mechanics/task-forces.mjs";
 import { monthlyIncome, yardLoad, supply } from "../mechanics/engine.mjs";
 import { aircraftSummary } from "../mechanics/naval-resources.mjs";
 import { sailorSummary } from "../mechanics/ship-staffing.mjs";
 import { merchantEconomy, MERCHANT_RULES } from "../mechanics/merchant-economy.mjs";
 import { economyFor, RULES } from "../mechanics/balance.mjs";
-import { upgradeLevel, facilityFactor, industryFactor, industryExpansion } from "../mechanics/levels.mjs";
-import { PORTS } from "../mechanics/world.mjs";
+import { upgradeLevel, MAX_LEVEL, industryFactor, industryExpansion } from "../mechanics/levels.mjs";
+import { PORTS, HOME_PORT } from "../mechanics/world.mjs";
 import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
 import { PORT_REPAIR } from "../mechanics/ports.mjs";
 import { yardAvailability } from "../mechanics/port-trade.mjs";
@@ -89,13 +92,21 @@ export function resourceHover(s, c, key) {
       flow("Actual change this month",n[field]-n.monthAccount.opening[field]),
       ["Last completed month",n.monthAccount.last?signed(n.monthAccount.last[field]):"First month in progress"],
       ["GDP growth next month",pct(growthOutlook(s,c).monthly)]);
+    if(!gold) {
+      const exchange=diplomacyAccount(n);
+      rows.push(flow("Diplomatic transfers this month · included above",exchange.current[field]),
+        flow("Diplomatic transfers last month · included above",exchange.last[field]));
+    }
     if(!strategic) {
       const d=n.industrialDamage, repair=d&&campaignMinutes(s)-d.lastAttack>=1440?Math.min(d.industry,.0006)+Math.min(d.yards,.0006):0;
       const ports=Object.entries(s.ports).filter(([p,x])=>(s.world?.portControl?.[p]||PORTS[p].nation)===s.player&&x.health<1&&campaignMinutes(s)-x.lastAttack>=PORT_REPAIR.safeMinutes)
         .reduce((v,[,x])=>v+Math.min(1-x.health,PORT_REPAIR.healthPerDay)*(gold?PORT_REPAIR.goldPerHealth:PORT_REPAIR.industryPerHealth),0);
       rows.push(flow("Industrial repairs requested / day",-repair*(gold?b.goldYear*.22:b.industryYear*.14)),
         flow("Port repairs requested / day",-ports));
-      if(gold)rows.push(flow("Ship repairs requested / day",-n.groups.filter(g=>g.status==="repair"&&g.health<1).reduce((v,g)=>v+c.classes[g.classId].cost*g.count*.0001,0)));
+      if(gold) {
+        const ports=usablePorts(s,s.player);
+        rows.push(flow("Eligible ship repairs requested / day",-n.groups.filter(g=>g.status==="repair"&&g.health<1&&!g.battleId&&ports.includes(g.dockPort||HOME_PORT[s.player])).reduce((v,g)=>v+c.classes[g.classId].cost*g.count*.0001,0)));
+      }
     }
     if(gold) {
       const account=goldAccount(n);
@@ -107,8 +118,8 @@ export function resourceHover(s, c, key) {
           rows.push(flow('Last month · '+({governmentAircraft:'government aircraft',shipRepairs:'ship repairs',portRepairs:'port repairs',industrialRepairs:'industry / yard repairs'})[key],amount));
       }
     }
-    note="Formula: annual gold = productive GDP × 20% + GTP × 80%; annual industry = (productive GDP × 80% + GTP × 20%) × facility factor × funding × paid operation × strategic effectiveness. Strategic is an abstract stock, not a physical fuel mass. GDP and GTP refer to naval budgets, not total national products. Annual strategic = 5% × (productive GDP × national modifier + GTP × min(1, GTP/GDP)). Divide by 12 for monthly gross, then subtract the listed costs. Industry expansion adds 15% of opening output per upgrade. Monthly projections use current funding and selected models. Output arrives daily. Orders, research, diplomacy, repairs and government aircraft replacements are additional; actual monthly change includes all spending. Strategic is shared nationally and shortages apply immediately to ships, aircraft and production. Below seven days of operating requirements, effectiveness falls toward 20%.";
-    if(gold) note="Gold income = (productive GDP × 20% + GTP × 80%) ÷ 12 per month, credited daily. The forecast uses current funding and models. Actual cash flow records amounts paid, including wartime ship, port and industrial repairs. Orders, diplomacy and refunds appear in other activity; on older saves that row also includes activity before detailed tracking began. The cash-flow total matches the change in reserves. Zero-cost government aircraft do not incur a gold charge. Repair requests are daily estimates and are paid only when eligible and affordable.";
+    note="Formula: annual gold = productive GDP × 20% + GTP × 80%; annual industry = (productive GDP × 80% + GTP × 20%) × facility factor × funding × paid operation × strategic effectiveness. Strategic is an abstract stock, not a physical fuel mass. GDP and GTP refer to naval budgets, not total national products. Annual strategic = 5% × (productive GDP × national modifier + GTP × min(1, GTP/GDP)). Divide by 12 for monthly gross, then subtract the listed costs. Industry expansion adds 15% of opening output per upgrade. Facility cost forecasts assume the selected funding and nominal aircraft output; shortages can lower the amounts actually paid. Output arrives daily. Orders, research, diplomacy, repairs and government aircraft replacements are additional; actual monthly change includes all spending. Diplomatic exchanges transfer existing national stocks; they do not directly change GDP, GTP or convoy deliveries. Strategic is shared nationally and shortages apply immediately to ships, aircraft and production. Below seven days of operating requirements, effectiveness falls toward 20%.";
+    if(gold) note="Gold income = (productive GDP × 20% + GTP × 80%) ÷ 12 per month, credited daily. The forecast uses current funding and nominal aircraft output; shortages can reduce actual payments. Actual cash flow records amounts paid, including bilateral exchanges and wartime ship, port and industrial repairs. Orders, refunds and untracked activity appear in other activity; on older saves that row also includes activity before detailed tracking began. The cash-flow total matches the change in reserves. Zero-cost government aircraft do not incur a gold charge. Repair requests are daily estimates and are paid only when eligible and affordable.";
   } else if(key==="INFLUENCE") {
     rows=[["Current / maximum",num(n.influence)+" / 500"],flow("Monthly ministry allocation",RULES.influencePerMonth),
       flow("Government organization",upgradeLevel(n.tech,"influence")),flow("Treaty policy",-treaty.influence),
@@ -187,29 +198,30 @@ export function resourceHover(s, c, key) {
       ["Logistics = (port access + convoy performance) ÷ 2",pct(e.logistics/100,0)]];
     note="Delivery coverage may exceed 100%; only its contribution to logistics is capped. No observed voyages gives 100% success, but delivery coverage starts at zero until actual round trips complete. Peace always assumes 100% success; deliveries still count. Sinkings enter the 30-day ledger immediately. Logistics also multiplies fleet supply by 0.8 + 0.2 × logistics fraction.";
   } else if (key === "SUPPLY") {
+    const fleets=n.fleets.map(f=>({f,supply:v?.fleets?.[f.id]?.supply || supplyDetails(s,c,s.player,f)}));
+    const depots=usablePorts(s,s.player);
     rows = [
       ["Fleet average", pct(v?.averageSupply ?? supply(s,c,s.player))],
-      ...Object.entries(v?.fleets || {})
-        .slice(0, 20)
-        .map(([id, row]) => [
-          n.fleets.find((f) => f.id === id)?.name || id,
-          pct(row.supply.factor),
-        ]),
+      ["National logistics multiplier", "× " + num(0.8 + 0.2*e.logistics/100,3)],
+      ["Strategic reserve multiplier", n.strategic>0?"× 1":"× 0.5"],
+      ["Forces receiving delivered AO relief", num(fleets.filter(row=>row.supply.replenishment>0).length)],
+      ["Accessible functioning supply ports", num(depots.filter(id=>(s.ports[id]?.health??1)>0).length)],
+      ...fleets.map(({f,supply}) => [f.name,pct(supply.factor)]),
     ];
     note =
-      "Arithmetic mean of task-force supply. Each force uses distance to the closest accessible supply port and its shortest-range hull’s endurance. Nearby operational support eases distance penalties. Multiply distance × endurance × (0.8 + 0.2 × national logistics fraction) × strategic supply factor. Strategic supply is ×1 with stock remaining or ×0.5 at zero. The naval combat formula applies this supply once.";
+      "Arithmetic mean of every listed task force. Each uses distance to the closest functioning accessible supply port and its shortest-range hull’s endurance. Multiply distance × endurance × (0.8 + 0.2 × national logistics fraction) × strategic supply factor. Strategic supply is ×1 with stock remaining or ×0.5 at zero. A physical AO meeting within "+num(SUPPORT_RULES.MEETING_RANGE_NM*1.852,1)+" km restores at most "+pct(SUPPORT_RULES.TRANSFER_MAX_FRACTION)+" fuel, limited by missing fuel and cargo. Delivered relief adds up to "+num(SUPPORT_RULES.RELIEF_MAX*100)+" percentage points to distance and endurance factors and fades over "+num(SUPPORT_RULES.RELIEF_MINUTES/1440)+" days. Hover a fleet for its actual factors, fuel and replenishment. Local AO depot capacity guides support assignments; it does not multiply fleet supply. The naval combat formula applies supply once.";
   } else if (key === "TRAINING") {
     rows = [
       ["Current training", num(n.training) + "%"],
       flow(
         "Daily skill decay",
-        -0.0025 / (1 + upgradeLevel(n.tech, "training") * 0.2),
+        -Math.min(Math.max(0,n.training-20),0.0025 / (1 + upgradeLevel(n.tech, "training") * 0.2)),
       ),
-      flow("Next training upgrade", 9),
+      flow("Next training upgrade", n.tech.training>=MAX_LEVEL?0:Math.min(9,100-n.training)),
       ["Combat = 0.5 + training fraction × 0.65", "× " + num(0.5 + (n.training / 100) * 0.65, 3)],
     ];
     note =
-      "Exercises and doctrine upgrades raise national proficiency; trained recruits are counted separately. Training is capped at 100. Research also slows daily decay.";
+      "Doctrine upgrades raise national proficiency; trained recruits are counted separately. Daily decay stops at 20 and upgrades cannot exceed 100. Research also slows daily decay.";
   } else if (key === "MORALE") {
     rows = [
       ["Current morale", num(n.morale) + "%"],
@@ -276,6 +288,8 @@ export function resourceHover(s, c, key) {
         ),
       ],
       ["In this graduation batch", num(n.personnelTraining[type])],
+      ...(sailor?[["Assigned aboard / unassigned trained",num(crew.assigned)+" / "+num(crew.free)],
+        ["Ships waiting for complete crews",num(crew.waiting)]]:[]),
       ["Rescued; awaiting recovery", num(awaitingRecovery(n, type))],
       ["Permanently lost", num(n.casualties[type].lost)],
     ];

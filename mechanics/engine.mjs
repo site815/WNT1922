@@ -154,7 +154,9 @@ import {
   diplomaticBlock,
   diplomaticTerms,
   readyProvocationFleet,
+  bilateralAction,
 } from "./diplomacy-rules.mjs";
+import { initializeDiplomaticOffers, expireDiplomaticOffers, createDiplomaticOffer, applyDiplomaticExchange, answerDiplomaticOffer } from './diplomatic-exchange.mjs';
 import { organizeSupport } from "./support-operations.mjs";
 export const VERSION = SAVE_VERSION;
 export const DAY = data.DAY;
@@ -357,6 +359,7 @@ export function newGame(
 }
 export function initializeCampaign(s, content) {
   s.campaignId ??= DEFAULT_CAMPAIGN;
+  initializeDiplomaticOffers(s);
   initializeResources(s, content);
   for (const n of Object.values(s.nations)) {
     n.customDesigns ??= [];
@@ -1013,14 +1016,26 @@ export function diplomaticAction(
     action === "provoke"
       ? readyProvocationFleet(s, content, target, id)
       : null;
+  if(bilateralAction(action) && s.controllers[target]==='human') {
+    const offer=createDiplomaticOffer(s,id,target,action,rule);
+    const receipt=PROFILES[id].name+' offered '+rule.name.toLowerCase()+'. Reply within 14 days; no response means No. No resources are reserved.';
+    if(target===s.player)addAlert(s,'Trade offer from '+PROFILES[id].name,receipt,'diplomacy',{offerId:offer.id,newsView:'diplomacy'});
+    return {receipt,offerId:offer.id,price:rule.price,gains:{},effects:rule.effects};
+  }
   if (force) startProvocation(s, content, id, target, force.id);
-  spend(n, rule.price, { production: false });
-  n.cooldowns[action + "-" + target] = now + rule.days;
   const gains = {};
-  for (const [k, v] of Object.entries(rule.gain)) {
-    const before = n[k];
-    n[k] = k === "influence" ? Math.min(500, before + v) : before + v;
-    gains[k] = n[k] - before;
+  if(bilateralAction(action)) {
+    applyDiplomaticExchange(s,id,target,action,rule);
+    Object.assign(gains,rule.gain);
+  } else {
+    spend(n, rule.price, { production: false });
+    recordGold(n,'diplomaticAdministration',-(rule.price.gold||0));
+    n.cooldowns[action + "-" + target] = now + rule.days;
+    for (const [k, v] of Object.entries(rule.gain)) {
+      const before = n[k];
+      n[k] = k === "influence" ? Math.min(500, before + v) : before + v;
+      gains[k] = n[k] - before;
+    }
   }
   const receipt = force
     ? force.name +
@@ -1034,13 +1049,22 @@ export function diplomaticAction(
       Object.entries(gains)
         .map(([k, v]) => v.toLocaleString("en-US") + " " + k)
         .join(", ") +
-      ".";
+      (bilateralAction(action)?'. The other government paid these resources and received the quoted payment.':'.');
   invalidateOperations(s);
   if (id === s.player) {
     addLog(s, receipt, "diplomacy");
     s.log[0].dismissed = true;
   }
-  return { receipt, fleetId: force?.id, gains, price: rule.price, effects: rule.effects };
+  return { receipt, fleetId: force?.id, gains, price: rule.price, effects: rule.effects, partnerPrice:rule.partnerPrice,partnerGain:rule.partnerGain };
+}
+
+export function respondDiplomaticOffer(s,c,id,accept,actor=s.player) {
+  const offer=answerDiplomaticOffer(s,c,id,accept,actor);
+  for(const alert of s.alerts || [])if(alert.offerId===offer.id)alert.dismissed=true;
+  invalidateOperations(s);
+  const receipt=PROFILES[offer.from].name+': '+offer.terms.name+' '+(accept?'accepted. Both governments exchanged the quoted resources.':'declined. No resources changed.');
+  if(actor===s.player) {addLog(s,receipt,'diplomacy');s.log[0].dismissed=true;}
+  return {receipt,offerId:offer.id,status:offer.status};
 }
 export function setTreatyPolicy(s, policy, id = s.player) {
   if (!TREATY_POLICIES[policy])
@@ -1263,6 +1287,7 @@ function historicalEvents(s, content) {
     now = campaignMinutes(s);
   pacificOpening(s, content);
   politicsTick(s);
+  expireDiplomaticOffers(s);
   if (!t.polandOccurred && now >= t.polandAt - 1e-6) {
     t.polandOccurred = true;
     const event = EUROPE_OPENING.invasion;
@@ -1492,7 +1517,7 @@ export function aiTurn(s, content, id) {
     if (
       action &&
       !diplomaticBlock(s, content, target, action, id) &&
-      aiCanSpend(s, id, diplomaticTerms(s, content, target, action, id).price)
+      (bilateralAction(action) || aiCanSpend(s, id, diplomaticTerms(s, content, target, action, id).price))
     )
       command("diplomatic", { id: target, kind: action });
     if (

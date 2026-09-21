@@ -2,6 +2,8 @@ import { airOperationsText } from "../mechanics/air-operations.mjs";
 import { finiteTorpedoOutfit, torpedoesPerHull } from '../mechanics/torpedo-ammunition.mjs';
 import { navalInfluence, POWERS } from "../mechanics/land-war.mjs";
 import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
+import { SUPPORT_RULES } from "../mechanics/support-effects.mjs";
+import { averageMerchantGRT } from "../mechanics/merchant-economy.mjs";
 import { modelFerryKm } from "../mechanics/base-aviation.mjs";
 import { portSpec } from "../mechanics/port-catalog.mjs";
 import { uiModel, displayedFleet } from "../mechanics/queries.mjs";
@@ -81,6 +83,7 @@ export function mapHover(s, c, key, data = {}) {
     const p = data.features?.find((t) => t.id === id);
     if (!p) return "";
     const owner = s.world?.control?.[id] || p.owner;
+    const fronts = (s.world?.fronts || []).filter(f => f.territories?.includes(id));
     return (
       "<h3>" +
       esc(p.name || id) +
@@ -95,12 +98,13 @@ export function mapHover(s, c, key, data = {}) {
         ],
         [
           "Status",
-          s.world?.fronts?.some(
-            (f) => f.territory === id && f.status === "active",
-          )
+          fronts.some(f => f.status === "Contested")
             ? "Land campaign underway"
-            : "No active campaign",
+            : fronts.some(f => f.status === "Ceasefire")
+              ? "Ceasefire"
+              : "No active campaign",
         ],
+        ...fronts.map(f => [esc(f.name), esc(f.status || "Awaiting naval support") + " · attacker " + num(f.progress * 100) + "%"]),
       ]) +
       "<small>Click to center · double-click to zoom.</small>"
     );
@@ -160,12 +164,25 @@ export function mapHover(s, c, key, data = {}) {
       cover = (uiModel(s)?.escortCoverage || convoyCoverage(s, c)).convoys.find(
         (v) => v.id === id,
       );
+    const transfer = s.nations[s.player].airTransfers?.find(t => t.id === convoy.aviationTransfer);
+    const state = convoy.battleId ? "Engaged; passage suspended"
+      : convoy.waitingForPort ? "Holding; no accessible port"
+      : convoy.aborted ? "Diverting home; no trade delivery credit"
+      : convoy.aviationTransfer ? "Aircraft transport"
+      : convoy.transportReturn ? "Aircraft transport returning empty"
+      : convoy.leg === "unloading" ? "Unloading; waiting for return sailing"
+      : convoy.leg === "returning" ? "Returning to origin" : "Outbound";
+    const credit = convoy.aborted ? 0
+      : convoy.count * (convoy.cargoGRTPerHull ?? averageMerchantGRT(s,s.player));
     return (
       '<span class="eyebrow">MERCHANT SHIPPING</span><h3>' +
       esc(convoy.name) +
       "</h3>" +
       list([
         ["Merchant hulls", num(convoy.count)],
+        ["Voyage state", state],
+        ["Potential round-trip credit", num(credit) + " GRT"],
+        ...(transfer ? [["Aircraft cargo", num(transfer.airWing.reduce((v, w) => v + w.count, 0)) + " airframes"]] : []),
         [
           "Escort coverage",
           cover?.defense > 0
@@ -176,9 +193,10 @@ export function mapHover(s, c, key, data = {}) {
             : "Exposed · no operational escort within 148 km",
         ],
         ["Speed", num(convoy.speed) + " kn"],
-        ["Next arrival", clock.date + " " + clock.time],
+        ["Next arrival", convoy.waitingForPort || convoy.battleId ? "Held until passage resumes"
+          : convoy.leg === "unloading" ? "Awaiting return departure" : clock.date + " " + clock.time],
       ]) +
-      "<small>Click to center · double-click to zoom.</small>"
+      "<small>Deliveries enter the rolling 30-day logistics ledger only after a surviving round trip returns to its origin. Trade convoys retain their departure GRT per hull; successful aircraft transports count surviving hulls at the current average GRT when they return. Diverted or failed voyages earn no delivery credit. Click to center · double-click to zoom.</small>"
     );
   }
   return "";
@@ -197,6 +215,14 @@ export function fleetReadinessHover(s, c, f) {
       ["Closest supply port", esc(supply.portName)],
       ["Sea-route distance / shortest hull range", num(supply.distance*1.852)+" / "+num(supply.rangeKm)+" km"],
       ["Endurance used = 2 × distance / range", num(supply.enduranceUsed*100)+"%"],
+      ["Delivered replenishment relief", "+" + num(supply.replenishment * 100, 1) + " percentage points to distance and endurance"],
+      ["Relief remaining", num(Number.isFinite(f.replenishedUntil) ? Math.max(0, f.replenishedUntil - campaignMinutes(s)) / 60 : 0, 1) + " hours"],
+      ...(f.role === "support" ? [
+        ["Replenishment cargo aboard / delivered", num(f.supportCargo) + " / " + num(f.deliveredCargo) + " cargo units"],
+        ["Replenishment target", esc(n.fleets.find(x => x.id === f.supportTarget)?.name || "Port depot support")],
+        ["Transfer availability", Number.isFinite(f.nextReplenishment) && f.nextReplenishment > campaignMinutes(s)
+          ? "In " + num((f.nextReplenishment - campaignMinutes(s)) / 60, 1) + " hours" : "Ready at rendezvous"],
+      ] : []),
       [
         "Distance / range factor",
         num(supply.distanceFactor * 100) +
@@ -222,7 +248,7 @@ export function fleetReadinessHover(s, c, f) {
       ],
     ]) +
     fleetHoverManifest(s, c, f) +
-    "<small>Distance and endurance use stepped penalties. Logistics research reduces the distance penalty; nearby support adds relief to both factors, capped at 100%. National logistics applies up to a 20% penalty; empty strategic reserves halve supply. Click to center and highlight this force.</small>"
+    "<small>Distance and endurance use stepped penalties. Logistics research reduces distance penalties. A physical AO transfer within " + num(SUPPORT_RULES.MEETING_RANGE_NM * 1.852, 1) + " km restores at most " + num(SUPPORT_RULES.TRANSFER_MAX_FRACTION * 100) + "% fuel, limited by missing fuel and cargo, once per " + num(SUPPORT_RULES.TRANSFER_INTERVAL_MINUTES / 60) + " hours. Delivered relief is capped at " + num(SUPPORT_RULES.RELIEF_MAX * 100) + " percentage points and fades over " + num(SUPPORT_RULES.RELIEF_MINUTES / 1440) + " days. National logistics applies up to a 20% penalty; empty strategic reserves halve supply. Port depot capacity is reported separately and does not multiply this fleet supply factor. Click to center and highlight this force.</small>"
   );
 }
 function fleetHoverManifest(s, c, f) {
@@ -501,10 +527,11 @@ export function portPopup(s, c, id, { parts = false } = {}) {
       list([
         ["Facility condition", num(p.health * 100) + "%"],
         [
-          "Supply capacity / demand",
+          "Depot capacity / assigned load",
           num(p.capacity) + " / " + num(p.demand) + " t",
         ],
         ["Fleet support contribution", num(p.depotSupport) + " t"],
+        ["Depot capacity coverage", num(p.coverage * 100) + "% · planning capacity"],
         [
           "Trade capacity",
           num(p.effectiveTrade, 1) + " / " + num(p.trade) + " trade points",
@@ -543,7 +570,7 @@ export function portPopup(s, c, id, { parts = false } = {}) {
               : "Automatic, when resources are available",
         ],
         [
-          "Daily repair budget",
+          "Maximum daily repair budget",
           num(p.repairCost.gold) +
             " gold + " +
             num(p.repairCost.industry) +
@@ -578,11 +605,11 @@ export function portPopup(s, c, id, { parts = false } = {}) {
     notes =
       "<p>" +
       esc(p.note) +
-      '</p><p class="panel-note">Damage reduces supply and trade; blockade reduces trade access. Safe repairs restore up to ' +
+      '</p><p class="panel-note">Damage reduces depot capacity, trade, artillery and airfield capacity; a destroyed port cannot supply fleets. Blockade reduces trade access. Safe repairs restore up to ' +
       num(PORT_REPAIR.healthPerDay * 100, 1) +
       " percentage points per day after 24 hours without attack. Land campaigns determine occupation. Capacities and battery profiles are provisional.</p><p>" +
       esc(p.gunBasis) +
-      "</p><p>Supply = intact facility capacity + crewed support ships. Trade = charted trade × facility condition × (1 − blockade). Combat power = artillery + aviation. Aviation reach is the longest combat radius of qualified stationed aircraft. Full crews, weather and national strategic materials govern sorties; ferries and merchant transports deliver replacements.</p>" +
+      "</p><p>Depot capacity = intact facility capacity + local, active, fully crewed AO support. The AO contribution is capped at the charted port capacity before port damage is applied. Capacity guides depot assignments; it does not multiply fleet supply. Fleet supply uses port distance, hull endurance, delivered replenishment, national logistics and strategic reserves. Trade = charted trade × facility condition × (1 − blockade). Combat power = artillery + aviation. Aviation reach is the longest combat radius of qualified stationed aircraft. Full crews, weather and national strategic materials govern sorties; ferries and merchant transports deliver replacements.</p>" +
       (p.baseAviation?.heldReason
         ? "<p>" + esc(p.baseAviation.heldReason) + "</p>"
         : "");

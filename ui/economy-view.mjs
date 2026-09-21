@@ -10,6 +10,7 @@ import { warBalances } from "../mechanics/war-balance.mjs";
 import { PROFILES, NATION_ORDER } from "../mechanics/catalog.mjs";
 import { shippingPlan } from "../mechanics/merchant-convoys.mjs";
 import { CONVOY_RULES } from "../mechanics/convoy-traffic.mjs";
+import { goldAccount, diplomacyAccount } from "../mechanics/gold-accounting.mjs";
 const num=(v,d=0)=>Number(v||0).toLocaleString("en-US",{maximumFractionDigits:d});
 const percent=(v,d=2)=>num(v*100,d)+"%";
 export function warView(s, compact = false) {
@@ -34,7 +35,17 @@ export function economyView(s,c) {
     ...(n.monthAccount.last?[flow('Last completed month',n.monthAccount.last.gold,n.monthAccount.last.industry,n.monthAccount.last.strategic)]:[])
   ];
   const budget=panel('Resource accounts · monthly',table(['Income / expense','Gold','Industry','Strategic'],monthly)+
-    '<small>Output and operating expenses accrue daily; upkeep and treaty charges monthly. The forecast excludes new orders, research, diplomacy, repairs and government replacements; actual changes include them.</small>');
+    '<small>Output and operating expenses accrue daily; upkeep and treaty charges monthly. Facility expense forecasts use chosen funding and nominal aircraft output; shortages can reduce actual payments. The forecast excludes new orders, research, diplomacy, repairs and government replacements; actual changes include them.</small>');
+  const cash=goldAccount(n), exchanges=diplomacyAccount(n);
+  const cashPanel=panel('Gold actually paid / received · this month',table(['Cash-flow category','Gold'],[
+    ...cash.rows.map(row=>[esc(row.label),signed(row.amount)]),
+    ['Total · matches change in reserve',signed(cash.change)]
+  ])+'<small>Paid amounts include wartime repairs and bilateral trade. These are components of the actual monthly change above, not additional charges.</small>');
+  const exchangePanel=panel('Diplomatic exchanges · national stocks',table(['Period','Gold','Industry','Strategic'],[
+    flow('This month',exchanges.current.gold,exchanges.current.industry,exchanges.current.strategic),
+    n.monthAccount.last?flow('Last completed month',exchanges.last.gold,exchanges.last.industry,exchanges.last.strategic)
+      : ['Last completed month','First month in progress','—','—']
+  ])+'<small>Signed net receipts and payments, already included in actual monthly changes. Exchanges move existing stocks between nations. They do not directly change GDP, GTP or completed merchant deliveries.</small>');
   const strategic=panel('Strategic materials',facts([
     ['Reserve',num(n.strategic),'National abstract stock of fuel, rubber, tin and critical materials; not tons or kg of physical fuel.'],
     ['Opening reserve',num(c.nations[s.player].starting.strategic)],
@@ -83,5 +94,5 @@ export function economyView(s,c) {
   const comparison=panel('Naval budgets & maritime capacity',table(['Nation','GDP budget','GTP budget','Merchant GRT','Port access','Convoy success','Coverage','Logistics'],NATION_ORDER.map(id=>{
     const x=merchantEconomy(s,c,id),a=s.nations[id];return ['<span style="color:'+PROFILES[id].color+'">'+esc(PROFILES[id].name)+'</span>',num(a.gdp),num(a.gtp),num(x.current),pct(x.ports.coverage,0),pct(x.convoys.success,0),pct(x.deliveryCoverage,0),pct(x.logistics/100,0)];
   })));
-  return '<div class="ledger-layout economy-ledger">'+budget+strategic+domestic+trade+shippingPanel+facilities+'<div class="ledger-wide">'+routes+comparison+'</div></div>';
+  return '<div class="ledger-layout economy-ledger">'+budget+cashPanel+exchangePanel+strategic+domestic+trade+shippingPanel+facilities+'<div class="ledger-wide">'+routes+comparison+'</div></div>';
 }

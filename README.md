@@ -8,7 +8,7 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.33.0 adds recognition drawings to ship and aircraft inspection, directly editable SVGs for original designs, the École navy's Mediterranean torpedo boats, treaty-aware diplomacy and strategic-material exports. Merchant traffic targets 3% of hulls at sea in approximately twelve convoys. Gold hover includes actual wartime repair costs; superseded aircraft have separate reserve-only and all-airframe retirement controls. Number keys 1–0 select the first ten menus, and +/− changes speed. Start a new campaign for beta testing.
+Version 0.34.0 makes diplomatic exchanges debit and credit both countries' real stocks. AI offers appear in Diplomacy with Yes/No controls and a persistent news alert; unanswered offers expire after fourteen simulated days without an exchange or interruption. The world map fills the background behind interface tiles. Supply, support, convoy, land-front, training and economic hovers expose the actual connected calculations and transactions. Recognition drawings remain directly editable under `assets/recognition/`. Existing compatible saves acquire the new offer ledger automatically.
 
 ## Edit and build
 

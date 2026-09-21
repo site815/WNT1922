@@ -2,7 +2,18 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.33.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.34.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.34.0 — portable beta
+
+- Diplomatic equipment sales, industrial cooperation and strategic-material purchases/sales exchange real gold and stocks between both governments. Equipment sales transfer stored industry rather than commissioned ships. Cooperation's influence cost remains a domestic expense. AI governments protect operating reserves and decline purchases they do not need.
+- AI exchanges with the player require consent. A persistent alert opens the offer in Diplomacy, showing both countries' exact payments and receipts, treaty terms and deadline. **Yes · Accept** settles the quote only if both countries can still pay and remain at peace. **No · Decline**, fourteen simulated days without a reply, or war moves no resources. Offers never open a popup or pause on arrival. Fixed quotes, a three-offer limit and a ninety-day per-partner retry limit prevent surprise charges and repeated offers.
+- Both governments record trade in their actual gold and resource ledgers. These are immediate treasury/stock exchanges; they do not create GDP/GTP income or simulated merchant delivery credit. This month and last month's net transfers are visible in Economy and the relevant resource hovers.
+- One world map fills the game viewport behind the sidebar, right-hand command tile, time/resource bars, news and menu panels. Map controls remain in the uncovered area; menu panels scroll independently. Marker sizes remain readable across window sizes.
+- Supply hovers show every force and the actual distance, endurance, logistics and strategic factors. Fleet hovers expose physical AO cargo, delivered relief, remaining duration and transfer availability. Port depot capacity is distinguished from the fleet supply calculation.
+- Convoy hovers explain outward, unloading, returning, held and diverted states, aircraft cargo and completed-voyage credit. Territory hovers identify active fighting and ceasefires correctly. Training displays respect the skill floor and research ceiling; repair estimates exclude ineligible ships. Economy panels include actual wartime repairs and trade cash flow.
+
+Compatible existing saves continue and initialize the offer ledger automatically. The earlier 0.33 opening fleet changes still require a new campaign if upgrading from an older opening state.
 
 ## Version 0.33.0 — portable beta
 

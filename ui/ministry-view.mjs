@@ -1,5 +1,6 @@
 import { recognitionCard } from "./recognition.mjs";
 import { NewsTicker } from "./news-ticker.mjs";
+import { diplomaticOfferAlert } from './diplomatic-offers-view.mjs';
 import { battleProgress } from "./battle-progress.mjs";
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
 import { currentGovernmentModels } from "../mechanics/government-aviation.mjs";
@@ -457,7 +458,7 @@ export function alertsView(s, c, ticker = new NewsTicker(() => {})) {
     const due=capitalClock(s,s.player,d.deadline);
     return '<button class="pending-decision" data-action="reopen-decision" data-key="'+esc(d.key)+'" title="'+esc(d.title+'. Due '+due.date+' '+due.time+'. If ignored: '+d.defaultText)+'"><strong>'+esc(d.title)+'</strong><small>Due '+esc(due.date)+'</small></button>';
   }).join('')+'</div>' : '';
-  return ticker.markup(alertItems(s),buttons);
+  return ticker.markup(alertItems(s),diplomaticOfferAlert(s)+buttons);
 }
 export function weaponDetails(c, content) {
   const raw = c.raw || {},

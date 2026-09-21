@@ -5,6 +5,7 @@ const byKind = {battle:'reports',convoy:'economy',trade:'economy',industry:'yard
 
 // News carries stable references. If its subject has gone, open its record area.
 export function newsDestination(s, notice) {
+  if (notice.offerId != null) return {view:'diplomacy',offerId:notice.offerId};
   if (notice.reportId != null) return {view:'reports',
     ...(s.reports.some(r=>r.id===notice.reportId)?{reportId:notice.reportId}:{})};
   if (notice.frontId) return {view:'land',

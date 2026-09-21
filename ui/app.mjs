@@ -305,6 +305,8 @@ function renderPass() {
   if (!state) {
     app.style.setProperty('--dialog-top','0px');
     app.style.setProperty('--dialog-left','0px');
+    app.style.setProperty('--dialog-right','0px');
+    app.style.setProperty('--dialog-bottom','0px');
     mapMotion.refresh();
     newsTicker.reset();
     renderStart();
@@ -333,16 +335,27 @@ function renderPass() {
     ["reports", "10", "Battle reports"],
     ["review", "11", "Naval record"],
   ];
+  // Keep chart symbols readable at the same screen size as the viewport grows.
+  // The SVG uses a 2:1 view box with uniform scaling, including any letterbox.
+  chart.markerScale = 1 / Math.max(.1, Math.min(window.innerWidth / 1200, window.innerHeight / 600));
+  const isMapView = ["command", "land", "airwar"].includes(view);
+  const renderedView = viewHTML();
+  const mapLayer = isMapView ? renderedView.map : commandView(true).map;
+  const mainLayer = isMapView ? renderedView.panels : renderedView;
   updateDOM(
     app,
-    `<div class="game-shell"><aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics)}${alertsView(state, content, newsTicker)}<main class="workspace view-${view}" data-record="overview"><div class="workspace-inner" data-scroll-key="workspace-${view}">${viewHTML()}</div></main></div></div>${modalHTML()}`,
+    `<div class="game-shell map-scene ${isMapView ? 'map-workspace' : 'menu-workspace'}">${mapLayer}<aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics)}${alertsView(state, content, newsTicker)}<main class="workspace view-${view}" data-record="overview"><div class="workspace-inner" data-scroll-key="workspace-${view}">${mainLayer}</div></main></div></div>${modalHTML()}`,
   );
   mapMotion.refresh();
   const workspaceBounds = app.querySelector('.workspace').getBoundingClientRect();
   app.style.setProperty('--dialog-top',workspaceBounds.top+'px');
   app.style.setProperty('--dialog-left',workspaceBounds.left+'px');
+  app.style.setProperty('--dialog-right',Math.max(0,innerWidth-workspaceBounds.right)+'px');
+  app.style.setProperty('--dialog-bottom',Math.max(0,innerHeight-workspaceBounds.bottom)+'px');
   if (newsFocus?.view === view) {
-    const target = newsFocus.shipId
+    const target = newsFocus.offerId != null
+      ? [...app.querySelectorAll('[data-offer]')].find(el=>el.dataset.offer===String(newsFocus.offerId))
+      : newsFocus.shipId
       ? [...app.querySelectorAll('[data-ship]')].find(el=>el.dataset.ship===newsFocus.shipId)?.closest('tr')
       : [...app.querySelectorAll('[data-program]')].find(el=>el.dataset.program===newsFocus.programKey);
     target?.classList.add('news-highlight');
@@ -394,14 +407,14 @@ function viewHTML() {
       landView(
         state,
         content,
-        chart,
+        { ...chart, detachedLayers: true },
         sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL,
       ),
     airwar: () =>
       strategicAirView(
         state,
         content,
-        chart,
+        { ...chart, detachedLayers: true },
         sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL,
       ),
     yards: yardsView,
@@ -462,11 +475,11 @@ function focusMap(kind, id, zoom = false) {
     row?.scrollIntoView({block:"nearest",inline:"nearest",behavior:"instant"});
   });
 }
-function commandView() {
+function commandView(backgroundOnly = false) {
   return worldCommandView(
     state,
     content,
-    chart,
+    { ...chart, detachedLayers: true, backgroundOnly },
     sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL,
   );
 }
@@ -1590,6 +1603,18 @@ app.addEventListener("click", async (event) => {
       });
       return;
     }
+    if (action === 'open-offers') {
+      view = 'diplomacy';
+      dialog = null;
+      newsFocus = {view:'diplomacy',offerId:id};
+      render();
+      app.querySelector('.news-highlight')?.scrollIntoView({block:'center',behavior:'instant'});
+      return;
+    }
+    if (action === 'diplomatic-offer') {
+      await mutate({type:'diplomatic-offer',args:{id,accept:kind==='accept'}});
+      return;
+    }
     if (action === "diplomatic") {
       if (kind === "provoke")
         openDialog({
@@ -1893,15 +1918,16 @@ window.addEventListener("pagehide", () => {
 app.addEventListener("pointerdown", (event) => {
   if (!state || event.button !== 0 || !event.target.closest(".world-map"))
     return;
-  const box = event.target.closest(".world-map").getBoundingClientRect();
+  const svg = event.target.closest(".world-map"),
+    transform = svg.getScreenCTM();
   drag = {
     id: event.pointerId,
     x: event.clientX,
     y: event.clientY,
     rotation: chart.rotation || 0,
     cy: chart.cy,
-    width: box.width,
-    height: box.height,
+    width: 1200 * transform.a / chart.zoom,
+    height: 600 * transform.d / chart.zoom,
     moved: false,
   };
 });
@@ -2014,8 +2040,8 @@ function importCampaign() {
   };
   input.click();
 }
-let hoverTimer,
-  hoverTarget = null;
+let hoverTimer, hoverHideTimer,
+  hoverTarget = null, hoverPending = null;
 let resizeTimer;
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
@@ -2031,8 +2057,10 @@ classTip.hidden = true;
 document.body.append(classTip);
 function hideClassHover() {
   clearTimeout(hoverTimer);
+  clearTimeout(hoverHideTimer);
   if (classTip) classTip.hidden = true;
   hoverTarget = null;
+  hoverPending = null;
 }
 let hoverPoint = null,
   hoverScrollTimer;
@@ -2042,11 +2070,19 @@ function inspectHover(event) {
   const target = event.target.closest(
     "[data-resource], [data-aircraft], [data-ship], [data-class], [data-fleet-hover], [data-map-hover], button:disabled, select:disabled",
   );
-  if (!target || target === hoverTarget) return;
-  hideClassHover();
-  hoverTarget = target;
+  if (!target) return;
+  clearTimeout(hoverHideTimer);
+  if (target === hoverTarget) {
+    clearTimeout(hoverTimer);
+    hoverPending = null;
+    return;
+  }
+  if (target === hoverPending) return;
+  clearTimeout(hoverTimer);
+  hoverPending = target;
   hoverTimer = setTimeout(() => {
-    if (!target.isConnected) return;
+    hoverPending = null;
+    if (!target.isConnected || !target.matches(':hover, :focus-within')) return;
     const shipTip = target.dataset.ship
       ? "<h3>" +
         esc(player().groups.find((g) => g.id === target.dataset.ship)?.name) +
@@ -2087,6 +2123,7 @@ function inspectHover(event) {
       !aircraftTip
     )
       return;
+    hoverTarget = target;
     classTip.classList.toggle("fleet-hover", !!f);
     classTip.classList.toggle("base-hover", target.dataset.mapHover?.startsWith("port:") || false);
     classTip.classList.toggle("resource-hover", !!resourceTip);
@@ -2105,6 +2142,7 @@ function inspectHover(event) {
             ? fleetReadinessHover(state, content, f)
             : fleetCompositionHover(state, content, f));
     classTip.hidden = false;
+    classTip.scrollTop = 0;
     const box = target.getBoundingClientRect(),
       width = classTip.offsetWidth,
       height = classTip.offsetHeight;
@@ -2132,11 +2170,21 @@ app.addEventListener("pointerout", (event) => {
     hoverTarget?.contains(event.target) &&
     !hoverTarget.contains(event.relatedTarget) &&
     !classTip.contains(event.relatedTarget)
-  )
-    hideClassHover();
+  ) {
+    clearTimeout(hoverHideTimer);
+    hoverHideTimer = setTimeout(hideClassHover, 240);
+  }
+});
+classTip.addEventListener("pointerenter", () => {
+  clearTimeout(hoverHideTimer);
+  clearTimeout(hoverTimer);
+  hoverPending = null;
 });
 classTip.addEventListener("pointerleave", (event) => {
-  if (!hoverTarget?.contains(event.relatedTarget)) hideClassHover();
+  if (!hoverTarget?.contains(event.relatedTarget)) {
+    clearTimeout(hoverHideTimer);
+    hoverHideTimer = setTimeout(hideClassHover, 240);
+  }
 });
 app.addEventListener("pointerdown", hideClassHover);
 app.addEventListener(

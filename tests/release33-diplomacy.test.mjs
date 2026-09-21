@@ -7,7 +7,7 @@ import { applyCommand } from '../mechanics/game-actions.mjs';
 import { validateSave } from '../mechanics/state-io.mjs';
 import { DIPLOMACY, diplomaticTerms, diplomaticBlock } from '../mechanics/diplomacy-rules.mjs';
 import { diplomacyView, diplomaticHint } from '../ui/diplomacy-view.mjs';
-const start=()=>{const s=newGame(CATALOG,'JPN',330033,'campaign_1922');s.decisions=[];s.pacts=[];s.treatyUntil=s.day-1;for(const n of Object.values(s.nations))Object.assign(n,{gold:1e6,industry:1e6,strategic:1e6,influence:100});return [s,contentFor(CATALOG,s)];};
+const start=()=>{const s=newGame(CATALOG,'JPN',330033,'campaign_1922');s.decisions=[];s.pacts=[];s.treatyUntil=s.day-1;for(const n of Object.values(s.nations))Object.assign(n,{gold:1e6,industry:20000,strategic:2500,influence:100});Object.assign(s.nations.JPN,{industry:1e6,strategic:1e6});return [s,contentFor(CATALOG,s)];};
 const pact=(s,kind,id=kind)=>s.pacts.push({id,name:'Test '+kind,members:['JPN','GBR'],kind,since:s.day,active:true});
 const issue=(s,kind,actor='JPN',target='GBR')=>applyCommand(s,CATALOG,{type:'diplomatic',args:{id:target,kind}},actor);
 const funds=n=>Object.fromEntries(['gold','industry','strategic','influence'].map(k=>[k,n[k]]));
@@ -53,7 +53,7 @@ test('naval treaty compliance, public sanctions, concealment and expiry produce 
 test('strategic sales debit exact stocks, keep production accounting intact and reject failed commands atomically',()=>{
   const [s,c]=start(),n=s.nations.JPN,foreign=funds(s.nations.GBR),before=funds(n),spent=n.strategicSpent.production;
   const result=issue(s,'sellStrategic');assert.equal(n.strategic,before.strategic-1000);assert.equal(n.gold,before.gold+1400);
-  assert.equal(n.strategicSpent.production,spent);assert.deepEqual(funds(s.nations.GBR),foreign);assert.equal(result.gains.gold,1400);
+  assert.equal(n.strategicSpent.production,spent);assert.deepEqual(funds(s.nations.GBR),{...foreign,gold:foreign.gold-1400,strategic:foreign.strategic+1000});assert.equal(result.gains.gold,1400);
   assert.equal(n.cooldowns['sellStrategic-GBR'],s.day+90);
   let snapshot=JSON.stringify(s);assert.throws(()=>issue(s,'sellStrategic'),/cooldown/);assert.equal(JSON.stringify(s),snapshot);
   assert.equal(diplomaticBlock(s,c,'USA','sellStrategic'),'');

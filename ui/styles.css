@@ -8560,8 +8560,8 @@ body:has(.view-command) #toast {
 .fleet-mission-status > span { display:inline; }
 
 /* Fixed envelopes by dialog family keep headings and footer actions stationary. */
-.modal-backdrop:not(.report-backdrop),.modal-backdrop.report-backdrop { inset:var(--dialog-top,0px) 0 0 var(--dialog-left,0px); align-items:center; justify-content:center; padding:16px; background:#040b1240; backdrop-filter:none; }
-.modal[data-dialog-type] { height: min(580px,80dvh); max-height: calc(100dvh - var(--dialog-top,0px) - 32px); }
+.modal-backdrop:not(.report-backdrop),.modal-backdrop.report-backdrop { inset:var(--dialog-top,0px) var(--dialog-right,0px) var(--dialog-bottom,0px) var(--dialog-left,0px); align-items:center; justify-content:center; padding:16px; background:#040b1240; backdrop-filter:none; }
+.modal[data-dialog-type] { height: min(580px,80dvh); max-height: calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 32px); }
 .modal[data-dialog-type="confirm"], .modal[data-dialog-type="new"] { height: min(340px,78dvh); }
 .modal[data-dialog-type="order"] { height: min(430px,80dvh); }
 .modal[data-dialog-type="diplomacy"] { width:min(780px,calc(100vw - 36px)); max-width:780px; height:min(460px,80dvh); }
@@ -8572,10 +8572,10 @@ body:has(.view-command) #toast {
 .modal[data-dialog-type] > footer > button { min-width:126px; min-height:44px; font-size:14px; line-height:1.2; margin:0; }
 .modal[data-dialog-type] > footer > .subtle { margin-right:auto; }
 .modal[data-dialog-type] > footer > .primary { order:2; }
-.report-backdrop .modal[data-dialog-type="report"] { height:calc(100dvh - var(--dialog-top,0px) - 32px); max-height:calc(100dvh - var(--dialog-top,0px) - 32px); max-width:1120px; }
+.report-backdrop .modal[data-dialog-type="report"] { height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 32px); max-height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 32px); max-width:1120px; }
 @media(max-height:650px) {
   .modal-backdrop:not(.report-backdrop) { padding:8px; }
-  .modal[data-dialog-type] { max-height:calc(100dvh - var(--dialog-top,0px) - 16px); }
+  .modal[data-dialog-type] { max-height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 16px); }
   .modal[data-dialog-type] > header { min-height:60px; }
 }
 /* Resource rates and map inspections share stable, readable dimensions. */
@@ -8680,7 +8680,7 @@ body:has(.view-command) #toast {
 .recognition-card.monochrome img { filter: grayscale(1); }
 .recognition-crop { position: relative; overflow: hidden; background: #fff; }
 .recognition-crop img { position: absolute; display: block; max-width: none; min-width: 0; }
-.modal[data-dialog-type="recognition"] { width: min(1400px,calc(100vw - var(--dialog-left,0px) - 48px)); max-width: none; height: min(860px,calc(100dvh - var(--dialog-top,0px) - 32px)); }
+.modal[data-dialog-type="recognition"] { width: min(1400px,calc(100vw - var(--dialog-left,0px) - var(--dialog-right,0px) - 48px)); max-width: none; height: min(860px,calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 32px)); }
 .recognition-sheet:not(.actual-size) > img { width: 100%; min-width: 0; max-width: 100%; max-height: 42vh; object-fit: contain; }
 
 /* Release 33: reserve the same diplomacy rows during peace, war and cooldowns. */
@@ -8698,3 +8698,191 @@ body:has(.view-command) #toast {
 
 @media (max-width: 900px) { .workspace .government-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .workspace .government-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* The world chart is the persistent scene; ministry controls are separate tiles. */
+.map-scene {
+  --scene-gap: 8px;
+  --scene-tile: rgba(15, 28, 38, .97);
+  --scene-border: #42545d;
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.map-scene > .world-board {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  background: #0b1c28;
+}
+.map-scene > .world-board .map-stage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+  background: #0b1c28;
+}
+.map-scene > .world-board .world-map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+.map-scene > .sidebar,
+.map-scene .game-body > .time-bar,
+.map-scene .game-body > .resource-bar,
+.map-scene .game-body > .news-rail,
+.map-scene .command-side-panel,
+.map-scene > .world-board .map-legend,
+.map-scene.menu-workspace .workspace-inner {
+  border: 1px solid var(--scene-border);
+  border-radius: 7px;
+  background: var(--scene-tile);
+  box-shadow: 0 4px 14px #0005;
+}
+.map-scene > .sidebar {
+  position: absolute;
+  inset: var(--scene-gap) auto var(--scene-gap) var(--scene-gap);
+  width: var(--sidebar);
+  height: auto;
+  z-index: 3;
+  flex-direction: column;
+  overflow: hidden;
+}
+.map-scene > .game-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--scene-gap);
+  margin-left: calc(var(--sidebar) + 2 * var(--scene-gap));
+  padding-top: var(--scene-gap);
+  width: calc(100% - var(--sidebar) - 3 * var(--scene-gap));
+  height: calc(100dvh - var(--scene-gap));
+  min-height: 0;
+  background: transparent;
+  pointer-events: none;
+}
+.map-scene .game-body > .time-bar,
+.map-scene .game-body > .resource-bar,
+.map-scene .game-body > .news-rail {
+  position: relative;
+  top: auto;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+.map-scene .game-body > .time-bar { padding: 7px 10px; }
+.map-scene .game-body > .resource-bar { overflow: hidden; }
+.map-scene .resource-bar > div { background: transparent; }
+.map-scene .resource-bar > div:last-child { border-right: 0; }
+.map-scene .game-body > .news-rail { padding: 0 10px; }
+.map-scene .workspace {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+.map-scene .workspace-inner {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+.map-scene.map-workspace .workspace-inner { display: block; overflow: hidden; }
+.map-scene .workspace .world-command {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.map-scene .world-command .command-side-panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: var(--sidebar);
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+.map-scene > .world-board .map-legend {
+  position: absolute;
+  inset: auto calc(var(--sidebar) + 2 * var(--scene-gap)) var(--scene-gap);
+  z-index: 1;
+  height: 29px;
+  min-height: 29px;
+  padding: 4px 8px;
+  gap: 8px;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+.map-scene.menu-workspace > .world-board .map-legend { display: none; }
+.map-scene.menu-workspace .workspace-inner {
+  display: block;
+  padding: 14px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  pointer-events: auto;
+}
+.map-scene.menu-workspace .workspace-inner > .view-heading { margin-top: 0; }
+@media (max-width: 1100px) {
+  .map-scene { --sidebar: 164px; --scene-gap: 6px; }
+  .map-scene .game-body > .time-bar { flex-wrap: wrap; row-gap: 5px; }
+  .map-scene .header-audio { margin-left: auto; }
+  .map-scene.menu-workspace .workspace-inner { padding: 10px; }
+}
+@media (max-height: 700px) {
+  .map-scene > .sidebar .side-country { padding-top: 3px; padding-bottom: 3px; }
+  .map-scene > .sidebar nav { flex: 1; overflow-y: auto; }
+  .map-scene > .sidebar .side-bottom { padding-top: 4px; gap: 3px; }
+}
+
+/* Incoming trade stays in the news rail until opened; no modal interrupts play. */
+.pending-offers { min-width: 0; max-width: 270px; min-height: 30px; height: 30px; margin: 0; padding: 3px 8px; text-align: left; border-color: #819184; white-space: nowrap; font-size: 11px; }
+.pending-offers strong,.pending-offers small { display: block; overflow: hidden; text-overflow: ellipsis; line-height: 1.15; }
+.pending-offers small { color: var(--muted); font-size: 10px; }
+.diplomatic-offers { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(320px,100%),1fr)); gap: 10px; margin: 0 0 16px; }
+.diplomatic-offers > h2,.diplomatic-offers > .panel-title,.diplomatic-offers > p,.diplomatic-offers > .offer-history { grid-column: 1/-1; }
+.diplomatic-offer { min-width: 0; padding: 12px; background: #162a35; border: 1px solid #526a66; border-radius: 5px; }
+.diplomatic-offer h3 { margin: 0 0 8px; }
+.offer-terms { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 9px 0; }
+.offer-party { min-width: 0; padding: 8px; background: #0b1923; border: 1px solid var(--line); border-radius: 3px; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.offer-party strong,.offer-party small,.offer-party > span { display: block; }
+.offer-deadline { display: block; color: var(--gold); font-size: 12px; line-height: 1.4; }
+.offer-actions { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.offer-actions button { min-height: 34px; margin: 0; }
+.offer-block { margin: 8px 0; color: var(--red); font-size: 12px; }
+.offer-history { border-top: 1px solid var(--line); padding-top: 9px; font-size: 12px; }
+.offer-history > summary { cursor: pointer; color: var(--muted); padding: 5px 0; }
+.offer-history p { margin: 5px 0; }

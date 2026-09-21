@@ -500,11 +500,19 @@ try {
     assert.equal(await page.locator("[data-fleet-mission],[data-fleet-aggression],[data-action=send-inline-order]").count(),0);
     assert.equal(await page.locator("[data-action=alert-history]").count(),0);
     const count = await page.locator(".fleet-command-row").count();
-    await page
-      .locator('.world-map [data-action="select-port"]')
-      .first()
-      .locator("circle:not(.map-hit):not(.island-front)")
-      .click();
+    // The chart extends behind the tiles; choose a port the player can actually
+    // point at instead of assuming the first cataloged port is unobstructed.
+    const portPoint = await page.locator('.world-map [data-action="select-port"]').evaluateAll(nodes => {
+      for (const port of nodes) {
+        const circle = port.querySelector('circle:not(.map-hit):not(.island-front)');
+        if (!circle) continue;
+        const r = circle.getBoundingClientRect(), x = r.x+r.width/2, y = r.y+r.height/2;
+        if (document.elementFromPoint(x,y)?.closest('[data-action="select-port"]') === port) return {x,y};
+      }
+      return null;
+    });
+    assert(portPoint, 'The uncovered chart offers a directly clickable port');
+    await page.mouse.click(portPoint.x,portPoint.y);
     await delay(450);
     assert.equal(await page.locator(".fleet-command-row").count(), count);
     const home=nation==='USA'?'norfolk':'portsmouth';
@@ -514,7 +522,8 @@ try {
       await delay(450);
       await page.mouse.move(10,10);
       await portTarget.focus();
-      await page.waitForFunction(()=>{const e=document.querySelector('.class-hover.base-hover:not([hidden])');return e?.textContent.includes('Supply capacity / demand');});
+      await page.waitForFunction(()=>{const e=document.querySelector('.class-hover.base-hover:not([hidden])');return e?.textContent.includes('Depot capacity / assigned load');});
+      assert.match(await page.locator('.class-hover.base-hover').innerText(),/does not multiply fleet supply/);
       const box=await page.locator('.class-hover').evaluate(el=>({width:el.clientWidth,height:el.clientHeight,scroll:el.scrollHeight}));
       assert.ok(box.width>=700,'Base hover must be wide enough for two columns');
       assert.ok(box.scroll<=box.height+2,'Base hover must fit without scrolling');
@@ -524,11 +533,19 @@ try {
     await page.locator('.sidebar [data-view="land"]').click();
     assert(await page.locator(".world-map").count());
     const mapBox = await page.locator(".world-board").boundingBox(),
-      sideBox = await page.locator(".command-side-panel").boundingBox();
+      sideBox = await page.locator(".command-side-panel").boundingBox(),
+      navBox = await page.locator(".sidebar").boundingBox(),
+      viewport = page.viewportSize();
     assert(
-      sideBox.x >= mapBox.x + mapBox.width - 2,
-      "Campaign panel stays to the right of the map",
+      mapBox.x === 0 && mapBox.y === 0 &&
+      Math.abs(mapBox.width - viewport.width) < 1 &&
+      Math.abs(mapBox.height - viewport.height) < 1,
+      "The world map fills the viewport behind the ministry tiles",
     );
+    assert.equal(await page.locator('.world-map').count(), 1, 'Only one world chart is mounted');
+    assert(Math.abs(sideBox.width - navBox.width) < 1, 'Campaign and navigation tiles have equal widths');
+    assert(sideBox.x > viewport.width / 2 && sideBox.x + sideBox.width <= viewport.width,
+      'Campaign information overlays the right edge of the chart');
     assert(
       (await page.locator(".political-territory").count()) > 100,
       "Land map retains political geography",

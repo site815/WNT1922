@@ -67,7 +67,7 @@ export class MapMotion {
       ui = this.chart(),
       minute = visualMinute(this.previous, this.current, now),
       rotation = ui.rotation || 0;
-    const scale = 1 / (ui.zoom || 1), locations = new Map();
+    const scale = (ui.markerScale || 1) / (ui.zoom || 1), locations = new Map();
     const items = [...svg.querySelectorAll('.fleet-marker.own, .convoy-marker')].flatMap(element => {
       const id = element.dataset.motionId, force = visualFleet(this.previous, this.current, id, minute);
       if (!force) return [];

@@ -11,6 +11,8 @@ export const GOLD_FLOW_LABELS = Object.freeze({
   shipRepairs: 'Ship repairs',
   portRepairs: 'Port repairs',
   industrialRepairs: 'Industrial and yard repairs',
+  diplomaticTrade: 'Diplomatic resource exchanges',
+  diplomaticAdministration: 'Diplomatic visits and naval demonstrations',
 });
 
 export function recordGold(n, category, amount) {
@@ -30,4 +32,9 @@ export function goldAccount(n) {
   if (Math.abs(other) > 1e-8)
     rows.push({ key: 'other', label: 'Orders, diplomacy, refunds and other activity', amount: other });
   return { rows, change };
+}
+
+export function diplomacyAccount(n) {
+  const amounts=flows=>Object.fromEntries(['gold','industry','strategic'].map(k=>[k,flows?.[k]||0]));
+  return {current:amounts(n.monthAccount?.diplomaticFlows),last:amounts(n.monthAccount?.last?.diplomaticFlows)};
 }

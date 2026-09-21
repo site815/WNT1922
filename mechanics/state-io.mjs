@@ -1,5 +1,6 @@
 import { validatePolitics } from "./politics-validation.mjs";
 import { GOLD_FLOW_LABELS } from './gold-accounting.mjs';
+import { validateDiplomaticOffers } from './diplomatic-exchange.mjs';
 import { contentFor } from "./campaign-content.mjs";
 import { VERSION, DAY, initializeCampaign } from "./engine.mjs";
 import { PRIORITIES, REGIONS, fleetService } from "./catalog.mjs";
@@ -252,6 +253,10 @@ export function validateSave(value, content) {
     for (const flows of [n.monthAccount?.goldFlows, n.monthAccount?.last?.goldFlows]) {
       if (flows !== undefined && (!plain(flows) || Object.entries(flows).some(([key, amount]) =>
         !Object.hasOwn(GOLD_FLOW_LABELS, key) || !finite(amount, -1e15, 1e15)))) fail();
+    }
+    for (const flows of [n.monthAccount?.diplomaticFlows, n.monthAccount?.last?.diplomaticFlows]) {
+      if (flows !== undefined && (!plain(flows) || Object.entries(flows).some(([key, amount]) =>
+        !['gold','industry','strategic'].includes(key) || !finite(amount, -1e15, 1e15)))) fail();
     }
     if (
       ![
@@ -919,6 +924,7 @@ export function validateSave(value, content) {
   }
   try {
     validatePolitics(value);
+    validateDiplomaticOffers(value);
   } catch {
     fail();
   }

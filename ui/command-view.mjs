@@ -212,7 +212,7 @@ export function commandView(s, content, ui = {}, data = {}) {
     height = 600 / zoom,
     cx = ui.cx ?? 600,
     cy = Math.max(height / 2, Math.min(600 - height / 2, ui.cy ?? 300)),
-    scale = 1.5 / zoom,
+    scale = 1.5 * (ui.markerScale || 1) / zoom,
     project = (p) => mapPoint(p, rotation);
   const enemies = Object.values(s.relations)
     .filter((r) => r.war && [r.a, r.b].includes(s.player))
@@ -457,10 +457,10 @@ export function commandView(s, content, ui = {}, data = {}) {
     "</span>" +
     '<a href="/third-party-notices.html" target="_blank" rel="noreferrer">Map credits</a>' +
     "</div>";
-  return (
-    '<div class="world-command" style="--command-columns:' +
-    columns +
-    '"><section class="world-board panel" aria-label="World naval chart"><div class="map-stage"><svg class="world-map" data-paused="' +
+  const map =
+    '<section class="world-board panel" ' +
+    (ui.backgroundOnly ? 'aria-hidden="true" inert' : 'aria-label="World naval chart"') +
+    '><div class="map-stage"><svg class="world-map" data-paused="' +
     s.paused +
     '" viewBox="' +
     (cx - width / 2) +
@@ -470,12 +470,12 @@ export function commandView(s, content, ui = {}, data = {}) {
     width +
     " " +
     height +
-    '" role="group" tabindex="0" aria-label="Equal Earth political and naval map. Drag to pan; scroll or plus and minus to zoom; Home resets. Hover for information; click to center; double-click to center and zoom."><path d="' +
+    '" role="group" tabindex="0" aria-label="Equal Earth political and naval map. Drag to pan; scroll to zoom; Home resets. Hover for information; click to center; double-click to center and zoom."><path d="' +
     seaOutline() +
     '" class="sea"/><g class="graticule">' +
     grid +
     "</g>" +
-    politicalMap(s, data, rotation, zoom) +
+    politicalMap(s, data, rotation, zoom / (ui.markerScale || 1)) +
     escortAreas +
     ports +
     capitals +
@@ -490,12 +490,17 @@ export function commandView(s, content, ui = {}, data = {}) {
     focus +
     "</svg></div>" +
     legend +
-    '</section><section class="panel command-side-panel" data-key="command-selection-' +
+    '</section>';
+  const panelLayer = '<section class="panel command-side-panel" data-key="command-selection-' +
     selectedKey +
     '" data-scroll-key="command-selection-' +
     selectedKey +
     '" aria-label="Command information and controls">' +
     panel +
-    "</section></div>"
-  );
+    "</section>";
+  const wrapper = '<div class="world-command" style="--command-columns:' + columns + '">';
+  // One world chart lives behind the shell; map pages supply only their own
+  // information tile. The default remains useful to standalone view consumers.
+  if (ui.detachedLayers) return { map, panels: wrapper + panelLayer + '</div>' };
+  return wrapper + map + panelLayer + '</div>';
 }
