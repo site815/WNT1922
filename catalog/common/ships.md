@@ -1407,8 +1407,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "speed": 24,
     "range": 5556,
     "shp": 10500,
-    "caliber": 0,
-    "barrels": 0,
+    "caliber": 101.6,
+    "barrels": 2,
     "tubes": 8,
     "torpedoRange": 8,
     "belt": 0,
@@ -1440,6 +1440,12 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "fuel": "oil"
       },
       "armament": {
+        "main_battery": {
+          "count": 2,
+          "caliber_in": 4,
+          "mounts": "single, one forward and one aft of the steam machinery casing",
+          "notes": "Deck-gun positions checked against Vickers 1918 general arrangement NPN5009, Royal Museums Greenwich."
+        },
         "torpedo_tubes": {
           "count": 8,
           "caliber_in": 18,
@@ -4052,8 +4058,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "range": 1481.6000000000001,
     "shp": 3500,
     "caliber": 88,
-    "barrels": 1,
-    "tubes": 2,
+    "barrels": 2,
+    "tubes": 1,
     "torpedoRange": 8,
     "belt": 0,
     "deck": 0,
@@ -4085,13 +4091,13 @@ Edit the JSON block directly. The game reads this document at startup; no export
       },
       "armament": {
         "main_battery": {
-          "count": 1,
+          "count": 2,
           "caliber_in": 3.4,
           "caliber_mm": 88,
-          "mounts": "1x1"
+          "mounts": "2x1"
         },
         "torpedo_tubes": {
-          "count": 2,
+          "count": 1,
           "caliber_in": 17.7,
           "submerged": false
         }
@@ -4109,7 +4115,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "status": "mixed",
         "notes": "The twelve torpedo boats Article 181 allows, from the wartime A-series coastal boats. Replacement capped at 200 t."
       },
-      "notes": "Two hundred and twenty-seven tons, one gun and a coastal radius. They are on the establishment because the Treaty counts hulls and not capability, and they are the reason a German naval officer of 1922 could go to sea at all."
+      "notes": "A-II / A26 historical reference: 227 tons, two single 88 mm guns, one 450 mm torpedo tube and a coastal radius (https://www.navypedia.org/ships/germany/ger_dd_a26.htm). They are on the establishment because the Treaty counts hulls and not capability, and they are the reason a German naval officer of 1922 could go to sea at all."
     }
   },
   "courbet": {
@@ -4535,7 +4541,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "range": 3704,
     "shp": 17500,
     "caliber": 119.38,
-    "barrels": 3,
+    "barrels": 1,
     "tubes": 4,
     "torpedoRange": 8,
     "belt": 0,
@@ -4568,7 +4574,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       },
       "armament": {
         "main_battery": {
-          "count": 3,
+          "count": 1,
           "caliber_in": 4.7,
           "mounts": "single"
         },
@@ -4576,7 +4582,14 @@ Edit the JSON block directly. The game reads this document at startup; no export
           "count": 4,
           "caliber_in": 17.7,
           "submerged": false
-        }
+        },
+        "secondary_battery": [
+          {
+            "count": 4,
+            "caliber_in": 3,
+            "mounts": "4x1"
+          }
+        ]
       },
       "complement": 82,
       "design_year": 1916,
@@ -4584,6 +4597,10 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "count": 12,
         "status": "active",
         "notes": "Japanese-built (Kaba derivative); plus assorted war-era 800t boats and ex-German prizes."
+      },
+      "source": {
+        "title": "Brassey's Naval and Shipping Annual 1923, p.363: 1 × 4.7-inch and 4 × 12-pounder guns",
+        "url": "https://archive.org/details/brasseysnavala1923brasuoft/page/n515/mode/1up"
       }
     }
   },
@@ -5376,7 +5393,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "main_battery": {
           "count": 4,
           "caliber_in": 4,
-          "mounts": "2x2"
+          "mounts": "4x1"
         },
         "torpedo_tubes": {
           "count": 4,
@@ -5390,6 +5407,10 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "count": 4,
         "status": "active",
         "notes": "Plus numerous war-era 3-funnel boats reclassified torpedo boats."
+      },
+      "source": {
+        "title": "Brassey's Naval and Shipping Annual 1923, p.434: original Palestro profile",
+        "url": "https://archive.org/details/brasseysnavala1923brasuoft/page/n636/mode/1up"
       }
     }
   },
@@ -5454,7 +5475,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "hulls_aggregate": {
         "count": 3,
         "status": "mixed",
-        "notes": "Approximate; plus small war-era coastal boats. Provana herself lost 1918."
+        "notes": "Approximate; includes small war-era coastal boats. The early Barbarigo-class Andrea Provana entered service in September 1918 and was struck in January 1928; its central section is preserved by ANMI Torino. This is not the later Marcello-class namesake."
       }
     }
   },

@@ -18,6 +18,7 @@ import { contentFor } from "../mechanics/campaign-content.mjs";
 import {
   DIPLOMACY,
   diplomaticBlock,
+  diplomaticTerms,
   readyProvocationFleet,
 } from "../mechanics/diplomacy-rules.mjs";
 import {
@@ -74,7 +75,7 @@ const approx = (a, b) =>
     a + " != " + b,
   );
 
-test("diplomacy has five exchanges; payments and 90-day country/action clocks are independent", () => {
+test("diplomacy has six actions; payments and 90-day country/action clocks are independent", () => {
   const [s, c, n] = start();
   Object.assign(n, { gold: 100000, influence: 100, industry: 100000 });
   assert.deepEqual(Object.keys(DIPLOMACY), [
@@ -82,11 +83,12 @@ test("diplomacy has five exchanges; payments and 90-day country/action clocks ar
     "sell",
     "cooperate",
     "strategic",
+    "sellStrategic",
     "provoke",
   ]);
   for (const action of ["visit", "sell", "cooperate"]) {
     const before = money(n),
-      rule = DIPLOMACY[action];
+      rule = diplomaticTerms(s,c,"USA",action);
     diplomaticAction(s, "USA", action, s.player, c);
     for (const k of Object.keys(before))
       approx(n[k], before[k] - rule.price[k] + (rule.gain[k] || 0));
@@ -100,8 +102,9 @@ test("diplomacy has five exchanges; payments and 90-day country/action clocks ar
     assert.equal(diplomaticBlock(s, c, "GBR", action), "");
   }
   const before = money(n);
+  const visit = diplomaticTerms(s,c,"GBR","visit");
   diplomaticAction(s, "GBR", "visit", s.player, c);
-  assert.equal(n.influence, before.influence + 8);
+  assert.equal(n.influence, before.influence + visit.gain.influence);
   const rendered = diplomacyView(s, c);
   assert.doesNotMatch(
     rendered,

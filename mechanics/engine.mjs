@@ -1,4 +1,5 @@
 import { beginEngagement, progressEngagements } from "./engagements.mjs";
+import { armedClass, fireTorpedoes } from "./torpedo-ammunition.mjs";
 import { MORALE, changeMorale, dailyMoraleRecovery, navalWarScore } from './campaign-impact.mjs';
 import { strategicFactor, strategicDemand, shipMaterialCost } from "./strategic-materials.mjs";
 import { HISTORICAL_WARS, EUROPE_OPENING } from "./war-politics.mjs";
@@ -36,6 +37,7 @@ import {
 import { airConditions } from "./air-conditions.mjs";
 import { initializeGovernmentAviation } from "./government-aviation.mjs";
 import { initializeEconomy, closeEconomicMonth } from "./economic-growth.mjs";
+import { recordGold } from './gold-accounting.mjs';
 import {
   initializeDiplomacy,
   commenceWar,
@@ -150,6 +152,7 @@ import { recordWarBattle, recordWarRaid } from "./war-balance.mjs";
 import {
   DIPLOMACY,
   diplomaticBlock,
+  diplomaticTerms,
   readyProvocationFleet,
 } from "./diplomacy-rules.mjs";
 import { organizeSupport } from "./support-operations.mjs";
@@ -634,6 +637,7 @@ export function fleetPower(
   region = null,
   fleetId = null,
   airDistanceKm = 0,
+  torpedoTargets = true,
 ) {
   const n = s.nations[id],
     result = {
@@ -665,7 +669,7 @@ export function fleetPower(
     )
       continue;
     const c = content.classes[g.classId],
-      p = classPower(c, n.tech, !!fleetId),
+      p = classPower(armedClass(g, c, torpedoTargets), n.tech, !!fleetId),
       a = airPower(s, content, id, g, airDistanceKm),
       logistics =
         supplies.get(g.fleetId) ?? supplyDetails(s, content, id).factor;
@@ -701,6 +705,13 @@ export function fleetPower(
   result.speed /= Math.max(1, result.ships);
   result.supply = sumSupply / Math.max(1, result.ships);
   return result;
+}
+
+function expendFleetTorpedoes(s, c, id, region, fleetId) {
+  for (const g of s.nations[id].groups)
+    if (availableGroup(s, g) && g.sailors > 0 &&
+        (fleetId ? g.fleetId === fleetId : !region || g.region === region))
+      fireTorpedoes(g, c.classes[g.classId]);
 }
 
 export function monthlyIncome(s, content, id = s.player) {
@@ -741,12 +752,12 @@ export function affordability(n, price) {
     )
     .join("; ");
 }
-function spend(n, p) {
+function spend(n, p, { production = true } = {}) {
   const error = affordability(n, p);
   if (error) throw new Error(error);
   for (const k of ["gold", "influence", "industry", "strategic"])
     n[k] = Math.max(0, n[k] - (p[k] || 0));
-  n.strategicSpent.production += p.strategic || 0;
+  if (production) n.strategicSpent.production += p.strategic || 0;
 }
 export function shipPrice(s, content, classId, count = 1, id = s.player) {
   const c = content.classes[classId],
@@ -996,14 +1007,14 @@ export function diplomaticAction(
   const block = diplomaticBlock(s, content, target, action, id, fleetId);
   if (block) throw new Error(block);
   const n = s.nations[id],
-    rule = DIPLOMACY[action],
+    rule = diplomaticTerms(s, content, target, action, id),
     now = s.day + (s.fraction || 0);
   const force =
     action === "provoke"
       ? readyProvocationFleet(s, content, target, id)
       : null;
   if (force) startProvocation(s, content, id, target, force.id);
-  spend(n, rule.price);
+  spend(n, rule.price, { production: false });
   n.cooldowns[action + "-" + target] = now + rule.days;
   const gains = {};
   for (const [k, v] of Object.entries(rule.gain)) {
@@ -1029,7 +1040,7 @@ export function diplomaticAction(
     addLog(s, receipt, "diplomacy");
     s.log[0].dismissed = true;
   }
-  return { receipt, fleetId: force?.id, gains };
+  return { receipt, fleetId: force?.id, gains, price: rule.price, effects: rule.effects };
 }
 export function setTreatyPolicy(s, policy, id = s.player) {
   if (!TREATY_POLICIES[policy])
@@ -1173,6 +1184,7 @@ function daily(s, content) {
         const cost = content.classes[g.classId].cost * g.count * 0.0001;
         if (n.gold >= cost) {
           n.gold -= cost;
+          recordGold(n, 'shipRepairs', -cost);
           g.health = clamp(
             g.health +
               0.003 *
@@ -1386,7 +1398,11 @@ function monthly(s, content) {
   for (const [id, n] of Object.entries(s.nations)) {
     closeEconomicMonth(s, content, id);
     const income = monthlyIncome(s, content, id);
+    const paidUpkeep = Math.min(n.gold, income.upkeep);
+    const paidTreaty = Math.min(Math.max(0, n.gold - paidUpkeep), income.treaty.gold);
     n.gold = Math.max(0, n.gold - income.upkeep - income.treaty.gold);
+    recordGold(n, 'upkeep', -paidUpkeep);
+    recordGold(n, 'treaty', -paidTreaty);
     n.influence = clamp(n.influence + income.influence, 0, 500); // Industry output and its running expense are credited daily.
     if (n.gold < 1) {
       changeMorale(n,MORALE.unpaidFleet);
@@ -1466,6 +1482,8 @@ export function aiTurn(s, content, id) {
         ? "strategic"
         : n.influence < 24
         ? "visit"
+        : n.gold < economyFor(s, id).goldYear / 12 && n.strategic > Math.max(4000, (n.strategicDailyDemand || 0) * 60 + DIPLOMACY.sellStrategic.price.strategic)
+          ? "sellStrategic"
         : n.gold < economyFor(s, id).goldYear / 12 && n.industry > 5000
           ? "sell"
           : n.industry < 2500 && n.gold > 10000 && n.influence > 35
@@ -1474,13 +1492,13 @@ export function aiTurn(s, content, id) {
     if (
       action &&
       !diplomaticBlock(s, content, target, action, id) &&
-      aiCanSpend(s, id, DIPLOMACY[action].price)
+      aiCanSpend(s, id, diplomaticTerms(s, content, target, action, id).price)
     )
       command("diplomatic", { id: target, kind: action });
     if (
       (response || (target === n.rival && rng(s) < 0.05)) &&
       !diplomaticBlock(s, content, target, "provoke", id) &&
-      aiCanSpend(s, id, DIPLOMACY.provoke.price)
+      aiCanSpend(s, id, diplomaticTerms(s, content, target, "provoke", id).price)
     )
       command("diplomatic", { id: target, kind: "provoke" });
   }
@@ -1874,6 +1892,9 @@ export function resolveBattle(
     return null;
   }
   if (!phase) return beginEngagement(s,content,{kind:"surface",a,b,region,fleetA,fleetB,position});
+  // Power above includes the loaded salvo; subsequent exchanges see the spent outfit.
+  expendFleetTorpedoes(s, content, a, region, fleetA);
+  expendFleetTorpedoes(s, content, b, region, fleetB);
   const va = 1 + (rng(s) * 2 - 1) * RULES.battleVariation,
     vb = 1 + (rng(s) * 2 - 1) * RULES.battleVariation;
   const preparationA = {
@@ -1994,7 +2015,8 @@ export function resolvePortAction(s, c, a, f, port, kind, distance = 0, phase = 
   const b = portOwner(s, port);
   if (!s.relations[pairKey(a, b)]?.war) return null;
   const before = portSummary(s, c, port),
-    pa = fleetPower(s, c, a, null, f.id, distance * 1.852);
+    harbor = kind === "anchorage" ? anchoredShips(s, c, b, port) : [],
+    pa = fleetPower(s, c, a, null, f.id, distance * 1.852, harbor.length > 0);
   if (!pa.ships) return null;
   if (!phase) return beginEngagement(s,c,{kind:"port",a,b,fleetA:f.id,port,operation:kind,distance,position:fleetPosition(s,f)});
   const position = fleetPosition(s, f),
@@ -2029,7 +2051,7 @@ export function resolvePortAction(s, c, a, f, port, kind, distance = 0, phase = 
       (pa.air / (1 + air.fighters / Math.max(300, pa.air)) +
         (distance <= 18 ? pa.surface * 0.55 : 0)) *
       va * phase.weight;
-  const harbor = kind === "anchorage" ? anchoredShips(s, c, b, port) : [];
+  if (distance <= 18 && harbor.length > 0) expendFleetTorpedoes(s, c, a, region, f.id);
   const da = damageFleet(
     s,
     c,
@@ -2151,9 +2173,11 @@ export function resolveConvoyAttack(s,c,a,b,fleetId,convoyId,position,phase=null
   const pb={surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:v.speed,supply:1};
   for(const escort of s.nations[b].fleets) if(distanceNm(fleetPosition(s,escort),position)<120) {
     const power=fleetPower(s,c,b,null,escort.id); pb.asw+=power.asw; pb.surface+=power.surface*.2;
+    expendFleetTorpedoes(s,c,b,null,escort.id);
   }
   pb.total=pb.asw+pb.surface;
   const attack=pa.surface+pa.sub, chance=attack/Math.max(1,attack+pb.total);
+  expendFleetTorpedoes(s,c,a,region,fleetId);
   const lost=rng(s)<chance ? Math.floor((1+Math.min(7,attack/100)*rng(s))*phase.weight+rng(s)) : 0;
   const loss=sinkMerchants(s,b,Math.min(v.count,lost),{details:true,convoy:v});
   s.nations[a].merchantSunk+=loss.hulls; s.nations[a].merchantSunkGRT+=loss.grt;
@@ -2254,6 +2278,7 @@ export function campaignScores(s, content) {
 // Scheduled maritime air action. Remote aircraft cannot inflict gunfire on a
 // carrier hundreds of kilometers away; CAP and flak fight the airborne wing.
 export function resolveAirAttack(s, c, a, op, position, phase = null) {
+  if (!op.airWing?.some(w => ["strike", "bomber"].includes(w.role) && w.count > 0 && w.crewed > 0)) return null;
   const b = op.targetNation,
     n = s.nations[a],
     enemy = s.nations[b],

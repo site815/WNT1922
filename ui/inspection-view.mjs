@@ -1,4 +1,5 @@
 import { airOperationsText } from "../mechanics/air-operations.mjs";
+import { finiteTorpedoOutfit, torpedoesPerHull } from '../mechanics/torpedo-ammunition.mjs';
 import { navalInfluence, POWERS } from "../mechanics/land-war.mjs";
 import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
 import { modelFerryKm } from "../mechanics/base-aviation.mjs";
@@ -332,7 +333,7 @@ export function classHover(c) {
           ? num(c.barrels) + " × " + num(c.caliber) + " mm"
           : "No main battery",
       ],
-      ["Torpedoes", num(c.tubes) + " tubes"],
+      ["Torpedoes", num(c.tubes) + " tubes" + (finiteTorpedoOutfit(c) ? ' · '+num(c.torpedoCapacity)+' aboard · no reloads at sea' : '')],
       ["Aircraft", (c.air || 0) + (c.scoutAircraft || 0) + " slots"],
       ["Complement", num(c.crew) + " sailors"],
       [
@@ -405,6 +406,7 @@ export function shipDetails(s, c, id) {
             ),
       ],
       ["Sailors aboard", num(g.sailors) + " / " + num(cl.crew * g.count)],
+      ...(finiteTorpedoOutfit(cl) ? [["Torpedoes aboard",num(torpedoesPerHull(g,cl)*g.count)+' / '+num(cl.torpedoCapacity*g.count)+' · rearm in port only']] : []),
       [
         "Departure readiness",
         fullyStaffed(g, cl)

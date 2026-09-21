@@ -26,11 +26,11 @@ const options=[{id:'approve',label:'Approve',detail:'Approve the estimate.',gold
   {id:'decline',label:'Retain current policy',detail:'No new spending.'}];
 const command=(s,type,key)=>applyCommand(s,CATALOG,{type,args:{key}});
 
-test('2% shipping keeps compact convoys across all fourteen starts',()=>{
+test('3% shipping keeps compact convoys across all fourteen starts',()=>{
   for(const campaign of Object.keys(CATALOG.campaigns))for(const id of Object.keys(CATALOG.nations)) {
     const s=newGame(CATALOG,id,310031,campaign),t=convoyTraffic(s,id);
-    assert.equal(t.hullsAtSea,Math.round(s.nations[id].merchant.hulls*.02));
-    assert.ok(t.convoyCount<=15,id+' keeps compact convoy groups');
+    assert.equal(t.hullsAtSea,Math.round(s.nations[id].merchant.hulls*.03));
+    assert.ok(t.convoyCount<=17,id+' keeps compact convoy groups');
   }
 });
 

@@ -1,4 +1,5 @@
 import { syncConvoys, moveConvoys, merchantLaneNodes } from "./merchant-convoys.mjs";
+import { armedClass } from "./torpedo-ammunition.mjs";
 export { syncConvoys } from "./merchant-convoys.mjs";
 import { nationAtWar, recordConvoy } from "./economy-rules.mjs";
 import { strategicFactor } from "./strategic-materials.mjs";
@@ -163,7 +164,7 @@ export function fleetStats(s, c, id, f) {
     airRadius = 0,
     health = 0;
   for (const g of active) {
-    const cl = c.classes[g.classId],
+    const cl = armedClass(g, c.classes[g.classId]),
       a = airPower(s, c, id, g),
       effective = g.count * g.health * crewEffectiveness(g, cl),
       sub = type(cl) === "submarine";

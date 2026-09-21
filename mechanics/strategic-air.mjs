@@ -130,6 +130,7 @@ export function strategicDamage(s, c, id, op, attack) {
   }
   return record;
 }
+import { recordGold } from './gold-accounting.mjs';
 export function repairIndustry(s) {
   for (const [id, n] of Object.entries(s.nations)) {
     const d = n.industrialDamage;
@@ -145,6 +146,7 @@ export function repairIndustry(s) {
       );
       d[k] -= restore;
       n.gold -= restore * gold;
+      recordGold(n, 'industrialRepairs', -restore * gold);
       n.industry -= restore * industry;
       d.repairGold += restore * gold;
       d.repairIndustry += restore * industry;

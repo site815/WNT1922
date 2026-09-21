@@ -2,7 +2,20 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-portable-win-x64.exe** from Assets. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.33.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.33.0 — portable beta
+
+- Ship and aircraft inspections display local recognition drawings, source credits and reference configurations. Historical references retain their provenance; original designs use editable SVG geometry with aligned views. All live files and registries are organized beneath `assets/recognition/`. Repository artwork changes load directly without an asset build step.
+- Historical fit checks correct the A-II torpedo boat and K-class submarine armament, Arabe and Palestro mount descriptions, and the 1936 Courageous carrier configuration. Reference captions distinguish period drawings, later refits and original reconstructions.
+- École France starts with 96 Mediterranean PT boats: 600 tons, 12 crew and six torpedoes per hull. These boats have no reloads at sea; fired torpedoes remain spent until the boats return to port. Maya remains available through the end of the ALB campaign.
+- Gold hover separates budget estimates from actual cash flow, including ship, port and industrial repairs. The cash-flow total reconciles with the change in gold reserves.
+- Active pacts and public naval-treaty compliance affect diplomatic costs and results. Strategic materials can be sold through diplomacy. Country cards retain their layout when war disables bilateral actions.
+- Superseded aircraft have separate **Retire reserves** and **Retire all** controls. Retire all removes deployed airframes too, preserves aviators, and prevents pending orders from recreating a retired model.
+- Keys **1–0** select menus 1–10; **+ / −** change simulation speed. Autopause sits beside SFX and Music. Command, land and strategic-air side panels match the left sidebar width, leaving more space for the map.
+- Merchant dispatch targets **3%** of hulls at sea and approximately **12 convoys**. The 500,000× speed setting is removed. Requested speeds still use bounded worker slices and process every simulation tick; actual speed depends on workload.
+
+Start a new campaign to receive changed opening fleets and platform definitions. Existing save migration preserves legal speeds and accounts for cash activity recorded before the new detailed ledger.
 
 ## Version 0.32.1 — portable beta
 

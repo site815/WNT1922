@@ -21,7 +21,7 @@ const start=(id="USA",campaign="in_good_faith_1936")=>{const s=newGame(CATALOG,i
 const war=(s,a,b)=>{const r=s.relations[[a,b].sort().join("-")];r.war=true;r.allied=false;r.warSince=s.day;};
 test("diplomatic actions put automatic strongest-force provocation last",()=>{
   const [s,c]=start("JPN");
-  assert.deepEqual(Object.keys(DIPLOMACY),["visit","sell","cooperate","strategic","provoke"]);
+  assert.deepEqual(Object.keys(DIPLOMACY),["visit","sell","cooperate","strategic","sellStrategic","provoke"]);
   const f=readyProvocationFleet(s,c,"USA");assert.ok(f);
   const html=diplomacyView(s,c);assert.doesNotMatch(html,/provocation-fleet|data-provocation-country/);
   assert.match(html,/strongest ready task force/);
@@ -65,7 +65,7 @@ test("all fourteen starts derive shipping demand from product and assign only re
     const [s,c,n]=start(id,campaign),p=shippingPlan(s,c,id),e=merchantEconomy(s,c,id);
     near(p.required,(n.gdp+e.gtp)/2);assert.ok(p.routes.length>0);
     assert.ok(n.convoys.length>0);assert.ok(p.assigned<=n.merchant.hulls);
-    near(p.hullsAtSea,Math.round(n.merchant.hulls*.02));
+    near(p.hullsAtSea,Math.round(n.merchant.hulls*.03));
     assert.match(resourceHover(s,c,"SHIPPING"),/round trip|round-trip/);
     validateSave(s,CATALOG);
   }

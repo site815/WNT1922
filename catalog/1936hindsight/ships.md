@@ -430,8 +430,10 @@ Edit the JSON block directly. The game reads this document at startup; no export
         "jp45cic"
       ],
       "notes": "Fire control as launched is optical rangefinders. Deliberately unexceptional and deliberately everywhere; the fleet's arithmetic is written in her hull numbers. One class for the line's whole life: keels from 1935 rise on advanced panels as yard method, not as a new class. The catapult and the aviation crane share one 7.7 t rating -- sized in 1925 for a load nobody could then name; they work the Raiden's float kit. First keels 1927, first three hulls commissioning 1929 -- two years keel to commissioning, and she commissions with the automatic cannon fitted rather than wired -- the first ship in any navy to carry her light battery as designed. The line's four deferred years went into the yards with the carrier vote.",
-      "sensors": []
-    }
+      "sensors": [],
+      "production_service_life": "continuous"
+    },
+    "productionServiceLife": "continuous"
   },
   "kaze_t32": {
     "id": "kaze_t32",
@@ -3068,7 +3070,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
   "courageous_llc": {
     "id": "courageous_llc",
     "nation": "GBR",
-    "name": "Courageous class (large light cruiser)",
+    "name": "Courageous class (carrier conversion)",
     "type": "CV",
     "category": "aircraft_carrier",
     "tons": 18600,
@@ -3080,7 +3082,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "shp": 90000,
     "caliber": 0,
     "barrels": 0,
-    "tubes": 14,
+    "tubes": 0,
     "torpedoRange": 8,
     "belt": 0,
     "deck": 45,
@@ -3094,11 +3096,11 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "provisioned": 0,
     "raw": {
       "id": "courageous_llc",
-      "name": "Courageous class (large light cruiser)",
+      "name": "Courageous class (carrier conversion)",
       "nation": "GBR",
-      "type": "BC",
-      "treaty_category": "capital_ship",
-      "generation": "fast_battleship",
+      "type": "CV",
+      "treaty_category": "aircraft_carrier",
+      "generation": "interwar",
       "displacement": {
         "standard_tons": 18600,
         "full_load_tons": 22560
@@ -3112,32 +3114,29 @@ Edit the JSON block directly. The game reads this document at startup; no export
       },
       "armament": {
         "main_battery": {
-          "count": 4,
-          "caliber_in": 15,
-          "mounts": "2x2"
+          "count": 0,
+          "caliber_in": 0
         },
-        "secondary_battery": [
-          {
-            "count": 18,
-            "caliber_in": 4,
-            "mounts": "6x3"
-          }
-        ],
         "torpedo_tubes": {
-          "count": 14,
-          "caliber_in": 21,
-          "submerged": false
+          "count": 0
         }
       },
       "protection": {
-        "belt_mm": 76,
+        "belt_mm": 0,
         "deck_mm": 45,
-        "turret_mm": 229,
         "torpedo_defense": 1
       },
       "complement": 828,
       "design_year": 1915,
-      "notes": "Fisher's freaks — fast, huge, unarmored. Ideal carrier-conversion hulls under the 33,000-ton clause."
+      "notes": "Scenario carrier conversion of Courageous/Glorious. The 15-inch gun turrets and torpedo tubes were removed for the conversion. The scenario retains its existing 36-aircraft operating complement and hull/machinery estimates; these are not an exact historical 1928 fit. The 1922 campaign has a separate original battlecruiser definition.",
+      "aviation": {
+        "aircraft_capacity": 36,
+        "flight_deck": true
+      },
+      "source": {
+        "title": "HMS Courageous Association — carrier conversion history",
+        "url": "https://www.hmscourageous.co.uk/new-history-1"
+      }
     },
     "estimated": [
       "air"
@@ -7578,6 +7577,96 @@ Edit the JSON block directly. The game reads this document at startup; no export
       }
     },
     "notes": "The Tillman program reaches its largest design: six triple 546 mm turrets, three forward and three aft in superfiring tiers. Columbia armor is retained, with an enlarged machinery plant for 32 knots."
+  },
+  "ecole_pt32": {
+    "id": "ecole_pt32",
+    "nation": "FRA",
+    "name": "École coastal torpedo boat",
+    "type": "TB",
+    "category": "auxiliary_combatant",
+    "tons": 600,
+    "cost": 180,
+    "year": 1932,
+    "durability": 50,
+    "speed": 34,
+    "range": 2778,
+    "shp": 12000,
+    "caliber": 0,
+    "barrels": 0,
+    "tubes": 6,
+    "torpedoRange": 8,
+    "torpedoCapacity": 6,
+    "torpedoReloads": 0,
+    "belt": 0,
+    "deck": 0,
+    "air": 0,
+    "aa": 2,
+    "scoutAircraft": 0,
+    "sonar": false,
+    "radar": false,
+    "crew": 12,
+    "submergedSpeed": 0,
+    "provisioned": 0,
+    "raw": {
+      "id": "ecole_pt32",
+      "nation": "FRA",
+      "name": "École coastal torpedo boat",
+      "type": "TB",
+      "treaty_category": "auxiliary_combatant",
+      "generation": "standardized",
+      "design_year": 1932,
+      "displacement": {
+        "standard_tons": 600,
+        "full_load_tons": 660
+      },
+      "dimensions": {
+        "length_m": 62,
+        "beam_m": 7.8,
+        "draft_m": 2.4
+      },
+      "propulsion": {
+        "speed_kn": 34,
+        "shp": 12000,
+        "range_nm": 1500,
+        "range_at_kn": 14,
+        "fuel": "diesel",
+        "shafts": 2
+      },
+      "armament": {
+        "main_battery": {
+          "caliber_mm": 0,
+          "count": 0
+        },
+        "torpedo_tubes": {
+          "count": 6,
+          "caliber_mm": 550,
+          "mounts": "2x3",
+          "arrangement": "two centerline triple mounts",
+          "stowage": 6,
+          "reloads": 0
+        },
+        "aa_battery": [
+          {
+            "caliber_mm": 13.2,
+            "count": 2,
+            "mounts": "2x1"
+          }
+        ]
+      },
+      "protection": {
+        "belt_mm": 0,
+        "deck_mm": 0
+      },
+      "aviation": {
+        "aircraft_capacity": 0
+      },
+      "complement": 12,
+      "cost_gold": 180,
+      "durability": 50,
+      "sensors": [],
+      "notes": "Alternate-history École program. Inexpensive 600-ton coastal hull for mass Mediterranean flotillas, with a 12-person complement and one six-torpedo salvo. No reload torpedoes aboard; rearm only in port. No heavy gun, armor, sonar or aviation. Dimensions, machinery and procurement are authored scenario estimates, not a historical engineering claim."
+    },
+    "notes": "Alternate-history École program. Inexpensive 600-ton coastal hull for mass Mediterranean flotillas, with a 12-person complement and one six-torpedo salvo. No reload torpedoes aboard; rearm only in port. No heavy gun, armor, sonar or aviation. Dimensions, machinery and procurement are authored scenario estimates, not a historical engineering claim."
   }
 }
 ```

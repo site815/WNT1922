@@ -1,3 +1,4 @@
+import { recognitionCard } from "./recognition.mjs";
 import { NewsTicker } from "./news-ticker.mjs";
 import { battleProgress } from "./battle-progress.mjs";
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
@@ -310,11 +311,11 @@ export function aircraftCatalogView(s, c) {
         a.type_year +
         " · " +
         esc(planeRole(a)) +
-        '</span><h3 tabindex="0" data-aircraft="' +
+        '</span><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
         a.id +
         '">' +
         esc(a.name) +
-        "</h3><p>" +
+        "</button></h3>" + recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) + "<p>" +
         num(n.aircraft[a.id]) +
         " owned · <b>" + num(stock.reserve) + " reserve</b> · " +
         (a.crew?.normal || 1) +
@@ -362,11 +363,11 @@ export function aircraftCatalogView(s, c) {
         a.type_year +
         " · Government " +
         esc(a.role.replaceAll("_", " ")) +
-        '</span><h3 tabindex="0" data-aircraft="' +
+        '</span><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
         a.id +
         '">' +
         esc(a.name) +
-        "</h3><p>" +
+        "</button></h3>" + recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) + "<p>" +
         num(n.governmentAircraft?.[a.id]) +
         " aircraft · " +
         a.crew.normal +
@@ -385,7 +386,11 @@ export function aircraftCatalogView(s, c) {
     production +
     '<p class="panel-note">Newer qualified aircraft replace older wings of the same role in port. Aircraft ferry between reachable bases and carriers; distant reinforcements travel by merchant transport. Replaced aircraft enter local reserve.</p><div class="aircraft-models">' +
     catalog + '</div>' +
-    ([...inventory.values()].some(r=>r.replacement&&r.owned)?'<details class="superseded-aircraft"><summary>Superseded naval reserves</summary>'+[...inventory.values()].filter(r=>r.replacement&&r.owned).map(r=>'<div class="retired-model-row"><span data-aircraft="'+r.model.id+'">'+esc(r.model.name)+' · '+num(r.owned)+' owned / '+num(r.reserve)+' reserve</span><button data-action="retire-aircraft" data-id="'+r.model.id+'" '+(r.block?'disabled title="'+esc(r.block)+'"':'')+'>Retire reserves</button></div>').join('')+'</details>':'') +
+    ([...inventory.values()].some(r=>r.replacement&&r.owned)?'<details class="superseded-aircraft"><summary>Superseded naval aircraft</summary><p class="panel-note">Retire reserves keeps deployed aircraft in service. Retire all removes this model from ships, bases, flights and transfers. Aviators are retained.</p>'+
+      [...inventory.values()].filter(r=>r.replacement&&r.owned).map(r=>
+        '<div class="retired-model-row"><span data-aircraft="'+r.model.id+'">'+esc(r.model.name)+' · '+num(r.owned)+' owned / '+num(r.reserve)+' reserve / '+num(r.embarked+r.ashore+r.transit)+' in service or transit</span>'+
+        '<button data-action="retire-aircraft" data-id="'+r.model.id+'" '+(r.block?'disabled data-disabled-reason="'+esc(r.block)+'"':'')+' title="'+esc(r.block||'Retire '+num(r.retireable)+' available reserve airframes; keep deployed aircraft and aviators.')+'">Retire reserves</button>'+
+        '<button data-action="retire-aircraft-all" data-id="'+r.model.id+'" '+(r.allBlock?'disabled data-disabled-reason="'+esc(r.allBlock)+'"':'')+' title="'+esc(r.allBlock||'Retire all '+num(r.owned)+' airframes, including aircraft in service or transit; retain aviators.')+'">Retire all</button></div>').join('')+'</details>':'') +
     '<details class="government-aircraft" data-detail-key="government-aircraft"><summary>Army, shore & strategic aircraft</summary><p class="panel-note">Only current and genuinely future government models are listed. An unchanged model continues in service; it is not redeveloped every three years. Superseded grounded aircraft retire immediately; flights and shipments retire on return. Patrols, maritime strikes, fighters and strategic bombers operate automatically. Government establishments occupy 25% of base slots, use separate crews, and replace losses monthly at home. Reinforcements must ferry or travel by safe merchant route; national strategic materials limit operations. No ministry production orders.</p><div class="aircraft-models">' +
     government +
     "</div></details></section>"

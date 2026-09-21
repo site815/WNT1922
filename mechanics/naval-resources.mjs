@@ -1,4 +1,5 @@
 import { strategicFactor, consumeStrategic, aircraftMaterialCost } from "./strategic-materials.mjs";
+import { recordGold } from './gold-accounting.mjs';
 import { daysInMonth } from "./economy-rules.mjs";
 import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/naval-resources.md");
@@ -50,7 +51,7 @@ export function productionBlock(
       : cl.type === "SS"
         ? 10
         : 14;
-  if (!cl.supportHybrid && year(s) - cl.year > life)
+  if (!cl.supportHybrid && cl.productionServiceLife !== "continuous" && year(s) - cl.year > life)
     return "Obsolete construction: commission a current design draft.";
   return "";
 }
@@ -590,17 +591,20 @@ export function dailyResources(s, c, log) {
       scale = industryFactor(s, id) * n.industryFunding;
     const days = daysInMonth(s.day);
     n.gold += e.goldYear / 12 / days;
+    recordGold(n, 'output', e.goldYear / 12 / days);
     n.strategic += e.strategicYear / 12 / days;
     consumeStrategic(s, c, id);
     const operating = (e.goldYear * 0.12 * scale) / 12 / days,
       paid = Math.min(n.gold, operating);
     n.gold -= paid;
+    recordGold(n, 'industry', -paid);
     n.industryOperating = operating > 0 ? paid / operating : 1;
     n.industry += e.industryYear * scale / 12 / days * n.industryOperating * strategicFactor(n);
-    const fund = (quantity, gold, industry, strategic = 0) => {
+    const fund = (quantity, gold, industry, strategic = 0, category = 'training') => {
       const amount = Math.max(0, Math.min(quantity, n.gold / gold, n.industry / industry,
         strategic ? n.strategic / strategic : Infinity));
       n.gold = Math.max(0, n.gold - amount * gold);
+      recordGold(n, category, -amount * gold);
       n.industry = Math.max(0, n.industry - amount * industry);
       n.strategic = Math.max(0, n.strategic - amount * strategic);
       n.strategicSpent.production += amount * strategic;
@@ -616,6 +620,7 @@ export function dailyResources(s, c, log) {
         a.cost_gold,
         (a.weights?.empty_kg || 2500) / 80,
         aircraftMaterialCost(a),
+        'aircraft',
       );
       n.airProductionCarry[model] = (n.airProductionCarry[model] || 0) + amount;
       const done = Math.floor(n.airProductionCarry[model]);

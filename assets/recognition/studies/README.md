@@ -1,5 +1,7 @@
 # Original recognition studies
 
+These unaccepted bitmap studies have been superseded by the reviewed shared-geometry SVGs in `../originals/`. They remain as development history and are not loaded by the game.
+
 These three files were generated with the built-in image-generation tool on 13 September 2026. They are unfinished project work preserved for transfer to another computer. No downloaded third-party art is embedded in them. They are illustrations of fictional game designs, not historical ONI publications. Preserve their original pixels while reviewing; the Raiden image has transparency and should be displayed on white.
 
 | File | Catalog identity | Review status |

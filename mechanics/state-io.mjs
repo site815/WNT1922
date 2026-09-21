@@ -1,4 +1,5 @@
 import { validatePolitics } from "./politics-validation.mjs";
+import { GOLD_FLOW_LABELS } from './gold-accounting.mjs';
 import { contentFor } from "./campaign-content.mjs";
 import { VERSION, DAY, initializeCampaign } from "./engine.mjs";
 import { PRIORITIES, REGIONS, fleetService } from "./catalog.mjs";
@@ -248,6 +249,10 @@ export function validateSave(value, content) {
         n.personnelTraining.lastDay > value.day)
     )
       fail();
+    for (const flows of [n.monthAccount?.goldFlows, n.monthAccount?.last?.goldFlows]) {
+      if (flows !== undefined && (!plain(flows) || Object.entries(flows).some(([key, amount]) =>
+        !Object.hasOwn(GOLD_FLOW_LABELS, key) || !finite(amount, -1e15, 1e15)))) fail();
+    }
     if (
       ![
         "gold",
@@ -369,6 +374,9 @@ export function validateSave(value, content) {
         fail();
       if (g.service === "merchant" && !amount(g.merchantGRT)) fail();
       if (g.legacy !== undefined && typeof g.legacy !== "boolean") fail();
+      if (g.torpedoesPerHull !== undefined &&
+          (!Number.isInteger(g.torpedoesPerHull) ||
+           !finite(g.torpedoesPerHull, 0, content.classes[g.classId].torpedoCapacity ?? -1))) fail();
       if (g.notes !== undefined && !text(g.notes, 3000)) fail();
       if (
         !Number.isInteger(g.sailors) ||
@@ -921,9 +929,7 @@ export function validateSave(value, content) {
   delete safe.pauseReason;
   safe.speed = SPEEDS.some(([v]) => v === safe.speed)
     ? safe.speed
-    : safe.speed > SPEEDS.at(-1)[0]
-      ? SPEEDS.at(-1)[0]
-      : 1;
+    : [...SPEEDS].reverse().find(([v]) => v <= safe.speed)?.[0] ?? 1;
   return safe;
 }
 

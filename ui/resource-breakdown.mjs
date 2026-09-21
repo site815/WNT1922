@@ -1,4 +1,5 @@
 import { navalAircraftInventory } from "../mechanics/aircraft-inventory.mjs";
+import { goldAccount } from '../mechanics/gold-accounting.mjs';
 import { shippingPlan } from "../mechanics/merchant-convoys.mjs";
 import { CONVOY_RULES } from "../mechanics/convoy-traffic.mjs";
 import { ECONOMY } from "../mechanics/economy-rules.mjs";
@@ -96,7 +97,18 @@ export function resourceHover(s, c, key) {
         flow("Port repairs requested / day",-ports));
       if(gold)rows.push(flow("Ship repairs requested / day",-n.groups.filter(g=>g.status==="repair"&&g.health<1).reduce((v,g)=>v+c.classes[g.classId].cost*g.count*.0001,0)));
     }
+    if(gold) {
+      const account=goldAccount(n);
+      rows.push(['Actual cash flow this month','Paid / received'],
+        ...account.rows.map(row=>flow(row.label,row.amount)),
+        flow('Cash-flow total · matches reserve change',account.change));
+      for(const [key,amount] of Object.entries(n.monthAccount.last?.goldFlows||{})) {
+        if(['governmentAircraft','shipRepairs','portRepairs','industrialRepairs'].includes(key)&&amount)
+          rows.push(flow('Last month · '+({governmentAircraft:'government aircraft',shipRepairs:'ship repairs',portRepairs:'port repairs',industrialRepairs:'industry / yard repairs'})[key],amount));
+      }
+    }
     note="Formula: annual gold = productive GDP × 20% + GTP × 80%; annual industry = (productive GDP × 80% + GTP × 20%) × facility factor × funding × paid operation × strategic effectiveness. Strategic is an abstract stock, not a physical fuel mass. GDP and GTP refer to naval budgets, not total national products. Annual strategic = 5% × (productive GDP × national modifier + GTP × min(1, GTP/GDP)). Divide by 12 for monthly gross, then subtract the listed costs. Industry expansion adds 15% of opening output per upgrade. Monthly projections use current funding and selected models. Output arrives daily. Orders, research, diplomacy, repairs and government aircraft replacements are additional; actual monthly change includes all spending. Strategic is shared nationally and shortages apply immediately to ships, aircraft and production. Below seven days of operating requirements, effectiveness falls toward 20%.";
+    if(gold) note="Gold income = (productive GDP × 20% + GTP × 80%) ÷ 12 per month, credited daily. The forecast uses current funding and models. Actual cash flow records amounts paid, including wartime ship, port and industrial repairs. Orders, diplomacy and refunds appear in other activity; on older saves that row also includes activity before detailed tracking began. The cash-flow total matches the change in reserves. Zero-cost government aircraft do not incur a gold charge. Repair requests are daily estimates and are paid only when eligible and affordable.";
   } else if(key==="INFLUENCE") {
     rows=[["Current / maximum",num(n.influence)+" / 500"],flow("Monthly ministry allocation",RULES.influencePerMonth),
       flow("Government organization",upgradeLevel(n.tech,"influence")),flow("Treaty policy",-treaty.influence),
@@ -289,23 +301,14 @@ export function resourceHover(s, c, key) {
     note =
       "Formula: reserve = total − embarked − stationed − in transit/airborne. Naval inventory conserves airframes across ships, bases, transfers, combat sorties and reserve. Other-service maritime aircraft and crews have a separate government establishment. New models replace older qualified models when a delivery route is available.";
   }
+  const table = entries => '<dl>'+entries.map(([label,value,style])=>
+    '<div><dt>'+esc(label)+'</dt><dd class="'+(style||'')+'">'+esc(value)+'</dd></div>').join('')+'</dl>';
+  const cashStart=rows.findIndex(([label])=>label==='Actual cash flow this month');
+  const detail=key==='GOLD'&&cashStart>=0
+    ? '<div class="gold-account-columns"><section><h4>Budget and repair estimates</h4>'+table(rows.slice(0,cashStart))+'</section><section><h4>Actual cash flow this month</h4>'+table(rows.slice(cashStart+1))+'</section></div>'
+    : table(rows);
   return (
-    '<div class="resource-breakdown" data-breakdown="'+esc(key)+'"><span class="eyebrow">RESOURCE ACCOUNT</span><h3>' +
-    esc(title) +
-    "</h3><dl>" +
-    rows
-      .map(
-        ([label, value, style]) =>
-          "<div><dt>" +
-          esc(label) +
-          '</dt><dd class="' +
-          (style || "") +
-          '">' +
-          esc(value) +
-          "</dd></div>",
-      )
-      .join("") +
-    "</dl>" +
+    '<div class="resource-breakdown" data-breakdown="'+esc(key)+'"><span class="eyebrow">RESOURCE ACCOUNT</span><h3>'+esc(title)+'</h3>'+detail+
     (key==='AIRCRAFT' ? '<table class="resource-aircraft-types"><thead><tr><th>Naval model</th><th>Owned</th><th>Reserve</th><th>Embarked</th><th>Ashore</th><th>Transit</th></tr></thead><tbody>'+navalAircraftInventory(s,c).filter(r=>r.owned>0).map(r=>'<tr><td>'+esc(r.model.name)+'</td><td>'+num(r.owned)+'</td><td>'+num(r.reserve)+'</td><td>'+num(r.embarked)+'</td><td>'+num(r.ashore)+'</td><td>'+num(r.transit)+'</td></tr>').join('')+'</tbody></table>' : '') + '<p class="formula">' + esc(note) +
     "</p></div>"
   );

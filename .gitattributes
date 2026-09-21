@@ -16,3 +16,6 @@
 *.gz binary
 # Preserve the upstream compiler notice exactly, including its whitespace.
 assets/licenses/NSIS-LICENSE.txt -text -whitespace
+# Recognition source hashes cover the exact SVG bytes, including upstream line endings.
+# Preserve imported vector files; their original trailing whitespace is not a code defect.
+assets/recognition/**/*.svg -text whitespace=-blank-at-eol

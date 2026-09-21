@@ -48,7 +48,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "land": true
     },
     "crew": {
-      "normal": 2
+      "normal": 1
     },
     "cost_gold": 44,
     "weights": {
@@ -62,7 +62,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "fuel": {
       "combat_radius_km": 280
     },
-    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+    "notes": "Representative 1921 treaty-era procurement fit. Performance and costs are provisional. Historical single-seat Blackburn Dart torpedo configuration; the two-seat civil float trainer is a different fit. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station. Crew evidence: Flight July 1923, Blackburn Swift/Dart fleet torpedo-plane description (https://aviadejavu.ru/Site/Crafts/Craft30843.htm)."
   },
   {
     "id": "uk_naval_scout_1921",

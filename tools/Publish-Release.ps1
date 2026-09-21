@@ -72,7 +72,7 @@ if (-not $release) {
 @{repository='site815/WNT1922';tag=$metadata.tag;id=$release.id} | ConvertTo-Json | Set-Content -LiteralPath $releaseRecord -Encoding ascii
 Write-Output ('Using Release ID ' + $release.id + ' for ' + $metadata.tag)
 $uploadUrl = $release.upload_url -replace '\{.*$', ''
-if (-not $uploadUrl.StartsWith('https://uploads.github.com/repos/site815/WNT1922/releases/')) { throw 'Unexpected release upload destination.' }
+if (-not $uploadUrl.StartsWith('https://uploads.github.com/repos/site815/WNT1922/releases/', [StringComparison]::OrdinalIgnoreCase)) { throw 'Unexpected release upload destination.' }
 $assets = @(
     @{ Path = $executable; Name = $metadata.downloadName; Type = 'application/octet-stream' },
     @{ Path = (Join-Path $publishRoot ('.build/releases/' + $metadata.downloadName + '.sha256')); Name = $metadata.downloadName + '.sha256'; Type = 'text/plain' }

@@ -80,8 +80,7 @@ $portableOutput = Join-Path $releaseRoot ('.build/releases/WNT1922-' + $releaseV
 & $portableCompiler /V2 "/DGAME_VERSION=$releaseVersion" "/DPACKAGE_DIRECTORY=$resolvedOutput" "/DPORTABLE_OUTPUT=$portableOutput" "/DNSIS_LICENSE=$portableLicense" (Join-Path $releaseRoot 'worker/desktop/portable.nsi')
 if ($LASTEXITCODE -ne 0) { throw 'Portable executable compilation failed.' }
 $portableHash = (Get-FileHash -LiteralPath $portableOutput -Algorithm SHA256).Hash.ToLowerInvariant()
-Set-Content -LiteralPath ($portableOutput + '.sha256') -Value ($portableHash + '  ' + [IO.Path]::GetFileName($portableOutput)) -Encoding ascii
-$downloadName = 'WNT1922-portable-win-x64.exe'
+$downloadName = [IO.Path]::GetFileName($portableOutput)
 Set-Content -LiteralPath (Join-Path $releaseRoot ('.build/releases/' + $downloadName + '.sha256')) -Value ($portableHash + '  ' + $downloadName) -Encoding ascii
 $releaseMetadata = [ordered]@{
     version = $releaseVersion

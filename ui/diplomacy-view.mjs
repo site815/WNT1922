@@ -6,10 +6,11 @@ import {
 import {
   DIPLOMACY,
   diplomaticBlock,
+  diplomaticTerms,
+  PACT_MODIFIERS,
   readyProvocationFleet,
 } from "../mechanics/diplomacy-rules.mjs";
 import { NATION_ORDER, PROFILES } from "../mechanics/catalog.mjs";
-import { treatyLedger } from "../mechanics/engine.mjs";
 import { timedProgress, dateLabel } from "./progress-view.mjs";
 import { warBalances } from "../mechanics/war-balance.mjs";
 import { activePacts } from "../mechanics/war-politics.mjs";
@@ -27,14 +28,22 @@ export const diplomaticCost = (p) =>
     .filter(([, v]) => v)
     .map(([k, v]) => num(v) + " " + k)
     .join(" · ") || "No resource cost";
+const percent = v => (v > 0 ? '+' : '−') + Math.round(Math.abs(v)*100) + '%';
+export function diplomaticEffectLabel(effect) {
+  return ['price','gain'].flatMap(field => Object.entries(effect[field] || {}).map(([resource,amount]) =>
+    percent(amount) + ' ' + resource + (field === 'price' ? ' cost' : ' received'))).join(' · ');
+}
 export function diplomaticHint(s, c, target, action) {
-  const r = DIPLOMACY[action];
+  const r = diplomaticTerms(s,c,target,action);
+  if (!r) return 'Choose another government and a valid diplomatic action.';
   return (
     r.name +
     ": " +
     diplomaticCost(r.price) +
     (Object.keys(r.gain).length ? " → " + diplomaticCost(r.gain) : "") +
-    ". Available every 90 days, separately for this action and country. " +
+    '. Available every ' + r.days + ' days, separately for this action and country. ' +
+    (r.effects.length ? 'Treaty effects: ' + r.effects.map(e => e.label + ': ' + diplomaticEffectLabel(e)).join('; ') + '. ' : 'Standard terms; no active treaty modifier. ') +
+    (action === 'sellStrategic' ? 'Exports use your stored strategic materials. ' : '') +
     (action === "provoke"
       ? "Automatically send the strongest ready task force for 90 days. An overlap locks both forces into pursuit of one limited battle, even after deployment expires. Admirals use normal routes, supply, scouting and aircraft cycles. A new order cancels deployment without refund. Selected force: " + (readyProvocationFleet(s, c, target)?.name || "none ready") + "."
       : "") +
@@ -146,11 +155,12 @@ export function diplomacyView(s, c) {
           .map(([action, rule]) => {
             const until = n.cooldowns[action + "-" + id],
               hint = diplomaticHint(s, c, id, action),
-              block = diplomaticBlock(s, c, id, action);
+              block = diplomaticBlock(s, c, id, action),
+              terms = diplomaticTerms(s, c, id, action);
             if (until > s.day + (s.fraction || 0))
               return timedProgress(s, {
                 end: until,
-                duration: 90,
+                duration: rule.days,
                 label: rule.name,
                 datePrefix: "Next ",
                 hint,
@@ -167,8 +177,9 @@ export function diplomacyView(s, c) {
               ' title="' +
               esc(hint + (block ? " " + block : "")) +
               '">' +
-              rule.name +
-              "</button>"
+              '<span>' + esc(rule.name) + '</span><small class="diplomatic-action-terms">' +
+              esc(diplomaticCost(terms.price) + (Object.keys(terms.gain).length ? ' → ' + diplomaticCost(terms.gain) : '')) +
+              '</small></button>'
             );
           })
           .join("");
@@ -188,7 +199,12 @@ export function diplomacyView(s, c) {
           '">' +
           (r.war ? "At war" : r.allied ? "Allied · naval access" : "At peace") +
           "</p>" +
-          (w ? "<p>War balance: " + esc(w.result) + "</p>" : "") +
+          '<p class="government-war-balance">' + (w ? 'War balance: ' + esc(w.result) : 'No active war balance') + '</p>' +
+          '<div class="government-treaty-effects" aria-label="Treaty effects">' + (() => {
+            const effects = Object.keys(DIPLOMACY).flatMap(action => diplomaticTerms(s,c,id,action).effects);
+            const unique = [...new Map(effects.map(e => [e.id,e])).values()];
+            return unique.length ? unique.map(e => '<small><strong>' + esc(e.label) + '</strong> · adjusted action terms below</small>').join('') : '<small>' + (r.war ? 'Bilateral exchanges suspended during war' : 'Standard diplomatic terms') + '</small>';
+          })() + '</div>' +
           '<div class="government-actions">' +
           actions +
           '</div>' +
@@ -221,8 +237,10 @@ export function diplomacyView(s, c) {
           "</small><small>" +
           (p.kind === "defensive"
             ? "Shared naval access · historical war entries"
-            : "Political agreement") +
-          "</small></article>",
+            : p.kind === 'consultation' ? 'Consultation agreement' : 'Political agreement') +
+          '</small><small class="pact-bonuses">' +
+          esc(p.members.length < 2 ? 'No other playable signatory; no bilateral action modifier.' : Object.entries(PACT_MODIFIERS[p.kind] || {}).map(([action,effect]) => DIPLOMACY[action].name + ': ' + diplomaticEffectLabel(effect)).join('; ')) +
+          '</small></article>',
       )
       .join("") +
     '</div><div class="government-grid">' +

@@ -8,7 +8,7 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.32.1 targets 2% of merchant hulls at sea in approximately ten convoys, adds 500,000× and 1,000,000× speed ceilings, and restores optional Autopause. With Autopause unchecked, simulation mode continues through events and in the background. AO groups have a dedicated replenishment mission. Map leaders adjust smoothly per unit, economy panels use a consistent grid, and time-step confirmations report elapsed time. The latest portable beta is distributed through the release links above. Start a new campaign for beta testing.
+Version 0.33.0 adds recognition drawings to ship and aircraft inspection, directly editable SVGs for original designs, the École navy's Mediterranean torpedo boats, treaty-aware diplomacy and strategic-material exports. Merchant traffic targets 3% of hulls at sea in approximately twelve convoys. Gold hover includes actual wartime repair costs; superseded aircraft have separate reserve-only and all-airframe retirement controls. Number keys 1–0 select the first ten menus, and +/− changes speed. Start a new campaign for beta testing.
 
 ## Edit and build
 
@@ -39,9 +39,9 @@ cd WNT1922
 .\Play-WNT1922.cmd
 ```
 
-All source, catalogs, required assets, license notices, build tools and unfinished recognition-art studies are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
+All source, catalogs, required assets, license notices, build tools and recognition artwork are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
 
-The remaining artwork task is documented in [the recognition standard and work status](assets/recognition/README.md). Three studies are preserved with their available generation briefs; the complete art catalog and UI integration are unfinished.
+The [recognition artwork guide](assets/recognition/README.md) explains direct file editing, historical attribution and geometry checks. The repository launcher reads `assets/recognition/` directly, so artwork changes need no conversion or game rebuild. Standalone release executables contain their own bundled copy.
 
 ## Source layout
 

@@ -99,7 +99,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
       setProductionAutomatic(s, c, args.role, args.enabled, actor);
       break;
     case "retire-aircraft":
-      return retireAircraft(s,c,args.id,actor);
+      return retireAircraft(s,c,args.id,actor,args.scope);
     case "commission-draft": {
       const r = commissionDraft(s, c, args.recipe, actor);
       if (actor === s.player)

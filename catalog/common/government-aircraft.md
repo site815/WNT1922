@@ -2149,8 +2149,8 @@ Each entry is a distinct service model. A model remains current until a differen
       "cost_gold": 0,
       "durability": 24,
       "crew": {
-        "normal": 3,
-        "seats": 3
+        "normal": 2,
+        "seats": 2
       },
       "performance": {
         "speed_kmh": {
@@ -2174,7 +2174,7 @@ Each entry is a distinct service model. A model remains current until a differen
         "floatplane": false,
         "land": true
       },
-      "notes": "Government-operated maritime strike. National service type with a rounded representative game fit.",
+      "notes": "Government-operated maritime strike. National service type with a rounded representative game fit. Historical Ripon pilot and observer/gunner: two seats, not three. Crew/configuration evidence: Blackburn Ripon at the Finnish Aviation Museum (https://www.ilmailumuseot.fi/tuotteet.html?id=20776%2F237260); the drawing uses the British Napier-engined wheeled configuration, not the Finnish radial-engine float fit.",
       "specification_basis": "Rounded game values; not a variant-specific flight manual."
     },
     {

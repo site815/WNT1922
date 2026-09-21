@@ -48,7 +48,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "land": true
     },
     "crew": {
-      "normal": 2
+      "normal": 1
     },
     "cost_gold": 44,
     "weights": {
@@ -62,7 +62,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "fuel": {
       "combat_radius_km": 280
     },
-    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Single-seat triplane with one Napier Lion engine and fixed wheels; first flight in 1922. Designed as a carrier torpedo aircraft, but carrier operation with a torpedo proved impractical. Cannot use a battleship floatplane station."
   },
   {
     "id": "jp_naval_scout_1921",

@@ -1,6 +1,7 @@
 import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/ship-staffing.md");
 import { HOME_PORT } from "./world.mjs";
+import { atRearmPort, rearmTorpedoes } from "./torpedo-ammunition.mjs";
 const tiers = data.tiers;
 export const compareShips = (c) => (a, b) => {
   const x = c.classes[a.classId],
@@ -115,10 +116,12 @@ export function prepareDeparture(s, c, id, f) {
   return ready;
 }
 export function dockSailors(s, c, id, f) {
+  const rearm = atRearmPort(s, f, id);
   for (const g of s.nations[id].groups)
     if (g.fleetId === f.id) {
       g.atSea = false;
       g.dockPort = f.port;
+      if (rearm && !g.battleId) rearmTorpedoes(g, c.classes[g.classId]);
     }
   staffSailors(s, c, id);
 }

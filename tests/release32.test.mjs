@@ -45,12 +45,15 @@ test('time-step receipts report elapsed time and high speeds stay within a bound
   const s=start();s.paused=true;
   assert.equal(issue(s,'step',{minutes:15}).receipt,'Time advanced 15 minutes.');
   assert.equal(issue(s,'step',{minutes:360}).receipt,'Time advanced 6 hours.');
-  assert.deepEqual(SPEEDS.slice(-2).map(x=>x[0]),[50,100]);
-  for(const speed of [50,100]){
+  assert.deepEqual(SPEEDS.slice(-2).map(x=>x[0]),[10,100]);
+  assert.throws(()=>issue(s,'speed',{value:50}),/Unknown simulation speed/);
+  for(const [speed] of SPEEDS){
     issue(s,'speed',{value:speed});issue(s,'settings',{autoPause:false});issue(s,'pause',{value:false});
     let clock=0;const runner=new SimulationRunner(CATALOG,{now:()=>++clock,budgetMs:3});runner.replace(s);
-    clock+=1000;const before=campaignMinutes(s),done=runner.advance();
-    assert.ok(done>0&&done<=45);assert.equal(campaignMinutes(s)-before,done);
+    clock+=1000;const before=campaignMinutes(s),ticks=s.minuteTicks||0;
+    let done=runner.advance();clock+=1000;done+=runner.advance();
+    assert.ok(done>0&&done<=90);assert.equal(campaignMinutes(s)-before,done);
+    assert.equal((s.minuteTicks||0)-ticks,done/15);
     assert.ok(runner.credit<=s.speed*10000/60*.3);
     validateSave(s,CATALOG);
   }

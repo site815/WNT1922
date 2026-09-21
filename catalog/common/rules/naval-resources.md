@@ -1,6 +1,6 @@
 # naval resources — data and balance
 
-Superseded naval models expose a reserve-retirement action once a newer available model covers their role and every required basing installation. Switch any active production lines first. Retirement removes unassigned and accessible shore-reserve airframes, retaining all aviators and awarding no salvage. Aircraft embarked, stationed, airborne or in transit remain in service. Other-service aircraft continue their automatic replacement/retirement program.
+Superseded naval models expose Retire reserves and Retire all once a newer available model covers their role and every required basing installation. Switch active production lines first. Retire reserves removes unassigned and accessible shore reserves; Retire all removes every owned airframe from ships, bases, active flights and transfers. Complete outstanding paid aircraft orders before Retire all. Both retain aviators and award no salvage. Empty merchant transports sail home; flight records finish their normal recovery and report lifecycle. Other-service aircraft retain automatic replacement and retirement.
 
 Aircraft accounting: total owned = embarked + stationed + transit/airborne + reserve. Every owned aircraft, including reserves, requires its full documented crew for the aviator balance.
 
@@ -34,10 +34,6 @@ Each naval production line starts on automatic modernization. Automatic lines se
     [
       10,
       "Very fast · 100,000×"
-    ],
-    [
-      50,
-      "Maximum · 500,000×"
     ],
     [
       100,

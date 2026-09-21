@@ -6,6 +6,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import * as sim from "../mechanics/engine.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
+import { merchantEconomy } from "../mechanics/merchant-economy.mjs";
+import { supplyDetails } from "../mechanics/logistics.mjs";
 const content = structuredClone(CATALOG);
 function start(id = "JPN", seed = 71) {
   const s = sim.newGame(content, id, seed);
@@ -168,21 +170,40 @@ test("the 1950 score is recorded and the campaign continues past it", () => {
   assert.equal(s.reviews[0].year, 1950);
   assert.equal(s.reviews[0].scores.length, Object.keys(content.nations).length);
 });
-test("multi-year campaign stays finite, generates war, and saves safely", () => {
-  const s = start("JPN", 1969);
-  sim.advanceDays(s, content, 365 * 6);
-  assert.ok(Object.values(s.relations).some((r) => r.war));
-  for (const n of Object.values(s.nations))
+function assertCampaignFinite(s) {
+  for (const n of Object.values(s.nations)) {
     for (const key of [
       "gold",
       "industry",
+      "strategic",
       "influence",
       "crew",
       "training",
       "morale",
-      "logistics",
     ])
       assert.ok(Number.isFinite(n[key]) && n[key] >= 0, `${n.id}.${key}`);
+    // Logistics is derived from live port/convoy performance, never stored on n.
+    const logistics = merchantEconomy(s, content, n.id).logistics;
+    assert.ok(Number.isFinite(logistics) && logistics >= 0 && logistics <= 100, `${n.id}.logistics`);
+    const supply = supplyDetails(s, content, n.id).factor;
+    assert.ok(Number.isFinite(supply) && supply >= 0 && supply <= 1, `${n.id}.supply`);
+  }
+}
+
+test("campaign resource and supply invariants hold at opening and after daily updates", () => {
+  const s = start("JPN", 1969);
+  assertCampaignFinite(s);
+  sim.advanceDays(s, content, 1);
+  assertCampaignFinite(s);
+  assert.doesNotThrow(() => validateSave(s, content));
+});
+
+test("multi-year campaign stays finite, generates war, and saves safely", () => {
+  const s = start("JPN", 1969);
+  assertCampaignFinite(s);
+  sim.advanceDays(s, content, 365 * 6);
+  assert.ok(Object.values(s.relations).some((r) => r.war));
+  assertCampaignFinite(s);
   assert.doesNotThrow(() => validateSave(s, content));
   assert.ok(s.history.length >= 70);
   assert.ok(s.nations.USA.delivered > 0);

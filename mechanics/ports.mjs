@@ -115,6 +115,7 @@ export function damagePort(s, id, fraction) {
   p.lastAttack = campaignMinutes(s);
   return damage;
 }
+import { recordGold } from './gold-accounting.mjs';
 export function repairPorts(s) {
   initializePorts(s);
   for (const [id, p] of Object.entries(s.ports)) {
@@ -135,6 +136,7 @@ export function repairPorts(s) {
       industry = amount * PORT_REPAIR.industryPerHealth;
     p.health += amount;
     n.gold = Math.max(0, n.gold - gold);
+    recordGold(n, 'portRepairs', -gold);
     n.industry = Math.max(0, n.industry - industry);
     p.repairSpent.gold += gold;
     p.repairSpent.industry += industry;

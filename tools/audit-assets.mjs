@@ -3,6 +3,9 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { TRACKS, SOUNDTRACK, musicCredits, playlistFor } from "../ui/music.mjs";
+import { CATALOG } from "../worker/catalog-loader.mjs";
+import { validateRecognition } from "./check-recognition.mjs";
+const recognition = await validateRecognition({ catalog: CATALOG });
 const manifest = JSON.parse(await fs.readFile("assets/manifest.json"));
 manifest.assets.push(...TRACKS.map(t => ({...t, path:"assets/music/" + t.file})));
 const hash = (b) => createHash("sha256").update(b).digest("hex");
@@ -113,6 +116,7 @@ for (const f of await walk("ui")) {
 const result = {
   checkedAt: new Date().toISOString(),
   passed: true,
+  recognition,
   assetCount: manifest.assets.length,
   musicTracks: music.length,
   mapLicense: "Public domain",

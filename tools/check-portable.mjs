@@ -76,6 +76,7 @@ async function launch(profile) {
       env: {
         ...process.env,
         WNT_TEST_USER_DATA: profile,
+        WNT_RECOGNITION_ROOT: "",
         PATH: process.env.SystemRoot + "\\System32",
         TEMP: temp,
         TMP: temp,
@@ -167,6 +168,73 @@ if (-not [PortableTestPosition]::SetWindowPos($testWindowHandle,[IntPtr]::Zero,-
     await fs.readFile(path.join(unpacked, "../NSIS-LICENSE.txt")),
     await fs.readFile("assets/licenses/NSIS-LICENSE.txt"),
   );
+}
+async function checkRecognition(nation) {
+  for (const [view, selector, type] of [
+    ["yards", ".design-card .class-name", "spec"],
+    ["aircraft", '.aircraft-models [data-action="aircraft-spec"]', "aircraft-spec"],
+  ]) {
+    await page.locator('.sidebar [data-view="' + view + '"]').click();
+    await page.locator(selector).first().click();
+    await page.locator('[data-dialog-type="' + type + '"] .recognition-card img').waitFor();
+    await page.waitForFunction(() => {
+      const image = document.querySelector('.modal .recognition-card img');
+      return image?.complete && image.naturalWidth > 0;
+    });
+    const presentation = await page.locator('.modal .recognition-card img').evaluate(image => ({
+      fit: getComputedStyle(image).objectFit,
+      background: getComputedStyle(image).backgroundColor,
+      source: new URL(image.src).pathname,
+      caption: !!image.closest('figure').querySelector('figcaption strong'),
+    }));
+    assert.equal(presentation.fit, "contain");
+    assert.equal(presentation.background, "rgb(255, 255, 255)");
+    assert(presentation.source.startsWith("/assets/recognition/"));
+    assert(presentation.caption);
+    await page.locator('.modal [data-action="recognition"]').click();
+    await page.locator('[data-dialog-type="recognition"] .recognition-sheet img').waitFor();
+    await page.waitForFunction(() => {
+      const image = document.querySelector('.recognition-sheet img');
+      return image?.complete && image.naturalWidth > 0;
+    });
+    assert.equal(await page.locator('.recognition-sheet').evaluate(el => getComputedStyle(el).overflow), "auto");
+    await page.locator('[data-action="recognition-zoom"]').click();
+    await page.locator('.recognition-sheet.actual-size').waitFor();
+    await page.locator('[data-action="recognition-zoom"]').click();
+    await page.locator('.recognition-sheet:not(.actual-size)').waitFor();
+    await page.screenshot({ path: path.join(output, `recognition-${view}-${nation}.png`) });
+    await page.locator('.modal .close').click();
+  }
+  const direct = await page.evaluate(async () => {
+    const read = async file => {
+      const response = await fetch(file, { cache: "no-store" });
+      if (!response.ok) throw Error("Missing direct artwork: " + file);
+      return response;
+    };
+    const index = await (await read('/assets/recognition/index.json')).json();
+    const entries = (await Promise.all(index.registries.map(async file =>
+      (await (await read('/assets/recognition/' + file)).json()).entries))).flat();
+    const examples = ['ship', 'aircraft'].map(kind => entries.find(entry => entry.kind === kind));
+    const checks = [];
+    for (const entry of examples) {
+      const response = await read('/' + entry.file);
+      const bytes = await response.arrayBuffer();
+      const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(byte => byte.toString(16).padStart(2, '0')).join('');
+      checks.push({ file: entry.file, length: bytes.byteLength, expectedBytes: entry.bytes, digest, expectedHash: entry.sha256, cache: response.headers.get('cache-control') });
+    }
+    return checks;
+  });
+  for (const check of direct) {
+    assert.equal(check.length, check.expectedBytes, check.file);
+    assert.equal(check.digest, check.expectedHash, check.file);
+    assert.equal(check.cache, "no-store");
+  }
+  await page.locator('[data-action="menu"]').click();
+  await page.locator('[data-action="recognition-credits"]').click();
+  await page.locator('.recognition-credits figcaption').first().waitFor();
+  assert.match(await page.locator('.modal-body').innerText(), /recognition drawings cover/);
+  await page.locator('.modal .close').click();
+  result.checks.push(nation + ": ship and aircraft recognition cards, full-size drawings, source credits, original packaged file bytes and SHA-256 verified without external requests.");
 }
 async function closeSaved() {
   // Closing webContents from page JavaScript bypasses Electron's native close
@@ -260,8 +328,8 @@ try {
     await delay(1000);
     result.running1000000=await measureMapFrames();
     result.actualSpeed=await page.locator('.actual-speed').innerText();
-    await page.locator('#speed').selectOption('50');
-    result.running500000=await measureMapFrames();
+    await page.locator('#speed').selectOption('10');
+    result.running100000=await measureMapFrames();
     assert.equal(await page.locator('#auto-pause').isChecked(),false);
     assert.match(await page.locator('[data-action=pause]').innerText(),/Pause/);
     await page.locator('[data-action="pause"]').click();
@@ -336,6 +404,7 @@ try {
     await page.mouse.move(12, 12);
     await delay(300);
     await page.screenshot({ path: path.join(output, `map-${nation}.png`) });
+    await checkRecognition(nation);
     await page.locator('.sidebar [data-view="aircraft"]').click();
     assert.equal(await page.locator('[data-action="air-design"]').count(), 0);
     assert.equal(await page.locator('[data-model][data-future="false"]:not(:has(.badge.active))').count(), 0);

@@ -112,6 +112,7 @@ import { saveCampaign, loadCampaign, writeRecovery } from "./save-client.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import { newsDestination } from "./news-navigation.mjs";
 import { activeDispatch } from "../mechanics/alert-lifecycle.mjs";
+import { loadRecognition, recognitionCard, recognitionExpanded, recognitionCredits } from "./recognition.mjs";
 
 const app = document.querySelector("#app");
 const newsTicker = new NewsTicker((id, receipt) => state ? mutate({type:"read-news",args:{id,receipt}}, "", true) : undefined);
@@ -255,7 +256,7 @@ function renderStart() {
     })
     .join(
       "",
-    )}</div><div class="start-actions"><div><strong>${selectedCampaign === "campaign_1922" ? "Seven historical starting navies" : "All seven naval programs active"}</strong><p>Historical events shape the world. Invest now in the fleet you will need.</p></div>${btn(`Take command of ${PROFILES[selected].name} →`, "new", 'class="primary"')}</div><footer class="start-footer"><span>10,000× normal time · A year takes about 53 minutes · Pause and faster speeds available</span></footer><div class="start-bottom">${btn("Import a campaign", "import")}<a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Licenses & credits</a><span>Ship data from your catalogs. Provisional playtest balance.</span></div></main>${modalHTML()}`;
+    )}</div><div class="start-actions"><div><strong>${selectedCampaign === "campaign_1922" ? "Seven historical starting navies" : "All seven naval programs active"}</strong><p>Historical events shape the world. Invest now in the fleet you will need.</p></div>${btn(`Take command of ${PROFILES[selected].name} →`, "new", 'class="primary"')}</div><footer class="start-footer"><span>10,000× normal time · A year takes about 53 minutes · Pause and faster speeds available</span></footer><div class="start-bottom">${btn("Import a campaign", "import")}${btn("Recognition artwork & sources", "recognition-credits")}<a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Licenses & credits</a><span>Ship data from your catalogs. Provisional playtest balance.</span></div></main>${modalHTML()}`;
 }
 function render() {
   // Removing a focused edited input can synchronously fire change/blur. Defer
@@ -476,6 +477,7 @@ function armament(c) {
   const parts = [];
   if (c.barrels) parts.push(`${c.barrels} × ${number(c.caliber)} mm guns`);
   if (c.tubes) parts.push(`${c.tubes} torpedo tubes`);
+  if (Number.isInteger(c.torpedoCapacity)) parts.push(`${c.torpedoCapacity} torpedoes aboard · no reloads at sea`);
   if (c.air)
     parts.push(
       `${c.air} aircraft${c.estimated?.includes("air") ? " (estimated)" : ""}`,
@@ -551,7 +553,7 @@ function yardsView() {
       const future = c.year > sim.yearOf(state),
         price = sim.shipPrice(state, content, c.id),
         block = sim.shipOrderBlock(state, content, c.id);
-      return `<article class="design-card panel" data-future="${future}" data-design="${c.id}"><div class="design-top"><span class="type-mark">${c.type}</span><span>${SERVICES[fleetService(c)].toUpperCase()}</span></div><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3><div class="design-specs"><span><b>${number(c.tons)}</b> standard tons</span><span><b>${number(c.speed, 1)}</b> knots</span><span><b>${number(c.crew)}</b> crew</span></div><p class="armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="cost-line">${cost(price)}</div><small title="Base time before shared yard congestion. All yards contribute to one national pool.">Base build time ${months(price.days)}</small>${block ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${btn("Order hulls", "order", `data-id="${c.id}" class="primary"`, block || affordableMessage(price))}</div>`}</article>`;
+      return `<article class="design-card panel" data-future="${future}" data-design="${c.id}"><div class="design-top"><span class="type-mark">${c.type}</span><span>${SERVICES[fleetService(c)].toUpperCase()}</span></div><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3>${recognitionCard("ship", c.id, { compact: true, campaign: state.campaignId })}<div class="design-specs"><span><b>${number(c.tons)}</b> standard tons</span><span><b>${number(c.speed, 1)}</b> knots</span><span><b>${number(c.crew)}</b> crew</span></div><p class="armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="cost-line">${cost(price)}</div><small title="Base time before shared yard congestion. All yards contribute to one national pool.">Base build time ${months(price.days)}</small>${block ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${btn("Order hulls", "order", `data-id="${c.id}" class="primary"`, block || affordableMessage(price))}</div>`}</article>`;
     })
     .join("")}</div>${pageControls(designPage, "design")}`;
 }
@@ -1085,13 +1087,28 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag around the Equal Earth globe; scroll to zoom. Squares are your merchant convoys. Escort coverage is always shown: green rings have nearby operational escorts, red dashed rings are exposed. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. Home resets the map. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Permanent battle reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; 1–7 choose speeds from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag around the Equal Earth globe; scroll to zoom. Squares are your merchant convoys. Escort coverage is always shown: green rings have nearby operational escorts, red dashed rings are exposed. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. Home resets the map. Use the mouse wheel or map controls to zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Permanent battle reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
     body = `<p>${PROFILES[state.player].name} · ${smallDate(state.day)}</p><div class="menu-actions">${btn("Export save file", "export")}${btn("Import save file", "import")}${btn("Return to navy selection", "title-screen")}${btn("How to play", "help")}${btn("Toggle full window / fullscreen", "fullscreen")}</div>${musicCredits()}<p><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Third-party licenses and credits</a></p><p class="panel-note">Saves: %APPDATA%/WNT1922/saves. The previous disk save is kept as campaign.backup.json.</p>`;
   }
-  return `<div class="modal-backdrop ${dialog.type === "report" ? "report-backdrop" : ""}"><section data-key="dialog-${dialog.type}-${dialog.id || dialog.ship || ""}" class="modal ${dialog.type === "report" ? "wide" : ""}" data-dialog-type="${dialog.type}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header><h2 id="dialog-title">${esc(title)}</h2><button data-action="close" class="close" aria-label="Close dialog">×</button></header><div class="modal-body" data-scroll-key="modal-body" >${body}</div><footer>${actions ? btn("Cancel", "close", 'class="subtle"') + actions : btn("Close", "close")}</footer></section></div>`;
+  if (dialog.type === "spec") body = recognitionCard("ship", dialog.id, { campaign: state.campaignId }) + body;
+  if (dialog.type === "aircraft-spec") {
+    const aircraft = [...(content.nations[state.player].aircraft || []), ...(content.nations[state.player].armyAircraft || [])].find(a => a.id === dialog.id);
+    title = aircraft?.name || "Aircraft specifications";
+    body = recognitionCard("aircraft", dialog.id, { campaign: state.campaignId }) + (aircraft ? aircraftHover(aircraft, content) : "");
+  }
+  if (dialog.type === "recognition") {
+    title = "Recognition drawing";
+    body = recognitionExpanded(dialog.id, { actualSize: dialog.actualSize });
+  }
+  if (dialog.type === "recognition-credits") {
+    title = "Recognition artwork & sources";
+    body = recognitionCredits();
+  }
+  if (dialog.type === "menu") body += btn("Recognition artwork & sources", "recognition-credits");
+  return `<div class="modal-backdrop ${dialog.type === "report" ? "report-backdrop" : ""}"><section data-key="dialog-${dialog.type}-${dialog.id || dialog.ship || ""}" class="modal ${["report", "recognition", "recognition-credits"].includes(dialog.type) ? "wide" : ""}" data-dialog-type="${dialog.type}" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><header><h2 id="dialog-title">${esc(title)}</h2><button data-action="close" class="close" aria-label="Close dialog">×</button></header><div class="modal-body" data-scroll-key="modal-body" >${body}</div><footer>${actions ? btn("Cancel", "close", 'class="subtle"') + actions : btn("Close", "close")}</footer></section></div>`;
 }
 function openDialog(value) {
   hideClassHover();
@@ -1207,6 +1224,16 @@ app.addEventListener("click", async (event) => {
   unlockMusic();
   playSound("click");
   try {
+    if (action === "recognition-zoom" && dialog?.type === "recognition") {
+      dialog.actualSize = !dialog.actualSize;
+      render();
+      return;
+    }
+    if (["recognition", "recognition-credits", "aircraft-spec"].includes(action)) {
+      await loadRecognition({ refresh: true }).catch(error => toast(error.message));
+      openDialog({ type: action, id });
+      return;
+    }
     if (action === "select-campaign") {
       selectedCampaign = id;
       content = contentFor(bundle, id);
@@ -1282,7 +1309,12 @@ app.addEventListener("click", async (event) => {
       focusMap("ship", target.dataset.ship);
       return;
     }
-    if (action === "spec" || action === "ship") return;
+    if (action === "spec") {
+      await loadRecognition({ refresh: true }).catch(error => toast(error.message));
+      openDialog({ type: "spec", id });
+      return;
+    }
+    if (action === "ship") return;
     if (action === "help") {
       openDialog({ type: "help" });
       return;
@@ -1442,6 +1474,13 @@ app.addEventListener("click", async (event) => {
         label:"Retire reserve airframes",command:{type:"retire-aircraft",args:{id}}});
       return;
     }
+    if (action === "retire-aircraft-all") {
+      const a=content.nations[state.player].aircraft.find(a=>a.id===id);
+      openDialog({type:"confirm",title:"Retire all "+a.name+" airframes?",
+        body:"Permanently retire every owned airframe of this superseded model, including reserves, embarked and stationed aircraft, active flights and aircraft in transit. This removes them from service immediately. All aviators are retained; no salvage resources are awarded.",
+        label:"Retire all airframes",command:{type:"retire-aircraft",args:{id,scope:"all"}}});
+      return;
+    }
     if (action === "map-reset") {
       Object.assign(chart, { zoom: 1, cx: 600, cy: 300, rotation: 0 });
       render();
@@ -1464,6 +1503,10 @@ app.addEventListener("click", async (event) => {
       dialog = null;
       selectedAlert = null;
       render();
+      if (["yards", "aircraft"].includes(view)) {
+        await loadRecognition({ refresh: true }).catch(error => toast(error.message));
+        render();
+      }
       return;
     }
     if (action === "fleet-legacy") {
@@ -1749,17 +1792,10 @@ document.addEventListener("keydown", (event) => {
     ["command", "land", "airwar"].includes(view) &&
     !dialog &&
     event.target.closest(".world-map") &&
-    ["Home", "+", "=", "-", "_"].includes(event.key)
+    event.key === "Home"
   ) {
     event.preventDefault();
-    if (event.key === "Home")
-      Object.assign(chart, { zoom: 1, cx: 600, cy: 300, rotation: 0 });
-    else
-      chart.zoom = sim.clamp(
-        chart.zoom * (["+", "="].includes(event.key) ? 1.4 : 1 / 1.4),
-        1,
-        64,
-      );
+    Object.assign(chart, { zoom: 1, cx: 600, cy: 300, rotation: 0 });
     render();
     return;
   }
@@ -1804,19 +1840,33 @@ document.addEventListener("keydown", (event) => {
     !state ||
     dialog ||
     state.decisions.some((d) => d.popup) ||
-    ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(event.target.tagName)
+    event.ctrlKey || event.metaKey || event.altKey ||
+    event.target.isContentEditable ||
+    ["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName)
   )
     return;
   if (event.code === "Space") {
+    if (event.target.tagName === "BUTTON") return;
     event.preventDefault();
     mutate({ type: "pause" }, "", true);
   }
-  if (/^[1-7]$/.test(event.key))
+  if (/^[0-9]$/.test(event.key)) {
+    event.preventDefault();
+    const index = event.key === "0" ? 9 : Number(event.key) - 1;
+    app.querySelectorAll('.sidebar .nav-item')[index]?.click();
+    return;
+  }
+  if (["+", "=", "-", "_"].includes(event.key)) {
+    event.preventDefault();
+    const index = Math.max(0, SPEEDS.findIndex(([value]) => value === state.speed));
+    const next = Math.max(0, Math.min(SPEEDS.length - 1,
+      index + (["+", "="].includes(event.key) ? 1 : -1)));
     mutate(
-      { type: "speed", args: { value: SPEEDS[Number(event.key) - 1][0] } },
+      { type: "speed", args: { value: SPEEDS[next][0] } },
       "",
       true,
     );
+  }
 });
 document.addEventListener("visibilitychange", async () => {
   if (document.hidden && state) {

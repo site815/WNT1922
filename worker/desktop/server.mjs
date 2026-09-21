@@ -14,7 +14,14 @@ export async function createGameServer({
   port = 0,
   saveDir = path.join(root, ".build", "saves"),
   publicDirectory = publicDir,
+  recognitionDirectory = null,
 } = {}) {
+  const publicRoot = await fs.realpath(publicDirectory);
+  // Only the explicitly supplied recognition tree may come from the live repo.
+  // A standalone executable always falls back to its packaged assets.
+  const recognitionRoot = recognitionDirectory ? await fs.realpath(recognitionDirectory) : null;
+  if (recognitionRoot && !(await fs.stat(recognitionRoot)).isDirectory())
+    throw Error("Recognition root must be a directory.");
   const catalog = CATALOG;
   let saveQueue = Promise.resolve();
   const server = http.createServer(async (req, res) => {
@@ -160,6 +167,12 @@ export async function createGameServer({
         res.end();
         return;
       }
+      let decodedPath;
+      try { decodedPath = decodeURIComponent(req.url.split("?")[0]); }
+      catch { res.writeHead(400); res.end("Invalid path"); return; }
+      if (decodedPath.split(/[\\/]/).includes("..") || decodedPath.includes("\\")) {
+        res.writeHead(404); res.end("Not found"); return;
+      }
       const name =
         url.pathname === "/"
           ? "ui/index.html"
@@ -169,7 +182,7 @@ export async function createGameServer({
           name === "package.json" ||
           /^(ui|mechanics|worker|catalog|assets)\/[\w./-]+\.(?:mjs|css|html|json|md|mp3)$/.test(
             name,
-          )
+          ) || /^assets\/recognition\/[\w/-]+\.(?:png|jpe?g|svg)$/.test(name)
         ) ||
         name.includes("..") ||
         name.startsWith("worker/desktop/")
@@ -178,7 +191,19 @@ export async function createGameServer({
         res.end("Not found");
         return;
       }
-      const body = await fs.readFile(path.join(publicDirectory, name));
+      const liveRecognition = recognitionRoot && name.startsWith("assets/recognition/");
+      if (liveRecognition && !/\.(?:json|md|png|jpe?g|svg)$/.test(name)) {
+        res.writeHead(404); res.end("Not found"); return;
+      }
+      const fileRoot = liveRecognition ? recognitionRoot : publicRoot;
+      const file = await fs.realpath(path.join(fileRoot, liveRecognition ? name.slice("assets/recognition/".length) : name));
+      const relative = path.relative(fileRoot, file);
+      if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+        res.writeHead(404); res.end("Not found"); return;
+      }
+      const body = await fs.readFile(file);
+      if (name.endsWith(".svg"))
+        res.setHeader("Content-Security-Policy", "sandbox; default-src 'none'; style-src 'unsafe-inline'");
       res.setHeader(
         "Content-Type",
         {
@@ -188,6 +213,10 @@ export async function createGameServer({
           json: "application/json; charset=utf-8",
           md: "text/plain; charset=utf-8",
           mp3: "audio/mpeg",
+          png: "image/png",
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          svg: "image/svg+xml",
         }[name.split(".").pop()],
       );
       res.end(req.method === "HEAD" ? undefined : body);

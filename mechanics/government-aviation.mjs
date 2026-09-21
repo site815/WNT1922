@@ -1,4 +1,5 @@
 import { aircraftMaterialCost, strategicFactor } from "./strategic-materials.mjs";
+import { recordGold } from './gold-accounting.mjs';
 import { readDocument } from "../worker/documents.mjs";
 const data = await readDocument("common/rules/government-aviation.md");
 import {
@@ -106,6 +107,7 @@ export function governmentProduction(s, c, id) {
     n.strategic -= count * materials;
     n.strategicSpent.production += count * materials;
     n.gold -= count * gold;
+    recordGold(n, 'governmentAircraft', -count * gold);
     n.industry -= count * industry;
     n.governmentAircraft[a.id] += count;
     n.governmentAviators += count * aircraftSeats(a);

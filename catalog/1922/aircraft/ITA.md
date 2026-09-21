@@ -13,8 +13,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "catalogKind": "naval",
     "generation": 1921,
     "basing": {
-      "carrier": true,
-      "floatplane": false,
+      "carrier": false,
+      "floatplane": true,
       "land": true
     },
     "crew": {
@@ -32,7 +32,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "fuel": {
       "combat_radius_km": 220
     },
-    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+    "notes": "Representative 1921 procurement fit; performance and costs are provisional. Single-seat Macchi M.7 pusher flying boat, documented by NACA TM712 and Flygvapenmuseum. Waterborne aircraft handled through the game seaplane station or shore base; cannot operate from a wheeled carrier deck."
   },
   {
     "id": "it_naval_strike_1921",
@@ -43,8 +43,8 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "catalogKind": "naval",
     "generation": 1921,
     "basing": {
-      "carrier": true,
-      "floatplane": false,
+      "carrier": false,
+      "floatplane": true,
       "land": true
     },
     "crew": {
@@ -62,7 +62,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "fuel": {
       "combat_radius_km": 280
     },
-    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Carrier-qualified wheeled aircraft; cannot use a battleship floatplane station."
+    "notes": "Representative 1921 procurement fit; performance and costs are provisional. Savoia S.16 pusher flying boat, documented by the historical three-view in Queensland Museum's Thomas Macleod collection. Two-person naval mission crew in the multi-place airframe. Waterborne aircraft handled through the game seaplane station or shore base; cannot operate from a wheeled carrier deck."
   },
   {
     "id": "it_naval_scout_1921",
@@ -78,7 +78,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "land": true
     },
     "crew": {
-      "normal": 2
+      "normal": 1
     },
     "cost_gold": 36,
     "weights": {
@@ -92,7 +92,7 @@ Edit the JSON block directly. The game reads this document at startup; no export
     "fuel": {
       "combat_radius_km": 300
     },
-    "notes": "Representative 1921 treaty-era procurement fit. Model names retained only when the source availability year matches this generation; otherwise the label is a period role, not a fictional historical aircraft. Performance and costs are provisional. Catapult/recovered floatplane; cannot land on a carrier deck."
+    "notes": "Representative 1921 procurement fit; performance and costs are provisional. Historical single-seat pusher flying-boat fighter used in the game scout role; the US Navy's 1917-1919 chronology identifies the M.5 as single-seat. Waterborne aircraft handled through the game seaplane station or shore base; cannot land on a wheeled carrier deck."
   }
 ]
 ```

@@ -1,0 +1,289 @@
+{
+  "format": 1,
+  "entries": [
+    {
+      "id": "aircraft-historical-breguet-521-rama",
+      "kind": "aircraft",
+      "file": "assets/recognition/aircraft/FRA/breguet-521-bizerte.svg",
+      "title": "Breguet 521 Bizerte — historical reference drawing",
+      "origin": "historical",
+      "views": [
+        "plan",
+        "profile"
+      ],
+      "configuration": "Breguet 521 Bizerte flying boat: three radial tractor engines, unequal biplane wings, stepped hull and stabilizing floats. Original independent plan and profile scales preserved; the profile shows overlapping engine stations. The source does not draw propeller blades.",
+      "platforms": [
+        {
+          "id": "fra_gov_maritime_patrol_1936"
+        }
+      ],
+      "display": {
+        "monochrome": true
+      },
+      "source": {
+        "author": "Rama",
+        "title": "Breguet-521.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Breguet-521.svg",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Breguet-521.svg",
+        "license": "CC BY-SA 2.0 fr",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/fr/deed.en",
+        "modifications": "Original geometry, annotations and colors preserved. Added an explicit 800 × 800 viewBox matching the original 600 pt browser viewport and an opaque white background. Displayed in grayscale by game UI. This adapted SVG remains under CC BY-SA 2.0 fr."
+      },
+      "sha256": "210a76e14589b83f631728ab498e3528761676c867d22207d0968635bf70adba",
+      "bytes": 39641,
+      "review": {
+        "status": "accepted",
+        "reviewedAt": "2026-09-21",
+        "notes": "Inspected original and adapted SVG at 300 px and 900 px. Original plan and profile retained with complete margins, readable outline and title; three engine stations, biplane hull and tail configuration match. Added viewport and white underlay do not transform original shapes. Grayscale display only. Original source omits propeller blades and uses independent view scales."
+      }
+    },
+    {
+      "id": "aircraft-original-reference-cams-55-1",
+      "kind": "aircraft",
+      "file": "assets/recognition/aircraft/FRA/cams-55-1-profile.svg",
+      "title": "CAMS 55/1 — source-based profile",
+      "origin": "original",
+      "views": [
+        "profile"
+      ],
+      "configuration": "CAMS 55/1 reconnaissance flying boat: two inline Hispano-Suiza engines in a central tandem tractor/pusher installation, biplane wings, stepped boat hull, stabilizing wing floats and open pilot/gun positions. Original port profile of the early inline version. Far-side float overlaps the near float; beaching trolley omitted.",
+      "platforms": [
+        {
+          "id": "fra_gov_maritime_patrol_1930",
+          "note": "CAMS 55/1 reconnaissance flying boat: two inline Hispano-Suiza engines in a central tandem tractor/pusher installation, biplane wings, stepped boat hull, stabilizing wing floats and open pilot/gun positions. Original port profile of the early inline version. Far-side float overlaps the near float; beaching trolley omitted."
+        }
+      ],
+      "source": {
+        "author": "WNT1922",
+        "title": "Independent recognition illustration from historical configuration references",
+        "page": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/cams-55-1-profile.svg",
+        "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/cams-55-1-profile.svg",
+        "license": "Original project artwork",
+        "licenseUrl": "https://github.com/site815/WNT1922/blob/main/LICENSE.md",
+        "credit": "Reference studies: Period CAMS 55/1 hangar photograph and Flight 1931/1932 contemporary family records; Service historique de la Défense, CAMS 55 aircraft archive",
+        "modifications": "New vector drawing independently constructed from documented physical configuration and period photographs. Reference artwork is neither embedded nor traced; panel lines and minor fittings are simplified original illustration choices."
+      },
+      "references": [
+        {
+          "title": "Period CAMS 55/1 hangar photograph and Flight 1931/1932 contemporary family records",
+          "url": "https://aviadejavu.ru/Site/Crafts/Craft26243.htm"
+        },
+        {
+          "title": "Service historique de la Défense, CAMS 55 aircraft archive",
+          "url": "https://www.servicehistorique.sga.defense.gouv.fr/ark/1494860"
+        }
+      ],
+      "geometry": {
+        "format": 1,
+        "method": "Independently authored type-specific profile geometry",
+        "view": "profile",
+        "referenceDimensions": true,
+        "length_m": 14.84,
+        "span_m": 20.4,
+        "engineCount": 2,
+        "engineLayout": "one central tandem pair: tractor and pusher",
+        "wingPlanes": 2,
+        "boatHull": true,
+        "floatCount": 2,
+        "gear": "water landing; no wheels",
+        "crewSeats": 5,
+        "limitations": "Profile recognition illustration, not an engineering drawing. Minor contours and panel details are simplified original choices; opposite engines and floats overlap in profile. No unseen plan or front view asserted."
+      },
+      "sha256": "78cd4ebdacf9b19ef5fb43f2a6b6f39403a5dabab11ec7219147cb32f4f3eaaa",
+      "bytes": 7114,
+      "review": {
+        "status": "accepted",
+        "reviewedAt": "2026-09-21",
+        "notes": "Compared rendered 300 px and 900 px profile with cited period photographs, factual configuration and, for Latécoère, NACA structural drawing and museum model. Checked correct engine arrangement and number, biplane versus high-wing geometry, boat hull versus twin floats, and fixed gear on F.221. Full propellers, tail and water/landing gear fit inside opaque white image; no painted text or markings. Opposite engines/floats overlap in a true profile. Minor contours, bracing and panel detail are simplified independent choices; no precision or unseen views asserted."
+      },
+      "prompt": "Type-specific original black profile on opaque white with sparse white detail, no national markings or visible text. CAMS 55/1 reconnaissance flying boat: two inline Hispano-Suiza engines in a central tandem tractor/pusher installation, biplane wings, stepped boat hull, stabilizing wing floats and open pilot/gun positions. Original port profile of the early inline version. Far-side float overlaps the near float; beaching trolley omitted."
+    },
+    {
+      "id": "aircraft-original-reference-latecoere-523",
+      "kind": "aircraft",
+      "file": "assets/recognition/aircraft/FRA/latecoere-523-profile.svg",
+      "title": "Latécoère 523 — source-based profile",
+      "origin": "original",
+      "views": [
+        "profile"
+      ],
+      "configuration": "Military Latécoère 523 with a two-deck stepped hull, high wing, stabilizing stub wings and terminal floats. Six inline engines: four tractors and two pushers; opposite engine stations overlap in true profile. Glazed military navigation bow and gun positions distinguish this original interpretation from the civil 521 reference. Equipment and panel details simplified.",
+      "platforms": [
+        {
+          "id": "fra_gov_maritime_patrol_1939",
+          "note": "Military Latécoère 523 with a two-deck stepped hull, high wing, stabilizing stub wings and terminal floats. Six inline engines: four tractors and two pushers; opposite engine stations overlap in true profile. Glazed military navigation bow and gun positions distinguish this original interpretation from the civil 521 reference. Equipment and panel details simplified."
+        }
+      ],
+      "source": {
+        "author": "WNT1922",
+        "title": "Independent recognition illustration from historical configuration references",
+        "page": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/latecoere-523-profile.svg",
+        "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/latecoere-523-profile.svg",
+        "license": "Original project artwork",
+        "licenseUrl": "https://github.com/site815/WNT1922/blob/main/LICENSE.md",
+        "credit": "Reference studies: NACA Aircraft Circular 202 (1936), common Latécoère 521 structural arrangement and six-engine installation; Latécoère 523 museum model, Musée historique de l’hydraviation, photographed by Tiraden; Service historique de la Défense, Latécoère 523 aircraft archive",
+        "modifications": "New vector drawing independently constructed from documented physical configuration and period photographs. Reference artwork is neither embedded nor traced; panel lines and minor fittings are simplified original illustration choices."
+      },
+      "references": [
+        {
+          "title": "NACA Aircraft Circular 202 (1936), common Latécoère 521 structural arrangement and six-engine installation",
+          "url": "https://ntrs.nasa.gov/citations/19930090517"
+        },
+        {
+          "title": "Latécoère 523 museum model, Musée historique de l’hydraviation, photographed by Tiraden",
+          "url": "https://commons.wikimedia.org/wiki/File:Lat%C3%A9co%C3%A8re_523_(model).jpg"
+        },
+        {
+          "title": "Service historique de la Défense, Latécoère 523 aircraft archive",
+          "url": "https://www.servicehistorique.sga.defense.gouv.fr/ark/1494986"
+        }
+      ],
+      "geometry": {
+        "format": 1,
+        "method": "Independently authored type-specific profile geometry",
+        "view": "profile",
+        "referenceDimensions": true,
+        "length_m": 31.62,
+        "span_m": 49.31,
+        "engineCount": 6,
+        "engineLayout": "four tractor engines, two pusher engines in the inboard tandem pairs",
+        "wingPlanes": 1,
+        "boatHull": true,
+        "floatCount": 2,
+        "sponsonCount": 2,
+        "gear": "water landing; no wheels",
+        "crewSeats": 10,
+        "limitations": "Profile recognition illustration, not an engineering drawing. Minor contours and panel details are simplified original choices; opposite engines and floats overlap in profile. No unseen plan or front view asserted."
+      },
+      "sha256": "13e2138fa960de1ff5932bf76c7a9b60d806df2df882f612ae6436e2873f6be7",
+      "bytes": 9370,
+      "review": {
+        "status": "accepted",
+        "reviewedAt": "2026-09-21",
+        "notes": "Compared rendered 300 px and 900 px profile with cited period photographs, factual configuration and, for Latécoère, NACA structural drawing and museum model. Checked correct engine arrangement and number, biplane versus high-wing geometry, boat hull versus twin floats, and fixed gear on F.221. Full propellers, tail and water/landing gear fit inside opaque white image; no painted text or markings. Opposite engines/floats overlap in a true profile. Minor contours, bracing and panel detail are simplified independent choices; no precision or unseen views asserted."
+      },
+      "prompt": "Type-specific original black profile on opaque white with sparse white detail, no national markings or visible text. Military Latécoère 523 with a two-deck stepped hull, high wing, stabilizing stub wings and terminal floats. Six inline engines: four tractors and two pushers; opposite engine stations overlap in true profile. Glazed military navigation bow and gun positions distinguish this original interpretation from the civil 521 reference. Equipment and panel details simplified."
+    },
+    {
+      "id": "aircraft-original-reference-liore-h257bis",
+      "kind": "aircraft",
+      "file": "assets/recognition/aircraft/FRA/liore-h257bis-profile.svg",
+      "title": "Lioré et Olivier H.257bis — source-based profile",
+      "origin": "original",
+      "views": [
+        "profile"
+      ],
+      "configuration": "H.257bis maritime floatplane with two Gnome-Rhône radial tractor engines, two-bay biplane wings, two long stepped main floats, glazed pilot cabin and bow gun cupola. Port profile; opposite engine and float overlap. Represents the radial-engine float fit, not the inline H.258 or the later wheeled conversion. Crew positions inside the fuselage are not individually illustrated.",
+      "platforms": [
+        {
+          "id": "fra_gov_maritime_strike_1936",
+          "note": "H.257bis maritime floatplane with two Gnome-Rhône radial tractor engines, two-bay biplane wings, two long stepped main floats, glazed pilot cabin and bow gun cupola. Port profile; opposite engine and float overlap. Represents the radial-engine float fit, not the inline H.258 or the later wheeled conversion. Crew positions inside the fuselage are not individually illustrated."
+        }
+      ],
+      "source": {
+        "author": "WNT1922",
+        "title": "Independent recognition illustration from historical configuration references",
+        "page": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/liore-h257bis-profile.svg",
+        "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/liore-h257bis-profile.svg",
+        "license": "Original project artwork",
+        "licenseUrl": "https://github.com/site815/WNT1922/blob/main/LICENSE.md",
+        "credit": "Reference studies: Service historique de la Défense, Lioré et Olivier H.257bis archival record; Period H.257bis photographs and named historical general arrangement (configuration study only)",
+        "modifications": "New vector drawing independently constructed from documented physical configuration and period photographs. Reference artwork is neither embedded nor traced; panel lines and minor fittings are simplified original illustration choices."
+      },
+      "references": [
+        {
+          "title": "Service historique de la Défense, Lioré et Olivier H.257bis archival record",
+          "url": "https://www.servicehistorique.sga.defense.gouv.fr/en/node/85521"
+        },
+        {
+          "title": "Period H.257bis photographs and named historical general arrangement (configuration study only)",
+          "url": "https://aviadejavu.ru/Site/Crafts/Craft26251.htm"
+        }
+      ],
+      "geometry": {
+        "format": 1,
+        "method": "Independently authored type-specific profile geometry",
+        "view": "profile",
+        "referenceDimensions": true,
+        "length_m": 17.73,
+        "span_m": 25.78,
+        "engineCount": 2,
+        "engineLayout": "two wing-mounted tractor radials",
+        "wingPlanes": 2,
+        "boatHull": false,
+        "floatCount": 2,
+        "gear": "two main floats; no wheels",
+        "limitations": "Profile recognition illustration, not an engineering drawing. Minor contours and panel details are simplified original choices; opposite engines and floats overlap in profile. No unseen plan or front view asserted."
+      },
+      "sha256": "4bee05a7a05d5f54b21eab6184f12758c98481ca9d3cac163dd1ec8178469573",
+      "bytes": 7412,
+      "review": {
+        "status": "accepted",
+        "reviewedAt": "2026-09-21",
+        "notes": "Compared rendered 300 px and 900 px profile with cited period photographs, factual configuration and, for Latécoère, NACA structural drawing and museum model. Checked correct engine arrangement and number, biplane versus high-wing geometry, boat hull versus twin floats, and fixed gear on F.221. Full propellers, tail and water/landing gear fit inside opaque white image; no painted text or markings. Opposite engines/floats overlap in a true profile. Minor contours, bracing and panel detail are simplified independent choices; no precision or unseen views asserted."
+      },
+      "prompt": "Type-specific original black profile on opaque white with sparse white detail, no national markings or visible text. H.257bis maritime floatplane with two Gnome-Rhône radial tractor engines, two-bay biplane wings, two long stepped main floats, glazed pilot cabin and bow gun cupola. Port profile; opposite engine and float overlap. Represents the radial-engine float fit, not the inline H.258 or the later wheeled conversion. Crew positions inside the fuselage are not individually illustrated."
+    },
+    {
+      "id": "aircraft-original-reference-farman-f221",
+      "kind": "aircraft",
+      "file": "assets/recognition/aircraft/FRA/farman-f221-profile.svg",
+      "title": "Farman F.221 — source-based profile",
+      "origin": "original",
+      "views": [
+        "profile"
+      ],
+      "configuration": "Production Farman F.221 heavy bomber: four cowled Gnome-Rhône radial engines in two tandem tractor/pusher pairs, high braced wing, rectangular deep fuselage, single fin, fixed main wheels and tail wheel. Enclosed bow and dorsal gun positions plus ventral position. Port profile; opposite nacelle overlaps. Distinct from the later retractable-gear F.222 and twin-fin F.223.",
+      "platforms": [
+        {
+          "id": "fra_gov_strategic_bomber_1936",
+          "note": "Production Farman F.221 heavy bomber: four cowled Gnome-Rhône radial engines in two tandem tractor/pusher pairs, high braced wing, rectangular deep fuselage, single fin, fixed main wheels and tail wheel. Enclosed bow and dorsal gun positions plus ventral position. Port profile; opposite nacelle overlaps. Distinct from the later retractable-gear F.222 and twin-fin F.223."
+        }
+      ],
+      "source": {
+        "author": "WNT1922",
+        "title": "Independent recognition illustration from historical configuration references",
+        "page": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/farman-f221-profile.svg",
+        "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/aircraft/FRA/farman-f221-profile.svg",
+        "license": "Original project artwork",
+        "licenseUrl": "https://github.com/site815/WNT1922/blob/main/LICENSE.md",
+        "credit": "Reference studies: Flight, March 1934: contemporary Farman 220/221 configuration description; January 1936 F.221 photograph; Library of Congress L’Aérophile collection: Farman F.221 specifications and description holdings",
+        "modifications": "New vector drawing independently constructed from documented physical configuration and period photographs. Reference artwork is neither embedded nor traced; panel lines and minor fittings are simplified original illustration choices."
+      },
+      "references": [
+        {
+          "title": "Flight, March 1934: contemporary Farman 220/221 configuration description; January 1936 F.221 photograph",
+          "url": "https://aviadejavu.ru/Site/Crafts/Craft26092.htm"
+        },
+        {
+          "title": "Library of Congress L’Aérophile collection: Farman F.221 specifications and description holdings",
+          "url": "https://tile.loc.gov/storage-services/service/gdc/gdcfindingaidpdfs/gc006001/gc006001.pdf"
+        }
+      ],
+      "geometry": {
+        "format": 1,
+        "method": "Independently authored type-specific profile geometry",
+        "view": "profile",
+        "referenceDimensions": true,
+        "length_m": 21.5,
+        "span_m": 36,
+        "engineCount": 4,
+        "engineLayout": "two tandem tractor/pusher radial pairs",
+        "wingPlanes": 1,
+        "boatHull": false,
+        "floatCount": 0,
+        "gear": "fixed main wheels and tail wheel",
+        "crewSeats": 5,
+        "limitations": "Profile recognition illustration, not an engineering drawing. Minor contours and panel details are simplified original choices; opposite engines and floats overlap in profile. No unseen plan or front view asserted."
+      },
+      "sha256": "e5b9c3d824e83d176b27a03ebcf2941f68ae8904553eb470e9775003ca468c27",
+      "bytes": 10246,
+      "review": {
+        "status": "accepted",
+        "reviewedAt": "2026-09-21",
+        "notes": "Compared rendered 300 px and 900 px profile with cited period photographs, factual configuration and, for Latécoère, NACA structural drawing and museum model. Checked correct engine arrangement and number, biplane versus high-wing geometry, boat hull versus twin floats, and fixed gear on F.221. Full propellers, tail and water/landing gear fit inside opaque white image; no painted text or markings. Opposite engines/floats overlap in a true profile. Minor contours, bracing and panel detail are simplified independent choices; no precision or unseen views asserted."
+      },
+      "prompt": "Type-specific original black profile on opaque white with sparse white detail, no national markings or visible text. Production Farman F.221 heavy bomber: four cowled Gnome-Rhône radial engines in two tandem tractor/pusher pairs, high braced wing, rectangular deep fuselage, single fin, fixed main wheels and tail wheel. Enclosed bow and dorsal gun positions plus ventral position. Port profile; opposite nacelle overlaps. Distinct from the later retractable-gear F.222 and twin-fin F.223."
+    }
+  ]
+}

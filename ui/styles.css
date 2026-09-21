@@ -8499,7 +8499,7 @@ body:has(.view-command) #toast {
 .view-land .world-command,
 .view-airwar .world-command {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(220px, 16vw, 275px);
+  grid-template-columns: minmax(0, 1fr) var(--sidebar);
   grid-template-rows: minmax(0, 1fr);
   height: 100%;
   min-height: 0;
@@ -8625,6 +8625,11 @@ body:has(.view-command) #toast {
 .production-auto input { margin:0; }
 .retired-model-row { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:6px 0; }
 .class-hover.resource-hover:has([data-breakdown="STRATEGIC"]) { width:min(890px,94vw); }
+.class-hover.resource-hover:has([data-breakdown="GOLD"]) { width:min(960px,94vw); }
+.gold-account-columns { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+.gold-account-columns > section { min-width:0; }
+.gold-account-columns h4 { margin:4px 0 8px; font-size:13px; }
+.gold-account-columns dl { font-size:12px; }
 .resource-breakdown[data-breakdown="STRATEGIC"] dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:22px; }
 .ledger-layout { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:stretch; }
 .ledger-panel { padding:12px 14px; min-width:0; }
@@ -8656,3 +8661,40 @@ body:has(.view-command) #toast {
 .time-bar .actual-speed { width:122px; min-width:122px; max-width:122px; }
 .economy-ledger .ledger-panel { display:flex; flex-direction:column; }
 .economy-ledger .ledger-panel > .formula { margin-top:auto; padding-top:10px; }
+/* Recognition plates retain their own aspect ratio and a clean white ground. */
+.recognition-card { margin: 16px 0; min-width: 0; }
+.recognition-image { display: block; width: 100%; padding: 10px; background: #fff; border: 1px solid #b8c1c5; border-radius: 3px; cursor: zoom-in; }
+.recognition-image:hover, .recognition-image:focus-visible { background: #fff; border-color: var(--gold); }
+.recognition-image img { display: block; width: 100%; height: 250px; object-fit: contain; background: #fff; }
+.recognition-card.compact .recognition-image img { height: 150px; }
+.recognition-card figcaption { display: grid; gap: 5px; padding: 10px 0; line-height: 1.45; overflow-wrap: anywhere; }
+.recognition-card figcaption span, .recognition-card figcaption small { display: block; font-size: 12px; color: var(--muted); }
+.recognition-card.compact figcaption strong { font-size: 12px; }
+.recognition-card.compact figcaption span, .recognition-card.compact figcaption small { font-size: 11px; }
+.recognition-sheet { overflow: auto; max-height: 60vh; background: #fff; border: 1px solid #b8c1c5; }
+.recognition-sheet img { display: block; width: auto; height: auto; max-width: none; min-width: 100%; background: #fff; }
+.recognition-status { font-size: 12px; color: var(--muted); }
+.recognition-credits figure { margin: 0; padding: 16px 0; border-top: 1px solid var(--line); }
+.recognition-credits figcaption { display: grid; gap: 5px; line-height: 1.5; overflow-wrap: anywhere; }
+.recognition-credits figcaption small { color: var(--muted); }
+.recognition-card.monochrome img { filter: grayscale(1); }
+.recognition-crop { position: relative; overflow: hidden; background: #fff; }
+.recognition-crop img { position: absolute; display: block; max-width: none; min-width: 0; }
+.modal[data-dialog-type="recognition"] { width: min(1400px,calc(100vw - var(--dialog-left,0px) - 48px)); max-width: none; height: min(860px,calc(100dvh - var(--dialog-top,0px) - 32px)); }
+.recognition-sheet:not(.actual-size) > img { width: 100%; min-width: 0; max-width: 100%; max-height: 42vh; object-fit: contain; }
+
+/* Release 33: reserve the same diplomacy rows during peace, war and cooldowns. */
+.workspace .government { display: block; }
+.government .government-war-balance { height: 2.5em; min-height: 2.5em; margin: 6px 0; overflow: auto; }
+.government .government-treaty-effects { height: 5em; min-height: 5em; margin: 6px 0 10px; overflow: auto; line-height: 1.3; }
+.government-treaty-effects small { display: block; margin-bottom: 4px; color: var(--muted); }
+.workspace .government .government-actions { grid-auto-rows: 64px; }
+.workspace .government .government-actions > .action-slot,
+.workspace .government .government-actions > .timed-progress { height: 64px; min-height: 64px; max-height: 64px; }
+.government .government-actions > button.action-slot { display: flex; flex-direction: column; justify-content: center; gap: 3px; white-space: normal; }
+.government .diplomatic-action-terms { font-size: 10px; line-height: 1.25; font-weight: 400; }
+.government .deployment-state { height: 3em; min-height: 3em; overflow: auto; }
+.pact-summary .pact-bonuses { font-size: 11px; line-height: 1.4; }
+
+@media (max-width: 900px) { .workspace .government-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .workspace .government-grid { grid-template-columns: minmax(0, 1fr); } }

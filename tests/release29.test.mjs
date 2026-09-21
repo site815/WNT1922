@@ -25,10 +25,10 @@ const start=(id="USA",campaign="in_good_faith_1936")=>{
   return [s,contentFor(CATALOG,s),s.nations[id]];
 };
 
-test("all 14 starts put 2% of actual merchants underway and show peacetime traffic",()=>{
+test("all 14 starts put 3% of actual merchants underway and show peacetime traffic",()=>{
   for(const camp of Object.keys(CATALOG.campaigns))for(const id of Object.keys(CATALOG.nations)) {
     const [s,c,n]=start(id,camp),t=convoyTraffic(s,id),e=merchantEconomy(s,c,id);
-    assert.equal(t.hullsAtSea,Math.round(n.merchant.hulls*.02),camp+id);
+    assert.equal(t.hullsAtSea,Math.round(n.merchant.hulls*.03),camp+id);
     assert.equal(t.hullsAtSea,t.targetAtSea);assert.ok(t.convoyCount>0);
     near(t.averageHulls,t.hullsAtSea/t.convoyCount);
     assert.equal(n.merchant.hulls,e.hulls);

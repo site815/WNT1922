@@ -1,6 +1,6 @@
 # WNT1922 third-party notices
 
-Asset review: 2026-09-12. These terms apply to the named third-party material independently of the game's own license. No endorsement by the contributors is implied.
+Asset review: 2026-09-21. These terms apply to the named third-party material independently of the game's own license. No endorsement by the contributors is implied.
 
 ## Map
 
@@ -20,7 +20,13 @@ The Windows download includes unmodified **Electron 44.3.0**, except for renamin
 
 ## Other material
 
-Sound effects are synthesized locally. Game icons are authored SVG/CSS. Fonts come from the operating system; no font package is included. Historical names and numerical specifications are factual references, with source citations in the repository; research scans and page images are excluded from repository and executable distribution. Original game code and scenario content have no open-source license grant; see LICENSE.md.
+Sound effects are synthesized locally. Game icons are authored SVG/CSS. Fonts come from the operating system; no font package is included. Historical names and numerical specifications are factual references, with source citations in the repository. Research-only downloads in `.build/` are excluded from repository and executable distribution. Original game code and scenario content have no open-source license grant; see LICENSE.md.
+
+## Recognition artwork
+
+The files in [assets/recognition](../recognition/README.md) include public-domain historical plates, separately licensed modern historical drawings, and original project illustrations. Each live registry listed by [the recognition index](../recognition/index.json) records the creator, source page, license, license URL, configuration, modifications and file hash for every image. Preserve those records with the files. The game displays the same attribution and license links in inspection captions and its recognition credits.
+
+Creative Commons files retain their individual attribution and share-alike terms, where specified; the project license does not restrict rights granted by those licenses. Full source images retain signatures and annotations. Display-only grayscale and crop windows do not modify the stored originals. Any SVG normalization or conversion is documented in the corresponding entry. Source-based original SVGs identify inferred details and are not represented as archival documents. Historical artwork does not imply endorsement by its creator or holding institution.
 
 ## Historical economic data
 
