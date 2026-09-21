@@ -32,6 +32,36 @@ export function authoredPlatforms(catalog) {
   }
   return platforms;
 }
+export function validateOpeningShipRecognition(catalog, resolved) {
+  const classes = new Set(), legacyClasses = new Set(), legacyOutsideDesigns = new Set();
+  let groups = 0, hulls = 0, legacyGroups = 0, legacyHulls = 0;
+  for (const [campaignId, campaign] of Object.entries(catalog.campaigns))
+    for (const [nationId, nation] of Object.entries(campaign.nations)) {
+      const rows = [
+        ...(nation.hulls || []).map(hull => ({ ...hull, count: 1 })),
+        ...(nation.aggregates || []),
+        ...(nation.support || []),
+      ];
+      for (const group of rows) {
+        const label = `${campaignId}/${nationId}/${group.id || group.name || group.class_id}`;
+        assert(campaign.classes[group.class_id], "Unknown opening ship class: " + label);
+        const key = "ship:" + group.class_id;
+        assert(resolved.platforms.get(campaignId + ":" + key) || resolved.platforms.get(key),
+          "Missing opening ship recognition: " + label);
+        groups++;
+        hulls += group.count;
+        classes.add(group.class_id);
+        if (group.legacy) {
+          legacyGroups++;
+          legacyHulls += group.count;
+          legacyClasses.add(group.class_id);
+          if (!(nation.designs || []).includes(group.class_id)) legacyOutsideDesigns.add(group.class_id);
+        }
+      }
+    }
+  return { groups, hulls, classes: classes.size, legacyGroups, legacyHulls,
+    legacyClasses: legacyClasses.size, legacyClassesOutsideDesigns: legacyOutsideDesigns.size };
+}
 export async function validateRecognition({ root = process.cwd(), catalog } = {}) {
   const recognitionRoot = await fs.realpath(path.join(root, "assets/recognition"));
   const read = async file => {
@@ -50,6 +80,9 @@ export async function validateRecognition({ root = process.cwd(), catalog } = {}
     return JSON.parse(await read(file));
   }));
   const resolved = recognitionIndex(registries);
+  // Opening fleets include retained and unfinished classes outside procurement.
+  // Validate their actual references rather than assuming the design list covers them.
+  validateOpeningShipRecognition(catalog, resolved);
   const files = new Set(), panels = new Set();
   for (const entry of resolved.entries.values()) {
     const panel = entry.file + ":" + JSON.stringify(entry.display?.crop || null);

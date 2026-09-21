@@ -8,7 +8,7 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.34.0 makes diplomatic exchanges debit and credit both countries' real stocks. AI offers appear in Diplomacy with Yes/No controls and a persistent news alert; unanswered offers expire after fourteen simulated days without an exchange or interruption. The world map fills the background behind interface tiles. Supply, support, convoy, land-front, training and economic hovers expose the actual connected calculations and transactions. Recognition drawings remain directly editable under `assets/recognition/`. Existing compatible saves acquire the new offer ledger automatically.
+Version 0.35.0 presents recognition drawings on muted ONI-style notepaper, keeps provenance under an **Art info** toggle, and includes smaller drawings in ship and aircraft hovers. Catalogs separate descriptions from larger gameplay specifications, and the top controls use available window width before wrapping. Legacy drawing coverage includes all 85 opening legacy classes. Recognition files remain directly editable under `assets/recognition/`; their historical source bytes are unchanged. Existing compatible saves continue.
 
 ## Edit and build
 
@@ -16,7 +16,7 @@ Version 0.34.0 makes diplomatic exchanges debit and credit both countries' real 
 2. Double-click **Build.cmd**. It validates the catalogs and assets, then creates the portable EXE and its SHA-256 checksum in `.build/releases/`.
 3. Run **Play-WNT1922.cmd** to test it.
 
-The portable build includes its browser engine, simulation, catalogs, maps, music and required notices. Playing requires no installation, separate browser, Node.js or internet connection. Saves are written to `%APPDATA%\WNT1922\saves`. New releases may require a new campaign. The executable is currently unsigned.
+The portable build includes its browser engine, simulation, catalogs, maps, music and required notices. Playing requires no installation, separate browser, Node.js or internet connection. Saves are written to `%APPDATA%\WNT1922\saves`. New releases may require a new campaign. The executable is currently unsigned. Windows Smart App Control can block an unsigned build under its signing policy; JavaScript changes cannot guarantee acceptance. See [Microsoft's signing guidance](https://learn.microsoft.com/en-us/windows/apps/develop/smart-app-control/code-signing-for-smart-app-control).
 
 Building requires Windows and Node.js 24 or later. The first build downloads pinned, checksum-verified Electron and NSIS tools. Subsequent builds reuse `.build/cache/`. There is no npm install step, transpiler, generated game database, browser copy, installer target or documentation exporter.
 

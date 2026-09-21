@@ -1,3 +1,23 @@
+# UI and desktop check — 0.35.0
+
+Review dates: 21–22 September 2026. This update checks presentation, recognition coverage, desktop error handling and save transport. The earlier connected-systems and long-campaign evidence is retained below; those long campaigns were not rerun for this presentation update.
+
+- Standard regression: **361/361 checks passed**. Catalog validation covers 86 live documents and all 14 starting states.
+- Asset validation passes for 310 recognition records, 301 source files, 166 ship types, 186 aircraft types and all 33 music tracks. Historical source bytes and hashes are unchanged. Presentation uses muted paper and multiply blending; original views, aspect ratios and documented source crops remain intact.
+- Opening-fleet coverage includes 349 groups / 2,091 hulls across both campaigns. All 244 legacy groups / 1,262 legacy hulls resolve to drawings, covering 85 distinct legacy classes. Checks include reserve, unfinished and retired hulls, carrier conversions, and campaign-specific Courageous configurations. Mixed legacy groups retain their documented representative-class drawings.
+- All 281 campaign ship definitions and 334 campaign aircraft definitions render populated recognition hovers without invalid placeholders. Custom designs receive no unrelated drawing. The initial fleet hover works before visiting a catalog. Art info defaults closed, supports keyboard operation and remains open across simulation refreshes; full source/license/configuration text remains accessible.
+- All 11 ministry menus were exercised at 1920, 1600, 1366, 1100, 900 and 768 pixels. An additional 84 peace and 84 six-opponent wartime combinations cover both campaigns, all seven nations and those six widths; actual resource text bounds show no cell clipping or overlap. Top controls fit one row at 1100 and wider. Resource tiles add rows where needed, with complete reserve counts; balanced wartime columns keep the same row count as peace. All resource hovers remain populated, finite, scrollable and within a 1366×768 viewport.
+- Catalog and inspection statistics retain existing gameplay fields and add clearer range, armor, AA, aircraft speed and production information. Shared speed formatting distinguishes cruise-only definitions from genuine maximum-speed figures and excludes torpedo attack profiles from maximum speed.
+- Desktop reference routing rejects malformed/privileged URLs and catches a failed Windows browser launch. Local-only hosting, renderer sandboxing, context isolation, permission denial and restrictive content policies remain enabled.
+- A reproduced save-transport bug corrupted UTF-8 names when a character crossed HTTP chunks. Requests now decode once; real HTTP tests cover accented, Japanese and emoji characters, exact save/backup round trips, and an 8 MB byte limit that leaves the previous save unchanged on rejection.
+- The final native portable passed USA 1936 and Britain 1922, artwork/Art info/initial hover checks, controls, diplomacy, all music, save/close/reopen, temporary cleanup and a five-round battle with retirement and live report updates. No JavaScript errors were recorded. All 579 packaged source files and 652 payload files match their expected hashes. The final executable SHA-256 is `ba2cd0d62a70387150bba4af8b607c274d269326d9c3c8ce1f1218f32b2101df`; the source fingerprint is `93565b8f8d030df035d05eca67be80c37998ff12dcb021426644c4d360a46041`.
+
+Windows Code Integrity logged signing-policy blocks for the unsigned 0.34.0 portable (events 3033/3077). This is separate from a JavaScript exception. Version 0.35.0 is also unsigned; no code-signing certificate is configured. Runtime fixes cannot guarantee Smart App Control acceptance. Smart App Control was not disabled, and no exclusions were added. See [Microsoft's Smart App Control signing guidance](https://learn.microsoft.com/en-us/windows/apps/develop/smart-app-control/code-signing-for-smart-app-control).
+
+Detailed local evidence is in ignored `test-output/release35-*`, `test-output/recognition-presentation/` and `test-output/portable/`. Repeatable regressions are under `tests/`; the packaged executable check is `tools/check-portable.mjs`.
+
+---
+
 # Systems check — 0.34.0
 
 Review date: 21 September 2026. This check covers the connected economy, diplomacy, fleet and air operations, state persistence, and displayed information. It combines regression tests, deterministic campaigns and real browser/portable interaction. It does not prove every possible seed, order sequence or campaign state.

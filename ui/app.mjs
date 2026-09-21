@@ -113,6 +113,7 @@ import { CATALOG } from "../worker/catalog-loader.mjs";
 import { newsDestination } from "./news-navigation.mjs";
 import { activeDispatch } from "../mechanics/alert-lifecycle.mjs";
 import { loadRecognition, recognitionCard, recognitionExpanded, recognitionCredits } from "./recognition.mjs";
+import { shipDescription, aircraftDescription } from "./catalog-presentation.mjs";
 
 const app = document.querySelector("#app");
 const newsTicker = new NewsTicker((id, receipt) => state ? mutate({type:"read-news",args:{id,receipt}}, "", true) : undefined);
@@ -190,6 +191,7 @@ const simulation = new SimulationClient({
   },
 });
 function receiveSimulation(next, metrics, model) {
+  if (!state) loadRecognition().catch(() => {});
   installView(next, model);
   const wasPaused = state?.paused,
     priorReason = state?.pauseReason;
@@ -566,7 +568,7 @@ function yardsView() {
       const future = c.year > sim.yearOf(state),
         price = sim.shipPrice(state, content, c.id),
         block = sim.shipOrderBlock(state, content, c.id);
-      return `<article class="design-card panel" data-future="${future}" data-design="${c.id}"><div class="design-top"><span class="type-mark">${c.type}</span><span>${SERVICES[fleetService(c)].toUpperCase()}</span></div><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3>${recognitionCard("ship", c.id, { compact: true, campaign: state.campaignId })}<div class="design-specs"><span><b>${number(c.tons)}</b> standard tons</span><span><b>${number(c.speed, 1)}</b> knots</span><span><b>${number(c.crew)}</b> crew</span></div><p class="armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="cost-line">${cost(price)}</div><small title="Base time before shared yard congestion. All yards contribute to one national pool.">Base build time ${months(price.days)}</small>${block ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${btn("Order hulls", "order", `data-id="${c.id}" class="primary"`, block || affordableMessage(price))}</div>`}</article>`;
+      return `<article class="design-card panel catalog-card" data-future="${future}" data-design="${c.id}"><h3><button class="text-button class-name" data-action="spec" data-id="${c.id}" data-class="${c.id}">${esc(c.name)}</button></h3><p class="catalog-description">${esc(shipDescription(c))}</p>${recognitionCard("ship", c.id, { compact: true, campaign: state.campaignId })}<dl class="catalog-stats"><div><dt>Standard displacement</dt><dd>${number(c.tons)} t</dd></div><div><dt>Speed / range</dt><dd>${number(c.speed, 1)} kn / ${number(c.range)} km</dd></div><div><dt>Complement</dt><dd>${number(c.crew)} sailors</dd></div><div><dt>Belt / deck armor</dt><dd>${number(c.belt)} / ${number(c.deck)} mm</dd></div><div><dt>Aircraft / AA</dt><dd>${number((c.air || 0) + (c.scoutAircraft || 0))} slots / ${number(c.aa)} barrels</dd></div></dl><p class="armament catalog-armament">${armament(c)}</p>${future ? catalogCountdown(state, c.year) : `<div class="catalog-procurement"><div class="cost-line">${cost(price)}</div><p class="catalog-build-time" title="Base time before shared yard congestion. All yards contribute to one national pool.">Base build time <strong>${months(price.days)}</strong></p>${block ? `<p class="block-reason">${esc(block)}</p>` : ""}<div class="design-actions">${btn("Order hulls", "order", `data-id="${c.id}" class="primary"`, block || affordableMessage(price))}</div></div>`}</article>`;
     })
     .join("")}</div>${pageControls(designPage, "design")}`;
 }
@@ -1003,7 +1005,8 @@ function modalHTML() {
   if (dialog.type === "ship") {
     title =
       player().groups.find((g) => g.id === dialog.ship)?.name || "Ship state";
-    body = shipDetails(state, content, dialog.ship);
+    const ship = player().groups.find((g) => g.id === dialog.ship);
+    body = (ship ? recognitionCard("ship", ship.classId, { campaign: state.campaignId }) : "") + shipDetails(state, content, dialog.ship);
   }
   if (dialog.type === "order") {
     const c = content.classes[dialog.id],
@@ -1106,11 +1109,11 @@ function modalHTML() {
     title = "Campaign menu";
     body = `<p>${PROFILES[state.player].name} · ${smallDate(state.day)}</p><div class="menu-actions">${btn("Export save file", "export")}${btn("Import save file", "import")}${btn("Return to navy selection", "title-screen")}${btn("How to play", "help")}${btn("Toggle full window / fullscreen", "fullscreen")}</div>${musicCredits()}<p><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Third-party licenses and credits</a></p><p class="panel-note">Saves: %APPDATA%/WNT1922/saves. The previous disk save is kept as campaign.backup.json.</p>`;
   }
-  if (dialog.type === "spec") body = recognitionCard("ship", dialog.id, { campaign: state.campaignId }) + body;
+  if (dialog.type === "spec") body = '<p class="catalog-description">' + esc(shipDescription(content.classes[dialog.id])) + '</p>' + recognitionCard("ship", dialog.id, { campaign: state.campaignId }) + body;
   if (dialog.type === "aircraft-spec") {
     const aircraft = [...(content.nations[state.player].aircraft || []), ...(content.nations[state.player].armyAircraft || [])].find(a => a.id === dialog.id);
     title = aircraft?.name || "Aircraft specifications";
-    body = recognitionCard("aircraft", dialog.id, { campaign: state.campaignId }) + (aircraft ? aircraftHover(aircraft, content) : "");
+    body = (aircraft ? '<p class="catalog-description">' + esc(aircraftDescription(aircraft)) + '</p>' : "") + recognitionCard("aircraft", dialog.id, { campaign: state.campaignId }) + (aircraft ? aircraftHover(aircraft, content, { artwork: false, heading: false }) : "");
   }
   if (dialog.type === "recognition") {
     title = "Recognition drawing";
@@ -2080,16 +2083,25 @@ function inspectHover(event) {
   if (target === hoverPending) return;
   clearTimeout(hoverTimer);
   hoverPending = target;
-  hoverTimer = setTimeout(() => {
+  hoverTimer = setTimeout(async () => {
+    if (target.matches("[data-ship], [data-class], [data-aircraft]")) {
+      // A register can be the first screen visited after loading a campaign.
+      // Keep this target pending while its drawings load; later pointer/focus
+      // changes invalidate it so an old async response cannot reopen a tooltip.
+      await loadRecognition().catch(() => {});
+      if (hoverPending !== target) return;
+    }
     hoverPending = null;
     if (!target.isConnected || !target.matches(':hover, :focus-within')) return;
+    const hoveredShip = target.dataset.ship ? player().groups.find((g) => g.id === target.dataset.ship) : null;
+    const hoveredClass = content.classes[target.dataset.class || hoveredShip?.classId];
     const shipTip = target.dataset.ship
       ? "<h3>" +
         esc(player().groups.find((g) => g.id === target.dataset.ship)?.name) +
         "</h3>" +
         shipDetails(state, content, target.dataset.ship) +
-        (content.classes[target.dataset.class]
-          ? classHover(content.classes[target.dataset.class])
+        (hoveredClass
+          ? classHover(hoveredClass, { campaign: state.campaignId })
           : "")
       : "";
     const cl = content.classes[target.dataset.class],
@@ -2098,7 +2110,7 @@ function inspectHover(event) {
         ...(content.nations[state.player].aircraft || []),
         ...(content.nations[state.player].armyAircraft || []),
       ].find((a) => a.id === target.dataset.aircraft),
-      aircraftTip = aircraft ? aircraftHover(aircraft, content) : "";
+      aircraftTip = aircraft ? aircraftHover(aircraft, content, { campaign: state.campaignId }) : "";
     const resourceTip = target.dataset.resource
       ? resourceHover(state, content, target.dataset.resource)
       : "";
@@ -2137,7 +2149,7 @@ function inspectHover(event) {
         shipTip ||
         mapTip ||
         (cl
-          ? classHover(cl)
+          ? classHover(cl, { campaign: state.campaignId })
           : target.dataset.hoverMode === "readiness"
             ? fleetReadinessHover(state, content, f)
             : fleetCompositionHover(state, content, f));

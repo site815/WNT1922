@@ -3,6 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
+import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { createGameServer } from "../worker/desktop/server.mjs";
 import { newGame } from "../mechanics/engine.mjs";
@@ -15,7 +16,7 @@ const gameRoot = path.resolve(
 const publicDirectory = process.env.WNT_TEST_PUBLIC || path.resolve(".");
 const content = structuredClone(CATALOG);
 
-test("local server serves the game, saves atomically, retains a backup and rejects bad writes", async (t) => {
+async function testServer(t) {
   const fixtures = path.join(gameRoot, "test-output");
   await fs.mkdir(fixtures, { recursive: true });
   const dir = await fs.mkdtemp(path.join(fixtures, "save-test-"));
@@ -39,6 +40,11 @@ test("local server serves the game, saves atomically, retains a backup and rejec
       throw new Error("Unexpected cleanup target");
     await fs.rm(dir, { recursive: true, force: true });
   });
+  return { dir, server, origin };
+}
+
+test("local server serves the game, saves atomically, retains a backup and rejects bad writes", async (t) => {
+  const { dir, origin } = await testServer(t);
   for (const file of [
     "",
     "ui/app.mjs",
@@ -139,4 +145,49 @@ test("local server serves the game, saves atomically, retains a backup and rejec
     (await (await fetch(origin + "/api/save?backup=1")).json()).player,
     "JPN",
   );
+});
+
+test("fragmented UTF-8 ship names survive save and backup, and oversized bodies are limited by bytes", async t => {
+  const { dir, server, origin } = await testServer(t);
+  const state = newGame(content, "JPN", 35);
+  let previousName;
+  for (const character of ["é", "摩", "🚢"]) {
+    const name = "Recognition test " + character + " — 摩耶";
+    state.nations.JPN.groups[0].name = name;
+    const bytes = Buffer.from(exportSave(state));
+    const split = bytes.indexOf(Buffer.from(character)) + 1;
+    assert(split > 1);
+    // Wait until the server receives the leading UTF-8 byte before sending
+    // its continuation bytes, so this exercises an actual stream boundary.
+    const firstChunk = new Promise(resolve => server.once("request", request => request.once("data", resolve)));
+    let request;
+    const response = new Promise((resolve, reject) => {
+      request = http.request(origin + "/api/save", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+      }, result => {
+        result.resume();
+        result.on("end", () => resolve(result.statusCode));
+      });
+      request.on("error", reject);
+      request.setNoDelay(true);
+      request.write(bytes.subarray(0, split));
+    });
+    await firstChunk;
+    request.end(bytes.subarray(split));
+    assert.equal(await response, 200);
+    const saved = await (await fetch(origin + "/api/save")).json();
+    assert.equal(saved.nations.JPN.groups[0].name, name);
+    if (previousName) {
+      const backup = await (await fetch(origin + "/api/save?backup=1")).json();
+      assert.equal(backup.nations.JPN.groups[0].name, previousName);
+    }
+    previousName = name;
+  }
+  const before = await fs.readFile(path.join(dir, "campaign.json"));
+  const oversized = JSON.stringify({ padding: "é".repeat(4_000_000) });
+  assert(oversized.length < 8_000_000 && Buffer.byteLength(oversized) > 8_000_000);
+  assert.equal((await fetch(origin + "/api/save", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: oversized,
+  })).status, 413);
+  assert.deepEqual(await fs.readFile(path.join(dir, "campaign.json")), before);
 });

@@ -53,7 +53,7 @@ Section
   ClearErrors
   ExecWait '"$OUTDIR\WNT1922.exe" $0' $1
   ${If} ${Errors}
-    MessageBox MB_OK|MB_ICONSTOP "WNT1922 could not start. Check that your temporary folder has enough free space, then try again."
+    MessageBox MB_OK|MB_ICONSTOP "WNT1922 could not start its bundled game. Check Windows Security for a blocked-app message and check that your temporary folder has enough free space. This portable build is unsigned."
     SetErrorLevel 1
   ${Else}
     SetErrorLevel $1

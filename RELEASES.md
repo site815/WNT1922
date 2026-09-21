@@ -2,7 +2,20 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.34.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.35.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.35.0 — portable beta
+
+- Recognition drawings use muted ONI-style notepaper. The presentation tones down white backgrounds while retaining the original asset bytes, proportions and complete views. Source, configuration and copyright details remain available under a small **Art info** toggle.
+- Ship and aircraft catalogs put the type name and short description ahead of larger gameplay specifications. Smaller complete drawings also appear in their hovers, including the first fleet hover after starting. Aircraft speed labels distinguish cruising from maximum speed.
+- Top controls use available horizontal space before wrapping. Resource tiles use extra rows where needed to show full totals and reserves, and war-opponent lists wrap inside their cells. Panels share more consistent spacing and type sizes.
+- Legacy recognition coverage is checked against actual opening hulls, including reserve and unfinished ships, retired classes and carrier conversions. All 85 legacy classes are covered; campaign-specific drawings retain their configuration notes. Mixed legacy groups use their documented representative class.
+- Malformed reference links and failures to open the Windows browser are handled without an uncaught desktop JavaScript error. Renderer isolation, local-only game hosting and permission restrictions remain enabled.
+- Saving preserves non-English ship and design names even when a UTF-8 character spans network chunks. The save-size limit counts actual bytes, and failed oversized saves leave the previous campaign intact.
+
+Validation: 361 regression checks passed, all 14 opening states and recognition assets validate, and 168 peace/wartime layout cases show no clipped resource text. The final portable passed both campaigns, artwork controls, save/close/reopen and a five-round battle with no JavaScript errors. See [the systems check](SYSTEMS-CHECK.md) for scope and evidence.
+
+Compatible saves continue. The portable remains unsigned: Windows Smart App Control may block it under signing policy. A signing-policy block is distinct from a JavaScript runtime error and requires trusted code signing for reliable acceptance; this release does not disable Windows protections.
 
 ## Version 0.34.0 — portable beta
 

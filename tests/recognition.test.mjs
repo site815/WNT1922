@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import { createGameServer } from "../worker/desktop/server.mjs";
 import { validateRecognition } from "../tools/check-recognition.mjs";
-import { recognitionIndex, loadRecognition, recognitionCard, recognitionExpanded } from "../ui/recognition.mjs";
+import { recognitionIndex, loadRecognition, recognitionCard, recognitionExpanded, recognitionThumbnail, recognitionCredits } from "../ui/recognition.mjs";
 
 const drawing = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="180" viewBox="0 0 600 180"><rect width="600" height="180" fill="white"/><path d="M20 120H580L550 140H60Z" fill="black"/></svg>';
 function entry(kind = "ship", id = "test-ship") {
@@ -43,7 +43,16 @@ test("recognition registries load only on request, refresh live files, and keep 
   assert.deepEqual(calls, ["/assets/recognition/index.json", "/assets/recognition/ships/registry.json"]);
   const card = recognitionCard("ship", original.id);
   assert.match(card, /src="\/assets\/recognition\/ships\/test-ship.svg"/);
-  assert.match(card, /<\/button><figcaption><strong>Test &amp; reference/);
+  assert.match(card, /<\/button><figcaption><details class="recognition-info" data-detail-key="recognition-card-test-ship"><summary>Art info<\/summary><div class="recognition-info-body"><strong>Test &amp; reference/);
+  assert.doesNotMatch(card, /<details[^>]*\bopen\b/);
+  assert.match(card, /https:\/\/creativecommons.org\/publicdomain\/zero\/1.0\//);
+  assert.match(card, /source file unchanged/);
+  assert.match(recognitionCredits(), /<figcaption><strong>Test &amp; reference/);
+  assert.doesNotMatch(recognitionCredits(), /<details/);
+  assert.match(recognitionThumbnail("ship", original.id), /recognition-thumbnail/);
+  assert.match(recognitionThumbnail("ship", original.id), /src="\/assets\/recognition\/ships\/test-ship.svg"/);
+  assert.doesNotMatch(recognitionThumbnail("ship", original.id), /<button|<figcaption|<details/);
+  assert.equal(recognitionThumbnail("ship", "custom-ministry-design"), "");
   assert.match(recognitionExpanded(original.id), /recognition-sheet/);
   original.title = "Edited drawing";
   await loadRecognition({ refresh: true, fetcher });
@@ -59,6 +68,10 @@ test("recognition registries load only on request, refresh live files, and keep 
   await loadRecognition({ refresh: true, fetcher });
   assert.match(recognitionExpanded(converted.id), /recognition-crop/);
   assert.match(recognitionExpanded(converted.id), /width:200%;height:180%/);
+  assert.match(recognitionThumbnail("ship", original.id, { campaign: "later" }), /recognition-crop/);
+  assert.match(recognitionThumbnail("ship", original.id, { campaign: "later" }), /Carrier conversion/);
+  assert.match(recognitionThumbnail("ship", original.id, { campaign: "later" }), /width:200%;height:180%/);
+  assert.match(recognitionExpanded(converted.id), /data-detail-key="recognition-expanded-converted-ship"/);
   assert.throws(() => recognitionIndex([{format:1,entries:[{...entry(),display:{crop:{x:100,y:0,width:600,height:180,imageWidth:600,imageHeight:180}}}]}]), /Invalid recognition source panel/);
   assert.match(recognitionCard("ship", "custom-ministry-design"), /custom design/);
   assert.throws(() => recognitionIndex([{ format: 1, entries: [entry(), entry()] }]), /Invalid/);

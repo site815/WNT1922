@@ -1,4 +1,6 @@
 import { airOperationsText } from "../mechanics/air-operations.mjs";
+import { recognitionThumbnail } from "./recognition.mjs";
+import { shipDescription, aircraftDescription, aircraftSpeed } from "./catalog-presentation.mjs";
 import { finiteTorpedoOutfit, torpedoesPerHull } from '../mechanics/torpedo-ammunition.mjs';
 import { navalInfluence, POWERS } from "../mechanics/land-war.mjs";
 import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
@@ -331,7 +333,7 @@ export function fleetCompositionHover(s, c, f) {
     "<small>Fuel endurance is the shared fleet limit. Click to center and highlight this force; admirals control missions.</small>"
   );
 }
-export function classHover(c) {
+export function classHover(c, { campaign = "", artwork = true } = {}) {
   return (
     '<span class="eyebrow">' +
     c.nation +
@@ -341,7 +343,8 @@ export function classHover(c) {
     (TYPES[c.type] || c.type) +
     "</span><h3>" +
     esc(c.name) +
-    "</h3>" +
+    '</h3><p class="catalog-description">' + esc(shipDescription(c)) + '</p>' +
+    (artwork ? recognitionThumbnail("ship", c.id, { campaign }) : "") +
     list([
       [
         "Displacement",
@@ -353,6 +356,7 @@ export function classHover(c) {
       ],
       ["Speed / endurance", num(c.speed, 1) + " kn / " + num(c.range) + " km"],
       ["Armor: belt / deck", num(c.belt) + " / " + num(c.deck) + " mm"],
+      ...(c.submergedSpeed ? [["Submerged sprint", num(c.submergedSpeed, 1) + " kn"]] : []),
       [
         "Guns",
         c.barrels
@@ -360,7 +364,8 @@ export function classHover(c) {
           : "No main battery",
       ],
       ["Torpedoes", num(c.tubes) + " tubes" + (finiteTorpedoOutfit(c) ? ' · '+num(c.torpedoCapacity)+' aboard · no reloads at sea' : '')],
-      ["Aircraft", (c.air || 0) + (c.scoutAircraft || 0) + " slots"],
+      ["Anti-aircraft weapons", num(c.aa) + " barrels"],
+      ["Aircraft", ((c.air || 0) + (c.scoutAircraft || 0)) + " slots" + (c.scoutAircraft ? " · " + c.scoutAircraft + " floatplane" : "")],
       ["Complement", num(c.crew) + " sailors"],
       [
         "Sensors",
@@ -616,14 +621,8 @@ export function portPopup(s, c, id, { parts = false } = {}) {
   return parts ? { summary, body, notes } : summary + body + notes;
 }
 
-export function aircraftHover(a, c) {
-  const speed = a.performance?.speed_kmh || {},
-    top = Math.max(
-      0,
-      ...Object.entries(speed)
-        .filter(([k]) => !k.includes("torpedo") && k !== "cruise")
-        .map(([, v]) => v),
-    ),
+export function aircraftHover(a, c, { campaign = "", artwork = true, heading = true } = {}) {
+  const speed = aircraftSpeed(a),
     weapons = (Array.isArray(a.armament) ? a.armament : [])
       .map(
         (w) =>
@@ -636,8 +635,8 @@ export function aircraftHover(a, c) {
     ["Role", esc((a.role || "").replaceAll("_", " "))],
     ["Crew", a.crew?.normal || 1],
     [
-      top ? "Maximum speed" : "Cruising speed",
-      num(top || speed.cruise || 240) + " km/h",
+      speed.label,
+      num(speed.value) + " km/h",
     ],
     ["Combat radius", num(a.fuel?.combat_radius_km) + " km"],
     [
@@ -648,6 +647,7 @@ export function aircraftHover(a, c) {
   if (a.performance?.ceiling_m)
     rows.push(["Ceiling", num(a.performance.ceiling_m) + " m"]);
   if (a.bomb_load_kg) rows.push(["Bomb load", num(a.bomb_load_kg) + " kg"]);
+  if (a.cost_gold !== undefined) rows.push(["Production per aircraft", num(a.cost_gold) + " gold · " + num((a.weights?.empty_kg || 2500) / 80, 1) + " industry"]);
   if (a.weights?.empty_kg)
     rows.push(["Empty weight", num(a.weights.empty_kg) + " kg"]);
   if (a.weights?.max_kg || a.weights?.max_takeoff_kg)
@@ -683,11 +683,12 @@ export function aircraftHover(a, c) {
     ],
   );
   return (
-    '<span class="eyebrow">AIRCRAFT CLASS · ' +
+    (heading ? '<span class="eyebrow">AIRCRAFT CLASS · ' +
     a.type_year +
     "</span><h3>" +
     esc(a.name) +
-    "</h3>" +
+    '</h3><p class="catalog-description">' + esc(aircraftDescription(a)) + '</p>' : "") +
+    (artwork ? recognitionThumbnail("aircraft", a.id, { campaign }) : "") +
     list(rows)
   );
 }

@@ -8661,27 +8661,39 @@ body:has(.view-command) #toast {
 .time-bar .actual-speed { width:122px; min-width:122px; max-width:122px; }
 .economy-ledger .ledger-panel { display:flex; flex-direction:column; }
 .economy-ledger .ledger-panel > .formula { margin-top:auto; padding-top:10px; }
-/* Recognition plates retain their own aspect ratio and a clean white ground. */
-.recognition-card { margin: 16px 0; min-width: 0; }
-.recognition-image { display: block; width: 100%; padding: 10px; background: #fff; border: 1px solid #b8c1c5; border-radius: 3px; cursor: zoom-in; }
-.recognition-image:hover, .recognition-image:focus-visible { background: #fff; border-color: var(--gold); }
-.recognition-image img { display: block; width: 100%; height: 250px; object-fit: contain; background: #fff; }
-.recognition-card.compact .recognition-image img { height: 150px; }
-.recognition-card figcaption { display: grid; gap: 5px; padding: 10px 0; line-height: 1.45; overflow-wrap: anywhere; }
-.recognition-card figcaption span, .recognition-card figcaption small { display: block; font-size: 12px; color: var(--muted); }
-.recognition-card.compact figcaption strong { font-size: 12px; }
-.recognition-card.compact figcaption span, .recognition-card.compact figcaption small { font-size: 11px; }
-.recognition-sheet { overflow: auto; max-height: 60vh; background: #fff; border: 1px solid #b8c1c5; }
-.recognition-sheet img { display: block; width: auto; height: auto; max-width: none; min-width: 100%; background: #fff; }
+/* Recognition notebook: tint display whites without changing licensed source files. */
+.recognition-card { --recognition-paper:#b9b4a0; --recognition-height:250px; margin:14px 0; min-width:0; }
+.recognition-card.compact { --recognition-height:160px; }
+.recognition-card.expanded { --recognition-height:42vh; }
+.recognition-image,.recognition-sheet { position:relative; isolation:isolate; padding:28px 14px 12px 25px; background-color:var(--recognition-paper); background-image:linear-gradient(90deg,transparent 15px,#775a4e45 15px,#775a4e45 16px,transparent 16px),repeating-linear-gradient(transparent 0,transparent 23px,#38515a13 23px,#38515a13 24px); border:1px solid #777d74; border-radius:3px; box-shadow:inset 0 0 18px #514d3626; }
+.recognition-image::before,.recognition-sheet::before { content:"RECOGNITION NOTES"; position:absolute; top:8px; left:25px; color:#3e4947; font:600 9px/1.2 "Courier New",monospace; letter-spacing:.16em; pointer-events:none; }
+.recognition-image { display:block; width:100%; cursor:zoom-in; }
+.recognition-image:hover,.recognition-image:focus-visible { background-color:var(--recognition-paper); border-color:var(--gold); }
+.recognition-image img { display:block; width:100%; height:var(--recognition-height); object-fit:contain; }
+.recognition-image img,.recognition-sheet img { background:transparent; mix-blend-mode:multiply; }
+.recognition-card figcaption { padding:6px 0 0; line-height:1.45; overflow-wrap:anywhere; }
+.recognition-info > summary { width:fit-content; color:var(--gold); cursor:pointer; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+.recognition-info > summary:hover { color:var(--text); }
+.recognition-info > summary:focus-visible { outline:3px solid var(--gold); outline-offset:3px; border-radius:2px; }
+.recognition-info-body { display:grid; gap:5px; margin-top:8px; padding:10px; border-left:2px solid var(--line); background:#101a2470; }
+.recognition-info-body strong { font-size:13px; }
+.recognition-info-body span,.recognition-info-body small { display:block; font-size:12px; color:var(--muted); }
+.recognition-info-body a { color:var(--gold); }
+.recognition-sheet { overflow:auto; max-height:60vh; }
+.recognition-sheet img { display:block; width:auto; height:auto; max-width:none; min-width:100%; }
 .recognition-status { font-size: 12px; color: var(--muted); }
 .recognition-credits figure { margin: 0; padding: 16px 0; border-top: 1px solid var(--line); }
 .recognition-credits figcaption { display: grid; gap: 5px; line-height: 1.5; overflow-wrap: anywhere; }
 .recognition-credits figcaption small { color: var(--muted); }
 .recognition-card.monochrome img { filter: grayscale(1); }
-.recognition-crop { position: relative; overflow: hidden; background: #fff; }
+.recognition-crop { position:relative; overflow:hidden; max-width:calc(var(--recognition-height) * var(--recognition-ratio)); margin-inline:auto; }
 .recognition-crop img { position: absolute; display: block; max-width: none; min-width: 0; }
+.recognition-sheet.actual-size .recognition-crop { max-width:none; }
 .modal[data-dialog-type="recognition"] { width: min(1400px,calc(100vw - var(--dialog-left,0px) - var(--dialog-right,0px) - 48px)); max-width: none; height: min(860px,calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 32px)); }
 .recognition-sheet:not(.actual-size) > img { width: 100%; min-width: 0; max-width: 100%; max-height: 42vh; object-fit: contain; }
+.recognition-thumbnail { --recognition-height:110px; margin:8px 0 10px; }
+.recognition-thumbnail .recognition-image { padding:20px 10px 8px 22px; cursor:default; }
+.recognition-thumbnail .recognition-image::before { top:6px; left:22px; font-size:8px; }
 
 /* Release 33: reserve the same diplomacy rows during peace, war and cooldowns. */
 .workspace .government { display: block; }
@@ -8886,3 +8898,83 @@ body:has(.view-command) #toast {
 .offer-history { border-top: 1px solid var(--line); padding-top: 9px; font-size: 12px; }
 .offer-history > summary { cursor: pointer; color: var(--muted); padding: 5px 0; }
 .offer-history p { margin: 5px 0; }
+
+/* The clock keeps its location below the date; controls wrap only when their
+   actual combined width no longer fits, rather than at a desktop breakpoint. */
+.map-scene .game-body > .time-bar {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 7px;
+  row-gap: 6px;
+}
+.map-scene .time-bar .campaign-clock {
+  flex: 0 0 auto;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.map-scene .time-bar .campaign-clock small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.map-scene .time-bar .clock-controls {
+  flex: 0 0 auto;
+  gap: 4px;
+  margin-left: auto;
+}
+.map-scene .time-bar #speed { width: 136px; }
+.map-scene .time-bar .header-audio { flex: 0 0 auto; margin-left: 0; gap: 5px; }
+.map-scene .time-bar .header-audio input[type="range"] { width: 40px; }
+.map-scene .time-bar .header-audio #sound-volume { width: 40px; }
+.map-scene .time-bar button, .map-scene .time-bar select { font-size: 11px; }
+
+/* One hierarchy across catalogs: design identity, illustration, then the
+   operational numbers and procurement controls. */
+.workspace .catalog-card { display: flex; flex-direction: column; min-width: 0; padding: 14px; }
+.workspace .catalog-card h3 { margin: 0 0 7px; font: 600 19px/1.3 Georgia, "Times New Roman", serif; }
+.workspace .catalog-card h3 button { padding: 0; font-size: inherit; font-weight: 600; line-height: inherit; text-align: left; }
+.workspace .catalog-card .catalog-description,
+.catalog-description { margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.catalog-stats { margin: 0; padding: 0; font-variant-numeric: tabular-nums; }
+.catalog-stats > div { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.catalog-stats dt { font-size: 13px; line-height: 1.35; color: var(--muted); }
+.catalog-stats dd { margin: 0; font-size: 15px; line-height: 1.35; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+.workspace .catalog-card .catalog-armament { min-height: 0; margin: 11px 0; font-size: 14px; line-height: 1.45; color: var(--text); }
+.workspace .catalog-card .catalog-procurement { margin-top: auto; padding-top: 6px; }
+.workspace .catalog-card .cost-line,
+.workspace .catalog-card .cost { font-size: 14px; line-height: 1.45; }
+.workspace .catalog-card .catalog-build-time,
+.workspace .catalog-card .catalog-unit-cost { margin: 9px 0; font-size: 14px; line-height: 1.45; }
+.workspace .catalog-card .catalog-unit-cost strong { color: var(--text); }
+.workspace .catalog-card .badge { align-self: flex-start; margin-top: auto; }
+.workspace .catalog-card .design-actions button { min-height: 34px; }
+.view-aircraft .aircraft-models,
+.view-yards .design-grid { grid-template-columns: repeat(auto-fit,minmax(min(300px,100%),1fr)); gap: 12px; }
+.class-hover .catalog-description { font-size: 12px; line-height: 1.4; margin: 7px 0; }
+.modal .inspection-list > div, .modal .spec-list > div { font-size: 14px; line-height: 1.45; gap: 16px; padding: 8px 0; }
+.modal .inspection-list dd, .modal .spec-list dd { font-size: 15px; overflow-wrap: anywhere; }
+.modal .panel-note { font-size: 12px; line-height: 1.5; }
+summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.class-hover.base-hover { pointer-events: auto; }
+.map-scene .resource-bar label,
+.map-scene .resource-bar .resource-change { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.map-scene > .game-body { container: game-body / inline-size; }
+.map-scene .game-body .resource-bar > div { gap: 0; padding: 3px 7px; }
+.map-scene .game-body .resource-bar strong { line-height: 1.1; overflow: visible; text-overflow: clip; }
+.map-scene .game-body .resource-bar .resource-reserve { display: block; font-size: 10px; line-height: 1.05; }
+.map-scene .game-body .resource-bar .resource-war strong { white-space: normal; overflow-wrap: anywhere; font-size: 11px; line-height: 1.15; }
+@container game-body (max-width: 1450px) {
+  .map-scene .game-body .resource-bar { grid-template-columns: repeat(8,minmax(0,1fr)); }
+  .map-scene .game-body .resource-bar:has(.resource-war) { grid-template-columns: repeat(9,minmax(0,1fr)); }
+}
+@container game-body (max-width: 800px) {
+  .map-scene .game-body .resource-bar { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .map-scene .game-body .resource-bar:has(.resource-war) { grid-template-columns: repeat(5,minmax(0,1fr)); }
+}
+@media (max-width: 850px) {
+  .map-scene .time-bar .campaign-clock { order: 1; }
+  .map-scene .time-bar .clock-controls { order: 3; margin-left: auto; }
+  .map-scene .time-bar .header-audio { order: 2; margin-left: auto; }
+}

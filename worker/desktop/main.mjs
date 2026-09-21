@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createGameServer } from "./server.mjs";
 import { GAME_VERSION } from "../../mechanics/version.mjs";
+import { referenceDestination, openReference } from './link-policy.mjs';
 
 app.setName("WNT1922");
 const testMode = process.argv.includes("--test-mode");
@@ -72,11 +73,8 @@ async function start() {
     if (!url.startsWith(origin + "/")) event.preventDefault();
   });
   window.webContents.setWindowOpenHandler(({ url }) => {
-    const parsed = new URL(url);
-    if (
-      parsed.origin === origin &&
-      parsed.pathname === "/assets/licenses/third-party-notices.html"
-    )
+    const destination = referenceDestination(url, origin);
+    if (destination === 'credits')
       return {
         action: "allow",
         overrideBrowserWindowOptions: {
@@ -88,11 +86,15 @@ async function start() {
           },
         },
       };
-    if (
-      ["https:", "http:"].includes(parsed.protocol) &&
-      parsed.origin !== origin
-    )
-      void shell.openExternal(url);
+    if (destination === 'external')
+      void openReference(url, {
+        open: value => shell.openExternal(value),
+        report: detail => dialog.showMessageBox(window, {
+          type: 'info', title: 'Reference link could not open',
+          message: 'Windows could not open this reference in your browser.',
+          detail, buttons: ['Return to game'],
+        }),
+      });
     return { action: "deny" };
   });
   window.on("close", (event) => {

@@ -98,18 +98,21 @@ export async function createGameServer({
           return;
         }
         if (req.method === "POST") {
-          let body = "";
+          const chunks = [];
+          let bodyBytes = 0;
           for await (const chunk of req) {
-            body += chunk;
-            if (body.length > 8_000_000) {
+            bodyBytes += chunk.length;
+            if (bodyBytes > 8_000_000) {
               res.writeHead(413);
               res.end();
               return;
             }
+            chunks.push(chunk);
           }
           let save;
           try {
-            save = JSON.parse(body);
+            // Decode once: a network chunk can end inside a multibyte ship name.
+            save = JSON.parse(Buffer.concat(chunks, bodyBytes).toString("utf8"));
           } catch {
             res.writeHead(400);
             res.end(JSON.stringify({ error: "Invalid save JSON." }));

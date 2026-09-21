@@ -184,13 +184,23 @@ async function checkRecognition(nation) {
     const presentation = await page.locator('.modal .recognition-card img').evaluate(image => ({
       fit: getComputedStyle(image).objectFit,
       background: getComputedStyle(image).backgroundColor,
+      blend: getComputedStyle(image).mixBlendMode,
+      paper: getComputedStyle(image.closest('.recognition-image')).backgroundColor,
       source: new URL(image.src).pathname,
       caption: !!image.closest('figure').querySelector('figcaption strong'),
     }));
     assert.equal(presentation.fit, "contain");
-    assert.equal(presentation.background, "rgb(255, 255, 255)");
+    assert.equal(presentation.background, "rgba(0, 0, 0, 0)");
+    assert.equal(presentation.blend, "multiply");
+    assert.equal(presentation.paper, "rgb(185, 180, 160)");
     assert(presentation.source.startsWith("/assets/recognition/"));
     assert(presentation.caption);
+    const artInfo = page.locator('.modal .recognition-info');
+    assert.equal(await artInfo.evaluate(el => el.open), false);
+    await artInfo.locator('summary').click();
+    assert.equal(await artInfo.evaluate(el => el.open), true);
+    assert.match(await artInfo.innerText(), /source file unchanged/);
+    await artInfo.locator('summary').click();
     await page.locator('.modal [data-action="recognition"]').click();
     await page.locator('[data-dialog-type="recognition"] .recognition-sheet img').waitFor();
     await page.waitForFunction(() => {
@@ -234,7 +244,7 @@ async function checkRecognition(nation) {
   await page.locator('.recognition-credits figcaption').first().waitFor();
   assert.match(await page.locator('.modal-body').innerText(), /recognition drawings cover/);
   await page.locator('.modal .close').click();
-  result.checks.push(nation + ": ship and aircraft recognition cards, full-size drawings, source credits, original packaged file bytes and SHA-256 verified without external requests.");
+  result.checks.push(nation + ": muted recognition paper, toggled art information, ship and aircraft cards, full-size drawings, original packaged file bytes and SHA-256 verified without external requests.");
 }
 async function closeSaved() {
   // Closing webContents from page JavaScript bypasses Electron's native close
@@ -375,6 +385,19 @@ try {
       result.checks.push('Lower-centered, unblurred dispatches leave menus/resources visible; defer, reopen and Escape preserve the deadline and manual pause.');
     }
     await acknowledgeDispatches();
+    // Inspect before visiting either catalog: artwork must be available on the
+    // first fleet hover, including legacy ships outside the procurement list.
+    await page.locator('.sidebar [data-view="fleet"]').click();
+    await page.locator('.workspace [data-ship]').first().hover();
+    await page.waitForFunction(() => {
+      const image = document.querySelector('.class-hover:not([hidden]) .recognition-thumbnail img');
+      return image?.complete && image.naturalWidth > 0;
+    });
+    assert.match(await page.locator('.class-hover').innerText(), /Complement/);
+    assert.equal(await page.locator('.class-hover .recognition-info').count(), 0);
+    await page.mouse.move(12, 12);
+    await page.locator('.sidebar [data-view="command"]').click();
+    result.checks.push(nation + ': first fleet hover displays its complete recognition thumbnail before any catalog visit.');
     if(nation==='USA') {
       for(const action of ['continue','new']) {
         await page.locator('.sidebar [data-view="fleet"]').click();
@@ -398,7 +421,7 @@ try {
     assert(cells.every(x=>x.height===55),'Resource cells keep the compact fixed height');
     for (const key of ["YARDS", "SAILORS", "AVIATORS", "AIRCRAFT"]) {
       const counter = page.locator('[data-resource="' + key + '"] strong');
-      assert.match(await counter.innerText(), /^[\d,]+\([+−][\d,]+\)$/);
+      assert.match((await counter.innerText()).replace(/\s/g, ''), /^[\d,]+\([+−][\d,]+\)$/);
       assert(await counter.evaluate(el => el.scrollWidth <= el.clientWidth + 1), key + " counter must fit without truncation");
     }
     await page.mouse.move(12, 12);
@@ -414,6 +437,10 @@ try {
     );
     await page.locator("[data-aircraft]").first().hover();
     await page.locator(".class-hover:not([hidden])").waitFor();
+    await page.waitForFunction(() => {
+      const image = document.querySelector('.class-hover:not([hidden]) .recognition-thumbnail img');
+      return image?.complete && image.naturalWidth > 0;
+    });
     assert.match(
       await page.locator(".class-hover").innerText(),
       /Combat radius/,

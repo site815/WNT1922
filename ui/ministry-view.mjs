@@ -1,4 +1,5 @@
 import { recognitionCard } from "./recognition.mjs";
+import { aircraftDescription, aircraftSpeed } from "./catalog-presentation.mjs";
 import { NewsTicker } from "./news-ticker.mjs";
 import { diplomaticOfferAlert } from './diplomatic-offers-view.mjs';
 import { battleProgress } from "./battle-progress.mjs";
@@ -303,35 +304,30 @@ export function aircraftCatalogView(s, c) {
     .map((a) => {
       const stock=inventory.get(a.id);
       const future = !!aircraftBlock(s, c, a.id);
+      const speed = aircraftSpeed(a);
       return (
         '<article data-model="' +
         a.id +
-        '" data-future="' +
+        '" class="catalog-card" data-future="' +
         future +
-        '"><span class="eyebrow">' +
-        a.type_year +
-        " · " +
-        esc(planeRole(a)) +
-        '</span><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
+        '"><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
         a.id +
         '">' +
         esc(a.name) +
-        "</button></h3>" + recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) + "<p>" +
-        num(n.aircraft[a.id]) +
-        " owned · <b>" + num(stock.reserve) + " reserve</b> · " +
-        (a.crew?.normal || 1) +
-        " aircrew each<br>" +
-        num(a.fuel?.combat_radius_km) +
-        " km combat radius<br><small>" +
-        esc(basingText(a)) +
-        "</small></p>" +
+        '</button></h3><p class="catalog-description">' + esc(aircraftDescription(a)) + '</p>' +
+        recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) +
+        '<dl class="catalog-stats"><div><dt>Owned / reserve</dt><dd>' + num(n.aircraft[a.id]) + ' / ' + num(stock.reserve) +
+        '</dd></div><div><dt>Aircrew per aircraft</dt><dd>' + (a.crew?.normal || 1) +
+        '</dd></div><div><dt>' + speed.label + '</dt><dd>' + num(speed.value) + ' km/h' +
+        '</dd></div><div><dt>Combat radius</dt><dd>' + num(a.fuel?.combat_radius_km) + ' km' +
+        '</dd></div><div><dt>Basing</dt><dd>' + esc(basingText(a)) + '</dd></div></dl>' +
         (future
           ? catalogCountdown(s, a.type_year)
-          : "<small>Production per aircraft: " +
+          : '<p class="catalog-unit-cost">Production per aircraft: <strong>' +
             num(a.cost_gold) +
             " gold · " +
             num((a.weights?.empty_kg || 2500) / 80, 1) +
-            " industry</small>" +
+            " industry</strong></p>" +
             '<span class="badge active" title="Available automatically from 1 January ' + a.type_year + '. Select it in a production line above.">Production ready</span>') +
         (stock.replacement ? '<button class="action-slot" data-action="retire-aircraft" data-id="'+a.id+'" '+
           (stock.block?'disabled data-disabled-reason="'+esc(stock.block)+'"':'')+' title="'+
@@ -357,24 +353,21 @@ export function aircraftCatalogView(s, c) {
     .filter(a => currentGovernment.has(a.id) || a.type_year > new Date(s.day*86400000).getUTCFullYear())
     .map((a) => {
       const future = a.type_year > new Date(s.day * 86400000).getUTCFullYear();
+      const speed = aircraftSpeed(a);
       return (
         '<article data-government-model="' +
         a.id +
-        '"><span class="eyebrow">' +
-        a.type_year +
-        " · Government " +
-        esc(a.role.replaceAll("_", " ")) +
-        '</span><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
+        '" class="catalog-card"><h3><button class="text-button" data-action="aircraft-spec" data-id="' + a.id + '" data-aircraft="' +
         a.id +
         '">' +
         esc(a.name) +
-        "</button></h3>" + recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) + "<p>" +
-        num(n.governmentAircraft?.[a.id]) +
-        " aircraft · " +
-        a.crew.normal +
-        " crew each<br>" +
-        num(a.fuel.combat_radius_km) +
-        " km combat radius<br><small>Shore operation only</small></p>" +
+        '</button></h3><p class="catalog-description">' + esc(aircraftDescription(a, { government: true })) + '</p>' +
+        recognitionCard("aircraft", a.id, { compact: true, campaign: s.campaignId }) +
+        '<dl class="catalog-stats"><div><dt>Government inventory</dt><dd>' + num(n.governmentAircraft?.[a.id]) + ' aircraft' +
+        '</dd></div><div><dt>Aircrew per aircraft</dt><dd>' + (a.crew?.normal || 1) +
+        '</dd></div><div><dt>' + speed.label + '</dt><dd>' + num(speed.value) + ' km/h' +
+        '</dd></div><div><dt>Combat radius</dt><dd>' + num(a.fuel?.combat_radius_km) + ' km' +
+        '</dd></div><div><dt>Production control</dt><dd>Government managed</dd></div></dl>' +
         (future
           ? catalogCountdown(s, a.type_year)
           : '<span class="badge">Government managed</span>') +
