@@ -2,7 +2,13 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.36.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.36.1-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.36.1 — canvas resolution correction
+
+Returning to navy selection and then starting or continuing a campaign at the same window size now allocates full-resolution map canvases. Previously a replacement canvas could retain its default 300×150 backing buffer, enlarging and blurring the map and separating drawn ships from their hit areas. This patch checks the actual foreground and background buffers as well as window size. Same-size remount and native-resolution checks cover the reported path. It includes all of the 0.36.0 features below and accepts the same saves.
+
+Validation: 390 regression checks passed, browser checks cover five window widths and the title-screen/continue path, and the final portable passes both campaigns, battle playback and save/close/reopen without JavaScript errors. Native fleet and battle screenshots were visually reviewed after the buffer correction.
 
 ## Version 0.36.0 — isometric fleets and battle watch
 

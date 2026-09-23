@@ -32,6 +32,16 @@ try {
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:'+server.address().port);
  await page.locator('[data-action="continue"]').click(); await page.locator('.isometric-canvas').waitFor();
+ await page.locator('[data-action="menu"]').click();
+ await page.locator('[data-action="title-screen"]').click();
+ await page.locator('[data-action="continue"]').click();
+ await page.locator('.isometric-canvas').waitFor();
+ const resolution=await page.locator('.isometric-canvas').evaluate(canvas=>{
+  const r=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
+  return {actual:[canvas.width,canvas.height],expected:[Math.ceil(r.width*dpr),Math.ceil(r.height*dpr)]};
+ });
+ assert.deepEqual(resolution.actual,resolution.expected,'same-size campaign remount keeps full canvas resolution and coordinate alignment');
+ checks.push('Title-screen/continue at unchanged window size preserves full foreground canvas resolution.');
  await page.evaluate(async()=>{const m=await import('/ui/voxel-models.mjs');await m.loadVoxelModels();});
  assert.equal(await page.locator('.modal').count(),0,'battle alerts do not open a viewer automatically');
  await page.locator('.decisive-alert [data-action="watch-battle"]').waitFor();
@@ -39,6 +49,7 @@ try {
  const menus=await page.locator('.sidebar .nav-item').evaluateAll(nodes=>nodes.map(n=>n.dataset.view));
  for(const width of [1920,1366,1100,900,768]) {
   await page.setViewportSize({width,height:width>=1600?1000:768});
+  await page.waitForTimeout(160); // The real resize handler settles at 100 ms.
   for(const menu of menus) {
    await page.locator('.sidebar [data-view="'+menu+'"]').click();
    await page.locator('.workspace.view-'+menu).waitFor();

@@ -2153,6 +2153,8 @@ function hideClassHover() {
   hoverTarget = null;
   hoverPending = null;
   sceneHoverKey = null;
+  isometricScene.hoverKey = '';
+  isometricScene.hoverSelection = null;
 }
 let hoverPoint = null,
   hoverScrollTimer;

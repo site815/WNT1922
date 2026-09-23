@@ -1,3 +1,16 @@
+# Canvas remount verification — 0.36.1
+
+Review date: 24 September 2026. Final visual review of 0.36.0 found an enlarged, blurry map after returning to navy selection and continuing at the same window size. Its automated interaction checks had passed without checking the replacement canvas resolution. This patch checks both canvas backing buffers and resets stale hull-hover state when the tooltip closes.
+
+- Standard regression: **390/390 checks passed**, including same-size canvas replacement at device pixel ratios 1, 1.25 and 2. Both drawing buffers regain the correct dimensions; obsolete buffers are not reused.
+- Browser checks now exercise title-screen/continue before World/Fleet interaction, verify actual canvas resolution, and cover all 11 menus at 1920, 1366, 1100, 900 and 768 pixels. Real pointer hover/click, battle pause and exact global stepping, read-only replay, close-paused behavior and saved replay all pass without browser errors.
+- The corrected native portable passed USA 1936 and Britain 1922, including the same-size campaign remount, actual canvas buffer dimensions, packaged models and recognition files, fleet clicks, all 33 music tracks, diplomacy, save/close/reopen and five-round battle playback. No JavaScript errors were recorded. The final fleet and battle screenshots were also visually reviewed: the map and ships retain full resolution after the title-screen cycle.
+- Packaging verified **770 source files / 843 payload files**. Executable: `WNT1922-0.36.1-portable-win-x64.exe`, 476,467,553 bytes. SHA-256: `1d3d5b84c7b5259da61a1301a5de96026768003b3a09d93726e3cb907fabd96f`. Source fingerprint: `bc4e5581666816103b8709328aed157aff3fd9b9423bf4ecba15df15647bd12a`.
+
+The battle mechanics and model assets are unchanged from the checks below; the six-year endurance evidence applies to those same mechanics. Local patch evidence is under ignored `test-output/release361-*`, `test-output/scene-ui/` and `test-output/portable/`. This release remains unsigned.
+
+---
+
 # Isometric fleets and battle systems check — 0.36.0
 
 Review date: 24 September 2026. The desktop workspace remains the main repository. This update adds the isometric presentation and decisive-battle recording while retaining the existing strategic combat calculations.

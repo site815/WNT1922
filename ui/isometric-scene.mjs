@@ -97,7 +97,12 @@ export class IsometricScene {
   resize() {
     const bounds = this.surface.getBoundingClientRect();
     const width = Math.max(1, bounds.width), height = Math.max(1, bounds.height), dpr = Math.min(2, window.devicePixelRatio || 1);
-    if (width !== this.width || height !== this.height || dpr !== this.dpr) {
+    // A new/continued campaign can replace the preserved surface at exactly the
+    // same window size. Its new canvases still start at 300×150, regardless of
+    // the previous surface's cached dimensions.
+    if (width !== this.width || height !== this.height || dpr !== this.dpr ||
+        this.canvas.width !== Math.ceil(width * dpr) || this.canvas.height !== Math.ceil(height * dpr) ||
+        this.background.width !== Math.ceil(width * dpr) || this.background.height !== Math.ceil(height * dpr)) {
       Object.assign(this, { width, height, dpr });
       for (const canvas of [this.canvas, this.background]) { canvas.width = Math.ceil(width * dpr); canvas.height = Math.ceil(height * dpr); }
       this.backgroundKey = ''; this.spriteCache.clear();

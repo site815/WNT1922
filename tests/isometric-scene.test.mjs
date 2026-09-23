@@ -5,6 +5,49 @@ import { sceneCamera, scenePoint, sceneInverse, sceneZoomAt, fleetHullInstances,
   landIntegral, clearWaterRectangle } from '../ui/isometric-math.mjs';
 import { voxelFaces, voxelBounds, voxelRaster, drawVoxelShip } from '../ui/voxel-renderer.mjs';
 
+test('same-size scene remount restores foreground and background canvas backing resolution', async () => {
+  const { IsometricScene } = await import('../ui/isometric-scene.mjs');
+  const priorWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  const makeCanvas = () => {
+    let width = 300, height = 150;
+    return { writes: 0, get width() { return width; }, set width(value) { width = value; this.writes++; },
+      get height() { return height; }, set height(value) { height = value; this.writes++; } };
+  };
+  try {
+    for (const dpr of [1, 1.25, 2]) {
+      Object.defineProperty(globalThis, 'window', { value: {devicePixelRatio:dpr}, configurable:true });
+      const width = 1920, height = 1080;
+      const scene = { surface: { getBoundingClientRect: () => ({width,height,left:0,top:0}), style: {setProperty() {}} },
+        root: {querySelector: () => null}, canvas: makeCanvas(), background: makeCanvas(),
+        spriteCache: new Map([['obsolete',{}]]), backgroundKey:'old' };
+      IsometricScene.prototype.resize.call(scene);
+      assert.equal(scene.canvas.width, Math.ceil(width*dpr));
+      assert.equal(scene.canvas.height, Math.ceil(height*dpr));
+      assert.equal(scene.background.width, Math.ceil(width*dpr));
+      assert.equal(scene.background.height, Math.ceil(height*dpr));
+      const retained = scene.canvas, oldBackground = scene.background, writes = retained.writes;
+      IsometricScene.prototype.resize.call(scene);
+      assert.equal(retained.writes, writes, 'unchanged canvases retain their pixel buffers');
+      // Returning to the title screen removes the surface. New/Continue mounts
+      // fresh HTML canvases but preserves the scene's cached CSS dimensions.
+      scene.canvas = makeCanvas(); scene.background = makeCanvas();
+      scene.spriteCache.set('obsolete',{}); scene.backgroundKey = 'old';
+      assert.equal(scene.width,width); assert.equal(scene.height,height); assert.equal(scene.dpr,dpr);
+      IsometricScene.prototype.resize.call(scene);
+      for (const canvas of [scene.canvas,scene.background]) {
+        assert.equal(canvas.width,Math.ceil(width*dpr),'replacement canvas backing width matches the display');
+        assert.equal(canvas.height,Math.ceil(height*dpr),'replacement canvas backing height matches the display');
+      }
+      assert.equal(scene.spriteCache.size,0); assert.equal(scene.backgroundKey,'');
+      assert.equal(retained.writes,writes,'detached foreground buffer is not reused');
+      assert.equal(oldBackground.width,Math.ceil(width*dpr));
+    }
+  } finally {
+    if (priorWindow) Object.defineProperty(globalThis,'window',priorWindow);
+    else delete globalThis.window;
+  }
+});
+
 test('isometric atlas picking and cursor zoom invert the same camera at every level and viewport', () => {
   for (const width of [768, 1100, 1366, 1920]) for (const zoom of [1, 3, 10, 24, 64]) {
     const viewport = { x: 170, y: 180, width: width - 350, height: 520 };

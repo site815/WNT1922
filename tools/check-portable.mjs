@@ -318,6 +318,11 @@ async function sceneHitPoint(kind, { id = null, lastFleet = false } = {}) {
   }, {kind, id, lastFleet});
 }
 async function checkVoxelScene(nation) {
+  const resolution=await page.locator('.isometric-canvas').evaluate(canvas=>{
+    const box=canvas.getBoundingClientRect(),ratio=Math.min(2,devicePixelRatio||1);
+    return {actual:[canvas.width,canvas.height],expected:[Math.ceil(box.width*ratio),Math.ceil(box.height*ratio)]};
+  });
+  assert.deepEqual(resolution.actual,resolution.expected,'Canvas backing resolution survives title-screen/new/continue at the same window size');
   const assets = await page.evaluate(async () => {
     const {loadVoxelModels,voxelModelFor} = await import('/ui/voxel-models.mjs');
     const collection = await loadVoxelModels();
