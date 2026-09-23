@@ -1,4 +1,5 @@
 import { reserveGroup, scrapGroup, affordability } from "./engine.mjs";
+import { shipInEngagement } from './battle-records.mjs';
 export const bulkEligible = (g, mode) =>
   g.count > 0 &&
   !g.battleId &&
@@ -20,7 +21,7 @@ export function bulkPlan(s, ids, mode, actor = s.player) {
     groups = ids.map((id) => n.groups.find((g) => g.id === id));
   if (groups.some((g) => !g))
     throw Error("A selected hull is no longer in the register.");
-  const eligible = groups.filter((g) => bulkEligible(g, mode)),
+  const eligible = groups.filter((g) => bulkEligible(g, mode) && !shipInEngagement(s,actor,g)),
     price = { gold: 0, influence: 0, industry: 0 };
   if (mode === "recommission")
     for (const g of eligible) {

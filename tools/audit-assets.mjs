@@ -5,7 +5,9 @@ import assert from "node:assert/strict";
 import { TRACKS, SOUNDTRACK, musicCredits, playlistFor } from "../ui/music.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import { validateRecognition } from "./check-recognition.mjs";
+import { validateVoxels } from "./check-voxels.mjs";
 const recognition = await validateRecognition({ catalog: CATALOG });
+const voxels = await validateVoxels({ catalog: CATALOG });
 const manifest = JSON.parse(await fs.readFile("assets/manifest.json"));
 manifest.assets.push(...TRACKS.map(t => ({...t, path:"assets/music/" + t.file})));
 const hash = (b) => createHash("sha256").update(b).digest("hex");
@@ -117,6 +119,7 @@ const result = {
   checkedAt: new Date().toISOString(),
   passed: true,
   recognition,
+  voxels,
   assetCount: manifest.assets.length,
   musicTracks: music.length,
   mapLicense: "Public domain",

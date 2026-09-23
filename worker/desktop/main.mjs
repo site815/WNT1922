@@ -40,7 +40,8 @@ async function start() {
   Menu.setApplicationMenu(null);
   const saveDir = path.join(app.getPath("userData"), "saves");
   server = await createGameServer({ port: 0, saveDir, publicDirectory: root,
-    recognitionDirectory: process.env.WNT_RECOGNITION_ROOT || null });
+    recognitionDirectory: process.env.WNT_RECOGNITION_ROOT || null,
+    voxelDirectory: process.env.WNT_VOXEL_ROOT || null });
   await new Promise((resolve, reject) => {
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);

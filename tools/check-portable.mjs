@@ -77,6 +77,7 @@ async function launch(profile) {
         ...process.env,
         WNT_TEST_USER_DATA: profile,
         WNT_RECOGNITION_ROOT: "",
+        WNT_VOXEL_ROOT: "",
         PATH: process.env.SystemRoot + "\\System32",
         TEMP: temp,
         TMP: temp,
@@ -295,15 +296,75 @@ if (-not [PortableTestWindow]::Close($testNativeProcess.ProcessId)) { throw 'Iso
     "Temporary game files must be removed on normal exit",
   );
 }
+// The visible canvas owns hit testing. Its keyboard-accessible objects expose
+// the same screen rectangles, so native tests can exercise real pointer picks
+// without dispatching clicks into the hidden SVG fallback.
+async function sceneHitPoint(kind, { id = null, lastFleet = false } = {}) {
+  return page.locator('.isometric-accessibility [data-iso-kind]').evaluateAll((nodes, options) => {
+    const objects = nodes.map((node, order) => ({ node, order, box: node.getBoundingClientRect(),
+      kind: node.dataset.isoKind, id: node.dataset.id, hullIndex: Number(node.dataset.hullIndex) }));
+    const fleetOrder = new Map([...document.querySelectorAll('.fleet-command-row')].map((node, i) => [node.dataset.id, i]));
+    const candidates = objects.filter(row => row.kind === options.kind && (!options.id || row.id === options.id));
+    if (options.lastFleet) candidates.sort((a, b) => (fleetOrder.get(b.id) || 0) - (fleetOrder.get(a.id) || 0));
+    else if (options.kind === 'ship') candidates.sort((a, b) => b.box.width - a.box.width);
+    for (const row of candidates) for (const [rx, ry] of [[.5,.5],[.5,.12],[.12,.5],[.88,.5],[.5,.88],[.12,.12],[.88,.12]]) {
+      const x = row.box.x + row.box.width * rx, y = row.box.y + row.box.height * ry;
+      if (!document.elementFromPoint(x, y)?.matches('.isometric-canvas')) continue;
+      const covered = objects.some(other => other.order > row.order && x >= other.box.x - 3 && x <= other.box.right + 3 &&
+        y >= other.box.y - 3 && y <= other.box.bottom + 3);
+      if (!covered) return { x, y, id: row.id, hullIndex: row.hullIndex };
+    }
+    return null;
+  }, {kind, id, lastFleet});
+}
+async function checkVoxelScene(nation) {
+  const assets = await page.evaluate(async () => {
+    const {loadVoxelModels,voxelModelFor} = await import('/ui/voxel-models.mjs');
+    const collection = await loadVoxelModels();
+    const response = await fetch('/assets/voxels/ships/index.json', {cache:'no-store'});
+    const index = await response.json();
+    const entry = index.models.find(row => row.platforms.length > 0);
+    const file = await fetch('/assets/voxels/ships/' + entry.file, {cache:'no-store'}), model = await file.json();
+    const platform = entry.platforms[0], selected = voxelModelFor(platform.id, {campaign:platform.campaign || '',type:model.type});
+    return {models:collection.models.size,expected:index.models.length,platforms:collection.platforms.size,
+      selected:selected.id,expectedModel:entry.id,parts:model.parts.length,cache:file.headers.get('cache-control')};
+  });
+  assert.equal(assets.models, assets.expected, 'Every packaged voxel model loads');
+  assert(assets.platforms > 200 && assets.parts > 3, 'Historical and original campaign classes have prebuilt geometry');
+  assert.equal(assets.selected, assets.expectedModel, 'Campaign class resolves to its authored model');
+  assert.equal(assets.cache, 'no-store', 'Model files are served directly without a build cache');
+  await page.locator('[data-iso-camera="fleet"]').click();
+  await page.waitForFunction(() => document.querySelector('.isometric-canvas')?.dataset.lod === 'fleet');
+  assert(Number(await page.locator('.isometric-canvas').getAttribute('data-visible-hulls')) > 0);
+  const point = await sceneHitPoint('ship');
+  assert(point, 'Fleet zoom provides an uncovered, individually clickable hull');
+  await page.mouse.move(point.x, point.y);
+  await page.waitForFunction(() => {
+    const image = document.querySelector('.class-hover:not([hidden]) .recognition-thumbnail img');
+    return image?.complete && image.naturalWidth > 0;
+  });
+  assert.match(await page.locator('.class-hover:not([hidden])').innerText(), /Sailors aboard/);
+  await page.mouse.move(1, 1); await delay(300);
+  await page.mouse.click(point.x, point.y);
+  await page.locator('[data-dialog-type="ship"]').waitFor();
+  assert.match(await page.locator('.modal').innerText(), /Sailors aboard/);
+  await page.locator('.modal [data-action="close"]').first().click();
+  await page.mouse.move(1, 1);
+  await page.screenshot({path:path.join(output,'voxel-fleet-'+nation+'.png')});
+  await page.locator('[data-iso-camera="home"]').click();
+  assert.equal(await page.locator('.isometric-canvas').getAttribute('data-lod'), 'strategic');
+  assert.equal(await page.locator('.world-map').evaluate(node => getComputedStyle(node).visibility), 'hidden', 'The isometric canvas is the visible engine');
+  result.checks.push({nation,voxelAssets:assets,scene:'World-to-fleet zoom, actual canvas ship hover and click, complete ship inspection, and return to strategic world verified.'});
+}
 async function measureMapFrames() {
   return page.evaluate(() => new Promise(resolve => {
-    const start=performance.now(),gaps=[];let last=start;
+    const start=performance.now(),gaps=[],startFrames=Number(document.querySelector('.isometric-canvas')?.dataset.sceneFrames || 0);let last=start;
     function frame(now) {
       gaps.push(now-last);last=now;
       const panel=document.querySelector('.command-side-panel');
       if(panel)panel.scrollTop=(now-start)%500;
       if(now-start<8000)requestAnimationFrame(frame);
-      else resolve({visible:!document.hidden,fps:1000*gaps.length/(now-start),largestFrameMs:Math.max(...gaps),mapFps:document.querySelector('.world-map')?.dataset.motionFps});
+      else { const scene=document.querySelector('.isometric-canvas'); resolve({visible:!document.hidden,fps:1000*gaps.length/(now-start),largestFrameMs:Math.max(...gaps),sceneFps:1000*(Number(scene?.dataset.sceneFrames || 0)-startFrames)/(now-start),sceneCpuMs:Number(scene?.dataset.sceneCpuMs || 0),sceneFrames:Number(scene?.dataset.sceneFrames || 0)}); }
     }
     requestAnimationFrame(frame);
   }));
@@ -327,7 +388,7 @@ try {
       await page.locator('[data-action="new"]').click();
       if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
     }
-    await page.locator('.world-map').waitFor();
+    await page.locator('.isometric-canvas').waitFor();
 
     await acknowledgeDispatches();
     await page.locator('#auto-pause').uncheck();
@@ -363,7 +424,7 @@ try {
     await page.locator('[data-action="new"]').click();
     if (await page.locator('[data-action="begin"]').count())
       await page.locator('[data-action="begin"]').click();
-    await page.locator(".world-map").waitFor();
+    await page.locator(".isometric-canvas").waitFor();
     if(nation==='USA') {
       const bounds=await page.locator('.diplomatic-dispatch').boundingBox(),workspace=await page.locator('.workspace').boundingBox();
       assert(bounds.x>=workspace.x && bounds.y>=workspace.y,'Dispatch leaves menus and resource bars visible');
@@ -407,7 +468,7 @@ try {
         await page.locator('[data-action="title-screen"]').click();
         await page.locator('[data-action="'+action+'"]').click();
         if(action==='new' && await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
-        await page.locator('.world-map').waitFor();
+        await page.locator('.isometric-canvas').waitFor();
         await acknowledgeDispatches();
         await page.locator('.sidebar [data-view="fleet"]').click();
         assert.equal(await page.locator('#fleet-filter').inputValue(),'all');
@@ -500,10 +561,13 @@ try {
       .locator("strong")
       .first()
       .click();
-    await page.locator(".chart-focus").waitFor();
+    await page.locator('.fleet-command-row.selected').waitFor();
     assert.equal(await page.locator('.fleet-command-row.selected').count(),1);
-    const firstFleet=await page.locator('.fleet-command-row').last().getAttribute('data-id');
-    await page.locator('.world-map [data-action="select-fleet"][data-id="'+firstFleet+'"]').first().dispatchEvent('click',{bubbles:true,detail:1});
+    await page.locator('[data-iso-camera="home"]').click();
+    const fleetPoint=await sceneHitPoint('fleet',{lastFleet:true});
+    assert(fleetPoint,'The strategic canvas exposes a directly clickable friendly fleet');
+    const firstFleet=fleetPoint.id;
+    await page.mouse.click(fleetPoint.x,fleetPoint.y);
     await delay(450);
     assert.equal(await page.locator('.fleet-command-row.selected').getAttribute('data-id'),firstFleet);
     const visibleSelection=await page.locator('.fleet-command-row.selected').evaluate(el=>{
@@ -526,29 +590,32 @@ try {
     await page.screenshot({ path: path.join(output, `orders-${nation}.png`) });
     assert.equal(await page.locator("[data-fleet-mission],[data-fleet-aggression],[data-action=send-inline-order]").count(),0);
     assert.equal(await page.locator("[data-action=alert-history]").count(),0);
+    await checkVoxelScene(nation);
     const count = await page.locator(".fleet-command-row").count();
     // The chart extends behind the tiles; choose a port the player can actually
     // point at instead of assuming the first cataloged port is unobstructed.
-    const portPoint = await page.locator('.world-map [data-action="select-port"]').evaluateAll(nodes => {
-      for (const port of nodes) {
-        const circle = port.querySelector('circle:not(.map-hit):not(.island-front)');
-        if (!circle) continue;
-        const r = circle.getBoundingClientRect(), x = r.x+r.width/2, y = r.y+r.height/2;
-        if (document.elementFromPoint(x,y)?.closest('[data-action="select-port"]') === port) return {x,y};
-      }
-      return null;
-    });
+    const portPoint = await sceneHitPoint('port');
     assert(portPoint, 'The uncovered chart offers a directly clickable port');
     await page.mouse.click(portPoint.x,portPoint.y);
     await delay(450);
     assert.equal(await page.locator(".fleet-command-row").count(), count);
     const home=nation==='USA'?'norfolk':'portsmouth';
-    const portTarget=page.locator('.world-map [data-map-hover="port:'+home+'"]').first();
-    if(await portTarget.count()) {
-      await portTarget.dispatchEvent('click',{bubbles:true,detail:1});
+    await page.locator('[data-iso-camera="home"]').click();
+    const portTarget=page.locator('.isometric-accessibility [data-iso-kind="port"][data-id="'+home+'"]');
+    assert.equal(await portTarget.count(),1,'The home port has an accessible canvas target');
+    {
+      await portTarget.dispatchEvent('click',{bubbles:true});
       await delay(450);
+      // Give nearby capital/fleet icons room while keeping the chosen port at
+      // the camera centre, then hover a real exposed portion of its hit area.
+      let hoverPoint=null;
+      for(let i=0;i<6&&!hoverPoint;i++) {
+        await page.locator('[data-iso-camera="in"]').click();
+        if(i>=2)hoverPoint=await sceneHitPoint('port',{id:home});
+      }
+      assert(hoverPoint,'The home port has an exposed canvas hit area');
       await page.mouse.move(10,10);
-      await portTarget.focus();
+      await page.mouse.move(hoverPoint.x,hoverPoint.y);
       await page.waitForFunction(()=>{const e=document.querySelector('.class-hover.base-hover:not([hidden])');return e?.textContent.includes('Depot capacity / assigned load');});
       assert.match(await page.locator('.class-hover.base-hover').innerText(),/does not multiply fleet supply/);
       const box=await page.locator('.class-hover').evaluate(el=>({width:el.clientWidth,height:el.clientHeight,scroll:el.scrollHeight}));
@@ -558,7 +625,7 @@ try {
       await page.mouse.move(180,160);
     }
     await page.locator('.sidebar [data-view="land"]').click();
-    assert(await page.locator(".world-map").count());
+    await page.locator('.isometric-canvas').waitFor();
     const mapBox = await page.locator(".world-board").boundingBox(),
       sideBox = await page.locator(".command-side-panel").boundingBox(),
       navBox = await page.locator(".sidebar").boundingBox(),
@@ -569,7 +636,8 @@ try {
       Math.abs(mapBox.height - viewport.height) < 1,
       "The world map fills the viewport behind the ministry tiles",
     );
-    assert.equal(await page.locator('.world-map').count(), 1, 'Only one world chart is mounted');
+    assert.equal(await page.locator('.isometric-canvas').count(), 1, 'Only one visible world scene is mounted');
+    assert.equal(await page.locator('.world-map').count(), 1, 'One semantic SVG fallback retains the political geography');
     assert(Math.abs(sideBox.width - navBox.width) < 1, 'Campaign and navigation tiles have equal widths');
     assert(sideBox.x > viewport.width / 2 && sideBox.x + sideBox.width <= viewport.width,
       'Campaign information overlays the right edge of the chart');
@@ -711,10 +779,10 @@ try {
     await page.waitForFunction(()=>document.querySelector('[data-action="step-six-hours"]')?.disabled);
     assert.deepEqual(await controlGeometry(),pausedControls,'Time control dimensions and positions do not change during play');
     const responsiveness=await page.evaluate(()=>new Promise(resolve=>{
-      const start=performance.now(),gaps=[];let last=start;
+      const start=performance.now(),gaps=[],startFrames=Number(document.querySelector('.isometric-canvas')?.dataset.sceneFrames || 0);let last=start;
       function frame(now){gaps.push(now-last);last=now;
         if(now-start<5000){const panel=document.querySelector('.command-side-panel');if(panel)panel.scrollTop=(now-start)%500;requestAnimationFrame(frame);}
-        else resolve({visible:!document.hidden,fps:gaps.length*1000/(now-start),largestFrameMs:Math.max(...gaps),mapFps:document.querySelector('.world-map')?.dataset.motionFps});
+        else {const scene=document.querySelector('.isometric-canvas');resolve({visible:!document.hidden,fps:gaps.length*1000/(now-start),largestFrameMs:Math.max(...gaps),sceneFps:1000*(Number(scene?.dataset.sceneFrames || 0)-startFrames)/(now-start),sceneCpuMs:Number(scene?.dataset.sceneCpuMs || 0),sceneFrames:Number(scene?.dataset.sceneFrames || 0)});}
       }requestAnimationFrame(frame);
     }));
     assert(responsiveness.largestFrameMs<2000,'The hidden test window must keep receiving simulation updates');
@@ -787,7 +855,7 @@ try {
       );
     await launch(profile);
     await page.locator('[data-action="continue"]').click();
-    await page.locator(".world-map").waitFor();
+    await page.locator(".isometric-canvas").waitFor();
     await page.locator('.sidebar [data-view="programs"]').click();
     assert.equal(await page.locator("#industryFunding").inputValue(), "40");
     await closeSaved();
@@ -866,7 +934,7 @@ try {
   await clickNews();
   await page.locator('.view-fleet .news-highlight').waitFor();
   assert.equal(await page.locator('.news-highlight [data-ship]').getAttribute('data-ship'),newsShip.id);
-  await page.waitForFunction(()=>document.querySelector('.news-message')?.textContent.includes('Battle underway'));
+  await page.waitForFunction(()=>document.querySelector('.news-message')?.textContent.toLowerCase().includes('battle underway'));
   await clickNews();
   await page.locator('.modal .battle-progress').waitFor();
   await page.locator('.modal header [data-action="close"]').click();
@@ -882,10 +950,22 @@ try {
   await page.locator('.report-card').first().click();
   assert.match(await page.locator('.modal .battle-progress').innerText(),/ONGOING · Contact/);
   await page.screenshot({path:path.join(output,"battle-ongoing.png")});
+  await page.locator('.modal [data-action="watch-battle"]').click();
+  await page.locator('.battle-canvas').waitFor();
+  assert(Number(await page.locator('.battle-canvas').getAttribute('data-visible-hulls'))>0);
+  for(const action of ['pause','step-minute','step-six-hours'])assert(await page.locator('[data-action="'+action+'"]').isDisabled());
+  await page.locator('[data-action="battle-next"]').click();
+  await page.waitForFunction(at=>Number(document.querySelector('.battle-canvas')?.dataset.frameAt)===at+15,report.startedAt);
+  await page.locator('[data-action="battle-previous"]').click();
+  assert.equal(Number(await page.locator('.battle-canvas').getAttribute('data-frame-at')),report.startedAt);
+  await page.locator('[data-action="battle-next"]').click();
+  assert.equal(Number(await page.locator('.battle-canvas').getAttribute('data-frame-at')),report.startedAt+15);
+  await page.screenshot({path:path.join(output,'battle-watch.png')});
   await page.locator('.modal header [data-action="close"]').click();
-  await page.locator('[data-action="step-minute"]').click();
+  assert.match(await page.locator('[data-action="pause"]').innerText(),/Resume/);
+  assert.equal(await page.locator('[data-action="pause"]').isDisabled(),false);
   await page.waitForFunction(() => document.querySelector('.report-card .battle-progress progress')?.value === 50);
-  assert((await page.evaluate(()=>window.testNotices)).includes('Time advanced 15 minutes.'));
+  result.checks.push('Native Battle watch loads packaged voxel ships, owns pause/step controls, advances exactly one global tick, replays known ticks read-only and closes paused.');
   await closeSaved();
   const savedBattle = JSON.parse(await fs.readFile(path.join(battleProfile,"saves/campaign.json")));
   assert.equal(campaignMinutes(savedBattle),report.startedAt+15,"Normal window close must save the latest fifteen-minute step");

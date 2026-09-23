@@ -1,0 +1,41 @@
+.modal[data-dialog-type="battle-watch"] { width:min(1500px,calc(100vw - var(--dialog-left,0px) - var(--dialog-right,0px) - 32px)); max-width:none; height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 24px); }
+.battle-watch { min-width:0; }
+.battle-watch-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.battle-watch-heading h3 { margin:4px 0; font-size:20px; }
+.battle-watch-heading > strong { white-space:nowrap; color:var(--gold); font-variant-numeric:tabular-nums; }
+.battle-qualification { color:var(--muted); margin:6px 0 10px; font-size:13px; line-height:1.4; }
+.battle-watch-controls { display:flex; align-items:center; flex-wrap:wrap; gap:7px; position:sticky; top:-1px; z-index:3; padding:8px 0; background:#13232e; }
+.battle-watch-controls button { min-height:32px; }
+.battle-watch-note { margin:2px 0 10px; font-size:12px; line-height:1.4; color:var(--muted); }
+.battle-stage { height:clamp(290px,44vh,530px); width:100%; border:1px solid #54717a; border-radius:4px; overflow:hidden; background:#17363d; }
+.battle-canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+.battle-canvas:focus-visible { outline:2px solid var(--gold); outline-offset:-3px; }
+.battle-watch-legend { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:6px 0 10px; font-size:11px; color:var(--muted); }
+.battle-side-ledger,.battle-rosters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.battle-side-ledger > div { display:grid; gap:6px; padding:12px; border:1px solid var(--line); border-radius:4px; background:#101d28; font-size:13px; }
+.battle-side-ledger small { color:var(--muted); line-height:1.4; }
+.battle-ship-inspection { margin:12px 0; padding:12px; border:1px solid var(--gold); border-radius:4px; display:flex; align-items:center; flex-wrap:wrap; gap:14px; }
+.battle-ship-inspection h3 { margin:5px 0; }
+.battle-ship-inspection > strong { margin-left:auto; color:var(--gold); font-size:18px; }
+.battle-ship-inspection .sunk { color:var(--red); }
+.battle-ship-inspection p { width:100%; font-size:12px; color:var(--muted); margin:0; }
+.battle-rosters section { min-width:0; }
+.battle-rosters h4 { margin:10px 0; }
+.battle-rosters button { display:flex; width:100%; justify-content:space-between; text-align:left; align-items:center; gap:12px; padding:8px 10px; margin-bottom:4px; font-size:12px; }
+.battle-rosters button span:last-child { color:var(--muted); text-align:right; font-size:11px; }
+.battle-rosters button span { min-width:0; overflow-wrap:anywhere; }
+.battle-ship-inspection h3 { overflow-wrap:anywhere; }
+.battle-rosters .selected { border-color:var(--gold); }
+.battle-air-roster { margin:0; padding:0; list-style:none; font-size:12px; }
+.battle-air-roster li { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid var(--line); }
+.battle-air-roster span { min-width:0; overflow-wrap:anywhere; }
+.battle-air-roster strong { text-align:right; }
+.attrition-panel { margin-top:16px; }
+.attrition-panel > p { font-size:13px; line-height:1.5; color:var(--muted); }
+.attrition-table-wrap { overflow-x:auto; }
+.attrition-panel table { width:100%; min-width:740px; font-size:12px; border-collapse:collapse; }
+.attrition-panel th,.attrition-panel td { padding:10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; line-height:1.5; }
+.attrition-panel td small { display:block; color:var(--muted); margin-top:4px; }
+.report-watch-link { display:block; color:var(--gold); margin:8px 0 0; }
+.decisive-alert { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-color:var(--gold); color:var(--gold); }
+@media(max-width:800px) { .battle-side-ledger,.battle-rosters {grid-template-columns:1fr;} .battle-watch-heading {align-items:flex-start;} .battle-watch-heading h3 {font-size:17px;} .battle-watch-controls {position:static;} }

@@ -1,4 +1,5 @@
 import { beginEngagement, progressEngagements } from "./engagements.mjs";
+import { shipInEngagement } from './battle-records.mjs';
 import { armedClass, fireTorpedoes } from "./torpedo-ammunition.mjs";
 import { MORALE, changeMorale, dailyMoraleRecovery, navalWarScore } from './campaign-impact.mjs';
 import { strategicFactor, strategicDemand, shipMaterialCost } from "./strategic-materials.mjs";
@@ -359,6 +360,8 @@ export function newGame(
 }
 export function initializeCampaign(s, content) {
   s.campaignId ??= DEFAULT_CAMPAIGN;
+  s.backgroundEngagements ??= [];
+  s.attritionLedger ??= [];
   initializeDiplomaticOffers(s);
   initializeResources(s, content);
   for (const n of Object.values(s.nations)) {
@@ -907,7 +910,7 @@ export function reserveGroup(s, id, content = null, actor = s.player) {
     g = n.groups.find((g) => g.id === id);
   if (!g || !["active", "reserve"].includes(g.status))
     throw new Error("Only operational or reserve hulls can change readiness.");
-  if (g.battleId) throw Error("This ship must disengage before changing readiness.");
+  if (shipInEngagement(s,actor,g)) throw Error("This ship must disengage before changing readiness.");
   if (g.status === "active") {
     const force = n.fleets.find((f) => f.id === g.fleetId);
     if (g.atSea && force) {
@@ -961,7 +964,7 @@ export function scrapGroup(s, content, id, actor = s.player) {
     g = n.groups.find((g) => g.id === id);
   if (!g || !["active", "reserve", "repair", "returning"].includes(g.status))
     throw new Error("Choose an existing hull to scrap.");
-  if (g.battleId) throw Error("This ship must disengage before returning for scrapping.");
+  if (shipInEngagement(s,actor,g)) throw Error("This ship must disengage before returning for scrapping.");
   if (g.scrapOnArrival)
     throw new Error("This ship is already ordered home for scrapping.");
   const force = n.fleets.find((f) => f.id === g.fleetId);

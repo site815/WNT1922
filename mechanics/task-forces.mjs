@@ -23,6 +23,7 @@ import {
 } from "./air-conditions.mjs";
 import { assignOpeningBases } from "./opening-bases.mjs";
 import { completeScrapping } from "./ship-retirement.mjs";
+import { shipInEngagement } from './battle-records.mjs';
 import {
   escortEligible,
   escortsForConvoy,
@@ -249,12 +250,12 @@ export function convoyCoverage(s, c, id = s.player) {
       .map((v) => ({ id: v.id, ...coverageAt(escorts, fleetPosition(s, v)) })),
   };
 }
-function splitHulls(n) {
+function splitHulls(s,n) {
   const extra = [];
   for (const g of n.groups) {
     if (
       g.service !== "warship" ||
-      g.count <= 1 ||
+      g.count <= 1 || shipInEngagement(s,n.id,g) ||
       ["building", "trials", "converting", "sunk", "scrapped"].includes(
         g.status,
       )
@@ -342,7 +343,7 @@ export function initializeOperations(s, c) {
     const oldFleets = n.fleets || [],
       theater = data.OPENING_THEATERS[id],
       origins = new Map();
-    splitHulls(n);
+    splitHulls(s,n);
     staffSailors(s, c, id);
     if (theater && !oldFleets.length) {
       const counters = {};
@@ -1220,7 +1221,7 @@ export function commissionToFleet(s, c, id, g) {
     g.dockPort = n.fleets.find((f) => f.id === g.fleetId)?.port || g.dockPort;
     delete g.fleetId;
   }
-  splitHulls(n);
+  splitHulls(s,n);
   staffSailors(s, c, id);
   const members = n.groups.filter(
     (x) =>

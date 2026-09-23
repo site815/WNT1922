@@ -24,6 +24,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
     "pause",
     "speed",
     "step",
+    "battle-next",
     "settings",
     "dismiss-alert",
     "read-news",
@@ -51,20 +52,28 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
         throw Error("Unknown simulation speed.");
       s.speed = args.value;
       break;
+    case "battle-next":
     case "step": {
+      const watching = type === 'battle-next';
+      if (watching) {
+        const report = s.reports.find(r => r.id === args.reportId);
+        if (!report || report.status !== 'ongoing' || report.decisive?.qualifies !== true || ![report.a, report.b].includes(actor))
+          throw Error('That decisive battle is no longer available for a new tick.');
+      }
       if (s.autoPause && s.decisions.some(activeDispatch))
         throw Error(
           "Acknowledge or return to ministry from the dispatch before stepping time.",
         );
+      if (watching) s.paused = true;
       if (!s.paused) throw Error("Pause the game before stepping time.");
-      if (![TICK_MINUTES, 360].includes(args.minutes)) throw Error("Invalid time step.");
+      const minutes = watching ? TICK_MINUTES : args.minutes;
+      if (![TICK_MINUTES, 360].includes(minutes)) throw Error("Invalid time step.");
       const before = campaignMinutes(s);
       s.paused = false;
-      sim.advanceMinutes(s, bundle, args.minutes, { respectPause: true });
-      s.paused = true;
-      delete s.resumeAfterDecision;
+      try { sim.advanceMinutes(s, bundle, minutes, { respectPause: true }); }
+      finally { s.paused = true; delete s.resumeAfterDecision; }
       const elapsed = campaignMinutes(s) - before;
-      return { receipt: `Time advanced ${elapsed >= 60 && elapsed % 60 === 0 ? elapsed / 60 + " hours" : elapsed + " minutes"}.${elapsed < args.minutes ? " Paused for a dispatch." : ""}` };
+      return { receipt: `Time advanced ${elapsed >= 60 && elapsed % 60 === 0 ? elapsed / 60 + " hours" : elapsed + " minutes"}.${elapsed < minutes ? " Paused for a dispatch." : ""}` };
     }
     case "settings":
       for (const [key, value] of Object.entries(args)) {

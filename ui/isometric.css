@@ -1,0 +1,24 @@
+.isometric-surface { position:absolute; inset:0; pointer-events:none; }
+.isometric-surface:not(:empty) + .world-map { visibility:hidden; pointer-events:none; }
+.isometric-canvas { display:block; width:100%; height:100%; pointer-events:auto; touch-action:none; cursor:grab; outline:none; }
+.isometric-canvas:focus-visible { outline:2px solid #d9bd80; outline-offset:-3px; }
+.isometric-toolbar { position:absolute; left:var(--iso-left,220px); top:var(--iso-top,180px); display:flex; flex-wrap:wrap; align-items:center; gap:5px; max-width:var(--iso-width,70vw); padding:5px 7px; border:1px solid #78908966; border-radius:5px; background:#142e39e8; box-shadow:0 4px 14px #0004; pointer-events:auto; }
+.isometric-toolbar .isometric-level { padding:0 8px 0 3px; color:#c7d5c7; font-size:11px; letter-spacing:.04em; font-weight:600; }
+.isometric-toolbar button { min-width:29px; min-height:27px; padding:3px 8px; border-color:#7e948171; color:#e5d9bb; background:#29434a; font-size:11px; }
+.isometric-toolbar button:hover { background:#3c5657; }
+.isometric-toolbar button:disabled { opacity:.4; cursor:default; }
+.isometric-caption { position:absolute; left:var(--iso-left,220px); bottom:var(--iso-bottom,44px); max-width:var(--iso-width,70vw); margin:0; padding:5px 9px; color:#b8ccca; font-size:10px; line-height:1.4; border-left:2px solid #a5b79780; background:#112d38d9; pointer-events:none; }
+.isometric-roster { position:absolute; left:var(--iso-left,220px); top:calc(var(--iso-top,180px) + 45px); max-width:min(330px,var(--iso-width,70vw)); width:max-content; max-height:min(62vh,560px); overflow:auto; border:1px solid #6f898177; border-radius:4px; background:#132e39f2; box-shadow:0 4px 14px #0004; pointer-events:auto; }
+.isometric-roster[hidden] { display:none; }
+.isometric-roster summary { padding:7px 10px; color:#d8dcc5; cursor:pointer; font-size:11px; }
+.isometric-roster-body { padding:3px 9px 9px; min-width:250px; }
+.isometric-roster-body > p { margin:0 0 8px; max-width:290px; color:#a9beb9; font-size:10px; line-height:1.5; }
+.isometric-roster-body > button { display:block; width:100%; min-height:35px; margin:0 0 3px; padding:5px 7px; border-color:#546f7066; text-align:left; font-size:11px; color:#dbe0cd; background:#243e47; }
+.isometric-roster-body button small { display:block; font-size:9px; color:#a9beb9; margin-top:2px; }
+.isometric-roster-pages { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:6px; font-size:10px; }
+.isometric-roster-pages button { padding:4px 8px; font-size:10px; }
+.isometric-accessibility { position:absolute; inset:0; pointer-events:none; }
+.isometric-accessibility button { position:absolute; margin:0; padding:0; opacity:0; overflow:hidden; white-space:nowrap; pointer-events:none; }
+.isometric-accessibility button:focus-visible { opacity:1; min-width:140px; height:auto!important; min-height:30px; padding:5px 8px; color:#f1dfb2; background:#18323c; outline:2px solid #eac987; z-index:2; pointer-events:auto; font-size:11px; }
+.menu-workspace .isometric-toolbar,.menu-workspace .isometric-roster,.menu-workspace .isometric-caption { display:none; }
+@media (max-width:900px) { .isometric-toolbar .isometric-level { font-size:10px; width:100%; } .isometric-roster { top:calc(var(--iso-top,180px) + 66px); } .isometric-caption { font-size:9px; } }

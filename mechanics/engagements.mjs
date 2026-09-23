@@ -1,15 +1,16 @@
 import { readDocument } from "../worker/documents.mjs";
 import { campaignMinutes, TICK_MINUTES } from "./campaign-clock.mjs";
-import { fleetGroups, fleetPosition, operationRandom, invalidateOperations, setRoute, detachRepairs } from "./task-forces.mjs";
+import { fleetGroups, fleetPosition, operationRandom, invalidateOperations, setRoute, detachRepairs, availableGroup } from "./task-forces.mjs";
 import { fleetPower, resolveBattle, resolvePortAction, resolveAirAttack, resolveConvoyAttack, addAlert, addLog } from "./engine.mjs";
 import { anchoredShips } from "./port-operations.mjs";
 import { portOwner } from "./ports.mjs";
 import { AREAS, PORTS, distanceNm } from "./world.mjs";
-import { PROFILES, REGIONS } from "./catalog.mjs";
+import { PROFILES, REGIONS, fleetService } from "./catalog.mjs";
 import { resultComposition } from "./composition.mjs";
 import { finishIncident, opposingProvocations } from "./provocation.mjs";
 import { recordWarBattle } from "./war-balance.mjs";
 import { applyBattleMorale } from './campaign-impact.mjs';
+import { decisiveAssessment, recordBattleFrame, recordBackgroundAttrition, pruneAttritionLedger } from './battle-records.mjs';
 const rules = await readDocument("common/rules/battle-stages.md");
 export const BATTLE_STAGES = rules.STAGES;
 const zeroPower = () => ({surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:0,supply:1});
@@ -39,10 +40,12 @@ export function beginEngagement(s,c,order) {
   if(kind!=="air" && (fa?.battleId || fb?.battleId)) return null;
   const pos=order.position || (fa ? fleetPosition(s,fa) : [0,0]);
   const region=order.region || Object.values(AREAS).sort((x,y)=>distanceNm(x.point,pos)-distanceNm(y.point,pos))[0].region;
-  const pa=fa && kind!=="air" ? fleetPower(s,c,a,region,fleetA) : zeroPower();
-  const pb=fb ? fleetPower(s,c,b,region,fleetB) : zeroPower();
-  const ga=fa && kind!=="air" ? fleetGroups(s,a,fa.id).filter(g=>["active","returning"].includes(g.status)) : [];
-  const gb=fb ? fleetGroups(s,b,fb.id).filter(g=>["active","returning"].includes(g.status))
+  const participating=(id,f)=> (f?fleetGroups(s,id,f.id):s.nations[id].groups.filter(g=>g.region===region))
+    .filter(g=>availableGroup(s,g) && (fleetService(c.classes[g.classId])==="warship" || (f && g.service==="support")));
+  const pa=(fa && kind!=="air") || kind==="surface" ? fleetPower(s,c,a,region,fleetA) : zeroPower();
+  const pb=fb || kind==="surface" ? fleetPower(s,c,b,region,fleetB) : zeroPower();
+  const ga=kind!=="air" && (fa || kind==="surface") ? participating(a,fa) : [];
+  const gb=fb || kind==="surface" ? participating(b,fb)
     : order.port && order.operation!=="strategic" ? anchoredShips(s,c,b,order.port) : [];
   const prep=(id,p)=>({training:s.nations[id].training,morale:s.nations[id].morale,supply:p.supply,crew:1});
   let mainRounds=1;
@@ -61,8 +64,9 @@ export function beginEngagement(s,c,order) {
     powerA:pa,powerB:pb,effectiveA:pa.total,effectiveB:pb.total,variationA:1,variationB:1,
     preparationA:prep(a,pa),preparationB:prep(b,pb),resultA:emptyResult(c,ga),resultB:emptyResult(c,gb),
     timeline:[{at:now,stage:0,round:1,label:BATTLE_STAGES[0]}]};
+  const sortie=kind==="air"?n.airSorties.find(op=>op.id===order.opId):null;
   if(kind==="air") {
-    const op=n.airSorties.find(op=>op.id===order.opId);
+    const op=sortie;
     if(!op) return null;
     r.airOperation={source:op.sourcePort?PORTS[op.sourcePort].name:fa?.name||"Air strike",
       light:op.conditions?.light||"",weather:op.conditions?.weather||"",strikes:op.strikes,
@@ -81,10 +85,18 @@ export function beginEngagement(s,c,order) {
   }
   r.limitedIncident=limited;
   if(limited) for(const p of s.provocations) if(p.fleetId===fleetA || p.fleetId===fleetB) p.battleId=r.id;
-  s.reports.unshift(r);
-  s.reports=s.reports.filter((x,i)=>x.status==="ongoing"||i<80);
-  if([a,b].includes(s.player)) addAlert(s,"Battle underway · "+REGIONS[region].name,
-    PROFILES[a].name+" and "+PROFILES[b].name+" have made contact.","battle",{reportId:r.id,a,b,ongoing:true});
+  r.decisive=decisiveAssessment(c,order,ga,gb,sortie,rules.DECISIVE);
+  if(r.decisive.qualifies) {
+    r.replay={version:1,frames:[],truncated:false};
+    recordBattleFrame(s,r,battleStageLabel(r));
+    s.reports.unshift(r);
+    s.reports=s.reports.filter((x,i)=>x.status==="ongoing"||i<80);
+    if([a,b].includes(s.player)) addAlert(s,"Decisive battle underway · "+REGIONS[region].name,
+      PROFILES[a].name+" and "+PROFILES[b].name+" have made contact. "+r.decisive.reason,"battle",{reportId:r.id,a,b,ongoing:true});
+  } else {
+    r.background=true;
+    (s.backgroundEngagements??=[]).push(r);
+  }
   invalidateOperations(s);
   return r;
 }
@@ -142,6 +154,7 @@ function applyExchange(s,c,r,weight) {
   return true;
 }
 function finish(s,c,r) {
+  if(r.status!=="ongoing") return;
   const now=campaignMinutes(s), a=r.resultA, b=r.resultB;
   const costA=a.tons+a.damagedTons*.65+a.planesLost*40,
     costB=b.tons+b.damagedTons*.65+b.planesLost*40+r.portEquivalent+(r.merchantGRT||r.airOperation?.merchantGRT||0)*.2;
@@ -167,13 +180,15 @@ function finish(s,c,r) {
   const alert=s.alerts.find(a=>a.reportId===r.id);
   const title=(r.limitedIncident?"Limited naval incident · ":"")+(r.winner?r.magnitude+" "+(r.winner===s.player?"victory":"defeat"):"Inconclusive action")+" · "+REGIONS[r.region].name;
   if(alert) Object.assign(alert,{title,body,minute:now,winner:r.winner,ongoing:false,dismissed:false});
-  if([r.a,r.b].includes(s.player)) addLog(s,title+". "+body,"battle",{reportId:r.id});
+  if(r.background) recordBackgroundAttrition(s,r);
+  else if([r.a,r.b].includes(s.player)) addLog(s,title+". "+body,"battle",{reportId:r.id});
   invalidateOperations(s);
 }
 export function progressEngagements(s,c) {
   const now=campaignMinutes(s);
-  for(const r of s.reports.filter(r=>r.status==="ongoing")) {
-    if(now<r.nextStageAt) continue;
+  pruneAttritionLedger(s);
+  for(const r of [...s.reports,...(s.backgroundEngagements||[])].filter(r=>r.status==="ongoing")) {
+    if(now<r.nextStageAt) {recordBattleFrame(s,r,battleStageLabel(r));continue;}
     const fighting=r.stage===2 || r.stage===3;
     if(fighting) {
       const weight=r.stage===2?rules.OPENING_WEIGHT:r.round===1?rules.MAIN_WEIGHT:rules.EXTRA_ROUND_WEIGHT;
@@ -181,10 +196,12 @@ export function progressEngagements(s,c) {
     }
     if(r.stage===3 && r.round<r.mainRounds) r.round++;
     else r.stage++;
-    if(r.stage===5) {finish(s,c,r);continue;}
+    if(r.stage===5) {finish(s,c,r);recordBattleFrame(s,r,battleStageLabel(r));continue;}
     r.nextStageAt=now+r.durations[r.stage];
     r.timeline.push({at:now,stage:r.stage,round:r.round,label:battleStageLabel(r)});
     const alert=s.alerts.find(a=>a.reportId===r.id);
     if(alert) {alert.title="Battle underway · "+battleStageLabel(r);alert.body="Fighting in the "+REGIONS[r.region].name+". Open the report for current losses.";}
+    recordBattleFrame(s,r,battleStageLabel(r));
   }
+  s.backgroundEngagements=(s.backgroundEngagements||[]).filter(r=>r.status==="ongoing");
 }

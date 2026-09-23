@@ -2,7 +2,17 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.35.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.36.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.36.0 — isometric fleets and battle watch
+
+- A raised isometric world atlas zooms down to individual, clickable voxel ships. Drag to pan, scroll to zoom, use **Fleet** to inspect a force and **World** to return to the strategic map. Hovers and ship panels retain the recognition drawings and gameplay details. Enemy positions remain intelligence reports. Enlarged hulls and formation spacing are illustrative.
+- The new `assets/voxels/ships/` folder contains 180 editable models: 167 authored variants covering 166 classes and 281 campaign mappings, plus 13 type fallbacks for custom designs. Historical models reference the existing recognition drawings; fictional equipment follows shared geometry. Campaign carrier conversions retain distinct silhouettes. The repository launcher reads the files directly; model changes need no asset build.
+- Decisive battles raise an alert without opening a popup. **Watch battle** pauses the campaign. **Next tick** advances the entire world by exactly 15 minutes, records the resulting state and remains paused. Recorded frames can be replayed without altering time or outcomes. The scene shows actual ship-group conditions, losses and aircraft composition; impact animation does not invent individual shot results.
+- Capital engagements qualify against at least 5,000 opposing warship tons. Air attacks qualify when at least 24 crewed strike aircraft attack a capital ship. Large surface battles also qualify at 20,000 tons per side and 60,000 combined. Editable rules and each report explain the decision. Unavailable reinforcements and remote launching carriers do not inflate contact strength.
+- Minor actions retain staged combat, ammunition use, damage, casualties, aircraft recovery and war accounting, while their outcomes collect in a bilateral monthly attrition ledger. Replay storage and the 24-month attrition history are bounded. Older compatible saves continue; missing historical battle chronology is never reconstructed.
+
+Validation: 389 regression checks passed, all 14 starts and 180 voxel models validate, and a six-year campaign completed all 210,240 ticks with 73 valid save checkpoints. The portable passed both campaigns, fleet clicks, battle playback, save/close/reopen and packaged-file verification without JavaScript errors. See [the systems check](SYSTEMS-CHECK.md) for scope and evidence.
 
 ## Version 0.35.0 — portable beta
 

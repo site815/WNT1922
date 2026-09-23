@@ -8,7 +8,9 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.35.0 presents recognition drawings on muted ONI-style notepaper, keeps provenance under an **Art info** toggle, and includes smaller drawings in ship and aircraft hovers. Catalogs separate descriptions from larger gameplay specifications, and the top controls use available window width before wrapping. Legacy drawing coverage includes all 85 opening legacy classes. Recognition files remain directly editable under `assets/recognition/`; their historical source bytes are unchanged. Existing compatible saves continue.
+Version 0.36.0 adds a raised isometric atlas with zoom from the strategic world to individual clickable voxel ships. **Fleet** inspects the selected force; **World** restores the strategic view. The 180 prebuilt models in `assets/voxels/ships/` cover every catalog class and starting legacy fleet, with generic models for custom designs. Geometry is shared between the map and battle viewer.
+
+Decisive actions raise an optional **Watch battle** alert. Opening the viewer pauses the campaign; **Next tick** advances the whole world by exactly 15 minutes and pauses again. Earlier recorded frames replay without changing the campaign. Ships show their recorded group condition and actual losses; formation spacing and impact animation are illustrative. Minor encounters retain all combat effects in a monthly background attrition ledger. [Battle rules](catalog/common/rules/battle-stages.md) define the capital, air-strike and large-surface-action thresholds. Existing compatible saves continue; older battles without recorded frames remain summary reports.
 
 ## Edit and build
 
@@ -41,17 +43,17 @@ cd WNT1922
 
 All source, catalogs, required assets, license notices, build tools and recognition artwork are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
 
-The [recognition artwork guide](assets/recognition/README.md) explains direct file editing, historical attribution and geometry checks. The repository launcher reads `assets/recognition/` directly, so artwork changes need no conversion or game rebuild. Standalone release executables contain their own bundled copy.
+The [recognition artwork guide](assets/recognition/README.md) and [voxel model guide](assets/voxels/README.md) explain direct file editing, historical references and geometry checks. The repository launcher reads `assets/recognition/` and `assets/voxels/` directly. After editing a model, reopen the game to read it without conversion or a game rebuild. Standalone release executables contain their own bundled copies. `node tools/check-voxels.mjs` validates models; `node tools/check-scene-ui.mjs` exercises the atlas, fleet inspection, battle stepping and replay in an optional Playwright/Edge test browser.
 
 ## Source layout
 
 | Folder | Owns |
 | --- | --- |
-| [ui](ui/README.md) | Screens, controls, hover details, map animation, audio playback, one stylesheet |
+| [ui](ui/README.md) | Screens, controls, hovers, isometric atlas, voxel renderer, battle viewer, audio and styles |
 | [catalog](catalog/README.md) | Editable Markdown data: common rules/catalogs, 1922, 1936 hindsight |
 | [mechanics](mechanics/README.md) | Shared calculations, simulation systems, legal actions and AI policy |
 | [worker](worker/README.md) | Catalog/asset loading, simulation scheduling, snapshots, portable desktop host |
-| assets | Maps, soundtrack, provenance, licenses and required runtime sources |
+| assets | Maps, prebuilt voxel ships, recognition drawings, soundtrack, provenance and licenses |
 | tests | Regression and architecture checks |
 | tools | Validation and the single portable build pipeline |
 

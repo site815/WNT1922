@@ -1,4 +1,5 @@
 import { strategicFactor } from "./strategic-materials.mjs";
+import { engagementReport, recordAttritionRecovery } from './battle-records.mjs';
 import { readDocument } from "../worker/documents.mjs";
 const ENGAGEMENTS = await readDocument("common/rules/engagements.md");
 const rules = (await readDocument('common/rules/air-warfare.md')).sorties;
@@ -407,8 +408,9 @@ function recoverFlight(s, c, id, op) {
         airframeRescue: 0,
       });
       ditched += loss.planes;
-      const report = s.reports.find((r) => r.id === op.reportId);
+      const report = engagementReport(s, op.reportId);
       if (report) addAirLoss(report.resultA, loss);
+      else recordAttritionRecovery(s, op, id, loss);
     }
   }
   op.airWing = [];
@@ -501,7 +503,7 @@ export function minuteAirOperations(s, c, resolve) {
           );
         if(op.phase!=="engaging") returnFlight(s, c, id, op);
       } else if (op.phase === "engaging") {
-        const report=s.reports.find(r=>r.id===op.reportId);
+        const report=engagementReport(s,op.reportId);
         if(report?.status==="ongoing") continue;
         if(op.operation==="opening" && s.pacificOpening) s.pacificOpening.targets[op.targetId]="Strike resolved";
         returnFlight(s,c,id,op);

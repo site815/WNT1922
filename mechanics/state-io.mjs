@@ -1,4 +1,5 @@
 import { validatePolitics } from "./politics-validation.mjs";
+import { validateBattleRecords } from './battle-validation.mjs';
 import { GOLD_FLOW_LABELS } from './gold-accounting.mjs';
 import { validateDiplomaticOffers } from './diplomatic-exchange.mjs';
 import { contentFor } from "./campaign-content.mjs";
@@ -434,7 +435,8 @@ export function validateSave(value, content) {
       if (o.relation !== undefined && !finite(o.relation, -100, 100)) fail();
     }
   }
-  for (const r of value.reports) {
+  try { validateBattleRecords(value, content); } catch { fail(); }
+  for (const r of [...value.reports, ...(value.backgroundEngagements || [])]) {
     if (
       !plain(r) ||
       !day(r.day) ||

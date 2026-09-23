@@ -29,6 +29,7 @@ const auxiliaries = (s, c, id, f) =>
   fleetGroups(s, id, f.id).filter(
     (g) => operational(g) && g.service === "support",
   );
+import { shipInEngagement } from './battle-records.mjs';
 export function organizeSupport(s, c) {
   for (const [id, n] of Object.entries(s.nations)) {
     const extra = [];
@@ -37,7 +38,7 @@ export function organizeSupport(s, c) {
         g.service !== "support" ||
         g.fleetId ||
         !operational(g) ||
-        g.count <= 1 ||
+        g.count <= 1 || shipInEngagement(s,id,g) ||
         !c.classes[g.classId].crew
       )
         continue;

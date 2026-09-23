@@ -284,8 +284,11 @@ test("a complete strategic sortie launches real bombers, damages industry and re
   }
   assert.ok(airborne);
   assert.equal(n.airSorties.length, 0);
-  assert.equal(s.reports.length, 1);
-  assert.ok(s.reports[0].industryRaid.damage > 0);
+  assert.equal(s.reports.length, 0, 'Routine strategic bombing stays in background attrition');
+  assert.equal(s.backgroundEngagements.length, 0, 'The resolved minor engagement is discarded');
+  assert.equal(s.attritionLedger.length, 1);
+  assert.ok(s.attritionLedger[0].sides.DEU.industryDamage > 0);
+  assert.equal(s.attritionLedger[0].sides.GBR.governmentPlanesLost, n.governmentLosses.planes - lost);
   assert.ok(s.nations.DEU.industrialDamage.industry > 0);
   assert.equal(
     Object.values(n.governmentAircraft).reduce((v, x) => v + x, 0) +

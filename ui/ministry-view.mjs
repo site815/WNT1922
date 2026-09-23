@@ -451,7 +451,9 @@ export function alertsView(s, c, ticker = new NewsTicker(() => {})) {
     const due=capitalClock(s,s.player,d.deadline);
     return '<button class="pending-decision" data-action="reopen-decision" data-key="'+esc(d.key)+'" title="'+esc(d.title+'. Due '+due.date+' '+due.time+'. If ignored: '+d.defaultText)+'"><strong>'+esc(d.title)+'</strong><small>Due '+esc(due.date)+'</small></button>';
   }).join('')+'</div>' : '';
-  return ticker.markup(alertItems(s),diplomaticOfferAlert(s)+buttons);
+  const watchable = s.reports.filter(r => r.status === 'ongoing' && r.decisive?.qualifies && [r.a,r.b].includes(s.player) && r.replay?.frames?.length);
+  const battleAlert = watchable.length ? '<div class="decisive-alert"><button data-action="watch-battle" data-id="'+watchable[0].id+'" title="Open the viewer and pause the campaign. Next tick advances the whole campaign by 15 minutes.">Watch battle · '+esc(REGIONS[watchable[0].region]?.name || watchable[0].region)+'</button>'+(watchable.length > 1 ? '<button data-action="view" data-view="reports">'+watchable.length+' decisive actions</button>' : '')+'</div>' : '';
+  return ticker.markup(alertItems(s),battleAlert+diplomaticOfferAlert(s)+buttons);
 }
 export function weaponDetails(c, content) {
   const raw = c.raw || {},

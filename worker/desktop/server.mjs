@@ -15,13 +15,16 @@ export async function createGameServer({
   saveDir = path.join(root, ".build", "saves"),
   publicDirectory = publicDir,
   recognitionDirectory = null,
+  voxelDirectory = null,
 } = {}) {
   const publicRoot = await fs.realpath(publicDirectory);
-  // Only the explicitly supplied recognition tree may come from the live repo.
+  // Only explicitly supplied artwork data trees may come from the live repo.
   // A standalone executable always falls back to its packaged assets.
   const recognitionRoot = recognitionDirectory ? await fs.realpath(recognitionDirectory) : null;
   if (recognitionRoot && !(await fs.stat(recognitionRoot)).isDirectory())
     throw Error("Recognition root must be a directory.");
+  const voxelRoot = voxelDirectory ? await fs.realpath(voxelDirectory) : null;
+  if (voxelRoot && !(await fs.stat(voxelRoot)).isDirectory()) throw Error('Voxel root must be a directory.');
   const catalog = CATALOG;
   let saveQueue = Promise.resolve();
   const server = http.createServer(async (req, res) => {
@@ -195,11 +198,14 @@ export async function createGameServer({
         return;
       }
       const liveRecognition = recognitionRoot && name.startsWith("assets/recognition/");
+      const liveVoxel = voxelRoot && name.startsWith('assets/voxels/');
       if (liveRecognition && !/\.(?:json|md|png|jpe?g|svg)$/.test(name)) {
         res.writeHead(404); res.end("Not found"); return;
       }
-      const fileRoot = liveRecognition ? recognitionRoot : publicRoot;
-      const file = await fs.realpath(path.join(fileRoot, liveRecognition ? name.slice("assets/recognition/".length) : name));
+      if (liveVoxel && !/\.(?:json|md)$/.test(name)) { res.writeHead(404); res.end('Not found'); return; }
+      const fileRoot = liveRecognition ? recognitionRoot : liveVoxel ? voxelRoot : publicRoot;
+      const localName = liveRecognition ? name.slice('assets/recognition/'.length) : liveVoxel ? name.slice('assets/voxels/'.length) : name;
+      const file = await fs.realpath(path.join(fileRoot, localName));
       const relative = path.relative(fileRoot, file);
       if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
         res.writeHead(404); res.end("Not found"); return;

@@ -460,7 +460,7 @@ export function commandView(s, content, ui = {}, data = {}) {
   const map =
     '<section class="world-board panel" ' +
     (ui.backgroundOnly ? 'aria-hidden="true" inert' : 'aria-label="World naval chart"') +
-    '><div class="map-stage"><svg class="world-map" data-paused="' +
+    '><div class="map-stage"><div class="isometric-surface" data-key="isometric-surface" data-preserve="true"></div><svg class="world-map" data-paused="' +
     s.paused +
     '" viewBox="' +
     (cx - width / 2) +

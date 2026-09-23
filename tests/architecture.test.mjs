@@ -145,7 +145,9 @@ test("source directories have no legacy build copies or browser persistence in m
         /localStorage\.|document\.querySelector|from ['"].*\/ui\//,
       );
   const html = await fs.readFile("ui/index.html", "utf8");
-  assert.equal((html.match(/rel="stylesheet"/g) || []).length, 1);
+  const styles = [...html.matchAll(/href="([^"]+)" rel="stylesheet"|rel="stylesheet" href="([^"]+)"/g)].map(m => m[1] || m[2]);
+  assert.equal(new Set(styles).size, styles.length, 'stylesheets are loaded only once');
+  for (const path of ['/ui/styles.css', '/ui/isometric.css', '/ui/battle-watch.css']) assert.ok(styles.includes(path));
 });
 
 test("worker design orders update the authoritative state and build a serializable snapshot", () => {
