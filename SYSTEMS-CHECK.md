@@ -1,3 +1,17 @@
+# Atlas angle and close-up zoom — 0.36.2
+
+Review date: 24 September 2026. The atlas has no sideways roll, retains its raised depth, and supports map zoom through 256× instead of 64×. Projected model bounds replace the fixed hull-culling margin so partially visible enlarged ships remain drawn and selectable. The map sprite cache retains at most 32 MiB of RGBA backing pixels and avoids a second retained raster copy; this is not a limit on total browser memory.
+
+- Standard regression: **391/391 checks passed**. Projection tests verify level east–west lines, north-up orientation, inverse picking and cursor anchoring through 256× at four viewport widths. Enlarged-hull checks compare drawing and pick bounds, preserve an onscreen bow whose centre is offscreen, and verify fourfold size relative to the old zoom limit.
+- The real browser passes all 11 menus at five widths and close-up interaction at 1920 and 768 pixels, plus a fresh 1920-pixel context at 200% display scaling. Buttons and wheel input reach 256×, the same hull visibly enlarges, pointer anchoring and drag distances remain aligned, hover artwork loads, actual canvas clicks inspect the ship, and World returns to 1×. Backing buffers match device scaling. Strategic and close-up screenshots were visually reviewed; no page errors were recorded. Existing battle stepping, replay and save checks also pass.
+- A real-canvas cache stress check creates 24 large near-maximum-zoom sprites at 200% scaling: 119,148,936 cumulative bytes generated, at most 33,455,052 bytes retained, within the 33,554,432-byte budget. The newest sprite is reused. This measures retained map sprite buffers, not transient raster buffers or GPU allocations.
+- The final native portable passed USA 1936 and Britain 1922, including actual wheel zoom to 256×, enlarged-hull clicks, ship inspection, return to World, packaged artwork, all 33 music tracks, diplomacy and save/close/reopen. The existing five-round battle-watch checks also pass. Native close-up screenshots were visually reviewed; no JavaScript errors were recorded.
+- Packaging verified **770 source files / 843 payload files**. Executable: `WNT1922-0.36.2-portable-win-x64.exe`, 476,468,252 bytes. SHA-256: `cab923035d258ab61d1113a867a7dab65aa1cb171a5687a78bc7683a9bd55b79`. Source fingerprint: `70cb340e7bd412860215219efbe2cfbf9ae47328d1cf33fd899436e28c9e1502`.
+
+Local evidence is under ignored `test-output/release362-*`, `test-output/scene-ui/` and `test-output/portable/`. Campaign calculations and model files are unchanged; earlier endurance results below cover those same mechanics.
+
+---
+
 # Canvas remount verification — 0.36.1
 
 Review date: 24 September 2026. Final visual review of 0.36.0 found an enlarged, blurry map after returning to navy selection and continuing at the same window size. Its automated interaction checks had passed without checking the replacement canvas resolution. This patch checks both canvas backing buffers and resets stale hull-hover state when the tooltip closes.

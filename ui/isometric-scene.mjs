@@ -1,7 +1,7 @@
 import { mapPoint, geometryPath, polygonPath, linePath } from './projection.mjs';
 import { sceneCamera, scenePoint, sceneInverse, sceneZoomAt, intersectsViewport, containsPoint,
   ownFleetScene, formationBounds, translatedBounds, waterFormationAnchor, landIntegral, clearWaterRectangle,
-  FLEET_DETAIL_ZOOM, MAX_SCENE_ZOOM } from './isometric-math.mjs';
+  FLEET_DETAIL_ZOOM, MAX_SCENE_ZOOM, ISO_TILT } from './isometric-math.mjs';
 import { drawVoxelShip, voxelFaces, voxelBounds } from './voxel-renderer.mjs';
 import { voxelModelFor } from './voxel-models.mjs';
 import { visualMinute, visualFleet } from './map-motion.mjs';
@@ -25,6 +25,15 @@ function mix(color, other, ratio) {
     parseInt(other.slice(i, i + 2), 16) * ratio).toString(16).padStart(2, '0')).join('');
 }
 const keyOf = selection => selection ? `${selection.kind}:${selection.id}:${selection.hullIndex ?? ''}` : '';
+const modelBounds = new WeakMap();
+export function sceneHullProjection(model, camera, position) {
+  const length = model.dimensions?.length || 100, heading = -.28;
+  const scale = camera.scale * clamp(length / 105, 1.2, 2.75) / length;
+  let unit = modelBounds.get(model);
+  if (!unit) { unit = voxelBounds(voxelFaces(model, { heading })); modelBounds.set(model, unit); }
+  return { scale, heading, bounds: { x: position[0] + unit.x * scale, y: position[1] + unit.y * scale,
+    width: unit.width * scale, height: unit.height * scale } };
+}
 
 export class IsometricScene {
   constructor({ root, chart, active = () => true, onSelect = () => {}, onHover = () => {}, onCameraChange = () => {} }) {
@@ -315,7 +324,7 @@ export class IsometricScene {
       // Raised shores project north of their sea-level footprint. Include that
       // displacement at small fleet scales so a hull cannot visually overlap a
       // cliff even though its geographic centre is technically over water.
-      const clearance = detail ? Math.max(3.2, 2.2 + this.elevation / (this.camera.scale * .68)) : 3.2;
+      const clearance = detail ? Math.max(3.2, 2.2 + this.elevation / (this.camera.scale * ISO_TILT)) : 3.2;
       if (row.clearance !== clearance) { row.formationBounds = formationBounds(row.hulls, clearance); row.clearance = clearance; }
       const anchor = detail ? waterFormationAnchor(preferred, row.formationBounds,
         rectangle => clearWaterRectangle(landMask, rectangle), occupiedFormations, this.waterOffsets.get(f.id)) : preferred;
@@ -333,8 +342,14 @@ export class IsometricScene {
       if (detail) {
         for (const hull of row.hulls) {
           const world = [anchor[0] + hull.offset[0], anchor[1] + hull.offset[1]], pos = scenePoint(this.camera, world);
-          if (!intersectsViewport({ x: pos[0] - 100, y: pos[1] - 90, width: 200, height: 160 }, { width: this.width, height: this.height })) continue;
-          drawnHulls.push({ ...hull, x: pos[0], y: pos[1], world, fleetId: f.id, nation: s.player, selectedFleet });
+          const type = this.content.classes[hull.classId]?.type || 'DD';
+          const model = voxelModelFor(hull.classId, { campaign: s.campaignId, type });
+          if (!model) continue;
+          const projection = sceneHullProjection(model, this.camera, pos);
+          // At ship-inspection zoom the bow can remain visible long after its
+          // centre leaves the screen. Cull against the actual projected hull.
+          if (!intersectsViewport(projection.bounds, { width: this.width, height: this.height }, 4)) continue;
+          drawnHulls.push({ ...hull, x: pos[0], y: pos[1], world, model, projection, fleetId: f.id, nation: s.player, selectedFleet });
         }
         if (intersectsViewport({ x: x - 4, y: y - 4, width: 8, height: 8 }, { width: this.width, height: this.height })) {
           const top = Math.min(...row.hulls.map(h => scenePoint(this.camera, [anchor[0] + h.offset[0], anchor[1] + h.offset[1]])[1]));
@@ -351,12 +366,7 @@ export class IsometricScene {
     }
     drawnHulls.sort((a, b) => a.y - b.y || a.x - b.x);
     for (const hull of drawnHulls) {
-      const type = this.content.classes[hull.classId]?.type || 'DD';
-      const model = voxelModelFor(hull.classId, { campaign: s.campaignId, type });
-      if (!model) continue;
-      const length = model.dimensions?.length || 100;
-      const scale = this.camera.scale * clamp(length / 105, 1.2, 2.75) / length;
-      const heading = -.28;
+      const { model, projection: { scale, heading } } = hull;
       const sprite = this.sprite(model, scale, heading);
       const selectedHull = this.selectedHull === hull.key;
       ctx.fillStyle = '#061c2a50'; ctx.beginPath(); ctx.ellipse(hull.x, hull.y + 3,
@@ -390,16 +400,26 @@ export class IsometricScene {
   }
   sprite(model, scale, heading) {
     const key = `${model.id}:${scale.toFixed(4)}:${heading}:${this.dpr}`;
-    if (this.spriteCache.has(key)) return this.spriteCache.get(key);
+    if (this.spriteCache.has(key)) {
+      const sprite = this.spriteCache.get(key); this.spriteCache.delete(key); this.spriteCache.set(key, sprite); return sprite;
+    }
     const bounds = voxelBounds(voxelFaces(model, { heading, scale }));
     const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.ceil((bounds.width + 4) * this.dpr));
     canvas.height = Math.max(1, Math.ceil((bounds.height + 4) * this.dpr));
     const ctx = canvas.getContext('2d'); ctx.scale(this.dpr, this.dpr);
-    drawVoxelShip(ctx, model, { x: -bounds.x + 2, y: -bounds.y + 2, scale, heading, outline: scale > .25 });
+    drawVoxelShip(ctx, model, { x: -bounds.x + 2, y: -bounds.y + 2, scale, heading, outline: scale > .25, cache: false });
     const sprite = { canvas, bounds };
-    // Camera movement reuses sprites; zoom/model edits replace them on demand.
-    if (this.spriteCache.size > 350) this.spriteCache.clear();
-    this.spriteCache.set(key, sprite); return sprite;
+    // Close-up sprites have much larger backing buffers. Retain at most 32 MiB
+    // of RGBA pixels, evicting least-recently-used scales/models first. The
+    // shared rasterizer does not retain a second copy of these map sprites.
+    const pixels = canvas.width * canvas.height, budget = 8 * 1024 * 1024;
+    let retained = [...this.spriteCache.values()].reduce((sum, row) => sum + row.canvas.width * row.canvas.height, 0);
+    while (this.spriteCache.size && (retained + pixels > budget || this.spriteCache.size >= 350)) {
+      const oldest = this.spriteCache.keys().next().value, row = this.spriteCache.get(oldest);
+      retained -= row.canvas.width * row.canvas.height; this.spriteCache.delete(oldest);
+    }
+    if (pixels <= budget) this.spriteCache.set(key, sprite);
+    return sprite;
   }
   nearestFleet() {
     const selected = this.fleets?.find(row => row.fleet.id === this.chart().fleetId);

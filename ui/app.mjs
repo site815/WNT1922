@@ -7,6 +7,7 @@ import { bulkPlan } from "../mechanics/bulk-fleet.mjs";
 import { resourceHover } from "./resource-breakdown.mjs";
 import { MapMotion } from "./map-motion.mjs";
 import { IsometricScene } from './isometric-scene.mjs';
+import { MAX_SCENE_ZOOM } from './isometric-math.mjs';
 import { loadVoxelModels } from './voxel-models.mjs';
 import { BattleWatchScene, battleWatchView, watchFrame, attritionView } from './battle-watch.mjs';
 import { chartPosition, centerChart, chartCoordinates } from "./map-focus.mjs";
@@ -2077,7 +2078,7 @@ app.addEventListener(
     chart.zoom = sim.clamp(
       chart.zoom * (event.deltaY < 0 ? 1.18 : 1 / 1.18),
       1,
-      64,
+      MAX_SCENE_ZOOM,
     );
     render();
   },

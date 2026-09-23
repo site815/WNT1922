@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { sceneCamera, scenePoint, sceneInverse, sceneZoomAt, fleetHullInstances, ownFleetScene,
   intersectsViewport, containsPoint, formationBounds, translatedBounds, waterFormationAnchor,
-  landIntegral, clearWaterRectangle } from '../ui/isometric-math.mjs';
+  landIntegral, clearWaterRectangle, MAX_SCENE_ZOOM } from '../ui/isometric-math.mjs';
 import { voxelFaces, voxelBounds, voxelRaster, drawVoxelShip } from '../ui/voxel-renderer.mjs';
 
 test('same-size scene remount restores foreground and background canvas backing resolution', async () => {
@@ -49,10 +49,16 @@ test('same-size scene remount restores foreground and background canvas backing 
 });
 
 test('isometric atlas picking and cursor zoom invert the same camera at every level and viewport', () => {
-  for (const width of [768, 1100, 1366, 1920]) for (const zoom of [1, 3, 10, 24, 64]) {
+  for (const width of [768, 1100, 1366, 1920]) for (const zoom of [1, 3, 10, 24, 64, 128, 256]) {
     const viewport = { x: 170, y: 180, width: width - 350, height: 520 };
     const chart = { cx: 621, cy: 187, zoom };
     const camera = sceneCamera(chart, viewport);
+    const centre = scenePoint(camera, [chart.cx, chart.cy]);
+    const east = scenePoint(camera, [chart.cx + 10, chart.cy]);
+    const north = scenePoint(camera, [chart.cx, chart.cy - 10]);
+    assert.equal(east[1], centre[1], 'east-west map lines remain horizontal');
+    assert.equal(north[0], centre[0], 'north remains directly above the camera centre');
+    assert(east[0] > centre[0] && north[1] < centre[1]);
     for (const point of [[600, 300], [0, 0], [1200, 600], [637.58, 52.193]]) {
       const actual = sceneInverse(camera, scenePoint(camera, point));
       assert(Math.hypot(actual[0] - point[0], actual[1] - point[1]) < 1e-9);
@@ -61,8 +67,29 @@ test('isometric atlas picking and cursor zoom invert the same camera at every le
     sceneZoomAt(chart, viewport, cursor, zoom * 1.5);
     const after = sceneInverse(sceneCamera(chart, viewport), cursor);
     assert(Math.hypot(after[0] - before[0], after[1] - before[1]) < 1e-9, 'zoom preserves the point beneath the cursor');
-    assert(chart.zoom >= 1 && chart.zoom <= 64);
+    assert(chart.zoom >= 1 && chart.zoom <= MAX_SCENE_ZOOM);
   }
+});
+
+test('close-up hull culling preserves visible bows and uses the same bounds as drawing and picking', async () => {
+  const { sceneHullProjection } = await import('../ui/isometric-scene.mjs');
+  const model = { dimensions: {length:270}, parts: [
+    {x:0,y:0,z:0,w:270,d:32,h:9,color:'#809695'},
+    {x:10,y:0,z:9,w:30,d:18,h:30,color:'#9ba9a3'},
+  ] };
+  const viewport = {width:1920,height:1080};
+  const camera = sceneCamera({zoom:MAX_SCENE_ZOOM}, viewport);
+  const position = [-150,400], projection = sceneHullProjection(model,camera,position);
+  const actual = voxelBounds(voxelFaces(model,projection));
+  for (const key of ['width','height']) assert(Math.abs(actual[key]-projection.bounds[key])<1e-9);
+  assert(Math.abs(actual.x+position[0]-projection.bounds.x)<1e-9);
+  assert(Math.abs(actual.y+position[1]-projection.bounds.y)<1e-9);
+  assert(intersectsViewport(projection.bounds,viewport),'visible bow remains drawn even with centre beyond the old 100px margin');
+  assert(containsPoint(projection.bounds,[1,projection.bounds.y+projection.bounds.height/2]),'visible portion remains selectable');
+  const distant = sceneHullProjection(model,camera,[-2000,400]);
+  assert(!intersectsViewport(distant.bounds,viewport),'fully offscreen hulls still skip raster work');
+  const oldLimit = sceneHullProjection(model,sceneCamera({zoom:64},viewport),position);
+  assert.equal(projection.bounds.width/oldLimit.bounds.width,4,'256× displays ships four times larger than the previous zoom limit');
 });
 
 test('fleet level includes every surviving own hull with stable instance identity and excludes foreign intelligence', () => {

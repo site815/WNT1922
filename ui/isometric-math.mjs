@@ -1,8 +1,10 @@
 // The chart is a raised atlas plane. These transforms are also used for mouse
 // picking: never infer a geographic position from an untransformed screen pixel.
-export const ISO_ANGLE = -Math.PI / 16;
+// Keep the atlas north-up and east/west level; depth comes from pitch and height,
+// not a sideways roll of the geographic chart.
+export const ISO_ANGLE = 0;
 export const ISO_TILT = .68;
-export const MAX_SCENE_ZOOM = 64;
+export const MAX_SCENE_ZOOM = 256;
 export const FLEET_DETAIL_ZOOM = 10;
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 

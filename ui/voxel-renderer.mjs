@@ -74,20 +74,27 @@ export function voxelRaster(model, { heading = 0, scale = 1, pixelRatio = 1 } = 
   return { data, width, height, bounds: { ...bounds, x: bounds.x - 1, y: bounds.y - 1 }, pixelRatio };
 }
 const rasterCache = new WeakMap();
-function browserSprite(ctx, model, scale, heading) {
+function browserSprite(ctx, model, scale, heading, retain = true) {
   if (!globalThis.document?.createElement || !ctx.getTransform) return null;
   const transform = ctx.getTransform(), ratio = Math.min(2, Math.max(1, Math.hypot(transform.a, transform.b)));
-  let cache = rasterCache.get(model); if (!cache) { cache = new Map(); rasterCache.set(model, cache); }
-  const key = `${scale.toFixed(5)}:${heading.toFixed(5)}:${ratio.toFixed(2)}`;
-  if (cache.has(key)) return cache.get(key);
+  let cache, key;
+  if (retain) {
+    cache = rasterCache.get(model); if (!cache) { cache = new Map(); rasterCache.set(model, cache); }
+    key = `${scale.toFixed(5)}:${heading.toFixed(5)}:${ratio.toFixed(2)}`;
+    if (cache.has(key)) return cache.get(key);
+  }
   const raster = voxelRaster(model, { scale, heading, pixelRatio: ratio });
   const canvas = document.createElement('canvas'); canvas.width = raster.width; canvas.height = raster.height;
   const context = canvas.getContext('2d'), image = context.createImageData(raster.width, raster.height); image.data.set(raster.data); context.putImageData(image, 0, 0);
   const sprite = { canvas, bounds: raster.bounds, ratio };
-  if (cache.size >= 24) cache.delete(cache.keys().next().value); cache.set(key, sprite); return sprite;
+  if (retain) {
+    if (cache.size >= 24) cache.delete(cache.keys().next().value);
+    cache.set(key, sprite);
+  }
+  return sprite;
 }
 export function drawVoxelShip(ctx, model, { x = 0, y = 0, scale = 1, heading = 0,
-  selected = false, alpha = 1, outline = false } = {}) {
+  selected = false, alpha = 1, outline = false, cache = true } = {}) {
   const faces = voxelFaces(model, { heading, scale }), bounds = voxelBounds(faces);
   ctx.save(); ctx.translate(x, y); ctx.globalAlpha *= alpha;
   if (selected) {
@@ -95,7 +102,7 @@ export function drawVoxelShip(ctx, model, { x = 0, y = 0, scale = 1, heading = 0
     ctx.beginPath(); ctx.ellipse(0, 2, Math.max(8, bounds.width * .62),
       Math.max(4, bounds.height * .38), 0, 0, Math.PI * 2); ctx.stroke();
   }
-  const sprite = browserSprite(ctx, model, scale, heading);
+  const sprite = browserSprite(ctx, model, scale, heading, cache);
   if (sprite) ctx.drawImage(sprite.canvas, sprite.bounds.x, sprite.bounds.y, sprite.canvas.width / sprite.ratio, sprite.canvas.height / sprite.ratio);
   else for (const face of faces) {
       ctx.beginPath(); face.points.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath();

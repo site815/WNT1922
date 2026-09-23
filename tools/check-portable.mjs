@@ -356,10 +356,25 @@ async function checkVoxelScene(nation) {
   await page.locator('.modal [data-action="close"]').first().click();
   await page.mouse.move(1, 1);
   await page.screenshot({path:path.join(output,'voxel-fleet-'+nation+'.png')});
+  const closePoint = await sceneHitPoint('ship');
+  assert(closePoint, 'Close-up zoom starts over a visible ship');
+  await page.mouse.move(closePoint.x, closePoint.y);
+  for (let step = 0; step < 6; step++) { await page.mouse.wheel(0, -160); await delay(80); }
+  await page.waitForFunction(() => document.querySelector('.isometric-level')?.textContent.includes('256.0×'));
+  assert(await page.locator('[data-iso-camera="in"]').isDisabled(), 'Portable reaches the new 256× zoom limit');
+  await page.mouse.move(1, 1);
+  const enlarged = await sceneHitPoint('ship', {id:closePoint.id});
+  assert(enlarged, 'The enlarged ship remains visible and clickable');
+  await page.mouse.click(enlarged.x, enlarged.y);
+  await page.locator('[data-dialog-type="ship"]').waitFor();
+  assert.match(await page.locator('.modal').innerText(), /Sailors aboard/);
+  await page.locator('.modal [data-action="close"]').first().click();
+  await page.mouse.move(1, 1);
+  await page.screenshot({path:path.join(output,'voxel-closeup-'+nation+'.png')});
   await page.locator('[data-iso-camera="home"]').click();
   assert.equal(await page.locator('.isometric-canvas').getAttribute('data-lod'), 'strategic');
   assert.equal(await page.locator('.world-map').evaluate(node => getComputedStyle(node).visibility), 'hidden', 'The isometric canvas is the visible engine');
-  result.checks.push({nation,voxelAssets:assets,scene:'World-to-fleet zoom, actual canvas ship hover and click, complete ship inspection, and return to strategic world verified.'});
+  result.checks.push({nation,voxelAssets:assets,scene:'World-to-fleet-to-256× zoom, actual canvas ship hover and close-up click, complete ship inspection, and return to strategic world verified.'});
 }
 async function measureMapFrames() {
   return page.evaluate(() => new Promise(resolve => {

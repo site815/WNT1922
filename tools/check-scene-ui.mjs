@@ -27,6 +27,72 @@ const server=await createGameServer({saveDir:output}); await new Promise(resolve
 const browser=await playwright.chromium.launch({channel:'msedge',headless:true});
 const checks=[],errors=[],metrics=[];
 let page;
+const cameraZoom = async target => Number((await target.locator('.isometric-level').innerText()).match(/([\d.]+)×/)?.[1]);
+const shipButton = (target, ship) => target.locator('[data-iso-kind="ship"][data-id='+JSON.stringify(ship.id)+'][data-hull-index="'+ship.index+'"]');
+const uncoveredShip = async target => target.locator('[data-iso-kind="ship"]').evaluateAll(nodes => nodes.map(node => {
+ const box=node.getBoundingClientRect();
+ return {id:node.dataset.id,index:Number(node.dataset.hullIndex),x:box.x+box.width/2,y:box.y+box.height/2,width:box.width,height:box.height};
+}).filter(ship => ship.width>20&&ship.height>16&&document.elementFromPoint(ship.x,ship.y)?.matches('.isometric-canvas')).sort((a,b)=>b.width-a.width)[0]);
+async function checkCloseZoom(target, width, suffix=String(width)) {
+ await target.locator('[data-iso-camera="home"]').click();
+ await target.locator('[data-iso-camera="fleet"]').click();
+ const initialZoom=await cameraZoom(target);
+ assert.equal(initialZoom,48,'Fleet starts at the familiar inspection zoom');
+ // Cross the old ceiling using the real camera button, then test wheel anchoring.
+ await target.locator('[data-iso-camera="in"]').click();
+ assert((await cameraZoom(target))>64,'camera button passes the former 64× limit');
+ const ship=await uncoveredShip(target); assert(ship,'uncovered close-zoom ship at '+suffix);
+ const baseline=await shipButton(target,ship).boundingBox(), baselineZoom=await cameraZoom(target);
+ const anchor={x:baseline.x+baseline.width/2,y:baseline.y+baseline.height/2};
+ await target.mouse.move(anchor.x,anchor.y);
+ const zoomTimes=[];
+ for(let step=0;step<12&&(await cameraZoom(target))<256;step++) {
+  const before=await shipButton(target,ship).boundingBox(),zoomBefore=await cameraZoom(target),start=performance.now();
+  await target.mouse.wheel(0,-160);
+  await target.waitForFunction(old=>Number(document.querySelector('.isometric-level')?.textContent.match(/([\d.]+)×/)?.[1])>old,zoomBefore);
+  const zoomAfter=await cameraZoom(target),after=await shipButton(target,ship).boundingBox();
+  zoomTimes.push({zoom:zoomAfter,milliseconds:Math.round(performance.now()-start)});
+  assert(after,'anchored ship remains visible at '+zoomAfter+'× / '+suffix);
+  const ratio=zoomAfter/zoomBefore;
+  const expected={x:anchor.x+(before.x+before.width/2-anchor.x)*ratio,y:anchor.y+(before.y+before.height/2-anchor.y)*ratio};
+  assert(Math.abs(after.x+after.width/2-expected.x)<2&&Math.abs(after.y+after.height/2-expected.y)<2,'wheel keeps the world point under the cursor at '+zoomAfter+'× / '+suffix);
+  assert(Math.abs(after.width/before.width-ratio)<.025,'ship width grows with actual zoom rather than only the label');
+ }
+ assert.equal(await cameraZoom(target),256,'maximum close zoom is reachable');
+ assert(await target.locator('[data-iso-camera="in"]').isDisabled(),'zoom-in button stops at 256×');
+ await target.waitForTimeout(220); // The final wheel camera commit settles at 180 ms.
+ const close=await shipButton(target,ship).boundingBox();
+ assert(close.width>baseline.width*3&&close.height>baseline.height*3,'the same ship is substantially larger at maximum zoom');
+ assert(Math.abs(close.width/baseline.width-256/baselineZoom)<.035,'full-range width matches the camera scale');
+ const point={x:close.x+close.width/2,y:close.y+close.height/2};
+ assert(await target.evaluate(p=>document.elementFromPoint(p.x,p.y)?.matches('.isometric-canvas'),point),'close-up interaction reaches the actual canvas');
+ await target.mouse.move(1,1); await target.mouse.move(point.x,point.y);
+ await target.locator('.class-hover:not([hidden]) .recognition-thumbnail img').waitFor();
+ assert.match(await target.locator('.class-hover').innerText(),/Sailors aboard/);
+ await target.mouse.click(point.x,point.y);
+ await target.locator('[data-dialog-type="ship"]').waitFor();
+ assert.match(await target.locator('.modal').innerText(),/Sailors aboard/);
+ await target.locator('.modal [data-action="close"]').first().click();
+ assert.equal(await cameraZoom(target),256,'ship inspection preserves the close camera');
+ const beforePan=await shipButton(target,ship).boundingBox(),panStart=performance.now(),dx=36,dy=24;
+ await target.mouse.move(beforePan.x+beforePan.width/2,beforePan.y+beforePan.height/2);
+ await target.mouse.down(); await target.mouse.move(beforePan.x+beforePan.width/2+dx,beforePan.y+beforePan.height/2+dy,{steps:4}); await target.mouse.up();
+ const panMilliseconds=Math.round(performance.now()-panStart),afterPan=await shipButton(target,ship).boundingBox();
+ assert(afterPan,'panned close-up ship remains reachable');
+ assert(Math.abs(afterPan.x-beforePan.x-dx)<2&&Math.abs(afterPan.y-beforePan.y-dy)<2,'pointer drag translates the same ship by the actual screen delta');
+ assert.equal(await cameraZoom(target),256,'panning does not change zoom');
+ assert.equal(await target.locator('.modal').count(),0,'a drag does not accidentally select a ship');
+ await target.mouse.move(1,1);
+ await target.screenshot({path:path.join(output,'closeup-'+suffix+'.png')});
+ const resolution=await target.locator('.isometric-canvas').evaluate(canvas=>{const r=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);return {dpr,actual:[canvas.width,canvas.height],expected:[Math.ceil(r.width*dpr),Math.ceil(r.height*dpr)],cpuMs:Number(canvas.dataset.sceneCpuMs)};});
+ assert.deepEqual(resolution.actual,resolution.expected,'close-up canvas buffer matches CSS size and DPR');
+ assert(zoomTimes.every(row=>row.milliseconds<5000)&&panMilliseconds<5000,'cold zoom and warm pan remain responsive');
+ metrics.push({kind:'close-zoom',width,suffix,baselineZoom,baselineWidth:baseline.width,closeWidth:close.width,zoomTimes,panMilliseconds,resolution});
+ await target.locator('[data-iso-camera="home"]').click();
+ assert.equal(await cameraZoom(target),1,'World resets maximum zoom to 1×');
+ assert.equal(await target.locator('.isometric-canvas').getAttribute('data-lod'),'strategic');
+ await target.screenshot({path:path.join(output,'world-'+suffix+'.png')});
+}
 try {
  page=await browser.newPage({viewport:{width:1600,height:1000}});
  page.on('pageerror',e=>errors.push(e.message));
@@ -73,10 +139,12 @@ try {
   await page.mouse.move(1,1);
   await page.screenshot({path:path.join(output,'fleet-'+width+'.png')});
   metrics.push({width,...await page.locator('.isometric-canvas').evaluate(n=>({...n.dataset}))});
+  if([1920,768].includes(width))await checkCloseZoom(page,width);
   await page.locator('[data-iso-camera="home"]').click();
   assert.equal(await page.locator('.isometric-canvas').getAttribute('data-lod'),'strategic');
  }
  checks.push('All ministry menus and world↔fleet zoom at five widths; actual canvas ship hover loads artwork and a pointer click opens ship details.');
+ checks.push('At 1920 and 768 pixels, real button/wheel input reaches 256×; the same hull enlarges, cursor-anchored zoom and pointer panning remain aligned, ship hover/click works, and World resets the camera.');
  await page.setViewportSize({width:1600,height:1000});
  await page.screenshot({path:path.join(output,'strategic.png')});
  await page.locator('.decisive-alert [data-action="watch-battle"]').click();
@@ -133,6 +201,41 @@ try {
  await page.locator('[data-action="battle-first"]').click();
  assert.equal(Number(await page.locator('.battle-canvas').getAttribute('data-frame-at')),original);
  checks.push('Watch explicitly pauses; live Next advances exactly 15 minutes; replay changes no time or RNG; ship inspection, responsive battle view, close-paused and save/reload replay verified.');
+ const dense=await browser.newPage({viewport:{width:1920,height:1000},deviceScaleFactor:2});
+ dense.on('pageerror',e=>errors.push('DPR2: '+e.message));
+ try {
+  await dense.goto('http://127.0.0.1:'+server.address().port);
+  await dense.locator('[data-action="continue"]').click(); await dense.locator('.isometric-canvas').waitFor();
+  await dense.evaluate(async()=>{await (await import('/ui/voxel-models.mjs')).loadVoxelModels();});
+  await checkCloseZoom(dense,1920,'1920-dpr2');
+  const spriteCache=await dense.evaluate(async()=>{
+   const {IsometricScene}=await import('/ui/isometric-scene.mjs');
+   const {voxelModelFor}=await import('/ui/voxel-models.mjs');
+   const model=voxelModelFor('admiral',{campaign:'campaign_1922',type:'BC'});
+   if(model.fallback)throw Error('Cache stress needs the actual historical Hood/Admiral model.');
+   // An isolated receiver creates real DPR2 canvases through the production
+   // method without reaching into or changing the campaign camera.
+   const receiver={spriteCache:new Map(),dpr:2},limit=32*1024*1024,created=24;
+   let peakRetainedBytes=0,totalCreatedBytes=0,last,scale=0;
+   const started=performance.now();
+   for(let i=0;i<created;i++){
+    scale=2.8+i*.035;last=IsometricScene.prototype.sprite.call(receiver,model,scale,-.28);
+    totalCreatedBytes+=last.canvas.width*last.canvas.height*4;
+    const retainedBytes=[...receiver.spriteCache.values()].reduce((total,sprite)=>total+sprite.canvas.width*sprite.canvas.height*4,0);
+    peakRetainedBytes=Math.max(peakRetainedBytes,retainedBytes);
+    if(retainedBytes>limit)throw Error('Map sprites exceeded the 32 MiB RGBA retention budget.');
+   }
+   const reused=IsometricScene.prototype.sprite.call(receiver,model,scale,-.28)===last;
+   return {model:model.id,created,retained:receiver.spriteCache.size,totalCreatedBytes,peakRetainedBytes,reused,milliseconds:Math.round(performance.now()-started)};
+  });
+  assert(spriteCache.totalCreatedBytes>32*1024*1024,'stress generates enough real RGBA buffers to require eviction');
+  assert(spriteCache.retained<spriteCache.created&&spriteCache.peakRetainedBytes<=32*1024*1024,'high-DPI sprite retention stays bounded');
+  assert(spriteCache.reused,'newest near-max-scale sprite reuses the cache');
+  metrics.push({kind:'sprite-cache-stress',...spriteCache});
+  checks.push('Twenty-four real near-max-scale DPR2 sprites exercise LRU eviction within 32 MiB and reuse the newest cached sprite.');
+  checks.push('A fresh DPR2 browser context repeats the 256× close-up interactions, verifies full canvas resolution, and records cold-zoom and warm-pan timings.');
+ } catch(error) {await dense.screenshot({path:path.join(output,'failure-dpr2.png')}).catch(()=>{});throw error;}
+ finally {await dense.close();}
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify({checks,metrics,errors},null,2));
 } catch(error) {

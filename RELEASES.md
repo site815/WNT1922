@@ -2,7 +2,13 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.36.1-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.36.2-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.36.2 — level atlas and closer ship inspection
+
+The atlas is now north-up with level east–west lines, removing its sideways roll while retaining raised terrain and voxel ship depth. Map zoom extends from 64× to 256×: ships can appear four times larger than at the previous limit. Wheel zoom stays anchored under the pointer; camera buttons and Page Up/Down use the same range, and World restores the strategic view. At close range, partially visible ships remain drawn and clickable until their entire projected hull leaves the screen. Ship geometry, formation spacing and campaign calculations are unchanged.
+
+The map image cache has a 32 MiB pixel budget to bound retained close-up sprites. Validation includes 391 regression checks, real 256× pointer interactions at wide and narrow window sizes, 200% display scaling and a real-canvas cache stress check. The final native portable passes both campaigns, close-up ship selection, battle playback and save/close/reopen without JavaScript errors.
 
 ## Version 0.36.1 — canvas resolution correction
 

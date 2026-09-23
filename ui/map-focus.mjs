@@ -7,6 +7,7 @@ import {
 import { fleetPosition, visibleContacts } from "../mechanics/task-forces.mjs";
 import { frontPosition } from "../mechanics/land-war.mjs";
 import { mapPoint, wrapLongitude } from "./projection.mjs";
+import { MAX_SCENE_ZOOM } from './isometric-math.mjs';
 export function chartPosition(s, data, kind, id) {
   const n = s.nations[s.player];
   if (kind === "fleet")
@@ -45,7 +46,7 @@ export function centerChart(chart, point, { zoom = false } = {}) {
   chart.cx = 600;
   chart.cy = mapPoint(point, point[0])[1];
   chart.focusPoint = [...point];
-  if (zoom) chart.zoom = Math.min(64, Math.max(2, chart.zoom * 2));
+  if (zoom) chart.zoom = Math.min(MAX_SCENE_ZOOM, Math.max(2, chart.zoom * 2));
 }
 export function chartCoordinates(point, rotation = 0) {
   let lo = -90,
