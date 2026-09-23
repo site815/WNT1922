@@ -117,7 +117,7 @@ export class StartBattleDemo {
     const rect = this.scene.canvas.getBoundingClientRect();
     for (const button of this.host.querySelectorAll('[data-demo-action="select-ship"]')) {
       const hit = this.scene.hits.find(h => h.unit.side === button.dataset.demoSide && h.unit.id === button.dataset.demoId);
-      const x = hit && hit.box.x + hit.box.width / 2, y = hit && hit.box.y + hit.box.height / 2;
+      const x = hit && (hit.point?.x ?? hit.box.x + hit.box.width / 2), y = hit && (hit.point?.y ?? hit.box.y + hit.box.height / 2);
       button.dataset.demoVisible = String(Boolean(hit && x >= 0 && y >= 0 && x < rect.width && y < rect.height));
       if (hit) {button.dataset.demoX = x.toFixed(2); button.dataset.demoY = y.toFixed(2);}
       else {delete button.dataset.demoX; delete button.dataset.demoY;}
@@ -130,7 +130,7 @@ export class StartBattleDemo {
     const model = chosen && voxelModelFor(chosen.classId, {campaign:CAMPAIGN,type:chosen.type});
     updateDOM(this.host, `<div class="start-demo" data-demo-battle="${battle.id}" data-demo-frame="${this.frameIndex}" data-demo-frames="${battle.stages.length}" data-demo-playing="${this.canPlay()}" data-demo-ready="${this.ready}">
       <header class="start-demo-heading"><div><span class="start-demo-eyebrow">Famous naval battles · ${this.battleIndex + 1} / ${DEMO_BATTLES.length}</span><h2>${esc(battle.title)}</h2><p>${esc(battle.date)} <span>· ${esc(battle.subtitle)}</span></p></div><div class="start-demo-navigation"><button data-demo-action="previous-battle" aria-label="Previous battle">←</button><button data-demo-action="next-battle" aria-label="Next battle">→</button></div></header>
-      <div class="start-demo-stage" data-key="demo-stage" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="Interactive illustrative naval battle. Click a ship to inspect it; scroll to zoom and drag to pan."></canvas><span class="start-demo-canvas-label">Isometric battle viewer</span></div>
+      <div class="start-demo-stage" data-key="demo-stage" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="Interactive 3D naval battle. Click a ship to inspect it; scroll to zoom, drag to pan, right-drag or Shift-drag to orbit."></canvas><span class="start-demo-canvas-label">3D battle viewer · right-drag to orbit</span></div>
       <div class="start-demo-toolbar"><div><button data-demo-action="toggle">${this.paused ? 'Play demo' : 'Pause demo'}</button><button data-demo-action="next">Next stage →</button><button data-demo-action="fit">Fit ships</button></div><span>Stage ${this.frameIndex + 1} / ${battle.stages.length}</span></div>
       <div class="start-demo-phase"><strong>${esc(stage.label)}</strong><p>${esc(stage.note)}</p></div>
       <div class="start-demo-roster" aria-label="Ships in the demonstration">${['A','B'].map(side => `<div class="start-demo-roster-side">${frame['groups' + side].map(s => `<button data-key="demo-ship-${side}-${s.id}" class="demo-ship-chip ${this.selected?.id === s.id ? 'selected' : ''} ${s.sunk ? 'is-sunk' : ''}" data-demo-action="select-ship" data-demo-side="${side}" data-demo-id="${s.id}" aria-pressed="${chosen?.id === s.id}"><span>${esc(s.name)}</span><small>${s.sunk ? 'Lost' : s.type}</small></button>`).join('')}</div>`).join('')}</div>

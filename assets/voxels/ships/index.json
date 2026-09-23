@@ -3,6 +3,11 @@
   "axes": "x/y center, z base; bow +x; w length, d beam, h vertical; metres",
   "models": [
     {
+      "id": "merchant-freighter",
+      "file": "generic/merchant-freighter.json",
+      "platforms": [{ "id": "merchant-freighter" }]
+    },
+    {
       "id": "queen_elizabeth",
       "file": "gbr/queen_elizabeth.json",
       "platforms": [
@@ -2207,6 +2212,7 @@
     "SM": "fallback-sm",
     "AO": "fallback-ao",
     "DE": "fallback-de",
-    "TB": "fallback-tb"
+    "TB": "fallback-tb",
+    "AK": "merchant-freighter"
   }
 }

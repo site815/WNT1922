@@ -8,11 +8,15 @@ This repository contains the game source and required assets. Portable executabl
 
 Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
 
-Version 0.37.0 puts alerts beside the campaign date in a compact two-bar header. Each ministry panel has a top-right **×** to return to the Command Map. The opening screen combines compact navy selection with cycling, interactive WWII battle demonstrations rendered with the game's voxel engine. Demonstrations are illustrative sequences with representative models where needed; they do not run or alter a campaign.
+Version 0.38.0 uses a true 3D globe with a continuous perspective camera from the strategic world down to individual ships. Three.js r180 and all rendering assets are included locally; WebGL2 rendering makes no internet requests. The compact header keeps alerts beside the date, and each ministry panel has a top-right **×** to return to the Command Map.
 
-The level, north-up raised atlas zooms from the strategic world to individual clickable voxel ships, up to 256× for close inspection. **Fleet** inspects the selected force; **World** restores the strategic view. The 180 prebuilt models in `assets/voxels/ships/` cover every catalog class and starting legacy fleet, with generic models for custom designs. Geometry is shared between the map and battle viewer. Returning to navy selection and starting or continuing a campaign preserves the full canvas resolution.
+Scroll to zoom, left-drag to turn the globe, and right-drag or Shift-drag to orbit and tilt the camera. **Home** restores the world overview; **Page Up / Page Down** zoom. Ship meshes appear at 2,048×, and double-clicking a fleet or convoy focuses its formation at at least 4,096×. Zoom reaches 65,536×; the current value appears in the lower map legend. The globe has no separate atlas control bar.
 
-Decisive actions raise an optional **Watch battle** alert. Opening the viewer pauses the campaign; **Next tick** advances the whole world by exactly 15 minutes and pauses again. Earlier recorded frames replay without changing the campaign. Ships show their recorded group condition and actual losses; formation spacing and impact animation are illustrative. Minor encounters retain all combat effects in a monthly background attrition ledger. [Battle rules](catalog/common/rules/battle-stages.md) define the capital, air-strike and large-surface-action thresholds. Existing compatible saves continue; older battles without recorded frames remain summary reports.
+The 181 prebuilt models in `assets/voxels/ships/` cover every catalog class and starting legacy fleet, generic custom designs, and a representative merchant freighter. The world and battle viewer share actual 3D cuboid geometry from these editable files. At close zoom, each surviving hull in your active merchant convoys appears alongside your naval ships and can be clicked. Enemy contacts remain intelligence reports. Review formations are illustrative and placed seaward where needed, with leaders marking their true strategic positions; these visual offsets do not change routes, combat or supply. Merchant GRT remains an aggregate registered-volume measure, not a claim about an individual model's dimensions or equipment.
+
+The opening screen combines compact navy selection with cycling, interactive WWII battle demonstrations using the same 3D ship renderer. Demonstrations are scripted illustrations with representative models where needed; they do not run or alter a campaign. Their history and model notes identify the sources and configuration limits.
+
+Decisive actions raise an optional **Watch battle** alert. Opening the 3D viewer pauses the campaign; **Next tick** advances the whole world by exactly 15 minutes and pauses again. Earlier recorded frames replay without changing the campaign. Scroll to zoom, left-drag to pan, right-drag or Shift-drag to orbit, and click a ship to inspect it. Ships show their recorded group condition and actual losses; formation spacing and impact animation are illustrative. Minor encounters retain all combat effects in a monthly background attrition ledger. [Battle rules](catalog/common/rules/battle-stages.md) define the capital, air-strike and large-surface-action thresholds. Existing compatible saves continue; older battles without recorded frames remain summary reports.
 
 ## Edit and build
 
@@ -45,13 +49,13 @@ cd WNT1922
 
 All source, catalogs, required assets, license notices, build tools and recognition artwork are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
 
-The [recognition artwork guide](assets/recognition/README.md) and [voxel model guide](assets/voxels/README.md) explain direct file editing, historical references and geometry checks. The repository launcher reads `assets/recognition/` and `assets/voxels/` directly. After editing a model, reopen the game to read it without conversion or a game rebuild. Standalone release executables contain their own bundled copies. `node tools/check-voxels.mjs` validates models; `node tools/check-scene-ui.mjs` exercises the atlas, fleet inspection, battle stepping and replay in an optional Playwright/Edge test browser.
+The [recognition artwork guide](assets/recognition/README.md) and [voxel model guide](assets/voxels/README.md) explain direct file editing, historical references and geometry checks. The repository launcher reads `assets/recognition/` and `assets/voxels/` directly. After editing a model, reopen the game to read it without conversion or a game rebuild. Standalone release executables contain their own bundled copies. `node tools/check-voxels.mjs` validates models; `node tools/check-scene-ui.mjs` runs the current 3D globe integration checks through `tools/check-globe-ui.mjs` in an optional Playwright/Edge test browser.
 
 ## Source layout
 
 | Folder | Owns |
 | --- | --- |
-| [ui](ui/README.md) | Screens, controls, hovers, isometric atlas, voxel renderer, battle viewer, audio and styles |
+| [ui](ui/README.md) | Screens, controls, hovers, 3D globe and ship meshes, battle viewer, audio and styles |
 | [catalog](catalog/README.md) | Editable Markdown data: common rules/catalogs, 1922, 1936 hindsight |
 | [mechanics](mechanics/README.md) | Shared calculations, simulation systems, legal actions and AI policy |
 | [worker](worker/README.md) | Catalog/asset loading, simulation scheduling, snapshots, portable desktop host |

@@ -50,6 +50,27 @@ const notice = await fs.readFile(
   "assets/licenses/third-party-notices.html",
   "utf8",
 );
+const graphics = JSON.parse(await fs.readFile('worker/desktop/graphics-lock.json'));
+assert.equal(graphics.name, 'three.js');
+assert.equal(graphics.revision, '180');
+assert.equal(graphics.version, '0.180.0');
+assert.equal(graphics.license, 'MIT');
+assert.equal(graphics.modified, false);
+assert.equal(graphics.release, 'https://github.com/mrdoob/three.js/releases/tag/r180');
+assert.deepEqual(graphics.files.map(file => file.path).sort(), ['ui/vendor/three/LICENSE','ui/vendor/three/three.core.js','ui/vendor/three/three.module.js']);
+const verifiedGraphics = new Set();
+for (const file of graphics.files) {
+  const bytes = await fs.readFile(file.path);
+  assert.equal(hash(bytes), file.sha256, 'Changed vendored graphics source: ' + file.path);
+  assert.equal(bytes.length, file.bytes, 'Changed vendored graphics size: ' + file.path);
+  const sourcePath = file.path.endsWith('/LICENSE') ? 'LICENSE' : 'build/' + path.basename(file.path);
+  assert.equal(file.url, 'https://raw.githubusercontent.com/mrdoob/three.js/r180/' + sourcePath);
+  verifiedGraphics.add(file.path);
+}
+assert.deepEqual((await fs.readdir('ui/vendor/three')).sort(), ['LICENSE','three.core.js','three.module.js']);
+assert(notice.includes(graphics.release) && notice.includes(graphics.licenseUrl), 'Missing exact graphics source and license attribution');
+const graphicsLicense = await fs.readFile('ui/vendor/three/LICENSE', 'utf8');
+assert(notice.replaceAll('\r\n','\n').includes(graphicsLicense.replaceAll('\r\n','\n').trim()), 'The bundled graphics MIT notice must be included verbatim');
 assert(notice.includes('/ui/license-credits.mjs'), 'Credits must read the live music catalog');
 const credits = musicCredits();
 for (const a of music) {
@@ -110,6 +131,9 @@ for (const f of await walk("ui")) {
     ),
     "External runtime asset: " + f,
   );
+  // Upstream JSDoc includes bare-import examples. Only byte-verified upstream
+  // files may skip this simple source regex; the actual module imports are local.
+  if (verifiedGraphics.has(f)) continue;
   assert(
     !/(?:import|export)\s+[^;\n]*?\sfrom\s*["'](?:https?:|[^.\/])/.test(source),
     "External module needs review: " + f,
@@ -120,6 +144,7 @@ const result = {
   passed: true,
   recognition,
   voxels,
+  graphics: {name:graphics.name,version:graphics.version,files:graphics.files.length,license:graphics.license},
   assetCount: manifest.assets.length,
   musicTracks: music.length,
   mapLicense: "Public domain",

@@ -1,0 +1,11 @@
+.globe-canvas { background:#081a25; }
+.globe-labels { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.globe-labels span { position:absolute; padding:1px 4px; font:10px/14px system-ui; background:#0c283ccc; border-radius:2px; white-space:nowrap; text-shadow:0 1px 2px #000; }
+.map-legend .isometric-level { color:var(--gold); font-size:10px; font-variant-numeric:tabular-nums; white-space:nowrap; flex:0 0 auto; }
+.globe-error { position:absolute; top:40%; left:30%; max-width:420px; color:#f0d5ad; background:#172936; padding:20px; }
+.merchant-inspection { font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
+.merchant-inspection h3 { font-size:15px; }
+.merchant-inspection > button { width:100%; margin-bottom:10px; font-size:11px; }
+.merchant-inspection dl { margin:10px 0; }
+.merchant-inspection small { display:block; color:var(--muted); line-height:1.5; }
+@media(max-width:900px) { .map-scene > .world-board .map-legend { gap:5px; } .map-legend .isometric-level { font-size:9px; } }

@@ -22,6 +22,7 @@ import {
 import { campaignMinutes } from "../mechanics/campaign-clock.mjs";
 
 import { escortCircle } from "../mechanics/convoy-coverage.mjs";
+import { mapHover } from './inspection-view.mjs';
 import {
   mapPoint,
   geometryPath,
@@ -392,7 +393,8 @@ export function commandView(s, content, ui = {}, data = {}) {
       })
       .join("") +
     "</div>";
-  const panel = ui.sidePanel || fleetList;
+  const merchantPanel = convoy ? `<section class="merchant-inspection" data-convoy-id="${esc(convoy.id)}" data-hull-index="${ui.merchantHullIndex ?? ''}"><button data-action="map-overview">Naval commands</button>${Number.isInteger(ui.merchantHullIndex) ? `<p>Merchant hull ${Math.min(convoy.count,ui.merchantHullIndex + 1)} of ${convoy.count}</p>` : ''}${mapHover(s,content,'convoy:'+convoy.id)}<p class="panel-note">Representative freighter geometry. Hull identities and spacing are for inspection; the simulation records the convoy's shared voyage and surviving count.</p></section>` : '';
+  const panel = ui.sidePanel || merchantPanel || fleetList;
   const focusPosition = f
     ? fleetPosition(s, f)
     : contact?.position ||
@@ -434,7 +436,7 @@ export function commandView(s, content, ui = {}, data = {}) {
       ? remainingRoute(s, f)
       : [];
   const legend =
-    '<div class="map-legend" aria-label="Map legend"><span style="color:' +
+    '<div class="map-legend" aria-label="Map legend"><span class="isometric-level" title="Scroll to zoom · drag to turn the globe · right-drag or Shift-drag to orbit/tilt · double-click a force for ships · Home for strategic view · close-up formations are illustrative, with lines to true positions">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
     PROFILES[s.player].color +
     '">▲ Fleet</span><span style="color:' +
     PROFILES[s.player].color +
@@ -450,7 +452,7 @@ export function commandView(s, content, ui = {}, data = {}) {
         "</span>",
     ).join("") +
     "</span>" +
-    '<span title="Always shown: green rings are escorted; dashed red rings are exposed. Green areas mark operational escort reach (148 km).">Escort cover ' +
+    '<span title="Green merchant markers are escorted; tan markers are exposed. Green circles show operational escort reach (148 km).">Escort cover ' +
     coverage.convoys.filter((v) => v.defense > 0).length +
     "/" +
     coverage.convoys.length +

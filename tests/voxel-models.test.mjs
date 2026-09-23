@@ -15,7 +15,7 @@ test('prebuilt voxel files cover every authored class, opening legacy hull and c
   const result = await validateVoxels({catalog: CATALOG});
   assert.equal(result.classTypes, 166);
   assert.equal(result.campaignMappings, 281);
-  assert.equal(result.fallbackTypes, 13);
+  assert.equal(result.fallbackTypes, 14);
   assert(result.openingLegacyGroups > 0);
   assert(result.maxParts <= 512);
 });

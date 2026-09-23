@@ -8,8 +8,8 @@ import { politicalPopup } from "./diplomacy-popup.mjs";
 import { bulkPlan } from "../mechanics/bulk-fleet.mjs";
 import { resourceHover } from "./resource-breakdown.mjs";
 import { MapMotion } from "./map-motion.mjs";
-import { IsometricScene } from './isometric-scene.mjs';
-import { MAX_SCENE_ZOOM } from './isometric-math.mjs';
+import { WorldScene3D } from './world-scene3d.mjs';
+import { MAX_GLOBE_ZOOM as MAX_SCENE_ZOOM } from './globe-camera.mjs';
 import { loadVoxelModels } from './voxel-models.mjs';
 import { BattleWatchScene, battleWatchView, watchFrame, attritionView } from './battle-watch.mjs';
 import { chartPosition, centerChart, chartCoordinates } from "./map-focus.mjs";
@@ -185,7 +185,7 @@ const statusBadge = (status) =>
   `<span class="badge ${["active", "reserve", "war", "building"].includes(status) ? status : ""}">${esc(status)}</span>`;
 
 const soundTracker = createSoundTracker();
-const isometricScene = new IsometricScene({
+const isometricScene = new WorldScene3D({
   root: app, chart: () => chart,
   active: () => !!state && ['command', 'land', 'airwar'].includes(view) && !dialog,
   onSelect: selectScene,
@@ -314,6 +314,7 @@ function renderPass() {
     app.style.setProperty('--dialog-right','0px');
     app.style.setProperty('--dialog-bottom','0px');
     mapMotion.refresh();
+    isometricScene.suspend();
     newsTicker.reset();
     renderStart();
     return;
@@ -454,6 +455,7 @@ function selectChart(key, id) {
     "portId",
     "contactId",
     "convoyId",
+    "merchantHullIndex",
     "frontId",
     "countryId",
     "territoryId",
@@ -501,6 +503,12 @@ function commandView(backgroundOnly = false) {
 async function selectScene(selection) {
   if (!state || dialog) return;
   hideClassHover();
+  if (selection.kind === 'merchant') {
+    focusMap('convoy', selection.id, !!selection.zoom);
+    chart.merchantHullIndex = selection.hullIndex;
+    render();
+    return;
+  }
   if (selection.kind === 'ship') {
     const ship = player().groups.find(g => g.id === selection.id);
     if (!ship) return;
@@ -1146,7 +1154,7 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag the isometric atlas; scroll from the strategic world down to individual ships. Use Fleet or double-click a fleet to inspect its voxel models; World returns to the full map. Click a hull for its actual ship-group details. Squares are your merchant convoys. Escort coverage is always shown: green rings have nearby operational escorts, red dashed rings are exposed. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. Home resets the map. Use the mouse wheel or map controls to zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag to turn the 3D globe; scroll continuously from the strategic world down to individual ships. Right-drag or Shift-drag rotates and tilts the camera. Double-click a fleet or convoy to inspect its ships; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Formations are spaced for inspection, with lines to their true positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
@@ -1585,6 +1593,9 @@ app.addEventListener("click", async (event) => {
     if (action === "pause") {
       await mutate({ type: "pause" }, "", true);
       return;
+    }
+    if (action === "map-overview") {
+      selectChart(null); render(); return;
     }
     if (action === "view") {
       newsFocus = null;
@@ -2164,7 +2175,7 @@ function inspectScene(selection, point = {}) {
     const fleet = selection.kind === 'fleet' ? player().fleets.find(f => f.id === selection.id) : null;
     const html = group ? '<h3>' + esc(group.name) + '</h3><p>Hull ' + (selection.hullIndex + 1) + ' of ' + group.count + ' · condition shared by group</p>' + shipDetails(state, content, group.id) + classHover(content.classes[group.classId], {campaign: state.campaignId})
       : fleet ? fleetCompositionHover(state, content, fleet)
-      : mapHover(state, content, (selection.kind === 'country' ? 'capital' : selection.kind) + ':' + selection.id, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL);
+      : (selection.kind === 'merchant' ? '<p>Merchant hull ' + (selection.hullIndex + 1) + ' · representative freighter model; voyage data is shared by the convoy.</p>' : '') + mapHover(state, content, (selection.kind === 'country' ? 'capital' : selection.kind === 'merchant' ? 'convoy' : selection.kind) + ':' + selection.id, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL);
     if (!html) return;
     hoverTarget = app.querySelector('.isometric-surface canvas');
     classTip.classList.toggle('fleet-hover', !!fleet);
@@ -2347,6 +2358,5 @@ globalThis.saveForDesktopClose = async () => {
 };
 // Load editable model files once per page load; no generated sprite build is needed.
 loadVoxelModels().then(() => {
-  isometricScene.spriteCache.clear();
-  isometricScene.refresh();
+  isometricScene.reloadModels();
 }).catch(error => toast(error.message + ' Generic ship silhouettes remain available.'));

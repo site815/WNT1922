@@ -48,6 +48,8 @@ test("local server serves the game, saves atomically, retains a backup and rejec
   for (const file of [
     "",
     "ui/app.mjs",
+    "ui/vendor/three/three.module.js",
+    "ui/vendor/three/three.core.js",
     "ui/styles.css",
     "mechanics/engine.mjs",
     "worker/simulation-worker.mjs",
@@ -62,6 +64,12 @@ test("local server serves the game, saves atomically, retains a backup and rejec
     (await (await fetch(origin + "/health")).json()).build,
     GAME_VERSION,
   );
+  for (const file of ['three.module.js','three.core.js']) {
+    const script = await fetch(origin + '/ui/vendor/three/' + file, {method:'HEAD'});
+    assert.equal(script.headers.get('content-type'), 'text/javascript; charset=utf-8');
+    const policy = script.headers.get('content-security-policy');
+    assert(policy.includes("script-src 'self'") && !policy.includes('unsafe-eval') && !policy.includes('https:'), 'Bundled graphics preserve the local-only script policy');
+  }
   for (const file of [
     "long-road-ahead.mp3",
     "opportunity-walks.mp3",
@@ -77,6 +85,9 @@ test("local server serves the game, saves atomically, retains a backup and rejec
     "content.json",
     "app.mjs",
     "worker/desktop/main.mjs",
+    "ui/app.js",
+    "ui/vendor/three/other.js",
+    "ui/vendor/other/three.module.js",
     "catalog/%2e%2e/%2e%2e/.git/config",
     ".git/config",
   ])

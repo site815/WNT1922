@@ -1,6 +1,7 @@
 import { PROFILES, REGIONS, TYPES } from '../mechanics/catalog.mjs';
 import { voxelModelFor } from './voxel-models.mjs';
 import { drawVoxelShip } from './voxel-renderer.mjs';
+export { BattleScene3D as BattleWatchScene } from './battle-scene3d.mjs';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = value => Math.round(Number(value) || 0).toLocaleString('en-US');
@@ -79,8 +80,8 @@ export function battleWatchView(report, campaign, { frameIndex = null, selected 
       <button data-action="battle-report" data-id="${report.id}">Full report</button>
     </div>
     <p class="battle-watch-note">${recorded ? 'Next tick at the live edge advances the whole campaign by 15 minutes. Closing leaves the campaign paused.' : 'This older action has no retained tick recording; only its confirmed outcome is shown.'} ${report.replay?.truncated ? 'Some intermediate frames are no longer retained.' : ''}</p>
-    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="Isometric battle view. Click a ship to inspect its recorded condition; scroll to zoom and drag to pan."></canvas></div>
-    <div class="battle-watch-legend"><span>Wheel: zoom · Drag: pan · Click: inspect ship</span><span>Illustrated formations · recorded losses</span></div>
+    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Click a ship to inspect its recorded condition; scroll to zoom, drag to pan, right-drag or Shift-drag to orbit."></canvas></div>
+    <div class="battle-watch-legend"><span>Wheel: zoom · Drag: pan · Right / Shift-drag: orbit · Click: inspect</span><span>Illustrated formations · recorded losses</span></div>
     <div class="battle-side-ledger">${['A','B'].map(side => `<div><strong style="color:${PROFILES[report[side === 'A' ? 'a' : 'b']]?.color}">${esc(PROFILES[report[side === 'A' ? 'a' : 'b']]?.name)}</strong>${sideLedger(frame,side,recorded)}</div>`).join('')}</div>
     ${selectedGroup ? `<section class="battle-ship-inspection"><div><span class="eyebrow">${esc(TYPES[selectedGroup.type] || selectedGroup.type)} · ${selected.side === 'A' ? esc(PROFILES[report.a]?.name) : esc(PROFILES[report.b]?.name)}</span><h3>${esc(selectedGroup.name)}${selectedGroup.count > 1 ? ' · hull ' + (hull + 1) + ' / ' + selectedGroup.count : ''}</h3></div><strong class="${sunk ? 'sunk' : ''}">${sunk ? 'SUNK' : num((1 - selectedGroup.health) * 100) + '% damage'}</strong>${selectedGroup.count > 1 ? `<p>Condition is shared by this ship group. ${num(selectedGroup.count - selectedGroup.sunk)} hulls remain afloat.</p><div><button data-action="battle-hull-previous" ${hull === 0 ? 'disabled' : ''}>Previous hull</button><button data-action="battle-hull-next" ${hull >= selectedGroup.count - 1 ? 'disabled' : ''}>Next hull</button></div>` : ''}</section>` : '<p class="panel-note">Select a ship in the scene or the roster below to inspect its condition at this recorded tick.</p>'}
     <div class="battle-rosters">${['A','B'].map(side => `<section><h4>${esc(PROFILES[report[side === 'A' ? 'a' : 'b']]?.name)} · ${side === 'A' && report.airOperation ? 'air wing' : 'ships'}</h4>${sideGroups(side).map(row => `<button data-action="battle-select" data-side="${side}" data-group="${esc(row.id)}" class="${selected?.side === side && selected?.id === row.id ? 'selected' : ''}"><span>${esc(row.name)}</span><span>${num(row.count - row.sunk)} / ${num(row.count)} afloat · ${num((1 - row.health) * 100)}% damage</span></button>`).join('') || (side === 'A' && report.airOperation ? recorded ? aircraftRoster(frame) : '<p class="panel-note">No per-tick aircraft roster was retained for this older action. See the full report for its aggregate outcome.</p>' : '<p class="panel-note">Shore defenses / no ships recorded</p>')}</section>`).join('')}</div>
@@ -98,7 +99,7 @@ export function attritionView(state) {
   return `<section class="panel attrition-panel"><div class="view-heading"><div><span class="eyebrow">ROUTINE ACTIONS</span><h2>Background attrition</h2></div><span>${num(active)} actions resolving</span></div><p>Minor encounters still consume ammunition and cause real ship, merchant, aircraft and personnel losses. Completed actions are grouped by month, opposing navy and region; the last 24 months are retained. Damage totals sum the outcomes of actions and can include repeated damage; infrastructure points are cumulative, not current facility condition.</p>${rows.length ? `<div class="attrition-table-wrap"><table><thead><tr><th>Month / opponent / region</th><th>Actions</th><th>Your naval losses</th><th>Opposing naval losses</th><th>Your merchant losses</th></tr></thead><tbody>${entries}</tbody></table></div>` : '<p class="panel-note">No completed minor actions have been recorded yet.</p>'}</section>`;
 }
 
-export class BattleWatchScene {
+export class LegacyBattleWatchScene {
   constructor({ root, onSelect }) {
     this.root = root; this.onSelect = onSelect; this.zoom = 1; this.pan = [0, 0]; this.hits = []; this.frame = null;
   }

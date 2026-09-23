@@ -1,5 +1,5 @@
 // Prebuilt, directly editable ship geometry. This module never changes simulation data.
-const TYPES = ['BB','BC','CV','CVL','CA','CL','DD','DL','SS','SM','AO','DE','TB'];
+const TYPES = ['BB','BC','CV','CVL','CA','CL','DD','DL','SS','SM','AO','DE','TB','AK'];
 const validId = value => typeof value === 'string' && /^[\w-]+$/.test(value);
 const modelPath = value => typeof value === 'string' && /^[\w/-]+\.json$/.test(value) && !value.split('/').includes('..');
 export function validateVoxelModel(model) {

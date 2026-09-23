@@ -189,6 +189,7 @@ export async function createGameServer({
           /^(ui|mechanics|worker|catalog|assets)\/[\w./-]+\.(?:mjs|css|html|json|md|mp3)$/.test(
             name,
           ) || /^assets\/recognition\/[\w/-]+\.(?:png|jpe?g|svg)$/.test(name)
+          || /^ui\/vendor\/three\/three\.(?:module|core)\.js$/.test(name)
         ) ||
         name.includes("..") ||
         name.startsWith("worker/desktop/")
@@ -219,6 +220,7 @@ export async function createGameServer({
           html: "text/html; charset=utf-8",
           css: "text/css; charset=utf-8",
           mjs: "text/javascript; charset=utf-8",
+          js: "text/javascript; charset=utf-8",
           json: "application/json; charset=utf-8",
           md: "text/plain; charset=utf-8",
           mp3: "audio/mpeg",

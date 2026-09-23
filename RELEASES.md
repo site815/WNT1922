@@ -2,7 +2,15 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.37.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.38.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.38.0 — 3D globe and ship inspection
+
+- The Command Map is now a true 3D globe with spherical terrain, coastlines and geographic grid lines. It wraps naturally across the date line. A continuous perspective camera zooms from the strategic world to individual ship geometry, up to **65,536×**.
+- Scroll to zoom, drag to turn the globe, and right-drag or Shift-drag to rotate and tilt the camera. Double-click a fleet or convoy to inspect its ships. **Home** restores the strategic globe; **Page Up / Page Down** zoom. The lower legend shows the current zoom; the atlas control bar is removed.
+- Individual warships and merchant freighters appear from **2,048×** and remain clickable at close range. Every surviving hull in your active convoys is represented. Editable files in `assets/voxels/ships/` supply actual 3D meshes directly, including the new merchant freighter. Close-up harbour formations are illustrative seaward arrangements; campaign positions, routes and supply calculations remain unchanged. Unknown enemy fleets remain intelligence contacts.
+- Campaign battle watching and the opening WWII demonstrations use the same 3D model geometry, with perspective, orbit, zoom and hull selection. Recorded battle navigation remains read-only; **Next tick** advances the whole campaign by exactly 15 minutes.
+- Three.js r180 is bundled locally with its MIT license and verified source hashes. The renderer uses WebGL 2 and requires graphics acceleration; it makes no external asset requests. Existing saves remain compatible. All 417 standard regression checks pass, along with browser checks at five widths and 200% scaling, and final native checks for both campaigns with no JavaScript errors. See [verification details](SYSTEMS-CHECK.md).
 
 ## Version 0.37.0 — compact command bars and opening battle demonstrations
 
