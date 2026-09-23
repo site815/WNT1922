@@ -1,0 +1,150 @@
+/* Clock, actionable dispatches and controls share the same map tile. */
+.map-scene .game-body > .time-bar {
+  display: grid;
+  grid-template-columns: max-content minmax(220px, 1fr) max-content max-content;
+  grid-template-areas: "clock news controls audio";
+  align-items: center;
+  gap: 4px 8px;
+  min-height: 38px;
+  padding: 4px 8px;
+}
+.map-scene .time-bar .campaign-clock {
+  grid-area: clock;
+  order: 0;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.map-scene .time-bar .campaign-clock small {
+  margin-top: 1px;
+  font-size: 10px;
+  line-height: 1.1;
+}
+.map-scene .time-bar .clock-controls {
+  grid-area: controls;
+  order: 0;
+  margin: 0;
+  gap: 3px;
+}
+.map-scene .time-bar .actual-speed {
+  width: 92px;
+  min-width: 92px;
+  max-width: 92px;
+  font-size: 10px;
+}
+.map-scene .time-bar button,
+.map-scene .time-bar select { min-height: 26px; height: 26px; font-size: 11px; }
+.map-scene .time-bar .step-control { width: 40px; min-width: 40px; max-width: 40px; padding: 3px; }
+.map-scene .time-bar .pause-control { width: 74px; min-width: 74px; max-width: 74px; padding: 3px; }
+.map-scene .time-bar #speed { width: 126px; padding: 3px 4px; }
+.map-scene .time-bar .header-audio {
+  grid-area: audio;
+  order: 0;
+  justify-self: end;
+  margin: 0;
+  gap: 4px;
+}
+.map-scene .time-bar .header-audio label { height: 26px; gap: 3px; font-size: 10px; }
+.map-scene .time-bar .header-audio input[type="range"],
+.map-scene .time-bar .header-audio #sound-volume { width: 32px; }
+.map-scene .time-bar .header-audio button { padding: 3px 5px; }
+
+.map-scene .time-bar > .news-rail {
+  grid-area: news;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  min-height: 28px;
+  max-height: 28px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  overflow: hidden;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: transparent;
+}
+.map-scene .time-bar .alert-heading { flex: 0 0 auto; height: auto; font-size: 9px; letter-spacing: .04em; }
+.map-scene .time-bar .news-viewport { height: 28px; line-height: 28px; }
+.map-scene .time-bar .news-viewport > .news-message {
+  min-height: 0;
+  height: 28px;
+  line-height: 28px;
+  padding: 0;
+  font-size: 12px;
+}
+.map-scene .time-bar .news-message strong { font-size: inherit; line-height: inherit; }
+.map-scene .time-bar .news-idle { white-space: nowrap; font-size: 11px; }
+.map-scene .time-bar .news-actions {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+  max-width: 62%;
+  height: 28px;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  overscroll-behavior-x: contain;
+}
+.map-scene .time-bar .news-actions > * { flex: 0 0 auto; }
+.map-scene .time-bar .pending-decisions,
+.map-scene .time-bar .decisive-alert {
+  display: flex;
+  gap: 4px;
+  max-width: none;
+  overflow: visible;
+}
+.map-scene .time-bar .pending-decisions > button { flex: 0 0 auto; }
+.map-scene .time-bar .news-actions button {
+  min-height: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 2px 6px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.map-scene .time-bar .news-actions strong { font-size: 10px; line-height: 1; }
+.map-scene .time-bar .news-actions small { font-size: 9px; line-height: 1; }
+.map-scene .time-bar .news-actions .pending-decision { max-width: 200px; }
+.map-scene .time-bar .decisive-alert button { border-color: var(--gold); color: var(--gold); }
+
+/* Keep totals, reserves and change rates; reduce only their surrounding space. */
+.map-scene .game-body > .resource-bar { padding: 1px 4px; min-height: 0; }
+.map-scene .game-body .resource-bar > div {
+  min-height: 44px;
+  height: auto;
+  gap: 0;
+  padding: 2px 6px;
+}
+.map-scene .game-body .resource-bar label { font-size: 9px; line-height: 10px; }
+.map-scene .game-body .resource-bar strong { font-size: 12px; line-height: 12px; }
+.map-scene .game-body .resource-bar .resource-reserve { font-size: 10px; line-height: 10px; }
+.map-scene .game-body .resource-bar .resource-change { margin-top: 0; font-size: 9px; line-height: 10px; }
+.map-scene .game-body .resource-bar .resource-war strong { font-size: 10px; line-height: 11px; }
+
+/* Wrap control groups only when a complete single line no longer fits. */
+@container game-body (max-width: 1000px) {
+  .map-scene .game-body > .time-bar {
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    grid-template-areas: "clock news news" "controls controls audio";
+  }
+  .map-scene .time-bar > .news-rail { border-right: 0; }
+}
+@container game-body (max-width: 680px) {
+  .map-scene .game-body > .time-bar {
+    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-areas: "clock news" "controls controls" "audio audio";
+  }
+  .map-scene .time-bar .clock-controls { justify-content: space-between; }
+}
+@container game-body (max-width: 430px) {
+  .map-scene .time-bar .clock-controls { flex-wrap: wrap; justify-content: flex-start; }
+  .map-scene .time-bar .actual-speed { width: 76px; min-width: 76px; max-width: 76px; }
+  .map-scene .time-bar .header-audio { flex-wrap: wrap; justify-content: flex-end; }
+}

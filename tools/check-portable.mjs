@@ -138,7 +138,7 @@ if (-not [PortableTestPosition]::SetWindowPos($testWindowHandle,[IntPtr]::Zero,-
   }
   await displaySession.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   page.on("pageerror", (error) => result.errors.push(error.message));
-  await page.locator(".nation-card").first().waitFor();
+  await page.locator('[data-action="select-nation"]').first().waitFor();
   await page.evaluate(() => {
     window.testNotices = [];
     const toast = document.querySelector("#toast");
@@ -169,6 +169,26 @@ if (-not [PortableTestPosition]::SetWindowPos($testWindowHandle,[IntPtr]::Zero,-
     await fs.readFile(path.join(unpacked, "../NSIS-LICENSE.txt")),
     await fs.readFile("assets/licenses/NSIS-LICENSE.txt"),
   );
+}
+async function checkOpeningDemo() {
+  await page.waitForFunction(() => document.querySelector('.start-demo')?.dataset.demoReady === 'true');
+  if (await page.locator('.start-demo').getAttribute('data-demo-playing') === 'true')
+    await page.locator('[data-demo-action="toggle"]').click();
+  const battles = new Set();
+  for (let index = 0; index < 3; index++) {
+    battles.add(await page.locator('.start-demo').getAttribute('data-demo-battle'));
+    assert(Number(await page.locator('.start-demo .battle-canvas').getAttribute('data-visible-hulls')) > 0,
+      'Opening demonstration renders the packaged voxel ships');
+    const before = await page.locator('.start-demo').getAttribute('data-demo-frame');
+    await page.locator('[data-demo-action="next"]').click();
+    assert.notEqual(await page.locator('.start-demo').getAttribute('data-demo-frame'), before);
+    await page.locator('[data-demo-action="next-battle"]').click();
+  }
+  assert.equal(battles.size, 3, 'Three historical battle demonstrations cycle');
+  assert.equal(await page.locator('[data-action="select-nation"]').count(), 7, 'All seven navy choices remain available');
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.screenshot({path:path.join(output,'opening-demo.png')});
+  result.checks.push('Opening screen: seven compact navy choices, three packaged voxel battle demonstrations, pause and manual stepping verified.');
 }
 async function checkRecognition(nation) {
   for (const [view, selector, type] of [
@@ -435,6 +455,7 @@ try {
   ]) {
     const profile = path.join(testRoot, "save profile " + nation);
     await launch(profile);
+    if (nation === 'USA') await checkOpeningDemo();
     await page
       .locator(`[data-action="select-campaign"][data-id="${campaign}"]`)
       .click();
@@ -497,9 +518,11 @@ try {
       await page.locator('.sidebar [data-view="command"]').click();
     }
     assert.equal(await page.locator(".news-rail").count(),1);
+    assert.equal(await page.locator('.time-bar > .news-rail').count(),1,'Alerts share the first bar beside the clock');
+    assert.equal(await page.locator('.game-body > .news-rail').count(),0,'There is no separate third alert bar');
     const cells=await page.locator('.resource-bar > div').evaluateAll(rows=>rows.map(x=>{const b=x.getBoundingClientRect();return {width:b.width,height:b.height};}));
     assert(Math.max(...cells.map(x=>x.width))-Math.min(...cells.map(x=>x.width))<1,'Resource cells use equal widths');
-    assert(cells.every(x=>x.height===55),'Resource cells keep the compact fixed height');
+    assert(cells.every(x=>x.height>=44 && x.height<=50),'Resource cells retain readable values within the reduced height');
     for (const key of ["YARDS", "SAILORS", "AVIATORS", "AIRCRAFT"]) {
       const counter = page.locator('[data-resource="' + key + '"] strong');
       assert.match((await counter.innerText()).replace(/\s/g, ''), /^[\d,]+\([+−][\d,]+\)$/);
@@ -508,6 +531,13 @@ try {
     await page.mouse.move(12, 12);
     await delay(300);
     await page.screenshot({ path: path.join(output, `map-${nation}.png`) });
+    const clockBeforeClose = await page.locator('.campaign-clock').innerText();
+    for (const panel of ['yards','aircraft']) {
+      await page.locator('.sidebar [data-view="'+panel+'"]').click();
+      await page.locator('.workspace-close').click();
+      assert.equal(await page.locator('.workspace.view-command').count(),1,'Panel close returns to Command Map');
+      assert.equal(await page.locator('.campaign-clock').innerText(),clockBeforeClose,'Panel close preserves campaign time');
+    }
     await checkRecognition(nation);
     await page.locator('.sidebar [data-view="aircraft"]').click();
     assert.equal(await page.locator('[data-action="air-design"]').count(), 0);

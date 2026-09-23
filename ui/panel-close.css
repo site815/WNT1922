@@ -1,0 +1,28 @@
+/* The close control stays at the panel corner while its contents scroll. */
+.map-scene .workspace > .workspace-close {
+  position: absolute;
+  z-index: 5;
+  inset: 8px 9px auto auto;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+  line-height: 1;
+  color: var(--muted);
+  background: var(--scene-tile, #132530);
+  border-color: transparent;
+  pointer-events: auto;
+}
+.map-scene .workspace > .workspace-close:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.map-scene.menu-workspace .workspace-inner > :first-child {
+  padding-right: 40px;
+}
+.map-scene .workspace:not(.view-command) .command-side-panel > :first-child {
+  padding-right: 35px;
+}

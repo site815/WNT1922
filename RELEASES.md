@@ -2,7 +2,14 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.36.2-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+Open the latest release and download **WNT1922-0.37.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+
+## Version 0.37.0 — compact command bars and opening battle demonstrations
+
+- Alerts and naval news sit directly beside the current date in the first bar. Reduced padding and compact controls leave more room for the map; the second bar retains national resources, reserve totals and their full hovers.
+- Every ministry panel has a persistent top-right **×** that returns to the Command Map while preserving the campaign clock and selected fleet.
+- Compact country choices make room on the opening screen for cycling WWII naval battle demonstrations. They use the same voxel models and battle renderer as campaign battles, with pause, scene selection and ship inspection. The scenes are clearly labeled illustrative, use representative models where exact classes are unavailable, and do not change campaign state or saved games. Historical references are available with the demonstration information.
+- Browser checks pass at five widths in peace and war, covering all resource hovers, all panel close controls, pending alerts, startup scrolling and demo isolation. All 397 standard regression checks and the final native portable checks for both campaigns pass with no JavaScript errors. See [verification details](SYSTEMS-CHECK.md).
 
 ## Version 0.36.2 — level atlas and closer ship inspection
 

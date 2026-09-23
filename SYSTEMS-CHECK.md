@@ -1,3 +1,21 @@
+# Compact command bars and opening demonstrations — 0.37.0
+
+Review date: 24 September 2026. Alerts now share the first bar with the date, resource rows retain their complete values and hovers, and each of the ten ministry views has a persistent close control returning to the Command Map. The opening screen combines compact navy choices with interactive, cycling Denmark Strait, Midway and North Cape demonstrations.
+
+- Standard regression: **397/397 checks passed**; the focused alert and opening-screen suite also passes after the browser fixes. Catalog validation covers 86 live documents and all 14 starts. Every selected navy's preview matches its own human-player opening state, including 1922 treaty construction choices.
+- Real Edge checks pass at 1920, 1366, 1100, 900 and 768 pixels in peace and war: 160 resource-breakdown interactions, 100 panel-close flows, actual moving-news clicks and read receipts, pending trade offers and decisive-battle alerts. Closing preserves campaign time, pause state, RNG and the selected fleet. Opening a pending offer does not accept it. The first bar is 38 pixels high at desktop widths; narrower layouts wrap control groups and resources while retaining their information.
+- Startup checks cover both campaigns, seven navy choices, actual canvas hull inspection, pause, manual stages, previous/next battle, automatic cycling, modal suspension, simulated document visibility changes and reduced motion. Wheel scrolling reaches the footer and Continue on short windows. Demo use and country selection leave the disk save and local storage unchanged; New and Continue are verified separately with isolated saves.
+- Browser review found and fixed a clipped startup footer and a stale ticker blur/leave callback after its notice was removed. The final browser run records **zero page errors**. Wide and narrow startup, command-map and scrolled-panel screenshots were visually reviewed.
+- Existing scene checks pass again: all 11 menus, world/fleet transitions, 256× close-up picking at normal and 200% display scaling, cursor anchoring, panning, read-only replay, exact 15-minute global battle stepping and the 32 MiB retained map-sprite cache bound.
+- The final native portable passes USA 1936 and Britain 1922, the three opening demonstrations, compact header, catalog close controls, all 180 packaged voxel models, recognition files, all 33 music tracks, diplomacy, save/close/reopen and the five-round battle-watch checks. The opening scene and campaign screenshots were visually reviewed. Native verification records **zero JavaScript errors** and confirms the exact packaged source/payload hashes without Node on PATH.
+- Packaging verifies **776 source files / 849 payload files**. Executable: `WNT1922-0.37.0-portable-win-x64.exe`, 476,480,498 bytes. SHA-256: `bdeb7bf1468a6b26b35cd948c871a45f299f77563d280bd2bdb899bffe36127d`. Source fingerprint: `e229a03930f181d3333b044a7db474839bb9380d8fdffca684f1105de23e9f55`.
+
+The opening scenes use the existing battle renderer with scripted stages and illustrative spacing/damage. They are not historical combat simulations. Available earlier fits and generic type models are disclosed per ship; official historical references appear under History & models. Campaign mechanics and model files are unchanged; the earlier endurance evidence below still covers those mechanics.
+
+Repeatable checks: `tools/check-chrome-ui.mjs`, `tools/check-scene-ui.mjs`, `tools/check-portable.mjs` and `tests/start-screen.test.mjs`. Local evidence is under ignored `test-output/chrome-ui/`, `test-output/scene-ui/`, `test-output/portable/` and `test-output/release37-*`.
+
+---
+
 # Atlas angle and close-up zoom — 0.36.2
 
 Review date: 24 September 2026. The atlas has no sideways roll, retains its raised depth, and supports map zoom through 256× instead of 64×. Projected model bounds replace the fixed hull-culling margin so partially visible enlarged ships remain drawn and selectable. The map sprite cache retains at most 32 MiB of RGBA backing pixels and avoids a second retained raster copy; this is not a limit on total browser memory.

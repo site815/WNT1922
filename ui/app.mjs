@@ -1,5 +1,7 @@
 import { navalRecordView } from "./naval-record.mjs";
 import { NewsTicker } from "./news-ticker.mjs";
+import { startScreen } from './start-screen.mjs';
+import { StartBattleDemo } from './start-battle-demo.mjs';
 import { battleProgress } from "./battle-progress.mjs";
 import { SCORE_NAVAL_TONS_PER_POINT } from '../mechanics/campaign-impact.mjs';
 import { politicalPopup } from "./diplomacy-popup.mjs";
@@ -99,7 +101,6 @@ import {
 import { mapPoint, wrapLongitude } from "./projection.mjs";
 import {
   contentFor,
-  campaignList,
   DEFAULT_CAMPAIGN,
 } from "../mechanics/campaign-content.mjs";
 import { automaticDraft } from "../mechanics/designer.mjs";
@@ -122,6 +123,7 @@ import { readDocument } from '../worker/documents.mjs';
 const DECISIVE_RULES = (await readDocument('common/rules/battle-stages.md')).DECISIVE;
 
 const app = document.querySelector("#app");
+const startDemo = new StartBattleDemo({root: app});
 const newsTicker = new NewsTicker((id, receipt) => state ? mutate({type:"read-news",args:{id,receipt}}, "", true) : undefined);
 let newsFocus = null;
 let fleetSelection = new Set();
@@ -259,25 +261,8 @@ function toast(message) {
   toastTimer = setTimeout(() => (el.style.display = "none"), 6000);
 }
 function renderStart() {
-  app.innerHTML = `<main class="start"><header class="masthead"><span class="wordmark">WNT<span>1922</span></span><span class="tag">v${GAME_VERSION} · SINGLE PLAYER · LOCAL SAVE</span></header><div class="start-heading"><div class="scenario-choices" aria-label="Starting campaign">${campaignList(
-    bundle,
-  )
-    .map(
-      (c) =>
-        `<button data-action="select-campaign" data-id="${c.id}" class="${c.id === selectedCampaign ? "selected" : ""}"><strong>${esc(c.title)}</strong><span>${c.start} · ${c.id === "campaign_1922" ? "Historical opening navies" : "Seven alternate naval programs"}</span></button>`,
-    )
-    .join(
-      "",
-    )}</div><h1>${esc(content.scenario.title)}<span>.</span></h1><p>${esc(content.scenario.description)}</p></div>${saved ? `<div class="resume"><div><strong>${PROFILES[saved.player].name} · ${smallDate(saved.day)}</strong><span>Your saved campaign will resume paused.</span></div>${btn("Continue campaign", "continue")}</div>` : ""}<div class="nation-grid">${NATION_ORDER.map(
-    (id) => [id, content.nations[id]],
-  )
-    .map(([id, p]) => {
-      const s = sim.fleetSummary(sim.newGame(content, id), content, id);
-      return `<button class="nation-card ${selected === id ? "selected" : ""}" data-action="select-nation" data-id="${id}" style="--nation:${p.color}"><span class="nation-code">${id}</span><span class="nation-name">${p.name}</span><strong>${p.title}</strong><p>${p.description}</p><div class="nation-stats"><span><b>${s.active}</b> active warships</span><span><b>${s.building}</b> warships building</span><span><b>${number(content.nations[id].merchants.hulls)}</b> merchant hulls</span><span><b>${number(content.nations[id].support.reduce((v, g) => v + g.count, 0))}</b> support hulls cataloged</span></div><span class="card-link">${selected === id ? "Selected" : "Select ministry"}<span>${selected === id ? "✓" : "↗"}</span></span></button>`;
-    })
-    .join(
-      "",
-    )}</div><div class="start-actions"><div><strong>${selectedCampaign === "campaign_1922" ? "Seven historical starting navies" : "All seven naval programs active"}</strong><p>Historical events shape the world. Invest now in the fleet you will need.</p></div>${btn(`Take command of ${PROFILES[selected].name} →`, "new", 'class="primary"')}</div><footer class="start-footer"><span>10,000× normal time · A year takes about 53 minutes · Pause and faster speeds available</span></footer><div class="start-bottom">${btn("Import a campaign", "import")}${btn("Recognition artwork & sources", "recognition-credits")}<a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Licenses & credits</a><span>Ship data from your catalogs. Provisional playtest balance.</span></div></main>${modalHTML()}`;
+  updateDOM(app, startScreen({bundle,content,selectedCampaign,selected,saved,version:GAME_VERSION}) + modalHTML());
+  startDemo.mount();
 }
 function render() {
   // Removing a focused edited input can synchronously fire change/blur. Defer
@@ -333,6 +318,7 @@ function renderPass() {
     renderStart();
     return;
   }
+  startDemo.stop();
   content = contentFor(bundle, state);
   if (
     selectedAlert &&
@@ -365,7 +351,7 @@ function renderPass() {
   const mainLayer = isMapView ? renderedView.panels : renderedView;
   updateDOM(
     app,
-    `<div class="game-shell map-scene ${isMapView ? 'map-workspace' : 'menu-workspace'}">${mapLayer}<aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics)}${alertsView(state, content, newsTicker)}<main class="workspace view-${view}" data-record="overview"><div class="workspace-inner" data-scroll-key="workspace-${view}">${mainLayer}</div></main></div></div>${modalHTML()}`,
+    `<div class="game-shell map-scene ${isMapView ? 'map-workspace' : 'menu-workspace'}">${mapLayer}<aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics, alertsView(state, content, newsTicker))}<main class="workspace view-${view}" data-record="overview">${view !== "command" ? `<button type="button" class="workspace-close" data-action="view" data-view="command" aria-label="Close ${esc(tabs.find(t => t[0] === view)?.[2] || "panel")} and return to Command Map" title="Close and return to Command Map">×</button>` : ""}<div class="workspace-inner" data-scroll-key="workspace-${view}">${mainLayer}</div></main></div></div>${modalHTML()}`,
   );
   isometricScene.refresh();
   if (dialog?.type === 'battle-watch') for (const control of app.querySelectorAll('[data-action="pause"], [data-action="step-minute"], [data-action="step-six-hours"]')) {
