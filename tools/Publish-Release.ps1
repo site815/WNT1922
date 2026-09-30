@@ -145,7 +145,7 @@ foreach ($asset in $assets) {
     if (-not $present) {
         Write-Output ('Uploading ' + $asset.Name + ' (' + $expectedSize + ' bytes)')
         $uri = $uploadUrl + '?name=' + [Uri]::EscapeDataString($asset.Name)
-        $present = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -ContentType $asset.Type -InFile $asset.Path -TimeoutSec 900
+        $present = Invoke-RestMethod -Method Post -Uri $uri -Headers $headers -ContentType $asset.Type -InFile $asset.Path -TimeoutSec 3600
     }
     if ($present.state -ne 'uploaded' -or $present.size -ne $expectedSize -or $present.digest -ne $expectedDigest) { throw ('Release asset verification failed: ' + $asset.Name + '. No existing asset was overwritten. Inspect the draft before retrying.') }
     Write-Output ('Verified ' + $asset.Name + ': ' + $expectedDigest)
