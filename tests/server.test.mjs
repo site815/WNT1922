@@ -48,8 +48,6 @@ test("local server serves the game, saves atomically, retains a backup and rejec
   for (const file of [
     "",
     "ui/app.mjs",
-    "ui/vendor/three/three.module.js",
-    "ui/vendor/three/three.core.js",
     "ui/styles.css",
     "mechanics/engine.mjs",
     "worker/simulation-worker.mjs",
@@ -64,11 +62,11 @@ test("local server serves the game, saves atomically, retains a backup and rejec
     (await (await fetch(origin + "/health")).json()).build,
     GAME_VERSION,
   );
-  for (const file of ['three.module.js','three.core.js']) {
-    const script = await fetch(origin + '/ui/vendor/three/' + file, {method:'HEAD'});
+  for (const file of ['app.mjs','unreal-scene.mjs']) {
+    const script = await fetch(origin + '/ui/' + file, {method:'HEAD'});
     assert.equal(script.headers.get('content-type'), 'text/javascript; charset=utf-8');
     const policy = script.headers.get('content-security-policy');
-    assert(policy.includes("script-src 'self'") && !policy.includes('unsafe-eval') && !policy.includes('https:'), 'Bundled graphics preserve the local-only script policy');
+    assert(policy.includes("script-src 'self'") && !policy.includes('unsafe-eval') && !policy.includes('https:'), 'Native HUD preserves the local-only script policy');
   }
   for (const file of [
     "long-road-ahead.mp3",

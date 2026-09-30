@@ -5,9 +5,9 @@ import assert from "node:assert/strict";
 import { TRACKS, SOUNDTRACK, musicCredits, playlistFor } from "../ui/music.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import { validateRecognition } from "./check-recognition.mjs";
-import { validateVoxels } from "./check-voxels.mjs";
+import { validateShipModels } from "./check-models.mjs";
 const recognition = await validateRecognition({ catalog: CATALOG });
-const voxels = await validateVoxels({ catalog: CATALOG });
+const models = await validateShipModels({ catalog: CATALOG });
 const manifest = JSON.parse(await fs.readFile("assets/manifest.json"));
 manifest.assets.push(...TRACKS.map(t => ({...t, path:"assets/music/" + t.file})));
 const hash = (b) => createHash("sha256").update(b).digest("hex");
@@ -50,28 +50,32 @@ const notice = await fs.readFile(
   "assets/licenses/third-party-notices.html",
   "utf8",
 );
-const graphics = JSON.parse(await fs.readFile('worker/desktop/graphics-lock.json'));
-assert.equal(graphics.name, 'three.js');
-assert.equal(graphics.revision, '180');
-assert.equal(graphics.version, '0.180.0');
-assert.equal(graphics.license, 'MIT');
-assert.equal(graphics.modified, false);
-assert.equal(graphics.release, 'https://github.com/mrdoob/three.js/releases/tag/r180');
-assert.deepEqual(graphics.files.map(file => file.path).sort(), ['ui/vendor/three/LICENSE','ui/vendor/three/three.core.js','ui/vendor/three/three.module.js']);
-const verifiedGraphics = new Set();
-for (const file of graphics.files) {
-  const bytes = await fs.readFile(file.path);
-  assert.equal(hash(bytes), file.sha256, 'Changed vendored graphics source: ' + file.path);
-  assert.equal(bytes.length, file.bytes, 'Changed vendored graphics size: ' + file.path);
-  const sourcePath = file.path.endsWith('/LICENSE') ? 'LICENSE' : 'build/' + path.basename(file.path);
-  assert.equal(file.url, 'https://raw.githubusercontent.com/mrdoob/three.js/r180/' + sourcePath);
-  verifiedGraphics.add(file.path);
+const graphics = JSON.parse(await fs.readFile('unreal/Plugins/glTFRuntime/WNT-UPSTREAM.json'));
+assert.equal(graphics.license,'MIT');
+assert.match(graphics.revision,/^[a-f0-9]{40}$/);
+for(const file of graphics.files) {
+  const bytes=await fs.readFile('unreal/Plugins/glTFRuntime/'+file.path);
+  assert.equal(hash(bytes),file.sha256,'Changed vendored native importer: '+file.path);
+  assert.equal(bytes.length,file.bytes);
 }
-assert.deepEqual((await fs.readdir('ui/vendor/three')).sort(), ['LICENSE','three.core.js','three.module.js']);
-assert(notice.includes(graphics.release) && notice.includes(graphics.licenseUrl), 'Missing exact graphics source and license attribution');
-const graphicsLicense = await fs.readFile('ui/vendor/three/LICENSE', 'utf8');
-assert(notice.replaceAll('\r\n','\n').includes(graphicsLicense.replaceAll('\r\n','\n').trim()), 'The bundled graphics MIT notice must be included verbatim');
+const graphicsLicense=await fs.readFile('unreal/Plugins/glTFRuntime/LICENSE','utf8');
+assert(notice.replaceAll('\r\n','\n').includes(graphicsLicense.trim()),'Missing glTFRuntime license text');
+const surfaces=JSON.parse(await fs.readFile('assets/materials/polyhaven/sources.json','utf8'));
+for(const asset of surfaces.assets) {
+  assert.equal(asset.license,'CC0-1.0');
+  assert(notice.includes(asset.source),'Missing material source '+asset.id);
+  for(const file of asset.files) {
+    const bytes=await fs.readFile('assets/materials/polyhaven/'+file.file);
+    assert.equal(hash(bytes),file.sha256,'Changed photographic asset: '+file.file);
+    assert.equal(bytes.length,file.bytes);
+  }
+}
 assert(notice.includes('/ui/license-credits.mjs'), 'Credits must read the live music catalog');
+const earthSurface=JSON.parse(await fs.readFile('assets/materials/nasa/source.json','utf8'));
+const earthBytes=await fs.readFile('assets/materials/nasa/'+earthSurface.file);
+assert.equal(hash(earthBytes),earthSurface.sha256,'Changed geographic color texture');
+assert.equal(earthBytes.length,earthSurface.bytes);
+assert(notice.includes(earthSurface.source),'Missing Earth surface attribution');
 const credits = musicCredits();
 for (const a of music) {
   assert(credits.includes(a.isrc), "Missing music attribution " + a.title);
@@ -131,9 +135,6 @@ for (const f of await walk("ui")) {
     ),
     "External runtime asset: " + f,
   );
-  // Upstream JSDoc includes bare-import examples. Only byte-verified upstream
-  // files may skip this simple source regex; the actual module imports are local.
-  if (verifiedGraphics.has(f)) continue;
   assert(
     !/(?:import|export)\s+[^;\n]*?\sfrom\s*["'](?:https?:|[^.\/])/.test(source),
     "External module needs review: " + f,
@@ -143,13 +144,13 @@ const result = {
   checkedAt: new Date().toISOString(),
   passed: true,
   recognition,
-  voxels,
-  graphics: {name:graphics.name,version:graphics.version,files:graphics.files.length,license:graphics.license},
+  models,
+  graphics: {name:'Unreal Engine / glTFRuntime',revision:graphics.revision,files:graphics.files.length,license:graphics.license},
+  photographicAssets:surfaces.assets.length+1,
   assetCount: manifest.assets.length,
   musicTracks: music.length,
   mapLicense: "Public domain",
-  runtime: JSON.parse(await fs.readFile("worker/desktop/runtime-lock.json"))
-    .version,
+  runtime: 'Unreal Engine 5.8',
 };
 await fs.mkdir("test-output", { recursive: true });
 await fs.writeFile(

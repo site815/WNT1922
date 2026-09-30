@@ -1,0 +1,17 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "WNT1922 native Unreal world and campaign interface",
+  "Modules": [{"Name":"WNT1922","Type":"Runtime","LoadingPhase":"Default"}],
+  "Plugins": [
+    {"Name":"Fab","Enabled":false},
+    {"Name":"Bridge","Enabled":false},
+    {"Name":"AndroidFileServer","Enabled":false},
+    {"Name":"ProceduralMeshComponent","Enabled":true},
+    {"Name":"GeometryProcessing","Enabled":true},
+    {"Name":"glTFRuntime","Enabled":true},
+    {"Name":"PythonScriptPlugin","Enabled":true,"TargetAllowList":["Editor"]},
+    {"Name":"EditorScriptingUtilities","Enabled":true,"TargetAllowList":["Editor"]}
+  ]
+}

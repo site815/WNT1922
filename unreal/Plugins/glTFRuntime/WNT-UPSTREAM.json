@@ -1,0 +1,523 @@
+{
+  "source": "https://github.com/rdeioris/glTFRuntime",
+  "revision": "cef7be26f803b1728508218957ea9d1baf01400d",
+  "license": "MIT",
+  "archiveSha256": "2a83a7cfea7acd442ad925885e75a34437f069c6faab79e73e650dbfe76d9e0d",
+  "files": [
+    {
+      "path": "Config/FilterPlugin.ini",
+      "bytes": 51,
+      "sha256": "8f7374fbb387cf86e1cecd9997aa4e25cd9f62d953ac5ce0999d25ce16f7ebb2"
+    },
+    {
+      "path": "Content/MF_BaseColorFromDSM.uasset",
+      "bytes": 111297,
+      "sha256": "915d27fb61f8efafdae8c48666726e859e98336e6d20b2b266a144ef5298401a"
+    },
+    {
+      "path": "Content/MF_GetBaseColorAndOpacity.uasset",
+      "bytes": 116012,
+      "sha256": "a05304902e3e59328e21c84b2263ac95174bf5a6d5c4cdd039cc6ea24e6943a6"
+    },
+    {
+      "path": "Content/MF_GetEmissive.uasset",
+      "bytes": 51315,
+      "sha256": "f65c684b2960c47f5f9b06662dcf3c7434e048c6d320df15b71af0eaca3936fa"
+    },
+    {
+      "path": "Content/MF_GetMaxComponent.uasset",
+      "bytes": 104605,
+      "sha256": "f763d8ad2c57b2b224eebbe5a1d9f71798e2093e490e582be40ce9b142f8aa5b"
+    },
+    {
+      "path": "Content/MF_GetMetallicRoughness.uasset",
+      "bytes": 111056,
+      "sha256": "a24dc6a5d4c3a500f88df6c413a8f2c134a08ddfbb3a0c20e29f4cb550b8a505"
+    },
+    {
+      "path": "Content/MF_GetNormal.uasset",
+      "bytes": 109693,
+      "sha256": "7599b1f6b52d742cd156b2e9ebf7985cff4530d4f99ce4975a51e01c283be15e"
+    },
+    {
+      "path": "Content/MF_GetOcclusion.uasset",
+      "bytes": 106523,
+      "sha256": "9afd44b4df44aa3e0012cf572beaa873371c9b2ec75f707abceffc23dfa79a55"
+    },
+    {
+      "path": "Content/MF_GetPBR.uasset",
+      "bytes": 111881,
+      "sha256": "3118cd7e2d34ea5bb953b97f6c3ac62d4d1481a24184de03881bbca9308ef705"
+    },
+    {
+      "path": "Content/MF_GetPerceivedBrightness.uasset",
+      "bytes": 108725,
+      "sha256": "e8d192e59f62f4f96d76e7ad620414c168e411a737e4fd7f596ae044c565c680"
+    },
+    {
+      "path": "Content/MF_GetSpecular.uasset",
+      "bytes": 52440,
+      "sha256": "75290aa8d11fb5fe37c0d1b29828f7dbb0737835fcf19da95b604f7b60fa4f18"
+    },
+    {
+      "path": "Content/MF_GetTexCoords.uasset",
+      "bytes": 112882,
+      "sha256": "2998b6234b38b23befe42cad976c5231c69df2c48243b3d3b745951a4c46c4cf"
+    },
+    {
+      "path": "Content/MF_SolveMetallicFromSpecular.uasset",
+      "bytes": 116887,
+      "sha256": "4b50f3cd1ef0988fd4f99d16b51b6f0a46b195511dc02bd0d510553f9bd32e18"
+    },
+    {
+      "path": "Content/M_ClearCoat_glTFRuntimeBase.uasset",
+      "bytes": 111525,
+      "sha256": "42f694d18f0669102716056bb48e765ef02f29f4b106511f829e2fbc90c4f778"
+    },
+    {
+      "path": "Content/M_ClearCoat_glTFRuntimeTranslucent_Inst.uasset",
+      "bytes": 76583,
+      "sha256": "2884feda532c51ce6afdf22b2342d5bc77e1f1b26d78b1b0d28ea3c34e50a6f3"
+    },
+    {
+      "path": "Content/M_ClearCoat_glTFRuntimeTwoSidedTranslucent_Inst.uasset",
+      "bytes": 76615,
+      "sha256": "8cf07ac3d8b9ca8aa4a486fa4eb602bda5eebaebf862d5813d4f81651b1504c9"
+    },
+    {
+      "path": "Content/M_ClearCoat_glTFRuntimeTwoSided_Inst.uasset",
+      "bytes": 95739,
+      "sha256": "929db34f7121cde7d71962ce49bd4b3347e51374d64e9181ab3a32eb8ab6136d"
+    },
+    {
+      "path": "Content/M_Transmission_glTFRuntimeBase.uasset",
+      "bytes": 113878,
+      "sha256": "7bf9046111037410e8fd5fdacf08bd7ecce6755d38e2c4ed0ac7d1e26a22f98a"
+    },
+    {
+      "path": "Content/M_Transmission_glTFRuntimeTwoSided_Inst.uasset",
+      "bytes": 97794,
+      "sha256": "63a737a6ae8fab560421a30b4a6c735e4ee54d9447f95bd62119e025f79ad2e3"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeBase.uasset",
+      "bytes": 71548,
+      "sha256": "250b9944a949dc6adb209b16c92b23e43ee93ea4d325f06369374b52afc1a450"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeMasked_Inst.uasset",
+      "bytes": 72817,
+      "sha256": "32a13b8f054ccd7d1abb50e92740831c5285e021facdfc308b85bfc1844885f8"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeTranslucent_Inst.uasset",
+      "bytes": 69675,
+      "sha256": "4dc63819916ab7f9ec136143f22b24280ac76ffc886725ebb0e3dc9558070b6c"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeTwoSidedMasked_Inst.uasset",
+      "bytes": 72945,
+      "sha256": "77e63b0900889b929922c361f7debb4b3c13ba78cc75eeb37b9d07491ce295e5"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeTwoSidedTranslucent_Inst.uasset",
+      "bytes": 69155,
+      "sha256": "9d2ec5573ad85339b4fc4cd8b326a2ce7474820098a7be3f628e4709f385eb69"
+    },
+    {
+      "path": "Content/M_Unlit_glTFRuntimeTwoSided_Inst.uasset",
+      "bytes": 72768,
+      "sha256": "0fdb2df3adff687bb9efe3ec043143f89a04431254a7d5b1b9196d464b553f67"
+    },
+    {
+      "path": "Content/M_glTFRuntimeBase.uasset",
+      "bytes": 95667,
+      "sha256": "0eca5f325440f32046b75b6ccea5e1282265dd222618e4429d863cbf38508a66"
+    },
+    {
+      "path": "Content/M_glTFRuntimeMasked_Inst.uasset",
+      "bytes": 84912,
+      "sha256": "2a3233d2ebfa8b96de1d5ef148c626888c2f2e8aa77a3aeaea28c42f148641e4"
+    },
+    {
+      "path": "Content/M_glTFRuntimeTranslucent_Inst.uasset",
+      "bytes": 67518,
+      "sha256": "a933f4c67945468473fe23319f83e1f05a5b82b2121f7b23b57dbc885135e9a4"
+    },
+    {
+      "path": "Content/M_glTFRuntimeTwoSidedMasked_Inst.uasset",
+      "bytes": 102296,
+      "sha256": "bc342916521313b413e722439d394b14678eda2cfba4d2e9a7f96a72bd5e5da2"
+    },
+    {
+      "path": "Content/M_glTFRuntimeTwoSidedTranslucent_Inst.uasset",
+      "bytes": 68626,
+      "sha256": "8b0f07b287dc9ed1f1401f56d4ee5c3203647c075d0523920c708c8f8e6ac7da"
+    },
+    {
+      "path": "Content/M_glTFRuntimeTwoSided_Inst.uasset",
+      "bytes": 79552,
+      "sha256": "56d63d9cd61b0d7f4798c163983eefdd5f41fcce541c89d6a55801d454a34baf"
+    },
+    {
+      "path": "Content/M_glTFRuntime_SG_Base.uasset",
+      "bytes": 99836,
+      "sha256": "3a37ae23e913a0c546416f49ae4d05249c12c2e90ea005224caaab3fd6a8b77a"
+    },
+    {
+      "path": "Content/M_glTFRuntime_SG_Translucent_Inst.uasset",
+      "bytes": 98079,
+      "sha256": "56e325fac91e7e727dea3d77c7650aed21b008e6b8d83f63b48282586bf97b95"
+    },
+    {
+      "path": "Content/M_glTFRuntime_SG_TwoSidedTranslucent_Inst.uasset",
+      "bytes": 98207,
+      "sha256": "c748494cf41b07eaf77475c72b50559c099ae76d4bc79ffa560646627741eb59"
+    },
+    {
+      "path": "Content/M_glTFRuntime_SG_Twosided_Inst.uasset",
+      "bytes": 102355,
+      "sha256": "6148d28c14cf35291d244aeeae296c23263ec014e99d4b39c264f770b088ec35"
+    },
+    {
+      "path": "Content/T_glTFRuntimeNormal.uasset",
+      "bytes": 3398,
+      "sha256": "208422010d5d24391cd43d0f60e91b317eee15651d4d90cac6501b2ce26d59d9"
+    },
+    {
+      "path": "Content/T_glTFRuntimeOne.uasset",
+      "bytes": 3485,
+      "sha256": "15238cddeb2e24560cecdfa59f2792a0c8a09a03bf0e75b0a24723d66693fdb3"
+    },
+    {
+      "path": "Content/T_glTFRuntimeOne_sRGB.uasset",
+      "bytes": 3465,
+      "sha256": "8bee27b773237e793d5da832f9ad340b8ed570863fe6bb5ba2b5b0c926c36855"
+    },
+    {
+      "path": "Content/T_glTFRuntimeZero.uasset",
+      "bytes": 3393,
+      "sha256": "7b6739fc6878c2f79f19be1ac3727145adfd3529294f6d56896aa0134ca80331"
+    },
+    {
+      "path": "Content/T_glTFRuntimeZero_sRGB.uasset",
+      "bytes": 3373,
+      "sha256": "676fa3035e18bc5c1d5b028b2be3e479781268a2087e77f1801d8edefcdbf06c"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1073,
+      "sha256": "fe108b3cf71498faab7e3fd2776715a9ba019ced5a38ecd2f5cab377bfe9cf99"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2644,
+      "sha256": "f87beb7760d1a8b056ee3856332d50ffbf07dc22977357699c0560905c10a2a3"
+    },
+    {
+      "path": "Resources/Icon128.png",
+      "bytes": 21756,
+      "sha256": "dd854fb8d6fae107b3b4f5fe0f860800d192a019c23869ac4357ccfc6a7412fb"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFAnimBoneCompressionCodec.cpp",
+      "bytes": 5100,
+      "sha256": "79936a5f52df42e49aa4749fe5c7fffba4c2065fb1d50a64a986a8b4c6893cbe"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFAnimCurveCompressionCodec.cpp",
+      "bytes": 1147,
+      "sha256": "5bfb8a49f8e33900977fa26f772eea895530f63454d3d2717075a1c672c91c4f"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntime.cpp",
+      "bytes": 286,
+      "sha256": "1fc3350370034d274f0ed3ba2fd5161f6b9bb9618ca30b471b38f17e825bd93c"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeAnimationCurve.cpp",
+      "bytes": 10670,
+      "sha256": "a47bf4ac68205fbede917391e118152ed552d73c0752abd9bf678f03e4db34c1"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeAsset.cpp",
+      "bytes": 59206,
+      "sha256": "25c6aaee71ceaf8f57338a6bc5e8864ba0456cd5c4b6e26aa613e3e88303e1f7"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeAssetActor.cpp",
+      "bytes": 15790,
+      "sha256": "9538946b0358243d80ad148a575a04d9d3e105442667bda130aa05d87a3f9fc9"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeAssetActorAsync.cpp",
+      "bytes": 8871,
+      "sha256": "3003467b17564fb6537dbfa9597644bfcde881630c1bf4a0272e163cd8d5fd4e"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeAssetUserData.cpp",
+      "bytes": 3494,
+      "sha256": "5c504b4fc258b0d4373b089611a4ef14cc6c862e5b9ab1cefc87fa05660e17e8"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeFunctionLibrary.cpp",
+      "bytes": 31154,
+      "sha256": "0445563b21eff1a3befbdd3ffc792d665a465df8d633a788b8abf165b57bd5fb"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeLight.cpp",
+      "bytes": 3311,
+      "sha256": "4104a28a245b35ae774fa38e020f7ac1d6db8bc6ff4bcb80ddc9d2178e9bb707"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParser.cpp",
+      "bytes": 205466,
+      "sha256": "27595436d6f9701db7ea4085bc0ae1b7a61a9a7c044d48033f64621b487b73a8"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserAudio.cpp",
+      "bytes": 2688,
+      "sha256": "dde9965d8706613c4511f889b75c159c8ea8599a8b376c86d653d088fb1ca4f4"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserCustom.cpp",
+      "bytes": 6284,
+      "sha256": "28a8b1bc6954ca4b063f4d2bc5d9c66edd37a8b316321498d57f081ba2949c77"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserMaterials.cpp",
+      "bytes": 72698,
+      "sha256": "dcde44e9e1dfd2773f89e80d099be189ca34cfe42a88b07f7ba5a4fa4f61cc35"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserSkeletalMeshes.cpp",
+      "bytes": 177822,
+      "sha256": "1fbcd057887443c80f1ba824df0b037b4ca5cb32e7e90eced50039b5e83c915b"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserStaticMeshes.cpp",
+      "bytes": 62307,
+      "sha256": "2fdb5dc339808dd2848cbe31785ae692523d35d49b6573204f09d3181b0f1061"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeSkeletalMeshComponent.cpp",
+      "bytes": 2931,
+      "sha256": "644546ee6ce3725e0e88e2d6fc79b0be169d61cc1318216bdd74a6e83cfd4e38"
+    },
+    {
+      "path": "Source/glTFRuntime/Private/glTFRuntimeSoundWave.cpp",
+      "bytes": 7323,
+      "sha256": "6dffce0c053769d38118ba9f03f49c1c4212030b233367ff1e86dddacc793098"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFAnimBoneCompressionCodec.h",
+      "bytes": 1219,
+      "sha256": "e94a88282bd99f7629c77bb85564aa2d0b59399b9ebaab95689ccf009cc03fd1"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFAnimCurveCompressionCodec.h",
+      "bytes": 887,
+      "sha256": "7151568fec91df4519c64075d46d7b10c89177c4961da52794a875e8faf4069a"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntime.h",
+      "bytes": 299,
+      "sha256": "aecb5799b86e3b48bc6d6df7b3a911a03198444478181bd5895d04a43aa4b87d"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeAnimationCurve.h",
+      "bytes": 2183,
+      "sha256": "c18cbff91c394e44b9d3c4b25537718f04be0764eafa1f6943d3f617cf0eefd7"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeAsset.h",
+      "bytes": 27696,
+      "sha256": "4fad5836d8ee83903c5a9d1f91ae266425f5824a400da35e84fa20f43a49405d"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeAssetActor.h",
+      "bytes": 5228,
+      "sha256": "080f66a9936f9e09366f6fe0cbbf2b3e45269cc48b6bbb7e92d25b4a28c5707e"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeAssetActorAsync.h",
+      "bytes": 3579,
+      "sha256": "ec5aa53b0bbeb6f0efe872e664e9f3eec88a470f9889a6f30ad53d730e1750c0"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeAssetUserData.h",
+      "bytes": 1807,
+      "sha256": "934de977027ab36836508cebef767c32219631291f3590285382d3f58b80d9e6"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeFunctionLibrary.h",
+      "bytes": 7963,
+      "sha256": "0930010e580e88e509bcedf0af23d919f5f2f4c77ed97e2a92c352dbf4c6864a"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeParser.h",
+      "bytes": 125772,
+      "sha256": "a62e9be9bda2d6d2d110d39e7770ee0d37bf5439c018cf434a5c3a6acae102fb"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeSkeletalMeshComponent.h",
+      "bytes": 551,
+      "sha256": "413d1e0bef39e63358c9a57fcf258a15651a6f386a3bdd76c8b259236b27361b"
+    },
+    {
+      "path": "Source/glTFRuntime/Public/glTFRuntimeSoundWave.h",
+      "bytes": 2455,
+      "sha256": "8bead16e27987141b222427cd6e64222419fce9a47d1b873346700332b6b9f61"
+    },
+    {
+      "path": "Source/glTFRuntime/glTFRuntime.Build.cs",
+      "bytes": 1703,
+      "sha256": "6805dfd210eca98e6464cb20e897ef1b44092de085d0e652df325ce7ce2b0f99"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/SkeletalMeshExporterGLTF.cpp",
+      "bytes": 6086,
+      "sha256": "be8764850b96b8999ea9ed9c53d218860977b7946cc1057c88a0ee213fa1bb2e"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/SkeletonExporterGLTF.cpp",
+      "bytes": 6938,
+      "sha256": "68a0656a45a82ccaacd0d7b5d6f1e0c88cbd69e6a02ecc5af2a7cc31a3aa6283"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/BadMesh.gltf",
+      "bytes": 900,
+      "sha256": "fdfe337dfafedf2adc27c147d5ba1bcbbc0f886d98532a2cfca468c21479d03f"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/BadScene.gltf",
+      "bytes": 165,
+      "sha256": "f9b8ece0d6415ba4ce34914ec265070d11e369759dce813fbab25ac8cd3a4313"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderEmpty.gltf",
+      "bytes": 178,
+      "sha256": "f8ecd3ead63a5c8795e80e509cd422f82762e96427d219f0ec408d7bd9af7ff1"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderPlane.bin",
+      "bytes": 60,
+      "sha256": "9005dfe042ba3e0d8d046fb9f1499007911bb7aa87ffea5a07c33c1e17dc3ef5"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderPlane.gltf",
+      "bytes": 919,
+      "sha256": "2edb6376194bda4e233e1c603fafa4ef7fa9ebe133ec4db1ddb729adc38bf52b"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderPlaneWeightMaps.bin",
+      "bytes": 92,
+      "sha256": "45291e6cc71af191439316f1aae6d5e47e8bc9ca905f5c648932ec07b281e9a2"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderPlaneWeightMaps.gltf",
+      "bytes": 1297,
+      "sha256": "cf920930c553c0b729a51585d60aa07ff5a7733482b258a2d38b7e3c17938230"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderSingleNode.gltf",
+      "bytes": 244,
+      "sha256": "14240419a408afed7055f7a296e8247ec4f548bc2dab1a796899e626b79e1e18"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Blender/BlenderTwoNodes.gltf",
+      "bytes": 282,
+      "sha256": "c53452960f6f9bc7e78aba3ede6b6c61c565ac58e1e38395539b678119f945fc"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Dummy.tar.gz",
+      "bytes": 199,
+      "sha256": "5ba3609ee1c411cd9cc29e2c840e6366a2687d5cbd09d744e7099f2fb75a1837"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Dummy.zip",
+      "bytes": 1054,
+      "sha256": "e1c6ee1de160fb90e327673b99ce0d00d20b7ac9475ba23a374c1af2cdebc25f"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/DummyNoRoot.tar.gz",
+      "bytes": 172,
+      "sha256": "a854210e95428917db977b725d23fb3a8907322b816b5030575c065652438ea0"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/EmptyScene.gltf",
+      "bytes": 83,
+      "sha256": "c9f3df16db317d77d9a0f0bcc615e252792a80cd3c736fc14975c9408e2a475b"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/Fixtures/Triangle.gltf",
+      "bytes": 959,
+      "sha256": "e387cee62de30e5720dfb1a8dc873d86826ac16c7654acceef2b136dcd1dd612"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/glTFRuntimeArchiveTests.cpp",
+      "bytes": 3519,
+      "sha256": "602ebd9f0404f79f9332d856b60ce062589d5c673e55c55b0d037024dd4b31f9"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/glTFRuntimeBasicTests.cpp",
+      "bytes": 5580,
+      "sha256": "877f76a2f5ffee33cc02f4c84ca67eb02759ea993f4799bca40b3c7509796221"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/Tests/glTFRuntimeMeshTests.cpp",
+      "bytes": 8361,
+      "sha256": "c4de1f0e0a1e1edb66343ef46e7e60180f2364b3d7ac4cb78e75a81d56069bb2"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/glTFRuntimeEditor.cpp",
+      "bytes": 7396,
+      "sha256": "f59e35dd1c2c44d16025b60d48f4e40c60460764b2d9ead6f7669ad6f7bee90a"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Private/glTFRuntimeEditorDelegates.cpp",
+      "bytes": 955,
+      "sha256": "7109194f561395b23963b1835ed7a783a0b2a79f3130743a00718b72bb019e61"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Public/SkeletalMeshExporterGLTF.h",
+      "bytes": 657,
+      "sha256": "0f9b186c0324361a95d24e363a10f3c7711df027d615cbbc8afd0246067222b1"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Public/SkeletonExporterGLTF.h",
+      "bytes": 1523,
+      "sha256": "a30f350d8aa6314948432f78845eaeac99c7d9c1a74782c44f56d332eeedf805"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Public/glTFRuntimeEditor.h",
+      "bytes": 885,
+      "sha256": "d3d05fb6a49d8c5284995defb4ccf59e10f8e75cd35a49db2e76cb2f17bb5a30"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/Public/glTFRuntimeEditorDelegates.h",
+      "bytes": 366,
+      "sha256": "5e58d1f0ca78342ac4fab31b722c368106b641a54ea8cce7025f6394e85385bf"
+    },
+    {
+      "path": "Source/glTFRuntimeEditor/glTFRuntimeEditor.Build.cs",
+      "bytes": 1527,
+      "sha256": "0816a9c77979e6bd60a91181f05c195a4729df947eaf5a58fbc99bbe9e403bb7"
+    },
+    {
+      "path": "glTFRuntime.uplugin",
+      "bytes": 1075,
+      "sha256": "aa265dcb8cd600790f0fbd8d7bd5b077097902694c73bf1c1203b9d46cd9d77f"
+    }
+  ],
+  "localPatches": [
+    {
+      "date": "2026-09-30",
+      "path": "Source/glTFRuntime/Private/glTFRuntimeParserMaterials.cpp",
+      "priorSha256": "f639e94dbfa65b5187fbe70fb5a35dd85a989e6e335772748e1f2c0dc32eeaf6",
+      "priorBytes": 72510,
+      "sha256": "dcde44e9e1dfd2773f89e80d099be189ca34cfe42a88b07f7ba5a4fa4f61cc35",
+      "description": "Condition the non-editor separate-file mip flag on ImagesConfig.bStreaming for 2D and volume textures. Resident generated mip chains have no archive-backed bulk payload; preserve the upstream streaming path and all mip data. No logging or global texture-streaming settings are changed."
+    }
+  ]
+}

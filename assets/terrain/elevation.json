@@ -1,0 +1,97 @@
+{
+  "formatVersion": 1,
+  "file": "elevation.bin",
+  "encoding": "signed-int16",
+  "byteOrder": "little-endian",
+  "headerBytes": 0,
+  "layout": "row-major; west-to-east within rows; north-to-south between rows",
+  "width": 1440,
+  "height": 720,
+  "byteLength": 2073600,
+  "noDataValue": -32768,
+  "units": "metres",
+  "scale": 1,
+  "offset": 0,
+  "horizontalCRS": "EPSG:4326",
+  "verticalCRS": "EPSG:3855 (EGM2008 height)",
+  "longitudeConvention": "[-180,180)",
+  "cellRegistration": "center",
+  "longitudeWestCenter": -179.875,
+  "latitudeNorthCenter": 89.875,
+  "longitudeStepDegrees": 0.25,
+  "latitudeStepDegrees": -0.25,
+  "bounds": {
+    "west": -180,
+    "east": 180,
+    "south": -90,
+    "north": 90
+  },
+  "wrapLongitude": true,
+  "poleSampling": "Clamp latitude to the nearest sampled row; the poles are not separate samples.",
+  "sha256": "eb2f4686714ac54b780ac20ce545fd2c04aaf3faac985833860b1a5ac03a4a62",
+  "statistics": {
+    "minMetres": -10435,
+    "maxMetres": 7108,
+    "landSamples": 352771,
+    "oceanSamples": 683480,
+    "seaLevelSamples": 549,
+    "noDataSamples": 0,
+    "maxQuantizationErrorMetres": 0.5
+  },
+  "checkSamples": {
+    "centralPacific": {
+      "longitude": -139.875,
+      "latitude": -0.125,
+      "metres": -4318
+    },
+    "TibetanPlateau": {
+      "longitude": 87.125,
+      "latitude": 31.875,
+      "metres": 4640
+    },
+    "Andes": {
+      "longitude": -67.875,
+      "latitude": -20.125,
+      "metres": 3654
+    },
+    "centralAustralia": {
+      "longitude": 133.125,
+      "latitude": -25.125,
+      "metres": 458
+    },
+    "AntarcticIceSurface": {
+      "longitude": 0.125,
+      "latitude": -89.125,
+      "metres": 2731
+    }
+  },
+  "source": {
+    "title": "NOAA NCEI ETOPO 2022 v1 60 arc-second Ice Surface elevation",
+    "datasetId": "ETOPO_2022_v1_60s",
+    "doi": "10.25921/fd45-gt74",
+    "landingPage": "https://www.ncei.noaa.gov/products/etopo-global-relief-model",
+    "metadataUrl": "https://oceanwatch.pifsc.noaa.gov/erddap/info/ETOPO_2022_v1_60s/index.json",
+    "downloadUrl": "https://oceanwatch.pifsc.noaa.gov/erddap/griddap/ETOPO_2022_v1_60s.nc?z%5B7:15:10792%5D%5B7:15:21592%5D",
+    "accessed": "2026-09-24",
+    "downloadFormat": "NetCDF classic v1",
+    "downloadByteLength": 4170604,
+    "downloadSha256": "5a3fd0ba3870249f19a8c6c786070d7668b37fbbebd7f0fadc7b0d6c707b47cc",
+    "sourceSpacingDegrees": 0.016666666666666666,
+    "latitudeIndices": "7:15:10792",
+    "longitudeIndices": "7:15:21592",
+    "processing": [
+      "Select every 15th source sample starting at index 7 on both axes; no averaging or interpolation.",
+      "Rotate source longitudes 0..360 by 720 columns to store -180..180.",
+      "Reverse source south-to-north latitude rows.",
+      "Round each Float32 elevation to the nearest whole metre; write signed little-endian Int16."
+    ],
+    "license": "The data may be used and redistributed for free but is not intended\nfor legal use, since it may contain inaccuracies. Neither the data\nContributor, ERD, NOAA, nor the United States Government, nor any\nof their employees or contractors, makes any warranty, express or\nimplied, including warranties of merchantability and fitness for a\nparticular purpose, or assumes any legal liability for the accuracy,\ncompleteness, or usefulness, of this information."
+  },
+  "limitations": [
+    "The 0.25-degree samples are approximately 28 km apart at the equator; they represent regional relief, not harbour or ship-scale terrain.",
+    "Subsampling is nearest-point selection, not average relief; narrow peaks, islands, trenches and coast detail may be absent.",
+    "Modern ETOPO 2022 geography and ice-surface elevations are not a reconstruction of 1922 or 1936.",
+    "No vertical exaggeration is baked into this file. Renderer exaggeration must remain a separate setting.",
+    "Use the game coastline geometry to clip land; this coarse elevation grid does not define navigable water or vessel grounding."
+  ]
+}

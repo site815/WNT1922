@@ -1,0 +1,46 @@
+{
+  "id": "farragut_dd34",
+  "name": "Farragut class, original five-gun fit",
+  "year": 1934,
+  "type": "DD",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "dimensions": {"length": 104.013, "beam": 10.4394, "draft": 3.6},
+  "textureMetres": 2.5,
+  "materialSources": [{"name": "Blue Metal Plate", "author": "Rob Tuytel", "license": "CC0-1.0", "url": "https://polyhaven.com/a/blue_metal_plate", "manifest": "assets/models/textures/blue_metal_plate/source.json", "usage": "Unmodified OpenGL normal and packed AO/roughness/metalness maps; gray paint base color is original, painted surfaces use metalness zero."}, {"name": "Neutral naval paint albedo", "author": "WNT1922", "license": "Original project artwork", "manifest": "assets/models/textures/naval-paint/source.json"}],
+  "geometrySource": "Original reconstruction from the United States War Department recognition plan/profile and NHHC dimensions; no legacy voxel or recognition-model geometry is imported.",
+  "sources": [
+    {"title": "Farragut III (DD-348), DANFS", "url": "https://www.history.navy.mil/research/histories/ship-histories/danfs/f/farragut-iii.html", "usedFor": "341 ft 3 in overall length; 34 ft 3 in beam; five 5-inch guns; eight 21-inch torpedo tubes"},
+    {"title": "United States War Department recognition manual, Farragut plan and profile, p134", "file": "assets/recognition/ships/USA/farragut_dd34.png", "usedFor": "Original five-gun arrangement, unequal funnels, two centerline quadruple torpedo mounts, forecastle break, bridge and mast stations"}
+  ],
+  "accuracy": "The overall dimensions and major equipment arrangement are source based. Hull body sections, underwater appendages, railings, doors, vents, plating and small fittings are original inferred reconstruction, not surveyed engineering geometry. Individual ship modifications and wartime AA refits are not represented. This is an exterior model with no interior.",
+  "hullStations": [
+    [-1, 0.36, 0.17, 2.75], [-0.97, 0.55, 0.4, 2.72], [-0.9, 0.72, 0.74, 2.65],
+    [-0.8, 0.85, 0.96, 2.62], [-0.6, 0.98, 1, 2.6], [-0.3, 1, 1, 2.62],
+    [0, 1, 1, 2.7], [0.2, 0.98, 0.97, 2.85], [0.38, 0.91, 0.93, 3.05],
+    [0.5, 0.81, 0.86, 3.35], [0.65, 0.62, 0.71, 3.65], [0.8, 0.37, 0.5, 4.05],
+    [0.92, 0.14, 0.25, 4.58], [1, 0.002, 0.01, 4.85]
+  ],
+  "mainGuns": [
+    {"station": 0.69, "height": 4.29, "bearing": 0, "shield": true, "number": 1},
+    {"station": 0.54, "height": 6.27, "bearing": 0, "shield": true, "number": 2},
+    {"station": -0.105, "height": 4.02, "bearing": 180, "shield": false, "number": 3},
+    {"station": -0.58, "height": 4.08, "bearing": 180, "shield": false, "number": 4},
+    {"station": -0.78, "height": 2.9, "bearing": 180, "shield": false, "number": 5}
+  ],
+  "funnels": [
+    {"station": 0.21, "length": 2.5, "beam": 2.6, "bottom": 4.25, "top": 11.25},
+    {"station": 0.015, "length": 3.85, "beam": 3.25, "bottom": 4.02, "top": 11.15}
+  ],
+  "torpedoMounts": [{"station": -0.23, "height": 3.05}, {"station": -0.42, "height": 2.98}],
+  "materials": {
+    "paint": {"color": [0.34, 0.375, 0.39, 1], "metallic": 0, "roughness": 0.95, "baseColorTexture": "naval-paint-albedo", "normalTexture": "naval-paint-normal", "normalScale": 0.65, "metallicRoughnessTexture": "naval-paint-orm", "occlusionTexture": "naval-paint-orm"},
+    "deck": {"color": [0.18, 0.205, 0.215, 1], "metallic": 0, "roughness": 1, "baseColorTexture": "naval-paint-albedo", "normalTexture": "naval-paint-normal", "normalScale": 0.6, "metallicRoughnessTexture": "naval-paint-orm", "occlusionTexture": "naval-paint-orm"},
+    "antifouling": {"color": [0.28, 0.045, 0.03, 1], "metallic": 0.05, "roughness": 0.8},
+    "boot": {"color": [0.025, 0.028, 0.029, 1], "metallic": 0.05, "roughness": 0.82},
+    "steel": {"color": [0.07, 0.08, 0.085, 1], "metallic": 0.82, "roughness": 0.43},
+    "canvas": {"color": [0.42, 0.43, 0.39, 1], "metallic": 0, "roughness": 0.94},
+    "glass": {"color": [0.025, 0.055, 0.069, 1], "metallic": 0.35, "roughness": 0.19},
+    "brass": {"color": [0.36, 0.235, 0.055, 1], "metallic": 0.9, "roughness": 0.4}
+  }
+}

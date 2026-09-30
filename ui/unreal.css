@@ -1,0 +1,48 @@
+html.unreal-mode, .unreal-mode body, .unreal-mode #app,
+.unreal-mode .app-shell, .unreal-mode .game-shell, .unreal-mode .game-body, .unreal-mode .world-board,
+.unreal-mode .map-stage, .unreal-mode .world-command,
+.unreal-mode .map-background { background:transparent!important; }
+.unreal-mode .unreal-input { background:transparent!important; touch-action:none; }
+.unreal-mode .battle-stage, .unreal-mode .start-demo-stage { background:transparent!important; }
+.unreal-mode[data-unreal-scene="battle"] .modal-backdrop { background:transparent; backdrop-filter:none; }
+.unreal-mode .battle-watch { background:transparent; }
+.unreal-mode .modal[data-dialog-type="battle-watch"],
+.unreal-mode .modal[data-dialog-type="battle-watch"] .modal-body {background:transparent!important;}
+.unreal-mode .modal[data-dialog-type="battle-watch"] > header,
+.unreal-mode .modal[data-dialog-type="battle-watch"] > footer {background:#132632;}
+.unreal-mode .battle-watch > :not(.battle-stage) { background:#132632; }
+.unreal-mode .start-screen, .unreal-mode .start, .unreal-mode .start-demo, .unreal-mode .start-demo-host { background:transparent!important; }
+.unreal-mode .start > :not(.start-grid), .unreal-mode .start-demo > :not(.start-demo-stage) { background:#111f2b; }
+.unreal-mode .unreal-input:focus-visible {outline:2px solid #d9bd80; outline-offset:-2px;}
+.unreal-mode #app {position:relative; z-index:1;}
+.unreal-mode #app[hidden] {display:none!important;}
+.unreal-scene-mask {position:fixed; pointer-events:none; box-shadow:0 0 0 200vmax #111f2b; z-index:0;}
+
+.native-world-surface { position:absolute; inset:0; pointer-events:none; }
+.native-world-input { display:block; width:100%; height:100%; pointer-events:auto; touch-action:none; cursor:grab; outline:none; }
+.native-world-input:focus-visible { outline:2px solid #d9bd80; outline-offset:-3px; }
+.native-launch-required { max-width:640px; margin:12vh auto; padding:32px; background:#152a38; border:1px solid #6b7b80; border-radius:6px; line-height:1.6; }
+.native-launch-required h1 { font-size:24px; }
+.model-gallery {position:fixed;inset:0;z-index:3;display:grid;grid-template-rows:auto auto minmax(180px,1fr) auto;color:#e3e7e7;background:transparent;}
+.model-gallery>header,.model-gallery-toolbar,.model-gallery>footer {background:#132632;padding:12px 24px;}
+.model-gallery>header {display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #405562;}
+.model-gallery h1 {margin:3px 0 0;font-size:24px;}
+.model-gallery [data-gallery="close"] {font-size:28px;line-height:1;}
+.model-gallery-toolbar {display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.model-gallery-toolbar select {max-width:min(55vw,580px);font-size:14px;}
+.model-gallery-toolbar>span {font-size:12px;color:#b5c1c8;}
+.model-gallery-stage,.model-gallery-stage canvas {width:100%;height:100%;min-height:0;display:block;background:transparent;}
+.model-gallery>footer {max-height:27vh;overflow:auto;font-size:13px;}
+.model-gallery>footer p {margin:4px 0 10px;line-height:1.5;}
+.model-gallery details {font-size:12px;color:#c2cbd0;}
+.model-gallery summary {cursor:pointer;text-decoration:underline;}
+.model-gallery-info {max-width:1000px;}
+.model-gallery-info a {color:#dfc792;text-underline-offset:2px;overflow-wrap:anywhere;}
+.native-launch-required code { color:#dfc792; }
+.map-legend .map-zoom-level { color:var(--gold); font-size:10px; font-variant-numeric:tabular-nums; white-space:nowrap; flex:0 0 auto; }
+.merchant-inspection { font-size:11px; line-height:1.5; overflow-wrap:anywhere; }
+.merchant-inspection h3 { font-size:15px; }
+.merchant-inspection > button { width:100%; margin-bottom:10px; font-size:11px; }
+.merchant-inspection dl { margin:10px 0; }
+.merchant-inspection small { display:block; color:var(--muted); line-height:1.5; }
+@media(max-width:900px) { .map-scene > .world-board .map-legend { gap:5px; } .map-legend .map-zoom-level { font-size:9px; } }

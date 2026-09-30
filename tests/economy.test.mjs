@@ -20,7 +20,7 @@ import { supplyDetails } from "../mechanics/logistics.mjs";
 import { NODES } from "../mechanics/world.mjs";
 import { resourceHover } from "../ui/resource-breakdown.mjs";
 import { economyView } from "../ui/economy-view.mjs";
-import { commandView } from "../ui/command-view.mjs";
+import { buildUnrealScenePacket } from "../ui/unreal-scene-packet.mjs";
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6*Math.max(1,Math.abs(b)),a+" != "+b);
 const start=(id="JPN",camp="in_good_faith_1936")=>{
   const s=newGame(CATALOG,id,24001,camp);s.autoPause=false;s.paused=false;s.decisions=[];
@@ -55,7 +55,9 @@ test("convoys use real hulls and logistics changes supply without immediately ch
   assert.ok(total()>0 && total()<=n.merchant.hulls);
   for(const r of Object.values(s.relations))r.war=false;
   syncConvoys(s,c,"JPN");assert.ok(n.convoys.length>0);assert.equal(convoyRecord(s,"JPN").success,1);
-  assert.match(commandView(s,c),/class="convoy-marker"/);
+  const merchantForces=buildUnrealScenePacket(s,c).forces.filter(force=>force.merchant);
+  assert.equal(merchantForces.length,n.convoys.length);
+  assert.equal(merchantForces.reduce((sum,force)=>sum+force.hulls.length,0),total());
 });
 test("convoy successes and losses expire at their exact thirty-day timestamps",()=>{
   const [s]=start();war(s);recordConvoy(s,"JPN",{delivered:300});

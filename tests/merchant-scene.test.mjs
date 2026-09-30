@@ -1,12 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
 import { merchantHullInstances, ownMerchantScene, MERCHANT_MODEL_ID } from '../ui/merchant-scene.mjs';
-import { fleetHullInstances } from '../ui/isometric-math.mjs';
+import { fleetHullInstances } from '../ui/fleet-instances.mjs';
 import { convoyTraffic } from '../mechanics/convoy-traffic.mjs';
 import { CATALOG } from '../worker/catalog-loader.mjs';
 import { newGame } from '../mechanics/engine.mjs';
-import { validateVoxelModel } from '../ui/voxel-models.mjs';
 
 test('merchant formations keep every real hull and share the naval deterministic spacing without mutating counts', () => {
   const convoy = {id:'convoy-USA-17',name:'Cargo route',count:1201,cargoGRTPerHull:5500};
@@ -39,15 +37,4 @@ test('both campaign scenes agree with the economy actual own merchant hulls at s
     assert.equal(ownMerchantScene(state).reduce((sum,row) => sum + row.hulls.length,0),convoyTraffic(state,nation).hullsAtSea);
     assert.equal(JSON.stringify(state),before);
   }
-});
-
-test('merchant model is a directly editable original cargo ship with no fabricated military fit', async () => {
-  const model = validateVoxelModel(JSON.parse(await fs.readFile('assets/voxels/ships/generic/merchant-freighter.json','utf8')));
-  const index = JSON.parse(await fs.readFile('assets/voxels/ships/index.json','utf8'));
-  assert.equal(model.id,MERCHANT_MODEL_ID); assert.equal(model.type,'AK');
-  assert.equal(index.fallbacks.AK,model.id);
-  assert(model.parts.some(p => p.role === 'cargo-hatch') && model.parts.some(p => p.role === 'cargo-derrick'));
-  assert(!model.parts.some(p => /barrel|gun|torpedo|turret/.test(p.role)));
-  assert.equal(model.reference.license,'Original project artwork');
-  assert.match(model.dimensionBasis,/independent of convoy GRT/);
 });

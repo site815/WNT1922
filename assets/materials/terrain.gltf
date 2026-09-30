@@ -1,0 +1,22 @@
+{
+  "asset": {"version": "2.0", "generator": "WNT1922 photographic terrain material"},
+  "images": [
+    {"uri": "polyhaven/aerial_rocks_02/aerial_rocks_02_diff_2k.jpg"},
+    {"uri": "polyhaven/aerial_rocks_02/aerial_rocks_02_nor_dx_2k.png"},
+    {"uri": "polyhaven/aerial_rocks_02/aerial_rocks_02_rough_2k.jpg"},
+    {"uri": "nasa/world.200409.3x5400x2700.jpg"}
+  ],
+  "samplers": [{"wrapS": 10497, "wrapT": 33071, "minFilter": 9987, "magFilter": 9729}],
+  "textures": [{"source": 0}, {"source": 1}, {"source": 2}, {"source": 3, "sampler": 0}],
+  "materials": [{
+    "name": "Aerial rocks / world-space terrain",
+    "pbrMetallicRoughness": {
+      "baseColorTexture": {"index": 0},
+      "metallicRoughnessTexture": {"index": 2},
+      "metallicFactor": 0,
+      "roughnessFactor": 1
+    },
+    "normalTexture": {"index": 1},
+    "extras": {"normalConvention": "DirectX; consumed by WNT's world-space terrain master, not a generic glTF normal shader", "surfaceWidthMetres": 50}
+  }]
+}

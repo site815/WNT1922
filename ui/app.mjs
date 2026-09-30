@@ -2,17 +2,16 @@ import { navalRecordView } from "./naval-record.mjs";
 import { NewsTicker } from "./news-ticker.mjs";
 import { startScreen } from './start-screen.mjs';
 import { StartBattleDemo } from './start-battle-demo.mjs';
+import { openModelGallery } from './model-gallery.mjs';
+import { nativeArtNotice } from './native-art-status.mjs';
 import { battleProgress } from "./battle-progress.mjs";
 import { SCORE_NAVAL_TONS_PER_POINT } from '../mechanics/campaign-impact.mjs';
 import { politicalPopup } from "./diplomacy-popup.mjs";
 import { bulkPlan } from "../mechanics/bulk-fleet.mjs";
 import { resourceHover } from "./resource-breakdown.mjs";
-import { MapMotion } from "./map-motion.mjs";
-import { WorldScene3D } from './world-scene3d.mjs';
-import { MAX_GLOBE_ZOOM as MAX_SCENE_ZOOM } from './globe-camera.mjs';
-import { loadVoxelModels } from './voxel-models.mjs';
-import { BattleWatchScene, battleWatchView, watchFrame, attritionView } from './battle-watch.mjs';
-import { chartPosition, centerChart, chartCoordinates } from "./map-focus.mjs";
+import { UnrealWorldScene, UnrealBattleScene } from './unreal-scene.mjs';
+import { battleWatchView, watchFrame, attritionView } from './battle-watch.mjs';
+import { chartPosition } from "./map-focus.mjs";
 import { landView, strategicAirView } from "./land-view.mjs";
 import {
   levelDescription,
@@ -98,7 +97,6 @@ import {
   fleetStats,
   visibleContacts,
 } from "../mechanics/task-forces.mjs";
-import { mapPoint, wrapLongitude } from "./projection.mjs";
 import {
   contentFor,
   DEFAULT_CAMPAIGN,
@@ -123,7 +121,7 @@ import { readDocument } from '../worker/documents.mjs';
 const DECISIVE_RULES = (await readDocument('common/rules/battle-stages.md')).DECISIVE;
 
 const app = document.querySelector("#app");
-const startDemo = new StartBattleDemo({root: app});
+const startDemo = new StartBattleDemo({root: app, SceneClass: UnrealBattleScene});
 const newsTicker = new NewsTicker((id, receipt) => state ? mutate({type:"read-news",args:{id,receipt}}, "", true) : undefined);
 let newsFocus = null;
 let fleetSelection = new Set();
@@ -133,9 +131,6 @@ let fleetSearch = "",
   renderPending = false;
 let chart = { zoom: 1, cx: 600, cy: 300, rotation: 0 };
 let selectedAlert = null,
-  drag = null,
-  suppressClickUntil = 0,
-  mapFrame = 0,
   readingAlert = null,
   simMetrics = { actual: 0, ratio: 1 };
 
@@ -185,23 +180,18 @@ const statusBadge = (status) =>
   `<span class="badge ${["active", "reserve", "war", "building"].includes(status) ? status : ""}">${esc(status)}</span>`;
 
 const soundTracker = createSoundTracker();
-const isometricScene = new WorldScene3D({
+const worldScene = new UnrealWorldScene({
   root: app, chart: () => chart,
   active: () => !!state && ['command', 'land', 'airwar'].includes(view) && !dialog,
   onSelect: selectScene,
   onHover: inspectScene,
   onCameraChange: () => { if (state) render(); },
 });
-const battleScene = new BattleWatchScene({root: app, onSelect: selected => {
+const battleScene = new UnrealBattleScene({root: app, onSelect: selected => {
   if (dialog?.type !== 'battle-watch') return;
   dialog.selected = selected;
   render();
 }});
-const mapMotion = new MapMotion({
-  root: app,
-  chart: () => chart,
-  active: () => !!state && !isometricScene.ready && ["command", "land", "airwar"].includes(view),
-});
 const simulation = new SimulationClient({
   onState: receiveSimulation,
   onError: (message) => {
@@ -219,8 +209,8 @@ function receiveSimulation(next, metrics, model) {
   content = contentFor(bundle, state);
   simMetrics = metrics || simMetrics;
   const now = performance.now();
-  isometricScene.accept(state, content, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL, now);
-  mapMotion.accept(state, now);
+  worldScene.accept(state, content, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL, now);
+
   musicPlayback(!state.paused);
   musicContext(state);
   soundSettings(state.audioEnabled, state.audioVolume);
@@ -313,8 +303,8 @@ function renderPass() {
     app.style.setProperty('--dialog-left','0px');
     app.style.setProperty('--dialog-right','0px');
     app.style.setProperty('--dialog-bottom','0px');
-    mapMotion.refresh();
-    isometricScene.suspend();
+
+    worldScene.suspend();
     newsTicker.reset();
     renderStart();
     return;
@@ -343,9 +333,6 @@ function renderPass() {
     ["reports", "10", "Battle reports"],
     ["review", "11", "Naval record"],
   ];
-  // Keep chart symbols readable at the same screen size as the viewport grows.
-  // The SVG uses a 2:1 view box with uniform scaling, including any letterbox.
-  chart.markerScale = 1 / Math.max(.1, Math.min(window.innerWidth / 1200, window.innerHeight / 600));
   const isMapView = ["command", "land", "airwar"].includes(view);
   const renderedView = viewHTML();
   const mapLayer = isMapView ? renderedView.map : commandView(true).map;
@@ -354,12 +341,12 @@ function renderPass() {
     app,
     `<div class="game-shell map-scene ${isMapView ? 'map-workspace' : 'menu-workspace'}">${mapLayer}<aside class="sidebar"><div class="side-brand wordmark">WNT<span>1922</span><small class="build-version">v${GAME_VERSION}</small></div><div class="side-country"><span class="eyebrow" style="color:${p.color}">${state.player} · NAVAL MINISTRY</span><strong>${p.name}</strong><span>${p.title}</span></div><nav>${tabs.map(([key, index, label]) => `<button class="nav-item ${view === key ? "current" : ""}" data-action="view" data-view="${key}"><span>${index}</span>${label}${key === "reports" && state.reports.length ? `<b>${state.reports.filter((r) => [r.a, r.b].includes(state.player)).length}</b>` : ""}</button>`).join("")}</nav><div class="side-bottom"><span class="save-status">${esc(saveStatus)}</span><div>${btn("Save", "save")}${btn("Menu", "menu")}</div></div></aside><div class="game-body">${topBars(state, content, simMetrics, alertsView(state, content, newsTicker))}<main class="workspace view-${view}" data-record="overview">${view !== "command" ? `<button type="button" class="workspace-close" data-action="view" data-view="command" aria-label="Close ${esc(tabs.find(t => t[0] === view)?.[2] || "panel")} and return to Command Map" title="Close and return to Command Map">×</button>` : ""}<div class="workspace-inner" data-scroll-key="workspace-${view}">${mainLayer}</div></main></div></div>${modalHTML()}`,
   );
-  isometricScene.refresh();
+  worldScene.refresh();
   if (dialog?.type === 'battle-watch') for (const control of app.querySelectorAll('[data-action="pause"], [data-action="step-minute"], [data-action="step-six-hours"]')) {
     control.disabled = true;
     control.dataset.disabledReason = 'Use Next tick in Battle watch, or close the viewer to resume normal time controls.';
   }
-  mapMotion.refresh();
+
   const workspaceBounds = app.querySelector('.workspace').getBoundingClientRect();
   app.style.setProperty('--dialog-top',workspaceBounds.top+'px');
   app.style.setProperty('--dialog-left',workspaceBounds.left+'px');
@@ -385,7 +372,6 @@ function renderPass() {
 }
 function liveRender() {
   const active = document.activeElement;
-  if (drag) return;
   const focus = active?.dataset?.action ? { ...active.dataset } : null,
     scrolls = [...app.querySelectorAll("[data-scroll-key]")].map((el) => [
       el.dataset.scrollKey,
@@ -484,8 +470,7 @@ function focusMap(kind, id, zoom = false) {
     const g = player().groups.find((g) => g.id === id);
     chart.fleetId = g?.fleetId;
   }
-  if (isometricScene.ready) isometricScene.focus(kind, id, {zoom});
-  else centerChart(chart, point, { zoom });
+  worldScene.focus(kind, id, {zoom});
   render();
   if (chart.fleetId) requestAnimationFrame(() => {
     const row=[...app.querySelectorAll('.fleet-command-row')].find(x=>x.dataset.id===chart.fleetId);
@@ -514,7 +499,7 @@ async function selectScene(selection) {
     if (!ship) return;
     chart.shipId = ship.id; chart.fleetId = ship.fleetId;
     await loadRecognition().catch(() => {});
-    openDialog({type: 'ship', ship: ship.id, hullIndex: selection.hullIndex || 0});
+    openDialog({type: 'ship', ship: ship.id, hullIndex: selection.hullIndex || 0, visualStatus: selection.visualStatus, detailedModel: selection.detailedModel});
     return;
   }
   focusMap(selection.kind, selection.id, !!selection.zoom);
@@ -524,7 +509,6 @@ async function openBattleWatch(id) {
   const report = state?.reports.find(r => r.id === Number(id) && [r.a, r.b].includes(state.player));
   if (!report) { toast('This report has left the recent history.'); return; }
   if (!await mutate({type: 'pause', args: {value: true}}, '', true)) return;
-  await loadVoxelModels().catch(error => toast(error.message));
   openDialog({type: 'battle-watch', id: report.id, report: structuredClone(report), frameIndex: null, selected: null});
 }
 function affordableMessage(p) {
@@ -1051,7 +1035,7 @@ function modalHTML() {
     title =
       player().groups.find((g) => g.id === dialog.ship)?.name || "Ship state";
     const ship = player().groups.find((g) => g.id === dialog.ship);
-    body = (ship?.count > 1 ? `<p class="panel-note">Hull ${Math.min(ship.count, (dialog.hullIndex || 0) + 1)} of ${ship.count} · condition and equipment are shared by this ship group.</p>` : '') + (ship ? recognitionCard("ship", ship.classId, { campaign: state.campaignId }) : "") + shipDetails(state, content, dialog.ship);
+    body = nativeArtNotice(dialog) + (ship?.count > 1 ? `<p class="panel-note">Hull ${Math.min(ship.count, (dialog.hullIndex || 0) + 1)} of ${ship.count} · condition and equipment are shared by this ship group.</p>` : '') + (ship ? recognitionCard("ship", ship.classId, { campaign: state.campaignId }) : "") + shipDetails(state, content, dialog.ship);
   }
   if (dialog.type === "order") {
     const c = content.classes[dialog.id],
@@ -1154,7 +1138,7 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag to turn the 3D globe; scroll continuously from the strategic world down to individual ships. Right-drag or Shift-drag rotates and tilts the camera. Double-click a fleet or convoy to inspect its ships; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Formations are spaced for inspection, with lines to their true positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag to pan the north-up Equal Earth world; scroll continuously from the strategic world down to individual ships. Right-drag or Shift-drag tilts the world camera. Double-click a fleet or convoy to inspect its ships; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Ship stations form stable formations around their recorded fleet positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
@@ -1274,7 +1258,6 @@ function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => persist(true), 1500);
 }
-let mapClickTimer;
 app.addEventListener("click", async (event) => {
   const target = event.target.closest("[data-action]");
   if (
@@ -1283,7 +1266,6 @@ app.addEventListener("click", async (event) => {
   )
     return;
   if (!target || target.disabled) return;
-  if (performance.now() < suppressClickUntil) return;
   const { action, id, kind } = target.dataset;
   soundSettings(state?.audioEnabled ?? true, state?.audioVolume ?? 0.5);
   unlockSound();
@@ -1291,6 +1273,12 @@ app.addEventListener("click", async (event) => {
   unlockMusic();
   playSound("click");
   try {
+    if (action === 'ship-gallery') {
+      startDemo.stop();
+      try { await openModelGallery({app,onClose:()=>startDemo.mount()}); }
+      catch(error) {startDemo.mount();throw error;}
+      return;
+    }
     if (action === 'watch-battle') { await openBattleWatch(id); return; }
     if (action.startsWith('battle-') && dialog?.type === 'battle-watch') {
       const current = dialog, report = state.reports.find(r => r.id === current.id) || current.report;
@@ -1474,13 +1462,6 @@ app.addEventListener("click", async (event) => {
       }
       return;
     }
-    if (event.target.closest(".world-map") && action.startsWith("select-")) {
-      clearTimeout(mapClickTimer);
-      const kind = action.slice(7);
-      if (event.detail > 1) focusMap(kind, id, true);
-      else mapClickTimer = setTimeout(() => focusMap(kind, id), 300);
-      return;
-    }
     if (action === "focus-fleet") {
       focusMap("fleet", id);
       return;
@@ -1623,7 +1604,7 @@ app.addEventListener("click", async (event) => {
       await simulation.stop();
       state = null;
       battleScene.clear();
-      isometricScene.refresh();
+      worldScene.refresh();
       musicPlayback(false);
       musicContext(null);
       dialog = null;
@@ -1901,25 +1882,6 @@ app.addEventListener("change", async (event) => {
   }
 });
 document.addEventListener("keydown", (event) => {
-  if (
-    state &&
-    ["command", "land", "airwar"].includes(view) &&
-    !dialog &&
-    event.target.closest(".world-map") &&
-    event.key === "Home"
-  ) {
-    event.preventDefault();
-    Object.assign(chart, { zoom: 1, cx: 600, cy: 300, rotation: 0 });
-    render();
-    return;
-  }
-  if (event.key === "Enter" && event.target.closest("svg [data-action]")) {
-    event.preventDefault();
-    event.target
-      .closest("[data-action]")
-      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
-    return;
-  }
   if (event.key === 'Escape' && state?.decisions.some(activeDispatch)) {
     event.preventDefault();
     void mutate({type:'defer-decision',args:{key:state.decisions.find(activeDispatch).key}},'',true);
@@ -2003,84 +1965,6 @@ window.addEventListener("pagehide", () => {
     }).catch(() => {});
   }
 });
-// The stable app element captures the pointer, so replacing the SVG during a drag is safe.
-app.addEventListener("pointerdown", (event) => {
-  if (!state || event.button !== 0 || !event.target.closest(".world-map"))
-    return;
-  const svg = event.target.closest(".world-map"),
-    transform = svg.getScreenCTM();
-  drag = {
-    id: event.pointerId,
-    x: event.clientX,
-    y: event.clientY,
-    rotation: chart.rotation || 0,
-    cy: chart.cy,
-    width: 1200 * transform.a / chart.zoom,
-    height: 600 * transform.d / chart.zoom,
-    moved: false,
-  };
-});
-app.addEventListener("pointermove", (event) => {
-  if (!drag || event.pointerId !== drag.id) return;
-  const dx = event.clientX - drag.x,
-    dy = event.clientY - drag.y;
-  if (Math.hypot(dx, dy) < 4 && !drag.moved) return;
-  if (!drag.moved) app.setPointerCapture(event.pointerId);
-  drag.moved = true;
-  chart.rotation = wrapLongitude(
-    drag.rotation - (dx * 360) / (drag.width * chart.zoom),
-  );
-  chart.cy = sim.clamp(
-    drag.cy - (dy * 600) / (drag.height * chart.zoom),
-    300 / chart.zoom,
-    600 - 300 / chart.zoom,
-  );
-  if (!mapFrame)
-    mapFrame = requestAnimationFrame(() => {
-      mapFrame = 0;
-      render();
-    });
-});
-function endDrag(event) {
-  if (!drag || event.pointerId !== drag.id) return;
-  if (drag.moved) suppressClickUntil = performance.now() + 300;
-  try {
-    app.releasePointerCapture(event.pointerId);
-  } catch {}
-  drag = null;
-}
-window.addEventListener("pointerup", endDrag);
-window.addEventListener("pointercancel", endDrag);
-app.addEventListener("dblclick", (event) => {
-  clearTimeout(mapClickTimer);
-  if (!state || !event.target.closest(".world-map")) return;
-  event.preventDefault();
-  const target = event.target.closest("[data-action]");
-  if (target && target.dataset.action.startsWith("select-")) return;
-  const svg = event.target.closest("svg"),
-    p = svg.createSVGPoint();
-  p.x = event.clientX;
-  p.y = event.clientY;
-  const local = p.matrixTransform(svg.getScreenCTM().inverse());
-  centerChart(chart, chartCoordinates([local.x, local.y], chart.rotation), {
-    zoom: true,
-  });
-  render();
-});
-app.addEventListener(
-  "wheel",
-  (event) => {
-    if (!state || !event.target.closest(".world-map")) return;
-    event.preventDefault();
-    chart.zoom = sim.clamp(
-      chart.zoom * (event.deltaY < 0 ? 1.18 : 1 / 1.18),
-      1,
-      MAX_SCENE_ZOOM,
-    );
-    render();
-  },
-  { passive: false },
-);
 function importCampaign() {
   const input = document.createElement("input");
   input.type = "file";
@@ -2151,8 +2035,8 @@ function hideClassHover() {
   hoverTarget = null;
   hoverPending = null;
   sceneHoverKey = null;
-  isometricScene.hoverKey = '';
-  isometricScene.hoverSelection = null;
+  worldScene.hoverKey = '';
+  worldScene.hoverSelection = null;
 }
 let hoverPoint = null,
   hoverScrollTimer;
@@ -2164,7 +2048,7 @@ function inspectScene(selection, point = {}) {
     return;
   }
   clearTimeout(hoverHideTimer);
-  const key = selection.kind + ':' + selection.id + ':' + (selection.hullIndex ?? '');
+  const key = selection.kind + ':' + selection.id + ':' + (selection.hullIndex ?? '') + ':' + (selection.visualStatus || '');
   if (key === sceneHoverKey) return;
   clearTimeout(hoverTimer);
   sceneHoverKey = key;
@@ -2173,11 +2057,11 @@ function inspectScene(selection, point = {}) {
     if (sceneHoverKey !== key || !state || dialog) return;
     const group = selection.kind === 'ship' ? player().groups.find(g => g.id === selection.id) : null;
     const fleet = selection.kind === 'fleet' ? player().fleets.find(f => f.id === selection.id) : null;
-    const html = group ? '<h3>' + esc(group.name) + '</h3><p>Hull ' + (selection.hullIndex + 1) + ' of ' + group.count + ' · condition shared by group</p>' + shipDetails(state, content, group.id) + classHover(content.classes[group.classId], {campaign: state.campaignId})
+    const html = nativeArtNotice(selection) + (group ? '<h3>' + esc(group.name) + '</h3><p>Hull ' + (selection.hullIndex + 1) + ' of ' + group.count + ' · condition shared by group</p>' + shipDetails(state, content, group.id) + classHover(content.classes[group.classId], {campaign: state.campaignId})
       : fleet ? fleetCompositionHover(state, content, fleet)
-      : (selection.kind === 'merchant' ? '<p>Merchant hull ' + (selection.hullIndex + 1) + ' · representative freighter model; voyage data is shared by the convoy.</p>' : '') + mapHover(state, content, (selection.kind === 'country' ? 'capital' : selection.kind === 'merchant' ? 'convoy' : selection.kind) + ':' + selection.id, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL);
+      : (selection.kind === 'merchant' ? '<p>Merchant hull ' + (selection.hullIndex + 1) + ' · voyage data is shared by the convoy.</p>' : '') + mapHover(state, content, (selection.kind === 'country' ? 'capital' : selection.kind === 'merchant' ? 'convoy' : selection.kind) + ':' + selection.id, sim.yearOf(state) < 1936 ? POLITICAL_1922 : POLITICAL));
     if (!html) return;
-    hoverTarget = app.querySelector('.isometric-surface canvas');
+    hoverTarget = app.querySelector('.native-world-surface canvas');
     classTip.classList.toggle('fleet-hover', !!fleet);
     classTip.classList.toggle('base-hover', selection.kind === 'port');
     classTip.classList.remove('resource-hover');
@@ -2356,7 +2240,3 @@ globalThis.saveForDesktopClose = async () => {
   writeRecovery(snapshot);
   return true;
 };
-// Load editable model files once per page load; no generated sprite build is needed.
-loadVoxelModels().then(() => {
-  isometricScene.reloadModels();
-}).catch(error => toast(error.message + ' Generic ship silhouettes remain available.'));

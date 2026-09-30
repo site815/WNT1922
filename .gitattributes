@@ -12,6 +12,9 @@
 *.zip binary
 *.ico binary
 *.png binary
+*.jpg binary
+*.exr binary
+*.glb binary
 *.geojson binary
 *.gz binary
 # Preserve the upstream compiler notice exactly, including its whitespace.
@@ -19,3 +22,5 @@ assets/licenses/NSIS-LICENSE.txt -text -whitespace
 # Recognition source hashes cover the exact SVG bytes, including upstream line endings.
 # Preserve imported vector files; their original trailing whitespace is not a code defect.
 assets/recognition/**/*.svg -text whitespace=-blank-at-eol
+# The glTFRuntime provenance manifest hashes upstream source bytes verbatim.
+unreal/Plugins/glTFRuntime/** -text -whitespace

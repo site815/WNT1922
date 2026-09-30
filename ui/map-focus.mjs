@@ -7,7 +7,7 @@ import {
 import { fleetPosition, visibleContacts } from "../mechanics/task-forces.mjs";
 import { frontPosition } from "../mechanics/land-war.mjs";
 import { mapPoint, wrapLongitude } from "./projection.mjs";
-import { MAX_SCENE_ZOOM } from './isometric-math.mjs';
+const MAX_SCENE_ZOOM = 1_000_000;
 export function chartPosition(s, data, kind, id) {
   const n = s.nations[s.player];
   if (kind === "fleet")

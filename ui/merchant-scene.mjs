@@ -1,6 +1,6 @@
 import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { convoyUnderway } from '../mechanics/convoy-traffic.mjs';
-import { fleetHullInstances } from './isometric-math.mjs';
+import { fleetHullInstances } from './fleet-instances.mjs';
 
 export const MERCHANT_MODEL_ID = 'merchant-freighter';
 export const MERCHANT_SCENE_NOTE = 'One representative freighter per surviving convoy hull. Merchant GRT is an aggregate registered-volume measure; the model does not imply individual dimensions, crew or armament.';

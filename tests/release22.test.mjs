@@ -226,7 +226,8 @@ test("map centering and inverse projection work across zoom and the date line wi
     (before.match(/data-fleet-mission=/g) || []).length,
     (after.match(/data-fleet-mission=/g) || []).length,
   );
-  assert.match(after, /chart-focus/);
+  assert.match(after, /native-world-surface/);
+  assert.doesNotMatch(after, /<svg/);
   assert.doesNotMatch(after, /selected-manifest/);
   assert.match(
     mapHover(s, c, "territory:test", {
@@ -247,7 +248,7 @@ test("economy resource breakdowns show the same normalized facility factor as ac
     }
   }
 });
-test("cached political geography remains present when switching between map menus", () => {
+test("native world surface remains preserved when switching between map menus", () => {
   const [s, c] = start(),
     data = POLITICAL;
   commandView(s, c, {}, data);
@@ -261,9 +262,9 @@ test("cached political geography remains present when switching between map menu
       data,
     );
     assert.match(cached, /data-preserve="true"/);
-    assert.ok(
-      (cached.match(/class="political-territory"/g) || []).length > 100,
-    );
+    assert.match(cached, /data-key="native-world-surface"/);
+    assert.match(cached, /Land campaigns/);
+    assert.doesNotMatch(cached, /<svg|political-territory/);
   } finally {
     if (previous === undefined) delete globalThis.document;
     else globalThis.document = previous;

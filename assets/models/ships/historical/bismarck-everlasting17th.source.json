@@ -1,0 +1,461 @@
+{
+  "id": "bismarck-everlasting17th",
+  "name": "Bismarck — everlasting17th reconstruction",
+  "type": "BB",
+  "year": 1940,
+  "file": "historical/bismarck-everlasting17th.glb",
+  "cacheName": "bismarck",
+  "length": 251,
+  "hullNames": [
+    "hull_hull_0"
+  ],
+  "bowPositive": true,
+  "sourceWaterline": 0,
+  "historicalDimensions": {
+    "lengthOverall": 251,
+    "beam": 36
+  },
+  "sourceUrl": "https://sketchfab.com/3d-models/bismark-battleship-dfc8b1756ce3419287a9e43a9b9dd21c",
+  "downloadUrl": "https://huggingface.co/datasets/allenai/objaverse/resolve/main/glbs/000-122/dfc8b1756ce3419287a9e43a9b9dd21c.glb",
+  "sourceSha256": "6fe5f73e1c0730c51f27b7df0dddb8d6be9b155ca378c409a4ba877408d94fcd",
+  "sources": [
+    {
+      "title": "Bismark battleship",
+      "url": "https://sketchfab.com/3d-models/bismark-battleship-dfc8b1756ce3419287a9e43a9b9dd21c",
+      "author": "everlasting17th",
+      "license": "CC-BY-4.0",
+      "usedFor": "Original complete geometry, UVs, normals and all embedded PBR textures"
+    },
+    {
+      "title": "Bismarck full-hull model and dimensions, Royal Museums Greenwich",
+      "url": "https://www.rmg.co.uk/collections/objects/rmgc-object-66120",
+      "usedFor": "Approximately 251 m overall length (823 ft), 36 m beam; vessel identity and contemporary configuration reference."
+    }
+  ],
+  "accuracy": "Detailed artist reconstruction of Bismarck, not surveyed engineering geometry. Source hull is uniformly scaled to 251 m; source proportions and authored paint waterline are retained, so measured beam, mast height and draft differ from exact historical specifications. Artist equipment fit and paint scheme are not assigned to a precise date. This specific vessel must not substitute for unrelated fictional or historical classes. Native visual review is required before campaign activation.",
+  "kind": "detailed-ship",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "author": "everlasting17th",
+  "authorUrl": "https://sketchfab.com/everlastinggrey",
+  "sourceAttribution": {
+    "author": "everlasting17th (https://sketchfab.com/everlastinggrey)",
+    "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "source": "https://sketchfab.com/3d-models/bismark-battleship-dfc8b1756ce3419287a9e43a9b9dd21c",
+    "title": "Bismark battleship"
+  },
+  "sourceRevision": "Pinned public Objaverse snapshot; may differ from the current Sketchfab revision",
+  "geometrySource": "Artist-authored licensed asset; no voxel or generated recognition geometry",
+  "modifications": "WNT1922 baked static node hierarchy and metre scale, centered the hull, oriented bow +X and up +Y, merged primitives by material without mesh simplification, retained every embedded image byte and all artist UVs, assigned unused planar UVs to untextured rigging, normalized vertex normals, removed Float32-degenerate faces and orientation-unstable microscopic slivers, and repaired normals-disagreeing winding. Native centimetre/int16 precision is checked explicitly; only unstable slivers within eight coordinate ULPs can be discarded. Counts below identify these repairs.",
+  "normalization": {
+    "sourceBounds": {
+      "min": [
+        -42.19129367933397,
+        -3.767777729633849,
+        -6.072960031886318
+      ],
+      "max": [
+        42.38689958326955,
+        21.995384603993784,
+        6.072960278675906
+      ]
+    },
+    "sourceHullBounds": {
+      "min": [
+        -41.195441544039056,
+        -3.767777729633849,
+        -6.062934737573867
+      ],
+      "max": [
+        42.38689958326955,
+        3.9768372831939027,
+        6.06293473757387
+      ]
+    },
+    "uniformScale": 3.0030266754276345,
+    "sourceCenterX": 0.5957290196152485,
+    "sourceCenterZ": 1.3322676295501878e-15,
+    "sourceWaterline": 0,
+    "yRotationDegrees": 0,
+    "removedDegenerateTriangles": 0,
+    "windingRepairs": 8,
+    "nativePrecision": {
+      "removedCollapsedTriangles": 0,
+      "removedOrientationUnstableSlivers": 0,
+      "maxUnstableAreaCm2": 0,
+      "maxUnstableAltitudeMicrometres": 0,
+      "maxUnstableAltitudeUlps": 0,
+      "normalFormat": "FPackedRGBA16N",
+      "positions": "Float32 centimetres",
+      "rule": "Drop only collapsed faces or winding-unstable slivers whose altitude is at most eight Float32 position ULPs; robust source winding is corrected, not discarded."
+    }
+  },
+  "sha256": "0ee6071bc9387a4c7990d619197008fba322d2408d90a99e70f12482259c5c0b",
+  "statistics": {
+    "id": "bismarck-everlasting17th",
+    "triangles": 258134,
+    "vertices": 315258,
+    "materials": 27,
+    "embeddedTextures": 49,
+    "bytes": 45041352,
+    "bounds": {
+      "min": [
+        -128.49057006835938,
+        -11.314737319946289,
+        -18.237260818481445
+      ],
+      "max": [
+        125.5,
+        66.05272674560547,
+        18.237260818481445
+      ]
+    }
+  },
+  "embeddedImages": [
+    {
+      "index": 0,
+      "mimeType": "image/png",
+      "bytes": 469637,
+      "sha256": "6c5a98e6df29f0c0ad4ecc94c3051f02700763a601b7d94adca3647274116de6",
+      "origin": "Unmodified embedded image 0 from pinned artist source GLB"
+    },
+    {
+      "index": 1,
+      "mimeType": "image/png",
+      "bytes": 244923,
+      "sha256": "92591825b04b0f5c39df4eda4e5e0aa7d23792adb023cf72b76cfaa2da15daeb",
+      "origin": "Unmodified embedded image 1 from pinned artist source GLB"
+    },
+    {
+      "index": 2,
+      "mimeType": "image/png",
+      "bytes": 328631,
+      "sha256": "9a7a8a13ad9e928a3ae919884ec56fd2b80d74969a94b530e141d1abb5e1dd15",
+      "origin": "Unmodified embedded image 2 from pinned artist source GLB"
+    },
+    {
+      "index": 3,
+      "mimeType": "image/png",
+      "bytes": 676336,
+      "sha256": "ebfdced537f773524ac013131f96950d6d371d453ac963fb2919e83878955a7e",
+      "origin": "Unmodified embedded image 3 from pinned artist source GLB"
+    },
+    {
+      "index": 4,
+      "mimeType": "image/png",
+      "bytes": 738407,
+      "sha256": "6aa16ae013f17aff5cdd7bd000ca15925c6e6313f8a8b200b9250d94e2318aba",
+      "origin": "Unmodified embedded image 4 from pinned artist source GLB"
+    },
+    {
+      "index": 5,
+      "mimeType": "image/png",
+      "bytes": 669962,
+      "sha256": "5b4cdd5310f4c86c2998de7915123dc5e01d983111d6d026641de86439faa4f9",
+      "origin": "Unmodified embedded image 5 from pinned artist source GLB"
+    },
+    {
+      "index": 6,
+      "mimeType": "image/png",
+      "bytes": 235642,
+      "sha256": "8f2ac99f686ec956a76fbde6c70065a58bbcb0a84e835f42523df0b244772e06",
+      "origin": "Unmodified embedded image 6 from pinned artist source GLB"
+    },
+    {
+      "index": 7,
+      "mimeType": "image/png",
+      "bytes": 374077,
+      "sha256": "5e0ef52c105be1691cb1ecc9877fd13594269c65bdd2e8c3a89019139d7bafcc",
+      "origin": "Unmodified embedded image 7 from pinned artist source GLB"
+    },
+    {
+      "index": 8,
+      "mimeType": "image/png",
+      "bytes": 777567,
+      "sha256": "72d5644255cbc4c147630a3d03123a4b2299baaa3a38adc86d55617dca8fc42c",
+      "origin": "Unmodified embedded image 8 from pinned artist source GLB"
+    },
+    {
+      "index": 9,
+      "mimeType": "image/png",
+      "bytes": 782844,
+      "sha256": "19b2264ff3b3916595c91af5dd037b71dc8b5941086b9e9cc0587307497e60c6",
+      "origin": "Unmodified embedded image 9 from pinned artist source GLB"
+    },
+    {
+      "index": 10,
+      "mimeType": "image/png",
+      "bytes": 787522,
+      "sha256": "f17871f7fd6019195ff4b44de500cc26376762edd18b5e202b10c6fd2abb37fc",
+      "origin": "Unmodified embedded image 10 from pinned artist source GLB"
+    },
+    {
+      "index": 11,
+      "mimeType": "image/png",
+      "bytes": 855625,
+      "sha256": "f6e8870a9745b7c171915b3c6f315b74e0e8417913d8e11d66a5c1bbb377e478",
+      "origin": "Unmodified embedded image 11 from pinned artist source GLB"
+    },
+    {
+      "index": 12,
+      "mimeType": "image/png",
+      "bytes": 584218,
+      "sha256": "080ead447d15d54eb601aa5dc3044d507251e24905c93b36396ca33f54d1639c",
+      "origin": "Unmodified embedded image 12 from pinned artist source GLB"
+    },
+    {
+      "index": 13,
+      "mimeType": "image/png",
+      "bytes": 295500,
+      "sha256": "a2e219bbad60870d9b289c3b2f0387253af0a38abd21c4ce34cc5f340194e75f",
+      "origin": "Unmodified embedded image 13 from pinned artist source GLB"
+    },
+    {
+      "index": 14,
+      "mimeType": "image/png",
+      "bytes": 668827,
+      "sha256": "608a11fab85190add07c8137ed05d1016bfd94921080c8ddcd9ed8eb83b3e910",
+      "origin": "Unmodified embedded image 14 from pinned artist source GLB"
+    },
+    {
+      "index": 15,
+      "mimeType": "image/png",
+      "bytes": 683232,
+      "sha256": "042de68ac694093cba43c90bab1d410e962f68d4c7453c8959f2c1f0fbcae0a8",
+      "origin": "Unmodified embedded image 15 from pinned artist source GLB"
+    },
+    {
+      "index": 16,
+      "mimeType": "image/png",
+      "bytes": 719061,
+      "sha256": "69026d46a182e098e8ce59f4db6f0a447ec7ac8eb74926cb90f0a6ee1a7b9b56",
+      "origin": "Unmodified embedded image 16 from pinned artist source GLB"
+    },
+    {
+      "index": 17,
+      "mimeType": "image/png",
+      "bytes": 604191,
+      "sha256": "2e12ce8c146d31bdf8d3f39e9d223bf0d4f822e3bc6c81fe4d0097b9de264f59",
+      "origin": "Unmodified embedded image 17 from pinned artist source GLB"
+    },
+    {
+      "index": 18,
+      "mimeType": "image/png",
+      "bytes": 645927,
+      "sha256": "fbe37e10c8cf25fa7437a0bf0130c1942805e3cd3a5856edfae90137e66e151d",
+      "origin": "Unmodified embedded image 18 from pinned artist source GLB"
+    },
+    {
+      "index": 19,
+      "mimeType": "image/png",
+      "bytes": 652433,
+      "sha256": "5c226d220b82e300e4b63a9edd217853a62ef522703df4c50dff9a78440eb1ce",
+      "origin": "Unmodified embedded image 19 from pinned artist source GLB"
+    },
+    {
+      "index": 20,
+      "mimeType": "image/png",
+      "bytes": 394944,
+      "sha256": "bcbe7aba4bafedf8be18bec260523116f751cacefdb7f78146dc692a00590f13",
+      "origin": "Unmodified embedded image 20 from pinned artist source GLB"
+    },
+    {
+      "index": 21,
+      "mimeType": "image/png",
+      "bytes": 624753,
+      "sha256": "c73169a766d51fd0af41e7d5a75a5c40f55edd6e74e3225f51f9d1887b9e6642",
+      "origin": "Unmodified embedded image 21 from pinned artist source GLB"
+    },
+    {
+      "index": 22,
+      "mimeType": "image/png",
+      "bytes": 525841,
+      "sha256": "68c4678c4806d98361701f760ee57888f57bb02410f6b6aaae85e54e2511cc4e",
+      "origin": "Unmodified embedded image 22 from pinned artist source GLB"
+    },
+    {
+      "index": 23,
+      "mimeType": "image/png",
+      "bytes": 564241,
+      "sha256": "a6643a87e5adc04a90d0d753b5c9079a6c45d70ab9b1ed3dffd01605163bea07",
+      "origin": "Unmodified embedded image 23 from pinned artist source GLB"
+    },
+    {
+      "index": 24,
+      "mimeType": "image/png",
+      "bytes": 659127,
+      "sha256": "a8d09ed3ebe75ba64b18364a379fcc6eb987496fe048f9fddd9d8e73d563057e",
+      "origin": "Unmodified embedded image 24 from pinned artist source GLB"
+    },
+    {
+      "index": 25,
+      "mimeType": "image/png",
+      "bytes": 589676,
+      "sha256": "d801497a8d2f14ed429f5694a6355c79f694c57c1e1c01c8f951ec611ca174c0",
+      "origin": "Unmodified embedded image 25 from pinned artist source GLB"
+    },
+    {
+      "index": 26,
+      "mimeType": "image/png",
+      "bytes": 339044,
+      "sha256": "24090fd6c4ff47282b399d596253435823f5573f26e4ab7bdbcec7d665f241fb",
+      "origin": "Unmodified embedded image 26 from pinned artist source GLB"
+    },
+    {
+      "index": 27,
+      "mimeType": "image/png",
+      "bytes": 512825,
+      "sha256": "b66d316080b1fc14a68709005890579614fc253c0850afeee9196a6dfe2b2694",
+      "origin": "Unmodified embedded image 27 from pinned artist source GLB"
+    },
+    {
+      "index": 28,
+      "mimeType": "image/png",
+      "bytes": 594479,
+      "sha256": "e0ee8311faad196605a5afe9b3decedbf454462b2603709c6c0ba1c21afaa285",
+      "origin": "Unmodified embedded image 28 from pinned artist source GLB"
+    },
+    {
+      "index": 29,
+      "mimeType": "image/png",
+      "bytes": 659568,
+      "sha256": "cab65698359fddd337445e77c16a7852c37479d613e5d85c9f8c923ce022a406",
+      "origin": "Unmodified embedded image 29 from pinned artist source GLB"
+    },
+    {
+      "index": 30,
+      "mimeType": "image/png",
+      "bytes": 674253,
+      "sha256": "c96e6b56ed3075bf4085ca2c8cf43250319407c1fd3063bd88ccff62cfe5c2fb",
+      "origin": "Unmodified embedded image 30 from pinned artist source GLB"
+    },
+    {
+      "index": 31,
+      "mimeType": "image/png",
+      "bytes": 789397,
+      "sha256": "73df65b919299e6f64342033ce4ff6188ead70cf237722d728b43418ccbd4569",
+      "origin": "Unmodified embedded image 31 from pinned artist source GLB"
+    },
+    {
+      "index": 32,
+      "mimeType": "image/png",
+      "bytes": 701583,
+      "sha256": "eac0f4b3d49c469e1935adf407dbef23f934e62a6e8d877bea0105bbd3fdd013",
+      "origin": "Unmodified embedded image 32 from pinned artist source GLB"
+    },
+    {
+      "index": 33,
+      "mimeType": "image/png",
+      "bytes": 639610,
+      "sha256": "1a16280d02e5bad78fbffad905198abcf82356a21790ba556112ddf26f2492c8",
+      "origin": "Unmodified embedded image 33 from pinned artist source GLB"
+    },
+    {
+      "index": 34,
+      "mimeType": "image/png",
+      "bytes": 754205,
+      "sha256": "0d2e7ebc2a2ddab96c82db42af9014369368a6add533f954ba171f99f79cc018",
+      "origin": "Unmodified embedded image 34 from pinned artist source GLB"
+    },
+    {
+      "index": 35,
+      "mimeType": "image/png",
+      "bytes": 671831,
+      "sha256": "0104195844af924f40679d8adccbcd27a00940f2c4d489351f590dd5848e94b3",
+      "origin": "Unmodified embedded image 35 from pinned artist source GLB"
+    },
+    {
+      "index": 36,
+      "mimeType": "image/png",
+      "bytes": 712550,
+      "sha256": "b0bd02f8fd71f1d33a6d121bc021737030fc05f83d6242238a0cb30c4388745f",
+      "origin": "Unmodified embedded image 36 from pinned artist source GLB"
+    },
+    {
+      "index": 37,
+      "mimeType": "image/png",
+      "bytes": 683309,
+      "sha256": "339fe17ae65311a0a8120cf2b6333656f1d590c0fc92d197ccc6b92d00420294",
+      "origin": "Unmodified embedded image 37 from pinned artist source GLB"
+    },
+    {
+      "index": 38,
+      "mimeType": "image/png",
+      "bytes": 719241,
+      "sha256": "45eed3443b3ac86f27cac31b987db169bd5a2ced968740e08ac90b6dc0fba9f0",
+      "origin": "Unmodified embedded image 38 from pinned artist source GLB"
+    },
+    {
+      "index": 39,
+      "mimeType": "image/png",
+      "bytes": 665444,
+      "sha256": "b08c1f363e95192de5b82e85096223a2b7874d40eeffddaee69d906ac9781810",
+      "origin": "Unmodified embedded image 39 from pinned artist source GLB"
+    },
+    {
+      "index": 40,
+      "mimeType": "image/png",
+      "bytes": 654804,
+      "sha256": "d1dbf4c71abfb83210f82a0dc0484a328051c08d70f76be102b6ee1cc32d469e",
+      "origin": "Unmodified embedded image 40 from pinned artist source GLB"
+    },
+    {
+      "index": 41,
+      "mimeType": "image/png",
+      "bytes": 486910,
+      "sha256": "4cb4bbec7cd80b36e8aaab19e73e8c118565c68eb533e519e59f8d60d87740a4",
+      "origin": "Unmodified embedded image 41 from pinned artist source GLB"
+    },
+    {
+      "index": 42,
+      "mimeType": "image/png",
+      "bytes": 201799,
+      "sha256": "ba1bf9f67e753f1a4593b4656ba9d4a86d0c98ad7ab0072f46c5746fc0b8fd20",
+      "origin": "Unmodified embedded image 42 from pinned artist source GLB"
+    },
+    {
+      "index": 43,
+      "mimeType": "image/png",
+      "bytes": 360173,
+      "sha256": "99412326362ef2083451e3d98357ef118b596fa3a7a08ea0ebaad4c1ab0ee625",
+      "origin": "Unmodified embedded image 43 from pinned artist source GLB"
+    },
+    {
+      "index": 44,
+      "mimeType": "image/png",
+      "bytes": 671953,
+      "sha256": "29f36bae5aeef22fc5d5fcc08461879cf4a6708728dad855998da134302173b6",
+      "origin": "Unmodified embedded image 44 from pinned artist source GLB"
+    },
+    {
+      "index": 45,
+      "mimeType": "image/png",
+      "bytes": 629091,
+      "sha256": "62e49254c4942472bf7c3691e1c8b485a3f022b21d5e2a19d841225c95641bb3",
+      "origin": "Unmodified embedded image 45 from pinned artist source GLB"
+    },
+    {
+      "index": 46,
+      "mimeType": "image/png",
+      "bytes": 548934,
+      "sha256": "f68a42556c7ff0ccb969c4a1856520e5a4e20223bce0dac5db23380731be273b",
+      "origin": "Unmodified embedded image 46 from pinned artist source GLB"
+    },
+    {
+      "index": 47,
+      "mimeType": "image/png",
+      "bytes": 794114,
+      "sha256": "c1b8cbd1f2c768884464b1ccd1968eab1ae6f6e74de4b4853ec85201bdf04258",
+      "origin": "Unmodified embedded image 47 from pinned artist source GLB"
+    },
+    {
+      "index": 48,
+      "mimeType": "image/png",
+      "bytes": 568891,
+      "sha256": "bac777172ae14b4ecc898d839e3c44cdaf8ffa9dd05c22e1cb96dd446bf46db3",
+      "origin": "Unmodified embedded image 48 from pinned artist source GLB"
+    }
+  ]
+}

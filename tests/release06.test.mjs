@@ -55,6 +55,7 @@ import {
   battleDetails,
 } from "../ui/ministry-view.mjs";
 import { commandView } from "../ui/command-view.mjs";
+import { buildUnrealScenePacket } from "../ui/unreal-scene-packet.mjs";
 const b = structuredClone(CATALOG);
 const start = (id = "JPN", campaign = "in_good_faith_1936") => {
   const s = sim.newGame(b, id, 901, campaign);
@@ -345,12 +346,16 @@ test("all zoom levels preserve national convoy color, port icons and labels; man
   syncConvoys(s, c, "JPN");
   for (const zoom of [1, 2, 5]) {
     const html = commandView(s, c, { zoom });
+    const scene = buildUnrealScenePacket(s, c);
     assert.equal(
-      (html.match(/class="map-port"/g) || []).length,
+      scene.ports.length,
       Object.keys(PORTS).length,
     );
-    assert.match(html, /convoy-marker" style="color:#f27b73/);
-    assert.match(html, /Pearl Harbor/);
+    assert.match(html, /style="color:#f27b73">■ Convoy/);
+    assert(scene.ports.some(port => port.name === 'Pearl Harbor'));
+    assert(scene.forces.some(force => force.merchant));
+    assert.match(html, /class="native-world-surface"/);
+    assert.doesNotMatch(html, /<svg/);
   }
   const ships = s.nations.JPN.groups
     .filter((g) => g.count)

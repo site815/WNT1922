@@ -1,7 +1,7 @@
 // An isolated title-screen illustration, not a campaign, reconstruction or
 // historical damage model. Reports deliberately use the real replay schema.
 const ship = (id, name, type, classId, modelNote) => ({id, name, type, classId, modelNote});
-const generic = type => `Representative ${type} silhouette; this ship's historical class is not yet modeled.`;
+const generic = type => `3D artwork pending: no historical ${type} model is displayed. An amber ? navigation symbol marks this ship.`;
 const freeze = value => { if (value && typeof value === 'object') {Object.values(value).forEach(freeze); Object.freeze(value);} return value; };
 
 export const DEMO_BATTLES = freeze([
@@ -11,12 +11,12 @@ export const DEMO_BATTLES = freeze([
     history:'Hood and Prince of Wales intercepted Bismarck and Prinz Eugen. Hood was lost; the damaged Prince of Wales withdrew. Bismarck also suffered damage.',
     source:{title:'Royal Navy · Remembering the loss of HMS Hood',url:'https://www.royalnavy.mod.uk/news/2021/may/24/20210524-loss-hood'},
     scope:'Four principal ships. Formations, timing and damage levels are illustrative; this is not a reconstruction of their tracks or gunnery.',
-    shipsA:[ship('hood','HMS Hood','BC','admiral','Admiral class / Hood model; an earlier fit represents the 1941 ship.'),ship('prince-of-wales','HMS Prince of Wales','BB','demo-prince-of-wales',generic('battleship'))],
-    shipsB:[ship('bismarck','Bismarck','BB','demo-bismarck',generic('battleship')),ship('prinz-eugen','Prinz Eugen','CA','demo-prinz-eugen',generic('heavy cruiser'))],
+    shipsA:[ship('hood','HMS Hood','BC','admiral',generic('Hood / Admiral-class')),ship('prince-of-wales','HMS Prince of Wales','BB','demo-prince-of-wales',generic('battleship'))],
+    shipsB:[ship('bismarck','Bismarck','BB','demo-bismarck','Detailed Bismarck reconstruction by everlasting17th (CC BY 4.0); artist proportions and paint fit are approximate.'),ship('prinz-eugen','Prinz Eugen','CA','demo-prinz-eugen',generic('heavy cruiser'))],
     stages:[
       {label:'Opposing squadrons',note:'Select a ship to inspect it. Scroll to zoom; drag to pan.',health:{}},
-      {label:'Opening salvos',note:'Scripted damage demonstrates the battle viewer’s impact and smoke effects.',health:{hood:.82,bismarck:.9}},
-      {label:'Hood is lost',note:'The historical loss is represented here by a fading hull.',health:{hood:0,bismarck:.8,'prince-of-wales':.78}},
+      {label:'Opening salvos',note:'The roster records illustrative damage; individual shells and historical hit locations are not reconstructed.',health:{hood:.82,bismarck:.9}},
+      {label:'Hood is lost',note:'The historical loss is marked in the roster and removes the hull from the scene.',health:{hood:0,bismarck:.8,'prince-of-wales':.78}},
       {label:'Prince of Wales withdraws',note:'Damage values and formation changes are illustrative, not historical estimates.',health:{hood:0,bismarck:.76,'prince-of-wales':.66}},
       {label:'The pursuit continues',note:'Bismarck’s Atlantic sortie continued after this encounter.',health:{hood:0,bismarck:.76,'prince-of-wales':.66}},
     ],
@@ -27,7 +27,7 @@ export const DEMO_BATTLES = freeze([
     source:{title:'U.S. Naval History and Heritage Command · Battle of Midway',url:'https://www.history.navy.mil/browse-by-topic/wars-conflicts-and-operations/world-war-ii/1942/midway.html'},
     scope:'Seven carriers only; escorts, submarines and land-based aircraft are omitted. Opposing carrier groups are displayed together for inspection, not at their actual distances. Stages compress several days.',
     shipsA:[ship('enterprise','USS Enterprise','CV','demo-enterprise',generic('fleet carrier')),ship('hornet','USS Hornet','CV','demo-hornet',generic('fleet carrier')),ship('yorktown','USS Yorktown','CV','demo-yorktown',generic('fleet carrier'))],
-    shipsB:[ship('akagi','Akagi','CV','akagi_cv','Akagi’s earlier, three-deck carrier fit is used as a representative model, not her 1942 configuration.'),ship('kaga','Kaga','CV','kaga_cv','Kaga’s earlier, three-deck carrier fit is used as a representative model, not her 1942 configuration.'),ship('soryu','Soryu','CV','demo-soryu',generic('fleet carrier')),ship('hiryu','Hiryu','CV','demo-hiryu',generic('fleet carrier'))],
+    shipsB:[ship('akagi','Akagi','CV','akagi_cv','3D artwork pending: Akagi’s 1942 carrier fit is not displayed. An amber ? navigation symbol marks her position.'),ship('kaga','Kaga','CV','kaga_cv','3D artwork pending: Kaga’s 1942 carrier fit is not displayed. An amber ? navigation symbol marks her position.'),ship('soryu','Soryu','CV','demo-soryu',generic('fleet carrier')),ship('hiryu','Hiryu','CV','demo-hiryu',generic('fleet carrier'))],
     stages:[
       {label:'The carrier forces',note:'An inspection tableau of the principal carriers, not a surface engagement.',health:{}},
       {label:'Air strikes reach the carriers',note:'Illustrative damage marks the effects of carrier aircraft; aircraft tracks are omitted.',health:{akagi:.55,kaga:.4,soryu:.5}},
@@ -49,7 +49,7 @@ export const DEMO_BATTLES = freeze([
       {label:'Cruisers make contact',note:'Scripted damage shows the early exchange, without reproducing exact hits.',health:{scharnhorst:.83,norfolk:.88}},
       {label:'Duke of York engages',note:'The battleship closes the action; formation and damage remain illustrative.',health:{scharnhorst:.48,norfolk:.88}},
       {label:'Scharnhorst is disabled',note:'The historical action also involved destroyer torpedo attacks, not shown in this selected roster.',health:{scharnhorst:.16,norfolk:.88}},
-      {label:'The Arctic battle ends',note:'Scharnhorst was lost. Click any hull, including its faded outline, to inspect it.',health:{scharnhorst:0,norfolk:.88}},
+      {label:'The Arctic battle ends',note:'Scharnhorst was lost. Select her name in the roster to inspect the recorded condition.',health:{scharnhorst:0,norfolk:.88}},
     ],
   },
 ]);

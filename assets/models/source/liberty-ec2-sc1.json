@@ -1,0 +1,57 @@
+{
+  "id": "liberty-ec2-sc1",
+  "name": "Liberty EC2-S-C1 cargo ship — unarmed merchant exterior",
+  "year": 1943,
+  "textureMetres": 2.5,
+  "materialSources": [
+    {"title":"Poly Haven — Blue Metal Plate by Rob Tuytel","url":"https://polyhaven.com/a/blue_metal_plate","license":"CC0-1.0","usedFor":"Unmodified OpenGL normal and packed occlusion/roughness/metalness maps; color is original neutral naval paint, not the source blue diffuse image."},
+    {"title":"Original naval painted steel","file":"assets/models/textures/naval-paint/source.json","usedFor":"Original neutral paint albedo. Plate weathering is illustrative and is not a measured EC2-S-C1 plating map."}
+  ],
+  "type": "AK",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse; loaded waterline Y=0",
+  "dimensions": {"length": 134.5692, "beam": 17.34185, "draft": 7.70255},
+  "geometrySource": "Original surface and fitting reconstruction from HAER VA-132. No legacy voxel geometry, cube smoothing or downloaded third-party mesh is used.",
+  "accuracy": "Major proportions and equipment stations follow the cited plans. Hull offsets are manually approximated from scanned lines, not a certified offsets table. Small fitting dimensions, weathering, plating joints and boat interiors are inferred. This candidate is an unarmed cargo exterior, omitting armed-guard guns, radar, gun tubs and later pipe/cable equipment. Visual dimensions do not define convoy GRT, armament, crew or economy. This is not a reconstruction of every national merchant in 1922 or 1936. Exterior only.",
+  "license": "Original WNT1922 geometry and paint albedo remain under the project owner's LICENSE.md; no public reuse license is granted. Independently licensed Poly Haven maps remain CC0-1.0. Government reference drawings are not embedded as textures.",
+  "sources": [
+    {"title": "MARAD / National Park Service HAER VA-132 — Arthur M. Huddell", "url": "https://vesselhistory.marad.dot.gov/documents/Arthur_M._Huddell_HAER_Report.pdf", "usedFor": "PDF pages 2, 7–8: dimensions and equipment. Pages 28–29: profile and superstructure; 35–36: rigging; 44: hull lines. Sheets trace original Maritime Administration drawings; they were not field-verified."},
+    {"title": "Library of Congress HAER VA-132 catalog and rights advisory", "url": "https://www.loc.gov/pictures/item/va2040/", "usedFor": "Survey identity. No known restrictions on U.S. government images; separately copied materials may be restricted. No reference raster is reproduced in this model."},
+    {"title": "National Park Service — Ships from the Home Front", "url": "https://www.nps.gov/rori/learn/historyculture/ships-from-the-home-front.htm", "usedFor": "Independent confirmation of overall length and Liberty cargo-ship context."}
+  ],
+  "stationColumns": ["stern=-1, bow=1", "deck half breadth / molded half beam", "underbody fullness", "deck edge height above loaded waterline"],
+  "hullStations": [
+    [-1,0.001,0.003,5.05],[-0.98,0.185,0.045,4.95],[-0.95,0.37,0.15,4.82],[-0.9,0.565,0.37,4.62],
+    [-0.85,0.695,0.56,4.43],[-0.8,0.79,0.7,4.27],[-0.7,0.915,0.89,4.02],[-0.6,0.975,0.98,3.86],
+    [-0.45,0.998,1,3.68],[-0.2,1,1,3.55],[0,1,1,3.53],[0.2,0.998,1,3.58],[0.4,0.976,0.97,3.73],
+    [0.55,0.914,0.88,4.0],[0.65,0.805,0.74,4.28],[0.75,0.65,0.57,4.66],[0.85,0.436,0.36,5.2],
+    [0.92,0.241,0.17,5.75],[0.97,0.094,0.055,6.2],[1,0.001,0.001,6.49]
+  ],
+  "cargoHatches": [
+    {"number":1,"x":49.15,"length":11.27,"beam":6.4},
+    {"number":2,"x":28.57,"length":11.27,"beam":6.4},
+    {"number":3,"x":10.75,"length":7.32,"beam":6.4},
+    {"number":4,"x":-22.91,"length":11.27,"beam":6.4},
+    {"number":5,"x":-42.72,"length":11.27,"beam":6.4}
+  ],
+  "cargoMasts": [
+    {"x":39.32,"top":24.3,"booms":[{"direction":1,"length":16.764},{"direction":-1,"length":16.764}]},
+    {"x":17.5,"top":27.1,"booms":[{"direction":-1,"length":14.3256}]},
+    {"x":-32.86,"top":24.15,"booms":[{"direction":1,"length":16.764},{"direction":-1,"length":16.764}]}
+  ],
+  "materials": {
+    "paint":{"color":[0.235,0.265,0.26,1],"metallic":0,"roughness":0.9,"baseColorTexture":"naval-paint","normalTexture":"paint-normal","metallicRoughnessTexture":"paint-orm","normalScale":0.4},
+    "house":{"color":[0.315,0.335,0.32,1],"metallic":0,"roughness":0.85,"baseColorTexture":"naval-paint","normalTexture":"paint-normal","metallicRoughnessTexture":"paint-orm","normalScale":0.3},
+    "deck":{"color":[0.105,0.132,0.129,1],"metallic":0,"roughness":1,"baseColorTexture":"naval-paint","normalTexture":"paint-normal","metallicRoughnessTexture":"paint-orm","normalScale":0.35},
+    "antifouling":{"color":[0.225,0.042,0.031,1],"metallic":0.015,"roughness":0.84},
+    "boot":{"color":[0.017,0.021,0.019,1],"metallic":0.015,"roughness":0.79},
+    "steel":{"color":[0.047,0.057,0.052,1],"metallic":0.72,"roughness":0.5},
+    "canvas":{"color":[0.23,0.245,0.17,1],"metallic":0,"roughness":0.96},
+    "rope":{"color":[0.245,0.178,0.091,1],"metallic":0,"roughness":0.95},
+    "wood":{"color":[0.18,0.11,0.055,1],"metallic":0,"roughness":0.83},
+    "glass":{"color":[0.022,0.042,0.043,1],"metallic":0.18,"roughness":0.15},
+    "brass":{"color":[0.28,0.17,0.043,1],"metallic":0.92,"roughness":0.4},
+    "lamp":{"color":[0.59,0.48,0.29,1],"metallic":0.06,"roughness":0.27},
+    "rust":{"color":[0.135,0.056,0.018,1],"metallic":0,"roughness":0.98}
+  }
+}

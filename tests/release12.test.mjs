@@ -19,7 +19,7 @@ import {
   campaignMinutes,
   setCampaignMinutes,
 } from "../mechanics/campaign-clock.mjs";
-import { visualMinute, visualFleet } from "../ui/map-motion.mjs";
+import { observedNavigation, sampleObservedNavigation } from "../ui/unreal-scene-packet.mjs";
 import {
   productionBlock,
   aircraftBlock,
@@ -44,23 +44,27 @@ test("contact alerts follow current war status without erasing peacetime chart i
   assert.equal(contactAlerts(s).length, 0);
   assert.deepEqual(visibleContacts(s)[0].position, [130, 5]);
 });
-test("visual motion interpolates received minutes, stops under load and snaps correctly on pause", () => {
+test("native motion interpolates only received positions and snaps correctly on pause", () => {
   const base = { day: 10, fraction: 0, paused: false },
     later = { ...base };
   setCampaignMinutes(later, campaignMinutes(base) + 100);
-  const a = { state: base, at: 1000 },
-    b = { state: later, at: 1350 };
-  assert.equal(visualMinute(a, b, 1350), 14400);
-  assert.equal(visualMinute(a, b, 1525), 14450);
-  assert.equal(visualMinute(a, b, 2500), 14500);
-  assert.equal(visualMinute(a, b, 1300), 14400);
+  const fleet = {id:'own',route:[[140,25],[150,25]],departAt:14000,arriveAt:16000,speed:20};
+  const row = {fleet,sceneScope:'own',scenePaused:false,sceneMinute:14500};
+  const prior = {...row,sceneMinute:14400};
+  const force = {navigation:observedNavigation(later,row,prior),position:fleetPosition(later,fleet),moving:true};
+  for (const [at,expected] of [[14400,14400],[14450,14450],[16000,14500],[13000,14400]]) {
+    const point = sampleObservedNavigation(force,at).position;
+    const truth = fleetPosition(later,fleet,expected);
+    assert(point.every((value,i)=>Math.abs(value-truth[i])<1e-8));
+  }
   later.paused = true;
-  assert.equal(visualMinute(a, b, 1350), 14500);
+  assert.equal(observedNavigation(later,row,prior).fromAt,14500);
+  assert.deepEqual(observedNavigation(later,row,prior).segments,[]);
   later.paused = false;
-  base.paused = true;
-  assert.equal(visualMinute(a, b, 1350), 14500);
+  prior.scenePaused = true;
+  assert.equal(observedNavigation(later,row,prior).fromAt,14500);
 });
-test("visual route transitions use the actual prior route and do not expose enemy movement", () => {
+test("native route transitions use the actual prior route only until a new order departs", () => {
   const prior = {
       id: "own",
       route: [
@@ -79,12 +83,18 @@ test("visual route transitions use the actual prior route and do not expose enem
       ],
       departAt: 400,
     },
-    a = { forces: new Map([["own", prior]]) },
-    b = { forces: new Map([["own", next]]) };
-  assert.equal(visualFleet(a, b, "own", 399), prior);
-  assert.equal(visualFleet(a, b, "own", 400), next);
-  assert.equal(visualFleet(a, b, "enemy", 400), null);
-  assert.equal(visualFleet(a, { forces: new Map() }, "own", 400), null);
+    state = {day:0,paused:false};
+  setCampaignMinutes(state,500);
+  const oldRow = {fleet:prior,sceneScope:'own',sceneMinute:300,scenePaused:false};
+  const row = {fleet:next,sceneScope:'own',sceneMinute:500,scenePaused:false};
+  const navigation = observedNavigation(state,row,oldRow);
+  assert.equal(navigation.segments.length,2);
+  assert.equal(navigation.segments[0].toAt,400);
+  assert.deepEqual(navigation.segments[0].from,fleetPosition(state,prior,300));
+  assert.deepEqual(navigation.segments[1].from,fleetPosition(state,next,400));
+  assert.deepEqual(navigation.segments[1].to,fleetPosition(state,next,500));
+  assert.deepEqual(observedNavigation(state,row,{...oldRow,sceneScope:'foreign'}).segments,[]);
+  assert.deepEqual(observedNavigation(state,row,null).segments,[]);
 });
 test("future catalog countdowns never authorize purchases or silently fund qualification", () => {
   const s = newGame(bundle, "USA", 12, "in_good_faith_1936"),

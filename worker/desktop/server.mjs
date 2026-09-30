@@ -15,7 +15,6 @@ export async function createGameServer({
   saveDir = path.join(root, ".build", "saves"),
   publicDirectory = publicDir,
   recognitionDirectory = null,
-  voxelDirectory = null,
 } = {}) {
   const publicRoot = await fs.realpath(publicDirectory);
   // Only explicitly supplied artwork data trees may come from the live repo.
@@ -23,8 +22,6 @@ export async function createGameServer({
   const recognitionRoot = recognitionDirectory ? await fs.realpath(recognitionDirectory) : null;
   if (recognitionRoot && !(await fs.stat(recognitionRoot)).isDirectory())
     throw Error("Recognition root must be a directory.");
-  const voxelRoot = voxelDirectory ? await fs.realpath(voxelDirectory) : null;
-  if (voxelRoot && !(await fs.stat(voxelRoot)).isDirectory()) throw Error('Voxel root must be a directory.');
   const catalog = CATALOG;
   let saveQueue = Promise.resolve();
   const server = http.createServer(async (req, res) => {
@@ -188,8 +185,8 @@ export async function createGameServer({
           name === "package.json" ||
           /^(ui|mechanics|worker|catalog|assets)\/[\w./-]+\.(?:mjs|css|html|json|md|mp3)$/.test(
             name,
-          ) || /^assets\/recognition\/[\w/-]+\.(?:png|jpe?g|svg)$/.test(name)
-          || /^ui\/vendor\/three\/three\.(?:module|core)\.js$/.test(name)
+          ) || /^assets\/recognition\/[\w/-]+\.(?:png|jpe?g|svg)$/.test(name) ||
+          /^assets\/models\/ships\/[\w/-]+\.glb$/.test(name)
         ) ||
         name.includes("..") ||
         name.startsWith("worker/desktop/")
@@ -199,13 +196,11 @@ export async function createGameServer({
         return;
       }
       const liveRecognition = recognitionRoot && name.startsWith("assets/recognition/");
-      const liveVoxel = voxelRoot && name.startsWith('assets/voxels/');
       if (liveRecognition && !/\.(?:json|md|png|jpe?g|svg)$/.test(name)) {
         res.writeHead(404); res.end("Not found"); return;
       }
-      if (liveVoxel && !/\.(?:json|md)$/.test(name)) { res.writeHead(404); res.end('Not found'); return; }
-      const fileRoot = liveRecognition ? recognitionRoot : liveVoxel ? voxelRoot : publicRoot;
-      const localName = liveRecognition ? name.slice('assets/recognition/'.length) : liveVoxel ? name.slice('assets/voxels/'.length) : name;
+      const fileRoot = liveRecognition ? recognitionRoot : publicRoot;
+      const localName = liveRecognition ? name.slice('assets/recognition/'.length) : name;
       const file = await fs.realpath(path.join(fileRoot, localName));
       const relative = path.relative(fileRoot, file);
       if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) {
@@ -228,6 +223,7 @@ export async function createGameServer({
           jpg: "image/jpeg",
           jpeg: "image/jpeg",
           svg: "image/svg+xml",
+          glb: "model/gltf-binary",
         }[name.split(".").pop()],
       );
       res.end(req.method === "HEAD" ? undefined : body);

@@ -42,8 +42,13 @@ test('historical demo identities, official sources and selected model limitation
     assert(battle.scope.length > 70 && battle.history.length > 70);
     for (const ship of [...battle.shipsA,...battle.shipsB]) {
       assert(ship.modelNote.length > 50);
-      if (ship.classId.startsWith('demo-')) assert.match(ship.modelNote,/Representative.*not yet modeled/);
-      if (['akagi','kaga'].includes(ship.id)) assert.match(ship.modelNote,/earlier.*not her 1942 configuration/);
+      if (ship.classId === 'demo-bismarck') assert.match(ship.modelNote,/everlasting17th.*CC BY 4.0.*approximate/);
+      else {
+        assert.match(ship.modelNote,/3D artwork pending/);
+        assert.match(ship.modelNote,/navigation symbol/);
+        assert.doesNotMatch(ship.modelNote,/representative|silhouette|earlier.*fit.*used/i);
+      }
+      if (['akagi','kaga'].includes(ship.id)) assert.match(ship.modelNote,/1942 carrier fit is not displayed/);
     }
   }
 });
@@ -57,7 +62,7 @@ test('scripted reports are independent and every displayed hull remains inspecta
       const units = battleInstances(frame,report.startedAt);
       assert.equal(units.length,expectedHulls);
       assert.equal(new Set(units.map(u => u.key)).size,expectedHulls);
-      assert(units.every(u => u.count === 1 && u.point.every(Number.isFinite) && u.health >= 0 && u.health <= 1));
+      assert(units.every(u => u.count === 1 && u.positionMetres.length === 3 && u.positionMetres.every(Number.isFinite) && u.health >= 0 && u.health <= 1));
       assert(units.every(u => Boolean(u.sunkHull) === (u.health === 0)));
     }
     assert(battleInstances(report.replay.frames.at(-1),report.startedAt).some(u => u.sunkHull));

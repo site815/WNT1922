@@ -16,6 +16,7 @@ import {
 import { merchantEconomy } from "../mechanics/merchant-economy.mjs";
 import { fleetPosition, sinkMerchants } from "../mechanics/task-forces.mjs";
 import { commandView } from "../ui/command-view.mjs";
+import { buildUnrealScenePacket } from "../ui/unreal-scene-packet.mjs";
 import { diplomacyView as governmentView } from "../ui/diplomacy-view.mjs";
 import { distanceNm } from "../mechanics/world.mjs";
 import { resourceHover } from "../ui/resource-breakdown.mjs";
@@ -26,7 +27,7 @@ const start = (id = "JPN", campaign = "in_good_faith_1936") => {
   return [s, contentFor(bundle, s), s.nations[id]];
 };
 
-test("every naval command appears in one scrolling list with stable marker offsets", () => {
+test("every naval command appears in one scrolling list with stable native positions", () => {
   const [s, c, n] = start();
   let html = commandView(s, c, { fleetPage: 999 });
   for (const f of n.fleets)
@@ -34,31 +35,15 @@ test("every naval command appears in one scrolling list with stable marker offse
       html.includes('data-action="focus-fleet" data-id="' + f.id + '"'),
     );
   assert.ok(!html.includes('data-action="list-page"'));
-  const marker = (html, id) => {
-    const match = html.match(
-      new RegExp(
-        'data-id="' +
-          id +
-          '" data-fleet-hover[^>]+data-motion-x="([^"]+)" data-motion-y="([^"]+)"[^>]*>[\\s\\S]*?<path transform="translate\\(([^,]+),([^\\)]+)',
-      ),
-    );
-    return (
-      match && [
-        Number(match[3]) - Number(match[1]),
-        Number(match[4]) - Number(match[2]),
-      ]
-    );
-  };
+  const marker = id => buildUnrealScenePacket(s,c).forces.find(force => force.id === id);
   const fleet = n.fleets.at(-1),
-    before = marker(html, fleet.id);
+    before = marker(fleet.id);
   assert.ok(before);
+  assert.deepEqual(before.position, fleetPosition(s,fleet));
   n.fleets.reverse();
   html = commandView(s, c);
-  const after = marker(html, fleet.id);
-  assert.ok(
-    before.every((v, i) => Math.abs(v - after[i]) < 1e-8),
-    "draw order cannot relocate the marker",
-  );
+  const after = marker(fleet.id);
+  assert.deepEqual(after, before, "list order cannot relocate a native formation");
 });
 test("peace fleet and convoy positions remain continuous across daily planning in both campaigns", () => {
   for (const campaign of Object.keys(bundle.campaigns)) {

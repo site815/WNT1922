@@ -1,6 +1,6 @@
 # WNT1922 third-party notices
 
-Asset review: 2026-09-21. These terms apply to the named third-party material independently of the game's own license. No endorsement by the contributors is implied.
+Asset review: 2026-09-30. These terms apply to the named third-party material independently of the game's own license. No endorsement by the contributors is implied. The [in-game notices](third-party-notices.html) contain the native renderer, detailed ship artwork, Poly Haven and NASA credits; source records beside those assets retain hashes, licenses and modification details.
 
 ## Map
 
@@ -14,7 +14,11 @@ All recordings are by **Kevin MacLeod (incompetech.com)**, licensed under [Creat
 
 The music may be shared and adapted commercially under CC BY 4.0. Retain attribution, the license link and any modification notice. The game license does not restrict rights granted for these recordings. [Composer's licensing page](https://incompetech.com/music/royalty-free/licenses/).
 
-## Windows runtime
+## Native Windows runtime
+
+The current native build uses Unreal Engine, its CEF browser component and a separately bundled Node.js runtime. Preserve `GameData/Licenses/UnrealThirdParty`, `GameData/Licenses/glTFRuntime-LICENSE.txt` and the complete Node distribution license at `GameData/Runtime/LICENSE.txt`. The Node version is recorded beside that license; the engine version and per-file hashes are in `package-manifest.json`. glTFRuntime is MIT-licensed, copyright Roberto De Ioris. Its pinned source and full MIT notice are retained in the repository and in-game notices. Unreal Engine is a trademark or registered trademark of Epic Games, Inc. Unreal Engine, Copyright 1998–2026, Epic Games, Inc. All rights reserved.
+
+## Earlier Electron releases
 
 The Windows download includes unmodified **Electron 44.3.0**, except for renaming the executable and adding the game. Electron is MIT-licensed; its bundled Chromium, Node.js and other components have separate notices. Preserve **LICENSE** and **LICENSES.chromium.html** in the executable folder, along with all required runtime files. [Exact runtime release and source](https://github.com/electron/electron/releases/tag/v44.3.0) · [Electron source license](https://github.com/electron/electron/blob/v44.3.0/LICENSE). The runtime archive is pinned by publisher SHA-256 in worker/desktop/runtime-lock.json. Exact FFmpeg and Electron source archives, build instructions and component revisions are included in the application’s assets/licenses/runtime-sources; preserve that directory with the binary. The LGPL library remains replaceable; the game license does not restrict modification or reverse engineering required to exercise its license rights.
 

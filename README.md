@@ -2,71 +2,62 @@
 
 A naval strategy sandbox with The Treaty System (1922) and In Good Faith (1936), each with seven playable nations.
 
-## Current version
+## Native Unreal development
 
-This repository contains the game source and required assets. Portable executable builds are distributed through GitHub Releases.
+The current working tree uses **Unreal Engine 5.8** for the world, water, ships, lighting, camera, picking and battles. The map is a north-oriented, wrapping Equal Earth projection with longitude and latitude lines. The transparent CEF interface retains the existing campaign menus and simulation. There is no browser graphics fallback: opening the web page directs you to the native game.
 
-Open the [latest release](https://github.com/site815/WNT1922/releases/latest) or [release index](https://github.com/site815/WNT1922/releases). See [release notes](RELEASES.md) for the current version.
+The voxel renderer, cuboid ship renderer and Three.js globe have been retired. The visual target is realistic naval presentation: historically grounded hulls and equipment, detailed geometry, physically based materials, photographic terrain surfaces and HDR lighting. This is a tested Development preview of the migration; **realistic fleet coverage remains unfinished**. Five detailed GLBs are registered. The 179 earlier JSON recognition meshes remain as migration/reference data and are **not used as live 3D ship assets**. Unfinished classes appear as individually selectable amber ? navigation symbols at their hull positions; red ! symbols identify model loading errors. Ports also use navigation symbols while their scenery is unfinished.
 
-Version 0.38.0 uses a true 3D globe with a continuous perspective camera from the strategic world down to individual ships. Three.js r180 and all rendering assets are included locally; WebGL2 rendering makes no internet requests. The compact header keeps alerts beside the date, and each ministry panel has a top-right **×** to return to the Command Map.
+The stable release remains [v0.38.0](https://github.com/site815/WNT1922/releases/tag/v0.38.0). The native development version is `0.39.0-dev`; its current build and verification evidence is recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md). Native previews are labeled prereleases and do not replace the stable download.
 
-Scroll to zoom, left-drag to turn the globe, and right-drag or Shift-drag to orbit and tilt the camera. **Home** restores the world overview; **Page Up / Page Down** zoom. Ship meshes appear at 2,048×, and double-clicking a fleet or convoy focuses its formation at at least 4,096×. Zoom reaches 65,536×; the current value appears in the lower map legend. The globe has no separate atlas control bar.
+## Play and test locally
 
-The 181 prebuilt models in `assets/voxels/ships/` cover every catalog class and starting legacy fleet, generic custom designs, and a representative merchant freighter. The world and battle viewer share actual 3D cuboid geometry from these editable files. At close zoom, each surviving hull in your active merchant convoys appears alongside your naval ships and can be clicked. Enemy contacts remain intelligence reports. Review formations are illustrative and placed seaward where needed, with leaders marking their true strategic positions; these visual offsets do not change routes, combat or supply. Merchant GRT remains an aggregate registered-volume measure, not a claim about an individual model's dimensions or equipment.
+Use the single working folder on the Desktop, `WNT1922`.
 
-The opening screen combines compact navy selection with cycling, interactive WWII battle demonstrations using the same 3D ship renderer. Demonstrations are scripted illustrations with representative models where needed; they do not run or alter a campaign. Their history and model notes identify the sources and configuration limits.
+1. Double-click **Test-Unreal.cmd** (or **Play-WNT1922.cmd**) to run the current native game.
+   Choose **3D ship gallery** on the opening screen to inspect the detailed models, orbit them, and read their art credits.
+2. After editing C++, run **Test-Unreal.cmd -BuildFirst** to compile, prepare materials and run native tests before launching.
+3. **Build.cmd** runs the native build and tests. `tools/Build-Unreal.ps1 -Package` additionally cooks and stages a Windows distribution.
 
-Decisive actions raise an optional **Watch battle** alert. Opening the 3D viewer pauses the campaign; **Next tick** advances the whole world by exactly 15 minutes and pauses again. Earlier recorded frames replay without changing the campaign. Scroll to zoom, left-drag to pan, right-drag or Shift-drag to orbit, and click a ship to inspect it. Ships show their recorded group condition and actual losses; formation spacing and impact animation are illustrative. Minor encounters retain all combat effects in a monthly background attrition ledger. [Battle rules](catalog/common/rules/battle-stages.md) define the capital, air-strike and large-surface-action thresholds. Existing compatible saves continue; older battles without recorded frames remain summary reports.
+Test campaigns are stored in `.build/native-test/saves`, separate from existing released-game saves. Each launch has a dated log folder. `Test-Unreal.cmd -Automation` creates a fresh disposable profile and runs the native interaction driver; normal testing does not enable its browser debug port. See [native build instructions](unreal/BUILDING.md).
 
-## Edit and build
+Scroll to zoom from the world to individual hulls, drag to pan, and right-drag or Shift-drag to tilt. Home returns to the strategic view; Page Up / Page Down zoom. Fleets stay at authoritative campaign route positions with stable metre-based formation stations. The campaign does not record individual tactical tracks or exact harbor berths, so formation stations are representative. Own naval hulls and active merchant convoys are selectable; unseen enemy ships are not exposed.
 
-1. Edit the relevant source files below.
-2. Double-click **Build.cmd**. It validates the catalogs and assets, then creates the portable EXE and its SHA-256 checksum in `.build/releases/`.
-3. Run **Play-WNT1922.cmd** to test it.
+Decisive actions raise an optional **Watch battle** alert. Watching pauses the campaign. **Next tick** advances the entire simulation by 15 minutes and pauses again; earlier recorded frames replay without changing state. Minor encounters retain their effects in background attrition. The opening battle demonstrations are labelled scripted illustrations. [Battle rules](catalog/common/rules/battle-stages.md) define the thresholds.
 
-The portable build includes its browser engine, simulation, catalogs, maps, music and required notices. Playing requires no installation, separate browser, Node.js or internet connection. Saves are written to `%APPDATA%\WNT1922\saves`. New releases may require a new campaign. The executable is currently unsigned. Windows Smart App Control can block an unsigned build under its signing policy; JavaScript changes cannot guarantee acceptance. See [Microsoft's signing guidance](https://learn.microsoft.com/en-us/windows/apps/develop/smart-app-control/code-signing-for-smart-app-control).
+## Assets and authoring
 
-Building requires Windows and Node.js 24 or later. The first build downloads pinned, checksum-verified Electron and NSIS tools. Subsequent builds reuse `.build/cache/`. There is no npm install step, transpiler, generated game database, browser copy, installer target or documentation exporter.
+- [Ship models](assets/models/README.md) live in `assets/models/ships`. Detailed GLB files retain scene geometry, UVs and physically based materials and are loaded directly at runtime. Replacing a model does not require compiling the game.
+- [Terrain data](assets/terrain/README.md) supplies geographical relief.
+- [Photographic materials](assets/materials/README.md) combine NASA Blue Marble September 2004 geographic color with local CC0 surface detail and HDR sky lighting. The modern land-cover image is background geography, not interwar or harbor reconstruction; sources, licenses and hashes are recorded beside the files.
+- [Recognition artwork](assets/recognition/README.md) remains available for the historical catalog, panels and hovers. These reference drawings are distinct from the full 3D game models.
 
-For a mechanics change, run the regression suite before distributing:
+The native runtime makes no online asset requests. Models, textures, catalog data and the simulation ship with the game. The MIT-licensed glTFRuntime dependency is pinned under `unreal/Plugins/glTFRuntime`; it loads editable external model files. Attribution is available in the game and [asset notices](assets/licenses/third-party-notices.html).
+
+## Verification and distribution
 
 ```powershell
+node tools/check.mjs
+node tools/check-models.mjs
+node tools/audit-assets.mjs
 node --test --test-isolation=none --test-skip-pattern="all selectable countries|multi-year campaign" tests/*.test.mjs
+.\tools\Build-Unreal.ps1
 ```
 
-The two additional long-campaign tests can be run by omitting the skip pattern. `node tools/playthrough.mjs campaign_1922` and `node tools/playthrough.mjs in_good_faith_1936` exercise all seven AI navies through 1950, checking saves and fleet/inventory references every month; append `--resume` to continue a checkpoint. `node tools/check.mjs` checks every live catalog and all 14 opening states. `node tools/check-portable.mjs` tests the packaged executable when the optional Playwright test driver is available; that driver is not shipped.
+Native GPU and interaction checks use `tools/verify-unreal-runtime.mjs` against an explicitly launched Unreal automation instance. The HUD-only smoke test does not verify Unreal rendering. Long campaign checks are available through `tools/playthrough.mjs` for both campaigns.
 
-## Continue on another computer
-
-Install Git and Node.js 24 or later, then clone this repository:
-
-```powershell
-git clone https://github.com/site815/WNT1922.git
-cd WNT1922
-.\Build.cmd
-.\Play-WNT1922.cmd
-```
-
-All source, catalogs, required assets, license notices, build tools and recognition artwork are tracked here. Build caches regenerate automatically; they are not needed from the previous computer. Test execution additionally needs the optional Playwright driver described in the test tool. Saved campaigns are machine-local under `%APPDATA%\WNT1922\saves` and are not uploaded to this public repository.
-
-The [recognition artwork guide](assets/recognition/README.md) and [voxel model guide](assets/voxels/README.md) explain direct file editing, historical references and geometry checks. The repository launcher reads `assets/recognition/` and `assets/voxels/` directly. After editing a model, reopen the game to read it without conversion or a game rebuild. Standalone release executables contain their own bundled copies. `node tools/check-voxels.mjs` validates models; `node tools/check-scene-ui.mjs` runs the current 3D globe integration checks through `tools/check-globe-ui.mjs` in an optional Playwright/Edge test browser.
+Native portable archive filenames retain their version, for example `WNT1922-v0.39.0-dev-Unreal-Windows.zip`. A release requires cooking, package testing and visual verification. Building never pushes source or publishes a release. `.build/`, `test-output/`, Unreal binaries and caches are disposable local output excluded from Git.
 
 ## Source layout
 
-| Folder | Owns |
+| Folder | Responsibility |
 | --- | --- |
-| [ui](ui/README.md) | Screens, controls, hovers, 3D globe and ship meshes, battle viewer, audio and styles |
-| [catalog](catalog/README.md) | Editable Markdown data: common rules/catalogs, 1922, 1936 hindsight |
-| [mechanics](mechanics/README.md) | Shared calculations, simulation systems, legal actions and AI policy |
-| [worker](worker/README.md) | Catalog/asset loading, simulation scheduling, snapshots, portable desktop host |
-| assets | Maps, prebuilt voxel ships, recognition drawings, soundtrack, provenance and licenses |
-| tests | Regression and architecture checks |
-| tools | Validation and the single portable build pipeline |
+| [unreal](unreal/BUILDING.md) | Native world, ships, water, camera, rendering and input bridge |
+| [ui](ui/README.md) | Campaign menus, panels, hovers, native scene input and audio |
+| [catalog](catalog/README.md) | Editable runtime campaign definitions and rules |
+| [mechanics](mechanics/README.md) | Simulation, calculations, actions and AI |
+| [worker](worker/README.md) | Local catalog loading, simulation scheduling and saves |
+| assets | 3D models, terrain, textures, historical drawings, music and provenance |
+| tests / tools | Regression checks, asset validation and native build tools |
 
-`.build/` and `test-output/` are disposable local output, excluded from Git. Executables and checksums are distributed only as Release assets. There is no maintained `dist` folder. Git synchronization and release publication are manual. Building never publishes or pushes anything.
-
-To publish when requested, after testing: commit and manually push the source, then run `tools/Publish-Release.ps1`. It uses the existing GitHub sign-in, uploads the EXE and checksum to a draft Release, verifies their hashes, then publishes it. Builds and their metadata remain local until that explicit publication step.
-
-Catalog documents are **the runtime data**, not a description of a separate database. Displayed names and blurbs belong in their data fields. Dynamic orders, damage, resources and player-created designs belong to campaign saves. See [catalog editing](catalog/README.md).
-
-Third-party attribution is available in the game and in [the asset notices](assets/licenses/third-party-notices.html).
+Catalog documents are the runtime data, not a separate generated database. Saved campaigns remain local and are not uploaded to the repository. Install Unreal Engine 5.8, Visual Studio C++ tools, a Windows SDK and Node 24 to continue development on another computer, then follow the native build instructions.

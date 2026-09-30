@@ -1,0 +1,281 @@
+{
+  "id": "samidare-everlasting17th",
+  "name": "Samidare — everlasting17th reconstruction",
+  "type": "DD",
+  "year": 1937,
+  "file": "historical/samidare-everlasting17th.glb",
+  "cacheName": "samidare",
+  "length": 110,
+  "hullNames": [
+    "Object001_hull_0"
+  ],
+  "bowPositive": true,
+  "sourceWaterline": 0,
+  "historicalDimensions": {
+    "lengthOverall": 110,
+    "lengthWaterline": 107.5,
+    "beam": 9.9,
+    "draft": 3.5
+  },
+  "sourceUrl": "https://sketchfab.com/3d-models/samidare-destroyer-b37939147c854e61857f5b248f9efd29",
+  "downloadUrl": "https://huggingface.co/datasets/allenai/objaverse/resolve/main/glbs/000-152/b37939147c854e61857f5b248f9efd29.glb",
+  "sourceSha256": "b5f77c0b2b87beef1061075a08a722e01cf9f0f7712017fa369524989b152788",
+  "sources": [
+    {
+      "title": "Samidare destroyer",
+      "url": "https://sketchfab.com/3d-models/samidare-destroyer-b37939147c854e61857f5b248f9efd29",
+      "author": "everlasting17th",
+      "license": "CC-BY-4.0",
+      "usedFor": "Original complete geometry, UVs, normals and all embedded PBR textures"
+    },
+    {
+      "title": "Shiratsuyu class technical data, Navypedia",
+      "url": "https://www.navypedia.org/ships/japan/jap_dd_shiratsuyu.htm",
+      "usedFor": "Distinguishes 110 m overall hull length from 107.5 m waterline length; 9.9 m beam and 3.5 m draft reference."
+    }
+  ],
+  "accuracy": "Detailed artist reconstruction of Samidare, a Shiratsuyu-class destroyer, not surveyed engineering geometry. Source hull is uniformly scaled to 110 m overall, preserving artist proportions and paint waterline; fittings can extend beyond the hull length and historical beam. The exact armament/refit date must be checked visually before campaign use. This vessel is not a Fubuki or Hatsuharu substitute. Native visual review is required before campaign activation.",
+  "kind": "detailed-ship",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "author": "everlasting17th",
+  "authorUrl": "https://sketchfab.com/everlastinggrey",
+  "sourceAttribution": {
+    "author": "everlasting17th (https://sketchfab.com/everlastinggrey)",
+    "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "source": "https://sketchfab.com/3d-models/samidare-destroyer-b37939147c854e61857f5b248f9efd29",
+    "title": "Samidare destroyer"
+  },
+  "sourceRevision": "Pinned public Objaverse snapshot; may differ from the current Sketchfab revision",
+  "geometrySource": "Artist-authored licensed asset; no voxel or generated recognition geometry",
+  "modifications": "WNT1922 baked static node hierarchy and metre scale, centered the hull, oriented bow +X and up +Y, merged primitives by material without mesh simplification, retained every embedded image byte and all artist UVs, assigned unused planar UVs to untextured rigging, normalized vertex normals, removed Float32-degenerate faces and orientation-unstable microscopic slivers, and repaired normals-disagreeing winding. Native centimetre/int16 precision is checked explicitly; only unstable slivers within eight coordinate ULPs can be discarded. Counts below identify these repairs.",
+  "normalization": {
+    "sourceBounds": {
+      "min": [
+        -78.68636499978129,
+        -4.931095686443998,
+        -7.287627902393864
+      ],
+      "max": [
+        66.65475423085536,
+        26.560827820915165,
+        7.287628428226527
+      ]
+    },
+    "sourceHullBounds": {
+      "min": [
+        -77.57239902417132,
+        -3.844915760304957,
+        -6.7557465883255645
+      ],
+      "max": [
+        66.22362192879609,
+        6.566689239233369,
+        6.755746588325565
+      ]
+    },
+    "uniformScale": 0.7649724886057775,
+    "sourceCenterX": -5.674388547687613,
+    "sourceCenterZ": 4.440892098500626e-16,
+    "sourceWaterline": 0,
+    "yRotationDegrees": 0,
+    "removedDegenerateTriangles": 4,
+    "windingRepairs": 189,
+    "nativePrecision": {
+      "removedCollapsedTriangles": 6,
+      "removedOrientationUnstableSlivers": 14,
+      "maxUnstableAreaCm2": 0.0007566077108879049,
+      "maxUnstableAltitudeMicrometres": 1.6375952389245414,
+      "maxUnstableAltitudeUlps": 0.6707590098634921,
+      "normalFormat": "FPackedRGBA16N",
+      "positions": "Float32 centimetres",
+      "rule": "Drop only collapsed faces or winding-unstable slivers whose altitude is at most eight Float32 position ULPs; robust source winding is corrected, not discarded."
+    }
+  },
+  "sha256": "4c9c45f5a4307a33619c5f12aca8ce9de96c6617be7d1f00bcde89112bc02eb2",
+  "statistics": {
+    "id": "samidare-everlasting17th",
+    "triangles": 140175,
+    "vertices": 174058,
+    "materials": 11,
+    "embeddedTextures": 23,
+    "bytes": 17763912,
+    "bounds": {
+      "min": [
+        -55.85215377807617,
+        -3.7721524238586426,
+        -5.574834823608398
+      ],
+      "max": [
+        55.329803466796875,
+        20.318302154541016,
+        5.574835300445557
+      ]
+    }
+  },
+  "embeddedImages": [
+    {
+      "index": 0,
+      "mimeType": "image/png",
+      "bytes": 348867,
+      "sha256": "9d48726f792be8a0efacef1485f505fbbdd08df19824551a45b8fc573aa749b3",
+      "origin": "Unmodified embedded image 0 from pinned artist source GLB"
+    },
+    {
+      "index": 1,
+      "mimeType": "image/png",
+      "bytes": 174318,
+      "sha256": "ccd30abfc119b0f8e46fe83070f7f0311a79618bdec718e88b99b2d77afafb21",
+      "origin": "Unmodified embedded image 1 from pinned artist source GLB"
+    },
+    {
+      "index": 2,
+      "mimeType": "image/png",
+      "bytes": 188045,
+      "sha256": "78664d8c0bdc0c9c93b47409bd907ed3f015be4e1ca61519435a4384a6724d17",
+      "origin": "Unmodified embedded image 2 from pinned artist source GLB"
+    },
+    {
+      "index": 3,
+      "mimeType": "image/png",
+      "bytes": 455768,
+      "sha256": "0d962d7cde7f73e3ffef7bd0fd2a92ad1374aff9192ce0e0929acaa341917b0f",
+      "origin": "Unmodified embedded image 3 from pinned artist source GLB"
+    },
+    {
+      "index": 4,
+      "mimeType": "image/png",
+      "bytes": 565710,
+      "sha256": "922248f430e8c8bd7c79389934c24844c34365db3fdf7e6f52d8f7bdbeb13bcf",
+      "origin": "Unmodified embedded image 4 from pinned artist source GLB"
+    },
+    {
+      "index": 5,
+      "mimeType": "image/png",
+      "bytes": 508051,
+      "sha256": "64ca0b91d8e2c981dca8730a00e7f1bcad767e28a90928ffa250b891c9e3fefc",
+      "origin": "Unmodified embedded image 5 from pinned artist source GLB"
+    },
+    {
+      "index": 6,
+      "mimeType": "image/png",
+      "bytes": 639171,
+      "sha256": "849d24990f3e3e39ca2bac23668cffe8dc9364085c2fdf523eafe9f9370cdbf9",
+      "origin": "Unmodified embedded image 6 from pinned artist source GLB"
+    },
+    {
+      "index": 7,
+      "mimeType": "image/png",
+      "bytes": 398731,
+      "sha256": "d24a1e641fcc78a24a1c8b2812bcc802831a22b2d29bddb4d3f50dd31797c6c1",
+      "origin": "Unmodified embedded image 7 from pinned artist source GLB"
+    },
+    {
+      "index": 8,
+      "mimeType": "image/png",
+      "bytes": 681831,
+      "sha256": "e7b5a07e0c6d43f2645efbe98e58d716f2595738e928d633fbaacddfe4785627",
+      "origin": "Unmodified embedded image 8 from pinned artist source GLB"
+    },
+    {
+      "index": 9,
+      "mimeType": "image/png",
+      "bytes": 661107,
+      "sha256": "fee24999dad141249155b7eb3c596c28fb82016318e749da47148a09f9c8ca98",
+      "origin": "Unmodified embedded image 9 from pinned artist source GLB"
+    },
+    {
+      "index": 10,
+      "mimeType": "image/png",
+      "bytes": 322546,
+      "sha256": "a4e74b83799c4c05a51d70758c6db083e9b6784a721a2a571e21a646ea4946d4",
+      "origin": "Unmodified embedded image 10 from pinned artist source GLB"
+    },
+    {
+      "index": 11,
+      "mimeType": "image/png",
+      "bytes": 427926,
+      "sha256": "e4d07652f0d82cd9457947c6045badde10226ee9c2e92a10a3336a5f5f1e4577",
+      "origin": "Unmodified embedded image 11 from pinned artist source GLB"
+    },
+    {
+      "index": 12,
+      "mimeType": "image/png",
+      "bytes": 470911,
+      "sha256": "927c65fda543422ee5206423c08b777950af6ada47af26d60e73fd3a4e6fa0fc",
+      "origin": "Unmodified embedded image 12 from pinned artist source GLB"
+    },
+    {
+      "index": 13,
+      "mimeType": "image/png",
+      "bytes": 429414,
+      "sha256": "d05732ad9c5b0d49839af393a47120447b092c2aae4309e4c279dc6e1c7b5f77",
+      "origin": "Unmodified embedded image 13 from pinned artist source GLB"
+    },
+    {
+      "index": 14,
+      "mimeType": "image/png",
+      "bytes": 518428,
+      "sha256": "adcd8c601a6abccbb30310fa85c87df2824078a3b07de3fbb9b218ac44fcabde",
+      "origin": "Unmodified embedded image 14 from pinned artist source GLB"
+    },
+    {
+      "index": 15,
+      "mimeType": "image/png",
+      "bytes": 619863,
+      "sha256": "cb01248fcb280356719da6a441566c554a37709031123c0720903d11d329466d",
+      "origin": "Unmodified embedded image 15 from pinned artist source GLB"
+    },
+    {
+      "index": 16,
+      "mimeType": "image/png",
+      "bytes": 395266,
+      "sha256": "4af8767559ff9483aa1b1ddd86c547275a125d15a22f7c726b4a6f0eb796032b",
+      "origin": "Unmodified embedded image 16 from pinned artist source GLB"
+    },
+    {
+      "index": 17,
+      "mimeType": "image/png",
+      "bytes": 489456,
+      "sha256": "5c549111ebc7ac66764c13146149a0464d1dcb3b83ce3e2015afe4c68b79be14",
+      "origin": "Unmodified embedded image 17 from pinned artist source GLB"
+    },
+    {
+      "index": 18,
+      "mimeType": "image/png",
+      "bytes": 503140,
+      "sha256": "5b70bf74fb607c8f68ca9611d500f6dfb79deffdb584fb6f798e8bec382c192b",
+      "origin": "Unmodified embedded image 18 from pinned artist source GLB"
+    },
+    {
+      "index": 19,
+      "mimeType": "image/png",
+      "bytes": 134208,
+      "sha256": "f61e0a375fbc7fe2daa85f951819a8bc57c435154b4caf1ac743fb15795f20e6",
+      "origin": "Unmodified embedded image 19 from pinned artist source GLB"
+    },
+    {
+      "index": 20,
+      "mimeType": "image/png",
+      "bytes": 190638,
+      "sha256": "57c561c2169db2f8a7d56d7f5db66178fd193403c3428d6b9874a1aac691172e",
+      "origin": "Unmodified embedded image 20 from pinned artist source GLB"
+    },
+    {
+      "index": 21,
+      "mimeType": "image/png",
+      "bytes": 288764,
+      "sha256": "bcaa6a5048b5da93f29e0c17b22ccbe98d0da66b68d56789f8d7a739b9edee24",
+      "origin": "Unmodified embedded image 21 from pinned artist source GLB"
+    },
+    {
+      "index": 22,
+      "mimeType": "image/png",
+      "bytes": 111498,
+      "sha256": "03cc74aa784ea8c81dce2d79773bba826c3110b7d878734ba3a8a4ff02ec797f",
+      "origin": "Unmodified embedded image 22 from pinned artist source GLB"
+    }
+  ]
+}

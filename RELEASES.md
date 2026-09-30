@@ -2,7 +2,13 @@
 
 [Latest release](https://github.com/site815/WNT1922/releases/latest) · [Release index](https://github.com/site815/WNT1922/releases)
 
-Open the latest release and download **WNT1922-0.38.0-portable-win-x64.exe** from Assets. Portable filenames retain their version number. This is the only game distribution: one self-contained executable for Windows 10/11 x64, with the browser engine, catalogs, maps, recognition artwork, voxel models and music included. No installation or internet connection is required to play. Its SHA-256 checksum is provided alongside it. Saves remain in `%APPDATA%\WNT1922\saves`. The beta executable is unsigned.
+The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
+
+## Native migration — 0.39.0-dev
+
+This development version replaces the voxel/WebGL renderer with Unreal terrain, water, lighting, camera and ship rendering. **The realistic asset conversion is unfinished:** only five detailed GLB models are registered. Most campaign classes and all port scenery still await detailed artwork and appear as explicitly labeled navigation symbols. The 179 old JSON recognition meshes remain reference files and are not used as live ship graphics. This version must not be presented as a completed realistic fleet or a World of Warships-quality conversion.
+
+Native previews include external editable art, the campaign worker and its Node runtime. The archive name and SHA-256 checksum retain the version. Publication requires a successful native build plus visual and interaction checks of a fresh extraction of that exact archive. Development configuration previews are labeled as such. Current verification evidence and remaining work are recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md).
 
 ## Version 0.38.0 — 3D globe and ship inspection
 

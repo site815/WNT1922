@@ -15,6 +15,7 @@ import { noticeReceipt } from "../mechanics/alert-lifecycle.mjs";
 import { politicsTick } from "../mechanics/war-politics.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
 import { commandView } from "../ui/command-view.mjs";
+import { buildUnrealScenePacket } from "../ui/unreal-scene-packet.mjs";
 import { politicalPopup } from "../ui/diplomacy-popup.mjs";
 import { alertItems } from "../ui/ministry-view.mjs";
 import { NewsTicker } from "../ui/news-ticker.mjs";
@@ -32,7 +33,9 @@ test("all 14 starts put 3% of actual merchants underway and show peacetime traff
     assert.equal(t.hullsAtSea,t.targetAtSea);assert.ok(t.convoyCount>0);
     near(t.averageHulls,t.hullsAtSea/t.convoyCount);
     assert.equal(n.merchant.hulls,e.hulls);
-    assert.equal((commandView(s,c).match(/class="convoy-marker"/g)||[]).length,n.convoys.length);
+    const merchants=buildUnrealScenePacket(s,c).forces.filter(force=>force.merchant);
+    assert.equal(merchants.length,n.convoys.length);
+    assert.equal(merchants.reduce((sum,force)=>sum+force.hulls.length,0),t.hullsAtSea);
     validateSave(s,CATALOG);
   }
 });
@@ -146,10 +149,11 @@ test("news is shown once, stale read receipts cannot dismiss new battle results,
   assert.match(politicalPopup(s),/Important decision/);
 });
 
-test("selecting a force circles it on the chart and highlights the list without any mission controls",()=>{
+test("selecting a force highlights the list beside the native chart without any mission controls",()=>{
   const [s,c,n]=start(),f=n.fleets.find(f=>f.role==='battle'),html=commandView(s,c,{fleetId:f.id});
   assert.ok(html.includes('class="fleet-command-row selected" data-action="focus-fleet" data-id="'+f.id+'"'));
-  assert.ok(html.includes('class="chart-focus" data-motion-id="'+f.id+'"'));
+  assert.match(html,/class="native-world-surface"/);
+  assert.doesNotMatch(html,/<svg/);
   assert.doesNotMatch(html,/send-inline-order|data-fleet-mission|data-fleet-aggression/);
   assert.doesNotMatch(html,/Admiral control/);assert.match(html,/fleet-mission-status/);
 });
