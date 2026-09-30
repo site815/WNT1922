@@ -62,7 +62,7 @@ try {
     $status.nativeRuntimeReport=Join-Path $output 'result.json'
     & $NodePath (Join-Path $PSScriptRoot 'verify-unreal-runtime.mjs') ('--debug-port='+$DebugPort) ('--output='+$output) ('--capture-dir='+(Join-Path $userDir 'Saved\Screenshots'))
     if ($LASTEXITCODE -ne 0) { throw 'Extracted native package interaction verification failed; the owned process remains available for inspection.' }
-    $runtime=Get-Content -Raw -LiteralPath $status.nativeRuntimeReport | ConvertFrom-Json
+    $runtime=Get-Content -Raw -Encoding UTF8 -LiteralPath $status.nativeRuntimeReport | ConvertFrom-Json
     if ($runtime.passed -ne $true) { throw 'Runtime verification did not pass.' }
     if ((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern 'GetLastError=4551|LogTemp: Error: WNT Unreal:|Failed to compile Material|LogShaderCompilers: Error|LogMaterial: Error|LogGLTFRuntime: Error|LogTexture: Error' -Quiet)) { throw 'The extracted package logged a native asset, shader or startup failure.' }
     $networkReport=Join-Path $run 'network.json'
@@ -92,7 +92,7 @@ finally {
                     [void]$owned.WaitForExit(10000)
                     $status.cleanup='Stopped only the launched offscreen process for this disposable failed test.'
                     if ($status.nativeRuntimeReport -and (Test-Path -LiteralPath $status.nativeRuntimeReport)) {
-                        $runtime=Get-Content -Raw -LiteralPath $status.nativeRuntimeReport | ConvertFrom-Json
+                        $runtime=Get-Content -Raw -Encoding UTF8 -LiteralPath $status.nativeRuntimeReport | ConvertFrom-Json
                         $runtime.gameLeftRunning=$false
                         $runtime | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $status.nativeRuntimeReport -Encoding UTF8
                     }

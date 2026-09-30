@@ -32,7 +32,7 @@ function nativeGalleryHarness(t,{gateInputs=false}={}){
   emit(type,event={}){for(const handler of this.listeners.get(type)||[])handler({target:this,...event});}});
  const select=node(),canvas=node(),status=node(),info=node(),host=node();
  host.querySelector=selector=>({'select':select,'.battle-canvas':canvas,'.model-gallery-status':status,'.model-gallery-info':info}[selector]);
- const app={inert:false,hidden:false},calls=[],battles=[],inputs=[];
+ const app={inert:false,hidden:false},calls=[],battles=[],inputs=[],camera={zoom:1,targetZoom:1};
  replace('document',{activeElement:null,createElement:()=>host,body:{append(){}},querySelector:()=>null});
  replace('matchMedia',()=>({matches:false}));
  replace('fetch',async url=>({ok:true,json:async()=>url.endsWith('index.json')?{models:[
@@ -41,13 +41,19 @@ function nativeGalleryHarness(t,{gateInputs=false}={}){
  ]}:{name:url.includes('/a.')?'Ship A':'Ship B',type:'DD',dimensions:{length:url.includes('/a.')?100:150,beam:10}}}));
  replace('ue',{wnt:{
   battle(json){const packet=JSON.parse(json),gate=deferred();calls.push('battle:'+packet.id);battles.push({packet,...gate});return gate.promise;},
-  sceneinput(json){const packet=JSON.parse(json),gate=deferred();calls.push(packet.action);inputs.push({packet,...gate});if(!gateInputs)gate.resolve();return gate.promise;},
+  sceneinput(json){const packet=JSON.parse(json),gate=deferred();calls.push(packet.action);inputs.push({packet,...gate});
+   // Native wheel acceptance changes its target, not the current eased zoom.
+   // Focus cancels an earlier target and establishes the minimum zoom of 3.
+   if(packet.action==='home')camera.zoom=camera.targetZoom=1;
+   if(packet.action==='focus')camera.zoom=camera.targetZoom=Math.max(camera.zoom,3);
+   if(packet.action==='zoom')camera.targetZoom=Math.max(.1,Math.min(1000,camera.targetZoom*Math.exp(-packet.delta*.0015)));
+   if(!gateInputs)gate.resolve();return gate.promise;},
  }});
  // Only DOM attachment is stubbed. The production refresh/send bridge and
  // gallery sequencing run against manually acknowledged native promises.
  t.mock.method(UnrealBattleScene.prototype,'attach',()=>{});
  t.mock.method(UnrealBattleScene.prototype,'activate',()=>{});
- return {app,host,select,calls,battles,inputs,opening:openModelGallery({app}),action:name=>host.emit('click',{target:{closest:()=>({dataset:{gallery:name}})}})};
+ return {app,host,select,calls,battles,inputs,camera,opening:openModelGallery({app}),action:name=>host.emit('click',{target:{closest:()=>({dataset:{gallery:name}})}})};
 }
 
 test('gallery waits for the native model packet and each camera acknowledgement before declaring ready',async t=>{
@@ -57,15 +63,18 @@ test('gallery waits for the native model packet and each camera acknowledgement 
  h.battles[0].resolve();await flush();
  assert.deepEqual(h.calls,['battle:gallery-model-a','home']);
  h.inputs[0].resolve();await flush();
- assert.equal(h.calls.at(-1),'zoom');
+ assert.equal(h.calls.at(-1),'focus');
  assert.equal(h.host.dataset.galleryReady,'false');
  h.inputs[1].resolve();await flush();
- assert.equal(h.calls.at(-1),'focus');
+ assert.equal(h.calls.at(-1),'zoom');
  assert.equal(h.host.dataset.galleryReady,'false');
  h.inputs[2].resolve();const close=await h.opening;
  assert.equal(h.host.dataset.galleryReady,'true');
  assert.equal(h.host.dataset.galleryModel,'model-a');
- assert.deepEqual(h.calls,['battle:gallery-model-a','home','zoom','focus']);
+ assert.deepEqual(h.calls,['battle:gallery-model-a','home','focus','zoom']);
+ assert.equal(h.camera.zoom,3,'Fit preserves smooth native wheel interpolation');
+ assert(Math.abs(h.camera.targetZoom-15.5)<1e-10,'Focus must not cancel the length-based camera target');
+ assert.equal(Number(h.host.dataset.galleryTargetZoom),h.camera.targetZoom);
  close();assert.equal(h.app.inert,false);assert.equal(h.app.hidden,false);
 });
 
@@ -77,9 +86,10 @@ test('rapid gallery selection and Fit keep the latest ship, and closing cancels 
  assert.deepEqual(h.calls,['battle:gallery-model-a','battle:gallery-model-b'],'Superseded Ship A must never receive a camera fit');
  assert.equal(h.host.dataset.galleryReady,'false');
  h.battles[1].resolve();await flush();
- assert.deepEqual(h.calls,['battle:gallery-model-a','battle:gallery-model-b','home','zoom','focus']);
+ assert.deepEqual(h.calls,['battle:gallery-model-a','battle:gallery-model-b','home','focus','zoom']);
  assert.equal(h.host.dataset.galleryModel,'model-b');assert.equal(h.host.dataset.galleryReady,'true');
- assert.equal(h.inputs.find(input=>input.packet.action==='zoom').packet.delta,-Math.log(1550/150)/.0015,'Fit uses the selected ship dimensions');
+ assert.equal(h.inputs.find(input=>input.packet.action==='zoom').packet.delta,-Math.log((1550/150)/3)/.0015,'Fit uses the selected ship dimensions relative to native focus zoom');
+ assert(Math.abs(h.camera.targetZoom-1550/150)<1e-10,'Newest model retains its intended fit while the camera is easing');
  const close=await h.opening;
  h.select.value='0';h.select.emit('change');await flush();
  assert.equal(h.calls.at(-1),'battle:gallery-model-a');

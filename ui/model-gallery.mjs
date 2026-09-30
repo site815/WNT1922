@@ -55,8 +55,9 @@ async function createModelGallery({app,onClose=()=>{},onDispose,previousFocus}) 
  const fit=()=>{
   if(closed)return Promise.resolve();
   const request=++revision,{entry,source}=entries[selected],mapping=entry.platforms[0],current=()=>!closed&&request===revision;
+  const targetZoom=Math.max(.1,Math.min(1000,1550/source.dimensions.length));
   const report={id:'gallery-'+entry.id,startedAt:0,replay:{frames:[{at:0,stage:1,groupsA:[{id:'gallery-ship',classId:mapping.id,type:source.type,name:source.name,count:1,health:1,sunk:0}],groupsB:[]}]}};
-  host.dataset.galleryReady='false';host.dataset.galleryModel=entry.id;
+  host.dataset.galleryReady='false';host.dataset.galleryModel=entry.id;host.dataset.galleryTargetZoom=String(targetZoom);
   // Serialize the native packet and its fit together. The new-report callback
   // resets the camera, so fitting before its acknowledgement loses that fit.
   // Fit also refreshes the selected record: a click during a queued selection
@@ -64,8 +65,10 @@ async function createModelGallery({app,onClose=()=>{},onDispose,previousFocus}) 
   cameraQueue=cameraQueue.catch(()=>{}).then(async()=>{
    if(!current())return;await scene.refresh(report,mapping.campaign||'in_good_faith_1936',0);
    if(!current())return;await scene.input('home');
-   if(!current())return;await scene.input('zoom',{delta:-Math.log(1550/source.dimensions.length)/.0015});
    if(!current())return;await scene.input('focus',{id:'gallery-ship',side:'A',hullIndex:0});
+   // Native focus establishes zoom 3 after Home and cancels earlier easing.
+   // Apply the dimensional zoom last, relative to that known focus baseline.
+   if(!current())return;await scene.input('zoom',{delta:-Math.log(targetZoom/3)/.0015});
    if(current())host.dataset.galleryReady='true';
   });
   return cameraQueue;

@@ -206,12 +206,18 @@ try {
   const model=path.basename(detailed[i].file,'.glb');
   await until(()=>diagnostics('battle'),d=>d.targets.some(t=>t.id==='gallery-ship'&&t.modelId===model&&t.visualStatus==='detailed-model'&&t.detailedModel&&!t.modelPending),{label:'actual detailed geometry '+model});
   await page.waitForFunction(id=>{const gallery=document.querySelector('.model-gallery');return gallery?.dataset.galleryReady==='true'&&gallery.dataset.galleryModel===id;},detailed[i].id);
+  const targetZoom=Number(await gallery.getAttribute('data-gallery-target-zoom'));
+  assert(Number.isFinite(targetZoom)&&targetZoom>0,'Gallery supplies its intended dimensional fit');
+  await until(()=>diagnostics('battle'),d=>Math.abs(d.zoom-targetZoom)<=Math.max(.0001,targetZoom*.001),{label:'gallery camera reaches fitted zoom '+model});
   await pick('battle-ship');
   assert.match(await gallery.locator('[role="status"]').textContent(),/selected/);
   await nativeCapture('native-gallery-'+i);
  }
  await gallery.locator('select').selectOption('0');
  await page.waitForFunction(id=>{const gallery=document.querySelector('.model-gallery');return gallery?.dataset.galleryReady==='true'&&gallery.dataset.galleryModel===id;},detailed[0].id);
+ const firstGalleryZoom=Number(await gallery.getAttribute('data-gallery-target-zoom'));
+ assert(Number.isFinite(firstGalleryZoom)&&firstGalleryZoom>0);
+ await until(()=>diagnostics('battle'),d=>Math.abs(d.zoom-firstGalleryZoom)<=Math.max(.0001,firstGalleryZoom*.001),{label:'gallery interface camera reaches fitted zoom'});
  await nativeCapture('native-gallery-interface',true);
  await gallery.locator('[data-gallery="close"]').click();await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
  assert.equal(await page.locator('#app').evaluate(el=>!el.hidden&&!el.inert),true);

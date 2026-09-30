@@ -15,7 +15,8 @@ assert(!crop||(crop.length===4&&crop.every(Number.isFinite)&&crop[0]>=0&&crop[1]
 assert(Number.isInteger(perSheet)&&perSheet>=1&&perSheet<=24,'--per-sheet must be from1to24');
 const cellWidth=480,cellHeight=crop?Math.round(cellWidth*crop[3]/crop[2]):270;
 const root=process.cwd(),runtime=path.resolve(runtimePath),resultFile=runtime.endsWith('.json')?runtime:path.join(runtime,'result.json');
-const result=JSON.parse(await fs.readFile(resultFile,'utf8'));
+// Windows PowerShell's UTF8 reports may begin with a byte-order mark.
+const result=JSON.parse((await fs.readFile(resultFile,'utf8')).replace(/^\uFEFF/,''));
 const registryFile=path.resolve(option('--registry')||'assets/models/ships/index.json');
 const registryBytes=await fs.readFile(registryFile),registry=JSON.parse(registryBytes);
 const models=registry.models.filter(model=>model.file.endsWith('.glb')&&model.platforms.length);
