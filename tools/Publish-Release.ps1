@@ -43,7 +43,9 @@ if ($extracted -eq ([IO.Path]::GetFullPath($build.packageDirectory)).TrimEnd('\'
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive=[IO.Compression.ZipFile]::OpenRead($executable)
 try {
-    $entries=@($archive.Entries | Where-Object { $_.FullName -match '^[^/]+/package-manifest\.json$' })
+    # Windows PowerShell's .NET Framework ZIP writer can retain backslashes.
+    # Match the same single root manifest after normalizing entry separators.
+    $entries=@($archive.Entries | Where-Object { $_.FullName.Replace('\','/') -match '^[^/]+/package-manifest\.json$' })
     if ($entries.Count -ne 1) { throw 'The archive must contain one package manifest.' }
     $reader=[IO.StreamReader]::new($entries[0].Open())
     try { $manifestText=$reader.ReadToEnd() } finally { $reader.Dispose() }
