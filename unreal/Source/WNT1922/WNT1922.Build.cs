@@ -9,7 +9,9 @@ public class WNT1922 : ModuleRules
             "ProceduralMeshComponent", "GeometryCore", "GeometryAlgorithms"
         });
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "Slate", "SlateCore", "WebBrowser", "ApplicationCore", "RenderCore", "RHI", "glTFRuntime"
+            "Slate", "SlateCore", "WNTWebBrowser", "ApplicationCore", "RenderCore", "RHI", "glTFRuntime"
         });
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+            PublicSystemLibraries.Add("Comctl32.lib");
     }
 }

@@ -1,16 +1,17 @@
 #pragma once
 #include "CoreMinimal.h"
 
-/** North-up Equal Earth in native Unreal centimetres: X north, Y east, Z up. */
+/** North-up wrapping cylindrical terrain in Unreal centimetres: X north, Y east, Z up. */
 namespace WNTProjection
 {
     constexpr double EarthRadiusMetres = 6371000.0;
     constexpr double WorldUnitsPerMetre = 100.0;
+    constexpr double WorldWidth = 2.0 * UE_DOUBLE_PI * EarthRadiusMetres * WorldUnitsPerMetre;
     WNT1922_API double WrapLongitude(double Degrees);
     WNT1922_API FVector Forward(const FVector2D& LongitudeLatitude, double CentralMeridian = 0.0, double HeightMetres = 0.0);
     /** Relative longitude may equal +180 on a clipped map seam. */
     WNT1922_API FVector ForwardUnwrapped(const FVector2D& RelativeLongitudeLatitude, double HeightMetres = 0.0);
-    /** Unset outside the curved outline or for non-finite inputs. */
+    /** Longitude repeats indefinitely; unset beyond the poles or for non-finite inputs. */
     WNT1922_API TOptional<FVector2D> Inverse(const FVector& World, double CentralMeridian = 0.0);
     inline FVector WorldToMetres(const FVector& World) { return World / WorldUnitsPerMetre; }
     inline FVector MetresToWorld(const FVector& Metres) { return Metres * WorldUnitsPerMetre; }

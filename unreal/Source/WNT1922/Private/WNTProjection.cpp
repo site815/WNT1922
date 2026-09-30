@@ -7,18 +7,7 @@
 
 namespace
 {
-    constexpr double A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796;
-    constexpr double M = 0.86602540378443864676, Radians = UE_DOUBLE_PI / 180.0;
-    double ProjectY(double Theta)
-    {
-        const double T2 = Theta * Theta, T6 = T2 * T2 * T2;
-        return Theta * (A1 + A2 * T2 + T6 * (A3 + A4 * T2));
-    }
-    double Derivative(double Theta)
-    {
-        const double T2 = Theta * Theta, T6 = T2 * T2 * T2;
-        return A1 + 3.0 * A2 * T2 + T6 * (7.0 * A3 + 9.0 * A4 * T2);
-    }
+    constexpr double Radians = UE_DOUBLE_PI / 180.0;
 }
 double WNTProjection::WrapLongitude(double Degrees)
 {
@@ -29,10 +18,11 @@ double WNTProjection::WrapLongitude(double Degrees)
 }
 FVector WNTProjection::ForwardUnwrapped(const FVector2D& Point, double HeightMetres)
 {
-    const double Theta = FMath::Asin(M * FMath::Sin(FMath::Clamp(Point.Y, -90.0, 90.0) * Radians));
-    const double East = Point.X * Radians * FMath::Cos(Theta) / (M * Derivative(Theta));
     const double Scale = EarthRadiusMetres * WorldUnitsPerMetre;
-    return FVector(ProjectY(Theta) * Scale, East * Scale, HeightMetres * WorldUnitsPerMetre);
+    // A fixed cylindrical chart has a constant wrap width at every latitude.
+    // Scrolling translates existing 3D terrain; it never reprojects continents.
+    return FVector(FMath::Clamp(Point.Y, -90.0, 90.0) * Radians * Scale,
+        Point.X * Radians * Scale, HeightMetres * WorldUnitsPerMetre);
 }
 FVector WNTProjection::Forward(const FVector2D& Point, double CentralMeridian, double HeightMetres)
 {
@@ -42,20 +32,9 @@ TOptional<FVector2D> WNTProjection::Inverse(const FVector& World, double Central
 {
     if (!FMath::IsFinite(World.X) || !FMath::IsFinite(World.Y) || !FMath::IsFinite(CentralMeridian)) return {};
     const double Scale = EarthRadiusMetres * WorldUnitsPerMetre;
-    const double North = World.X / Scale, East = World.Y / Scale;
-    const double MaxTheta = UE_DOUBLE_PI / 3.0, MaxNorth = ProjectY(MaxTheta);
-    if (FMath::Abs(North) > MaxNorth + 1e-12) return {};
-    double Theta = FMath::Clamp(North / A1, -MaxTheta, MaxTheta);
-    for (int32 Iteration = 0; Iteration < 12; ++Iteration)
-    {
-        const double Change = (ProjectY(Theta) - North) / Derivative(Theta);
-        Theta = FMath::Clamp(Theta - Change, -MaxTheta, MaxTheta);
-        if (FMath::Abs(Change) < 1e-14) break;
-    }
-    const double Longitude = East * M * Derivative(Theta) / FMath::Cos(Theta);
-    if (FMath::Abs(Longitude) > UE_DOUBLE_PI + 1e-11) return {};
-    const double Latitude = FMath::Asin(FMath::Clamp(FMath::Sin(Theta) / M, -1.0, 1.0));
-    return FVector2D(WrapLongitude(Longitude / Radians + CentralMeridian), Latitude / Radians);
+    const double Latitude = World.X / (Scale * Radians);
+    if (FMath::Abs(Latitude) > 90.0 + 1e-9) return {};
+    return FVector2D(WrapLongitude(World.Y / (Scale * Radians) + CentralMeridian), FMath::Clamp(Latitude,-90.0,90.0));
 }
 bool FWNTElevationGrid::Load(const FString& BinaryPath, const FString& MetadataPath, FString& OutError)
 {

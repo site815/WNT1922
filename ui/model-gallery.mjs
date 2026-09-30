@@ -53,23 +53,29 @@ async function createModelGallery({app,onClose=()=>{},onDispose,previousFocus}) 
   if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
  };
  const fit=()=>{
-  const request=++revision,{source}=entries[selected],current=()=>!closed&&request===revision;
-  // Native calls are asynchronous. Superseded fits must not accumulate zoom or
-  // move a reopened scene after a previous gallery has closed.
+  if(closed)return Promise.resolve();
+  const request=++revision,{entry,source}=entries[selected],mapping=entry.platforms[0],current=()=>!closed&&request===revision;
+  const report={id:'gallery-'+entry.id,startedAt:0,replay:{frames:[{at:0,stage:1,groupsA:[{id:'gallery-ship',classId:mapping.id,type:source.type,name:source.name,count:1,health:1,sunk:0}],groupsB:[]}]}};
+  host.dataset.galleryReady='false';host.dataset.galleryModel=entry.id;
+  // Serialize the native packet and its fit together. The new-report callback
+  // resets the camera, so fitting before its acknowledgement loses that fit.
+  // Fit also refreshes the selected record: a click during a queued selection
+  // must not cancel that selection and fit the previous ship instead.
   cameraQueue=cameraQueue.catch(()=>{}).then(async()=>{
+   if(!current())return;await scene.refresh(report,mapping.campaign||'in_good_faith_1936',0);
    if(!current())return;await scene.input('home');
    if(!current())return;await scene.input('zoom',{delta:-Math.log(1550/source.dimensions.length)/.0015});
    if(!current())return;await scene.input('focus',{id:'gallery-ship',side:'A',hullIndex:0});
+   if(current())host.dataset.galleryReady='true';
   });
   return cameraQueue;
  };
  const show=async()=>{
   if(closed)return;
-  const {entry,source}=entries[selected],mapping=entry.platforms[0];
-  const report={id:'gallery-'+entry.id,startedAt:0,replay:{frames:[{at:0,stage:1,groupsA:[{id:'gallery-ship',classId:mapping.id,type:source.type,name:source.name,count:1,health:1,sunk:0}],groupsB:[]}]}};
+  const {source}=entries[selected];
   host.querySelector('.model-gallery-status').textContent=`${source.name} · ${Number(source.dimensions.length).toFixed(1)} m × ${Number(source.dimensions.beam).toFixed(1)} m`;
   host.querySelector('.model-gallery-info').innerHTML=galleryArtInfo(source);
-  scene.refresh(report,mapping.campaign||'in_good_faith_1936',0);await fit();
+  await fit();
  };
  const failed=error=>{if(!closed)host.querySelector('.model-gallery-status').textContent=error.message;};
  host.addEventListener('click',event=>{const action=event.target.closest('[data-gallery]')?.dataset.gallery;if(action==='close')close();else if(action==='fit')void fit().catch(failed);},{signal:controller.signal});

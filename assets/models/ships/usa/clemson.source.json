@@ -1,0 +1,992 @@
+{
+  "id": "clemson",
+  "name": "Clemson class, original interwar destroyer fit",
+  "year": 1919,
+  "type": "DD",
+  "units": "metres",
+  "indexVertices": true,
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "dimensions": {
+    "length": 95.8342,
+    "beam": 9.6774,
+    "draft": 2.9972
+  },
+  "textureMetres": 2.5,
+  "geometrySource": "Original source-based reconstruction, independently authored from Navy profile drawings and original-fit photographs. No legacy recognition-model mesh, voxel dimensions or Farragut hull geometry is reused.",
+  "accuracy": "Representative original four-inch Clemson-class exterior, not a surveyed reconstruction of one hull. Overall dimensions follow DD-186 DANFS; structure, sheer, funnel spacing and masts are interpreted from Doyen DD-280's 1928 Navy drawing. Original aft gun/AA locations follow NHHC's dated Turner photograph rather than Doyen's later swapped gun positions. Port/starboard torpedo staggering and plan outline use the Army's shared flush-decker recognition plan. Hull body sections, underwater appendages, plating and small fittings are inferred; builder differences and later wartime radar, AA, tender, transport and escort conversions are not represented. Guns are shown trained for display, not a combat or mechanical-arc simulation. No interior is modeled.",
+  "sources": [
+    {
+      "title": "Clemson I (DD-186), DANFS",
+      "url": "https://www.history.navy.mil/research/histories/ship-histories/danfs/c/clemson.html",
+      "usedFor": "314 ft 5 in length, 31 ft 9 in beam, 9 ft 10 in draft. DANFS armament header is not used for original fit; class dimensions vary between builders."
+    },
+    {
+      "title": "USS Doyen DD-280 inboard and outboard profiles, U.S. Navy, 17 July 1928",
+      "url": "https://catalog.archives.gov/id/6919602",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Clemson-class_destroyer_inboard_and_ouboard_profiles_1920s.png",
+      "license": "US government public domain",
+      "usedFor": "Longitudinal hull sheer and bow rake, four raked funnels, bridge and galley house, boat stowage, searchlight platform, pole masts, rigging, deckhouse positions, bilge keel and stern appendage arrangement. NARA catalog title says Dyer, but the actual drawing identifies Doyen DD-280. Its later swapped aft gun locations are deliberately not copied."
+    },
+    {
+      "title": "Turner I (DD-259), NHHC DANFS, original configuration photograph NH80014, 1919–1920",
+      "url": "https://www.history.navy.mil/research/histories/ship-histories/danfs/t/turner-i.html",
+      "usedFor": "Forward shielded four-inch gun and after four-inch gun on main deck, paired wing four-inch guns atop galley deckhouse, three-inch AA atop after deckhouse."
+    },
+    {
+      "title": "The Sinking of USS Edsall, NHHC H-Gram067-1",
+      "url": "https://www.history.navy.mil/about-us/leadership/director/directors-corner/h-grams/h-gram-067/h-067-1.html",
+      "usedFor": "Original four 4-inch/50 singles, one 3-inch/23, four triple 21-inch torpedo banks two each side without reloads, stern depth-charge tracks and Y-gun."
+    },
+    {
+      "title": "U.S. War Department FM30-50 (1941), printed p142, shared flush-deck plan/profile",
+      "file": "assets/recognition/ships/USA/wickes.png",
+      "url": "https://www.ibiblio.org/hyperwar/USA/ref/FM/PDFs/FM30-50.PDF",
+      "license": "US government public domain",
+      "usedFor": "Planform, wing-gun positions and staggered torpedo banks only. This shared recognition diagram is not a Clemson builder's plan; original aft armament is established separately."
+    },
+    {
+      "title": "Brassey's Naval and Shipping Annual 1923, p433",
+      "file": "assets/recognition/ships/references/brasseys-1923-p433.png",
+      "url": "https://archive.org/details/brasseysnavala1923brasuoft/page/n635/mode/1up",
+      "usedFor": "Contemporary named Clemson silhouette, flush deck, four funnels and two masts."
+    }
+  ],
+  "stationBasis": "Independent metre estimates from the Doyen drawing's longitudinal hull limits, checked against the FM30-50 plan. X is measured from hull midpoint. Small feature dimensions are inferred and deliberately not labeled exact frame stations.",
+  "hullStations": [
+    [
+      -1,
+      0.025,
+      0.035,
+      2.66
+    ],
+    [
+      -0.992,
+      0.2,
+      0.11,
+      2.67
+    ],
+    [
+      -0.975,
+      0.39,
+      0.25,
+      2.7
+    ],
+    [
+      -0.94,
+      0.61,
+      0.52,
+      2.73
+    ],
+    [
+      -0.87,
+      0.77,
+      0.82,
+      2.77
+    ],
+    [
+      -0.75,
+      0.9,
+      0.98,
+      2.85
+    ],
+    [
+      -0.56,
+      0.98,
+      1,
+      2.96
+    ],
+    [
+      -0.32,
+      1,
+      1,
+      3.13
+    ],
+    [
+      -0.08,
+      0.996,
+      1,
+      3.36
+    ],
+    [
+      0.14,
+      0.974,
+      0.985,
+      3.6
+    ],
+    [
+      0.34,
+      0.89,
+      0.96,
+      3.88
+    ],
+    [
+      0.52,
+      0.74,
+      0.86,
+      4.17
+    ],
+    [
+      0.68,
+      0.54,
+      0.68,
+      4.51
+    ],
+    [
+      0.82,
+      0.32,
+      0.44,
+      4.88
+    ],
+    [
+      0.92,
+      0.137,
+      0.22,
+      5.12
+    ],
+    [
+      0.974,
+      0.041,
+      0.065,
+      5.25
+    ],
+    [
+      1,
+      0.002,
+      0.009,
+      5.32
+    ]
+  ],
+  "mainGuns": [
+    {
+      "number": 1,
+      "x": 31.8,
+      "z": 0,
+      "height": 4.62,
+      "bearing": 0,
+      "shield": true
+    },
+    {
+      "number": 2,
+      "x": 6.4,
+      "z": -3.48,
+      "height": 6.58,
+      "bearing": -90,
+      "shield": false
+    },
+    {
+      "number": 3,
+      "x": 6.4,
+      "z": 3.48,
+      "height": 6.58,
+      "bearing": 90,
+      "shield": false
+    },
+    {
+      "number": 4,
+      "x": -39.3,
+      "z": 0,
+      "height": 2.92,
+      "bearing": 180,
+      "shield": false
+    }
+  ],
+  "antiAircraft": {
+    "caliber": 76.2,
+    "barrelCalibres": 23,
+    "x": -34.1,
+    "z": 0,
+    "height": 5.15,
+    "bearing": 180
+  },
+  "funnels": [
+    {
+      "x": 13.7,
+      "bottom": 3.92,
+      "top": 11.88,
+      "length": 1.78,
+      "beam": 1.79,
+      "rake": 0.72
+    },
+    {
+      "x": 9.25,
+      "bottom": 6.55,
+      "top": 11.83,
+      "length": 1.78,
+      "beam": 1.79,
+      "rake": 0.5
+    },
+    {
+      "x": 1.73,
+      "bottom": 3.59,
+      "top": 11.64,
+      "length": 1.88,
+      "beam": 1.88,
+      "rake": 0.74
+    },
+    {
+      "x": -2.63,
+      "bottom": 3.49,
+      "top": 11.6,
+      "length": 1.9,
+      "beam": 1.9,
+      "rake": 0.76
+    }
+  ],
+  "torpedoMounts": [
+    {
+      "number": 1,
+      "x": -5.15,
+      "z": -3.38,
+      "tubes": 3
+    },
+    {
+      "number": 2,
+      "x": -10,
+      "z": 3.38,
+      "tubes": 3
+    },
+    {
+      "number": 3,
+      "x": -22,
+      "z": -3.18,
+      "tubes": 3
+    },
+    {
+      "number": 4,
+      "x": -27.35,
+      "z": 3.08,
+      "tubes": 3
+    }
+  ],
+  "masts": [
+    {
+      "name": "Foremast",
+      "x": 18.55,
+      "base": 3.98,
+      "top": 28.45,
+      "rake": 1.15
+    },
+    {
+      "name": "Mainmast",
+      "x": -30.4,
+      "base": 3.1,
+      "top": 15.72,
+      "rake": 0.74
+    }
+  ],
+  "materialSources": [
+    {
+      "name": "Blue Metal Plate",
+      "author": "Rob Tuytel",
+      "license": "CC0-1.0",
+      "url": "https://polyhaven.com/a/blue_metal_plate",
+      "manifest": "assets/models/textures/blue_metal_plate/source.json",
+      "usage": "Unmodified OpenGL normal and ORM maps; paint has original gray albedo and zero metalness."
+    },
+    {
+      "name": "Neutral naval paint albedo",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json"
+    }
+  ],
+  "materials": {
+    "paint": {
+      "color": [
+        0.37,
+        0.395,
+        0.405,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95,
+      "baseColorTexture": "naval-paint-albedo",
+      "normalTexture": "naval-paint-normal",
+      "normalScale": 0.48,
+      "metallicRoughnessTexture": "naval-paint-orm",
+      "occlusionTexture": "naval-paint-orm"
+    },
+    "deck": {
+      "color": [
+        0.17,
+        0.185,
+        0.19,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 1,
+      "baseColorTexture": "naval-paint-albedo",
+      "normalTexture": "naval-paint-normal",
+      "normalScale": 0.38,
+      "metallicRoughnessTexture": "naval-paint-orm",
+      "occlusionTexture": "naval-paint-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.24,
+        0.035,
+        0.023,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.86
+    },
+    "boot": {
+      "color": [
+        0.026,
+        0.03,
+        0.032,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.87
+    },
+    "steel": {
+      "color": [
+        0.055,
+        0.063,
+        0.068,
+        1
+      ],
+      "metallic": 0.82,
+      "roughness": 0.48
+    },
+    "canvas": {
+      "color": [
+        0.56,
+        0.535,
+        0.46,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.96
+    },
+    "wood": {
+      "color": [
+        0.25,
+        0.13,
+        0.055,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "glass": {
+      "color": [
+        0.025,
+        0.055,
+        0.065,
+        1
+      ],
+      "metallic": 0.15,
+      "roughness": 0.17
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.23,
+        0.08,
+        1
+      ],
+      "metallic": 0.88,
+      "roughness": 0.37
+    },
+    "portLamp": {
+      "color": [
+        0.31,
+        0.016,
+        0.012,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.18
+    },
+    "starboardLamp": {
+      "color": [
+        0.008,
+        0.15,
+        0.045,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.18
+    }
+  },
+  "authoringFile": "assets/models/authoring/clemson-1919.json",
+  "exporter": "assets/models/authoring/build-clemson.mjs",
+  "sha256": "0b3469bb5546b3efd31fa127f059f6a61af2d3a1cdbb4894a21267657709715f",
+  "statistics": {
+    "id": "clemson",
+    "triangles": 231244,
+    "vertices": 315119,
+    "materials": 11,
+    "embeddedTextures": 3,
+    "bytes": 17608424,
+    "bounds": {
+      "min": [
+        -47.91709899902344,
+        -3.153049945831299,
+        -8.241000175476074
+      ],
+      "max": [
+        47.91709899902344,
+        28.45244026184082,
+        8.241000175476074
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous Clemson flush-deck hull with fine bow and rounded stern",
+      "triangles": 10036,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 9372
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 5412
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 15324
+        }
+      ]
+    },
+    {
+      "name": "Unbroken sheered main deck with subtle camber and waterway",
+      "triangles": 12608,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 9372,
+          "indexCount": 35520
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "Forward deckhouse and rounded wheelhouse with open bridge wings",
+      "triangles": 7512,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 44892,
+          "indexCount": 6816
+        },
+        {
+          "material": "deck",
+          "indexStart": 2304,
+          "indexCount": 288
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 3816
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 3456
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 4416
+        },
+        {
+          "material": "portLamp",
+          "indexStart": 0,
+          "indexCount": 288
+        },
+        {
+          "material": "canvas",
+          "indexStart": 0,
+          "indexCount": 3168
+        },
+        {
+          "material": "starboardLamp",
+          "indexStart": 0,
+          "indexCount": 288
+        }
+      ]
+    },
+    {
+      "name": "Galley deckhouse with wing gun sponsons and after AA deckhouse",
+      "triangles": 10048,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 51708,
+          "indexCount": 9600
+        },
+        {
+          "material": "deck",
+          "indexStart": 2592,
+          "indexCount": 960
+        },
+        {
+          "material": "glass",
+          "indexStart": 3816,
+          "indexCount": 6912
+        },
+        {
+          "material": "brass",
+          "indexStart": 3456,
+          "indexCount": 7488
+        },
+        {
+          "material": "steel",
+          "indexStart": 4416,
+          "indexCount": 5184
+        }
+      ]
+    },
+    {
+      "name": "4-inch /50 single gun 1 with open-backed shield",
+      "triangles": 3692,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 61308,
+          "indexCount": 2676
+        },
+        {
+          "material": "boot",
+          "indexStart": 5412,
+          "indexCount": 384
+        },
+        {
+          "material": "brass",
+          "indexStart": 10944,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 9600,
+          "indexCount": 7824
+        }
+      ]
+    },
+    {
+      "name": "4-inch /50 single gun 2 open pedestal mount",
+      "triangles": 3600,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 63984,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 5796,
+          "indexCount": 384
+        },
+        {
+          "material": "brass",
+          "indexStart": 11136,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 17424,
+          "indexCount": 7824
+        }
+      ]
+    },
+    {
+      "name": "4-inch /50 single gun 3 open pedestal mount",
+      "triangles": 3600,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 66384,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 6180,
+          "indexCount": 384
+        },
+        {
+          "material": "brass",
+          "indexStart": 11328,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 25248,
+          "indexCount": 7824
+        }
+      ]
+    },
+    {
+      "name": "4-inch /50 single gun 4 open pedestal mount",
+      "triangles": 3600,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 68784,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 6564,
+          "indexCount": 384
+        },
+        {
+          "material": "brass",
+          "indexStart": 11520,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 33072,
+          "indexCount": 7824
+        }
+      ]
+    },
+    {
+      "name": "Original three-inch /23 AA gun on after deckhouse",
+      "triangles": 3600,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 71184,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 6948,
+          "indexCount": 384
+        },
+        {
+          "material": "brass",
+          "indexStart": 11712,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 40896,
+          "indexCount": 7824
+        }
+      ]
+    },
+    {
+      "name": "Four narrow raked funnels with hollow mouths, collars, steampipes and stays",
+      "triangles": 23424,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 73584,
+          "indexCount": 53376
+        },
+        {
+          "material": "boot",
+          "indexStart": 7332,
+          "indexCount": 5376
+        },
+        {
+          "material": "steel",
+          "indexStart": 48720,
+          "indexCount": 11520
+        }
+      ]
+    },
+    {
+      "name": "Triple 21-inch torpedo bank 1 with geared pedestal and clamps",
+      "triangles": 8048,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 126960,
+          "indexCount": 15552
+        },
+        {
+          "material": "boot",
+          "indexStart": 12708,
+          "indexCount": 1152
+        },
+        {
+          "material": "brass",
+          "indexStart": 11904,
+          "indexCount": 432
+        },
+        {
+          "material": "steel",
+          "indexStart": 60240,
+          "indexCount": 7008
+        }
+      ]
+    },
+    {
+      "name": "Triple 21-inch torpedo bank 2 with geared pedestal and clamps",
+      "triangles": 8048,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 142512,
+          "indexCount": 15552
+        },
+        {
+          "material": "boot",
+          "indexStart": 13860,
+          "indexCount": 1152
+        },
+        {
+          "material": "brass",
+          "indexStart": 12336,
+          "indexCount": 432
+        },
+        {
+          "material": "steel",
+          "indexStart": 67248,
+          "indexCount": 7008
+        }
+      ]
+    },
+    {
+      "name": "Triple 21-inch torpedo bank 3 with geared pedestal and clamps",
+      "triangles": 8048,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 158064,
+          "indexCount": 15552
+        },
+        {
+          "material": "boot",
+          "indexStart": 15012,
+          "indexCount": 1152
+        },
+        {
+          "material": "brass",
+          "indexStart": 12768,
+          "indexCount": 432
+        },
+        {
+          "material": "steel",
+          "indexStart": 74256,
+          "indexCount": 7008
+        }
+      ]
+    },
+    {
+      "name": "Triple 21-inch torpedo bank 4 with geared pedestal and clamps",
+      "triangles": 8048,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 173616,
+          "indexCount": 15552
+        },
+        {
+          "material": "boot",
+          "indexStart": 16164,
+          "indexCount": 1152
+        },
+        {
+          "material": "brass",
+          "indexStart": 13200,
+          "indexCount": 432
+        },
+        {
+          "material": "steel",
+          "indexStart": 81264,
+          "indexCount": 7008
+        }
+      ]
+    },
+    {
+      "name": "Pole masts, observation platform, yards and fore-and-aft aerial rigging",
+      "triangles": 6944,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 189168,
+          "indexCount": 7392
+        },
+        {
+          "material": "steel",
+          "indexStart": 88272,
+          "indexCount": 13440
+        }
+      ]
+    },
+    {
+      "name": "Lattice searchlight tower, lens, platform and ladder",
+      "triangles": 3104,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 196560,
+          "indexCount": 6528
+        },
+        {
+          "material": "deck",
+          "indexStart": 3552,
+          "indexCount": 96
+        },
+        {
+          "material": "glass",
+          "indexStart": 10728,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 101712,
+          "indexCount": 2112
+        }
+      ]
+    },
+    {
+      "name": "Open clinker-style boats, thwarts, oars, chocks and curved davits",
+      "triangles": 34560,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 203088,
+          "indexCount": 23520
+        },
+        {
+          "material": "steel",
+          "indexStart": 103824,
+          "indexCount": 8640
+        },
+        {
+          "material": "canvas",
+          "indexStart": 3168,
+          "indexCount": 15360
+        },
+        {
+          "material": "wood",
+          "indexStart": 0,
+          "indexCount": 56160
+        }
+      ]
+    },
+    {
+      "name": "Rail stanchions, lifelines, hull lights and boat booms",
+      "triangles": 38976,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 226608,
+          "indexCount": 60480
+        },
+        {
+          "material": "glass",
+          "indexStart": 11304,
+          "indexCount": 28224
+        },
+        {
+          "material": "brass",
+          "indexStart": 13632,
+          "indexCount": 28224
+        }
+      ]
+    },
+    {
+      "name": "Anchors, hawse pipes, chains, windlass, fairleads and mooring bitts",
+      "triangles": 14656,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 287088,
+          "indexCount": 10080
+        },
+        {
+          "material": "brass",
+          "indexStart": 41856,
+          "indexCount": 768
+        },
+        {
+          "material": "steel",
+          "indexStart": 112464,
+          "indexCount": 33120
+        }
+      ]
+    },
+    {
+      "name": "Cowl ventilators, machinery hatches, lockers and emergency steering gear",
+      "triangles": 7344,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 297168,
+          "indexCount": 11472
+        },
+        {
+          "material": "boot",
+          "indexStart": 17316,
+          "indexCount": 3696
+        },
+        {
+          "material": "glass",
+          "indexStart": 39528,
+          "indexCount": 960
+        },
+        {
+          "material": "brass",
+          "indexStart": 42624,
+          "indexCount": 864
+        },
+        {
+          "material": "steel",
+          "indexStart": 145584,
+          "indexCount": 3696
+        },
+        {
+          "material": "wood",
+          "indexStart": 56160,
+          "indexCount": 1344
+        }
+      ]
+    },
+    {
+      "name": "Original stern depth-charge tracks and amidships Y-gun",
+      "triangles": 10560,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 308640,
+          "indexCount": 7104
+        },
+        {
+          "material": "steel",
+          "indexStart": 149280,
+          "indexCount": 24576
+        }
+      ]
+    },
+    {
+      "name": "Twin propeller shafts, struts, three-blade screws, bilge keels and rudder",
+      "triangles": 1188,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 315744,
+          "indexCount": 1404
+        },
+        {
+          "material": "brass",
+          "indexStart": 43488,
+          "indexCount": 1392
+        },
+        {
+          "material": "steel",
+          "indexStart": 173856,
+          "indexCount": 768
+        }
+      ]
+    }
+  ]
+}

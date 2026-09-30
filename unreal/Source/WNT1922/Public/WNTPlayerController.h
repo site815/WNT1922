@@ -7,7 +7,7 @@
 class AWNTCameraActor;
 class AWNTWorldActor;
 class UWNTBrowserBridge;
-class SWebBrowser;
+class SWNTWebBrowser;
 class SWindow;
 class SWidget;
 class FJsonObject;
@@ -21,6 +21,7 @@ namespace WNTCameraMath
     WNT1922_API void Orbit(FMinimalViewInfo& View, const FVector& Target, double Distance, double Tilt, double Yaw);
     WNT1922_API void EnsureClearance(FMinimalViewInfo& View, const FVector& Target, TFunctionRef<double(const FVector&)> SurfaceHeight);
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
+    WNT1922_API double MaxWorldTilt(double Zoom);
 }
 
 UCLASS()
@@ -38,7 +39,7 @@ private:
     UPROPERTY() TObjectPtr<AWNTCameraActor> SceneCamera;
     UPROPERTY() TObjectPtr<AWNTWorldActor> WorldScene;
     UPROPERTY() TObjectPtr<UWNTBrowserBridge> Bridge;
-    TSharedPtr<SWebBrowser> Browser;
+    TSharedPtr<SWNTWebBrowser> Browser;
     TSharedPtr<SWidget> Overlay;
     TWeakPtr<SWindow> Window;
     FProcHandle HostProcess;
@@ -52,6 +53,11 @@ private:
     FVector BattleTarget = FVector::ZeroVector;
     FVector4 ViewRect = FVector4(0, 0, 1, 1);
     double Zoom = 1, WorldZoom = 1, BattleZoom = 1;
+    double TargetZoom = 1;
+    FVector ZoomAnchor = FVector::ZeroVector;
+    FVector2D ZoomPointer = FVector2D(.5,.5);
+    double ZoomAnchorMeridian = 0;
+    bool bHasZoomAnchor = false;
     double Tilt = 0, BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;
     bool bClosing = false, bHostFailed = false, bCameraDirty = true;

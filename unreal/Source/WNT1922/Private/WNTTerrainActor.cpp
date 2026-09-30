@@ -1,4 +1,5 @@
 #include "WNTTerrainActor.h"
+#include "WNTMapTileComponent.h"
 #include "WNTProjection.h"
 #include "WNTVisualAssets.h"
 #include "ProceduralMeshComponent.h"
@@ -334,11 +335,30 @@ bool AWNTTerrainActor::Initialize(const FString& DataRoot)
     RebuildProjectedMeshes();return true;
 }
 
+FVector WNTTerrainGeometry::WrappedTileOrigin(const FVector& GeographicOrigin, double Meridian, int32 Copy)
+{
+    const double Longitude=GeographicOrigin.Y/WNTProjection::WorldWidth*360.0;
+    return FVector(GeographicOrigin.X,
+        WNTProjection::WrapLongitude(Longitude-Meridian)/360.0*WNTProjection::WorldWidth+Copy*WNTProjection::WorldWidth,
+        GeographicOrigin.Z);
+}
+
+double WNTTerrainGeometry::GraticuleWidthForPixelSize(double CentimetresPerPixel)
+{
+    if(!FMath::IsFinite(CentimetresPerPixel)||CentimetresPerPixel<=0)return 24000.0;
+    const double Metres=FMath::Clamp(CentimetresPerPixel*.01,100.0,64000.0);
+    // Half-octave steps avoid uploading ribbon vertices for every zoom frame.
+    return FMath::Clamp(FMath::Pow(2.0,FMath::CeilToDouble(FMath::Log2(Metres)*2.0)*.5),100.0,64000.0);
+}
+
 void AWNTTerrainActor::SetCentralMeridian(double Degrees)
 {
     const double Next=WNTProjection::WrapLongitude(Degrees);
     if(FMath::Abs(WNTProjection::WrapLongitude(Next-CentralMeridian))<1e-9)return;
-    CentralMeridian=Next;if(Data&&!Data->Triangles.IsEmpty())RebuildProjectedMeshes();
+    CentralMeridian=Next;
+    const int32 TilesPerCopy=TerrainTiles.Num()/3;
+    for(int32 I=0;I<TerrainTiles.Num();++I)if(TerrainTiles[I]&&TileOrigins.IsValidIndex(I))
+        TerrainTiles[I]->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(TileOrigins[I],CentralMeridian,I/TilesPerCopy-1));
 }
 double AWNTTerrainActor::HeightAt(const FVector2D& P)const{return Data?Data->Elevation.SampleMetres(P):0.0;}
 bool AWNTTerrainActor::IsLandAt(const FVector2D& P)const{return Data&&Data->PolygonAt(P)!=INDEX_NONE;}
@@ -347,12 +367,12 @@ FString AWNTTerrainActor::TerritoryAt(const FVector2D& P)const
 double AWNTTerrainActor::RenderHeightAt(const FVector2D& P)const
 {
     if(!IsLandAt(P))return 0.0;
-    const FVector Query=WNTProjection::Forward(P,CentralMeridian);
+    const FVector Query=WNTProjection::Forward(P,0);
     double Surface=-1;
-    for(int32 Index:Data->TrianglesAt(P))for(const auto& T:WNTTerrainGeometry::ClipAtMeridian(Data->Triangles[Index].Geo,CentralMeridian))
+    for(int32 Index:Data->TrianglesAt(P))for(const auto& T:WNTTerrainGeometry::ClipAtMeridian(Data->Triangles[Index].Geo,0))
     {
         auto Vertex=[&](const FVector2D& Relative)
-        {return WNTProjection::ForwardUnwrapped(Relative,LandBaseMetres+FMath::Max(0.0,HeightAt(FVector2D(Relative.X+CentralMeridian,Relative.Y))));};
+        {return WNTProjection::ForwardUnwrapped(Relative,LandBaseMetres+FMath::Max(0.0,HeightAt(Relative)));};
         const FVector A=Vertex(T.A),B=Vertex(T.B),C=Vertex(T.C),W=BarycentricXY(Query,A,B,C);
         if(W.X>=-1e-8&&W.Y>=-1e-8&&W.Z>=-1e-8)Surface=FMath::Max(Surface,(A.Z*W.X+B.Z*W.Y+C.Z*W.Z)/100.0);
     }
@@ -371,6 +391,34 @@ void AWNTTerrainActor::SetGraticuleVisible(bool Visible)
 {
     if(bGraticuleVisible==Visible)return;bGraticuleVisible=Visible;
     for(UProceduralMeshComponent* Tile:TerrainTiles)if(Tile)Tile->SetMeshSectionVisible(2,Visible);
+}
+
+void AWNTTerrainActor::SetGraticulePixelSize(double CentimetresPerPixel)
+{
+    const double Width=WNTTerrainGeometry::GraticuleWidthForPixelSize(CentimetresPerPixel);
+    if(FMath::IsNearlyEqual(Width,GridWidthMetres,.001))return;
+    const double Scale=Width/FMath::Max(1.0,GridWidthMetres);
+    for(const auto& Mesh:TerrainTiles)if(Mesh)
+    {
+        const FProcMeshSection* Section=Mesh->GetProcMeshSection(2);
+        if(!Section||Section->ProcVertexBuffer.IsEmpty())continue;
+        // DrawInterval emits two triangles per ribbon: P-S,P+S,Q+S and
+        // P-S,Q+S,Q-S. Change only transverse offsets, preserving geography.
+        check(Section->ProcVertexBuffer.Num()%6==0);
+        TArray<FVector> Vertices;Vertices.SetNumUninitialized(Section->ProcVertexBuffer.Num());
+        for(int32 I=0;I<Vertices.Num();I+=6)
+        {
+            const auto& V=Section->ProcVertexBuffer;
+            const FVector P=(V[I].Position+V[I+1].Position)*.5;
+            const FVector Q=(V[I+2].Position+V[I+5].Position)*.5;
+            const FVector Side=(V[I+1].Position-V[I].Position)*(.5*Scale);
+            Vertices[I]=P-Side;Vertices[I+1]=P+Side;Vertices[I+2]=Q+Side;
+            Vertices[I+3]=P-Side;Vertices[I+4]=Q+Side;Vertices[I+5]=Q-Side;
+        }
+        // Empty attribute arrays retain the existing normals, colours and UVs.
+        Mesh->UpdateMeshSection_LinearColor(2,Vertices,TArray<FVector>(),TArray<FVector2D>(),TArray<FLinearColor>(),TArray<FProcMeshTangent>(),false);
+    }
+    GridWidthMetres=Width;
 }
 
 namespace
@@ -411,14 +459,17 @@ namespace
 void AWNTTerrainActor::RebuildProjectedMeshes()
 {
     if(!Data||Data->Triangles.IsEmpty())return;
+    // Geometry is built once against Greenwich. Three translated copies cover
+    // both seams and ultrawide views without rebuilding meshes during a drag.
+    constexpr double MeshMeridian=0;
     TArray<FTileBuild> Tiles;Tiles.SetNum(TileRows*TileColumns);
     for(int32 I=0;I<Tiles.Num();++I)Tiles[I].Origin=WNTProjection::ForwardUnwrapped(FVector2D(-172.5+(I%TileColumns)*TileDegrees,-82.5+(I/TileColumns)*TileDegrees));
-    auto Height=[&](const FVector2D& Relative){return LandBaseMetres+FMath::Max(0.0,HeightAt(FVector2D(Relative.X+CentralMeridian,Relative.Y)));};
+    auto Height=[&](const FVector2D& Relative){return LandBaseMetres+FMath::Max(0.0,HeightAt(FVector2D(Relative.X+MeshMeridian,Relative.Y)));};
     for(const FWNTTerrainData::FTriangle& Source:Data->Triangles)
     {
         const FWNTTerrainData::FPolygon& Polygon=Data->Polygons[Source.Polygon];
         const FLinearColor* Override=Data->Control.Find(Polygon.Id);const FLinearColor Colour=Override?*Override:Polygon.Colour;
-        for(const FWNTGeographicTriangle& T:WNTTerrainGeometry::ClipAtMeridian(Source.Geo,CentralMeridian))
+        for(const FWNTGeographicTriangle& T:WNTTerrainGeometry::ClipAtMeridian(Source.Geo,MeshMeridian))
         {
             const FVector2D Centre=(T.A+T.B+T.C)/3.0;FTileBuild& Tile=Tiles[TileAt(Centre.X,Centre.Y)];
             const double HA=Height(T.A),HB=Height(T.B),HC=Height(T.C);
@@ -426,16 +477,16 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
             // Keep longitudes unwrapped within each triangle. The texture's U
             // sampler repeats at 180 degrees without interpolating across the
             // entire image when the map's central meridian moves.
-            auto GlobalUV=[&](const FVector2D& P){return FVector2D((P.X+CentralMeridian+180.0)/360.0,(90.0-P.Y)/180.0);};
+            auto GlobalUV=[&](const FVector2D& P){return FVector2D((P.X+MeshMeridian+180.0)/360.0,(90.0-P.Y)/180.0);};
             Tile.Land.Triangle(WNTProjection::ForwardUnwrapped(T.A,HA),WNTProjection::ForwardUnwrapped(T.B,HB),WNTProjection::ForwardUnwrapped(T.C,HC),Colour,Tile.Origin,true,GlobalUV(T.A),GlobalUV(T.B),GlobalUV(T.C));
         }
     }
     for(const FWNTTerrainData::FEdge& Edge:Data->Edges)
     {
-        const double Centre=(Edge.A.X+Edge.B.X)*.5-CentralMeridian,Shift=-360.0*std::floor((Centre+180)/360.0);
+        const double Centre=(Edge.A.X+Edge.B.X)*.5-MeshMeridian,Shift=-360.0*std::floor((Centre+180)/360.0);
         for(int32 Copy=-1;Copy<=1;++Copy)
         {
-            FVector2D A(Edge.A.X-CentralMeridian+Shift+Copy*360.0,Edge.A.Y),B(Edge.B.X-CentralMeridian+Shift+Copy*360.0,Edge.B.Y);
+            FVector2D A(Edge.A.X-MeshMeridian+Shift+Copy*360.0,Edge.A.Y),B(Edge.B.X-MeshMeridian+Shift+Copy*360.0,Edge.B.Y);
             if(FMath::Max(A.X,B.X)<-180||FMath::Min(A.X,B.X)>180)continue;
             if(A.X< -180)A=FMath::Lerp(A,B,(-180-A.X)/(B.X-A.X));if(B.X< -180)B=FMath::Lerp(B,A,(-180-B.X)/(A.X-B.X));
             if(A.X>180)A=FMath::Lerp(A,B,(180-A.X)/(B.X-A.X));if(B.X>180)B=FMath::Lerp(B,A,(180-B.X)/(A.X-B.X));
@@ -453,7 +504,7 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
         struct FInterval{double Start,End,HeightA,HeightB;};TArray<FInterval> Land;
         TSet<int32> Candidates;
         for(const FVector2D& P:{A,B,(A+B)*.5})for(int32 Index:Data->TrianglesAt(P))Candidates.Add(Index);
-        for(int32 Index:Candidates)for(const auto& T:WNTTerrainGeometry::ClipAtMeridian(Data->Triangles[Index].Geo,CentralMeridian))
+        for(int32 Index:Candidates)for(const auto& T:WNTTerrainGeometry::ClipAtMeridian(Data->Triangles[Index].Geo,MeshMeridian))
         {
             const FVector TA=WNTProjection::ForwardUnwrapped(T.A,Height(T.A)),TB=WNTProjection::ForwardUnwrapped(T.B,Height(T.B)),TC=WNTProjection::ForwardUnwrapped(T.C,Height(T.C));
             const FVector WA=BarycentricXY(PA,TA,TB,TC),WB=BarycentricXY(PB,TA,TB,TC);
@@ -491,7 +542,7 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
     };
     auto GridSegment=[&](const FVector2D& A,const FVector2D& B)
     {
-        const double AX=WNTProjection::WrapLongitude(A.X-CentralMeridian),BX=WNTProjection::WrapLongitude(B.X-CentralMeridian);
+        const double AX=WNTProjection::WrapLongitude(A.X-MeshMeridian),BX=WNTProjection::WrapLongitude(B.X-MeshMeridian);
         if(FMath::Abs(AX-BX)<=180){AddGridLine(A,B,AX,BX);return;}
         const double UnwrappedB=BX+(AX>BX?360.0:-360.0),Boundary=AX>BX?180.0:-180.0;
         const FVector2D Seam=FMath::Lerp(A,B,(Boundary-AX)/(UnwrappedB-AX));
@@ -500,17 +551,28 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
     const double GridStep=FMath::Clamp(GridSpacingDegrees,5.0,90.0);
     for(double Lon=-180;Lon<180-1e-8;Lon+=GridStep)for(double Lat=-90;Lat<90-1e-8;Lat+=.25)GridSegment(FVector2D(Lon,Lat),FVector2D(Lon,Lat+.25));
     for(double Lat=-90+GridStep;Lat<90-1e-8;Lat+=GridStep)for(double Lon=-180;Lon<180-1e-8;Lon+=.25)GridSegment(FVector2D(Lon,Lat),FVector2D(Lon+.25,Lat));
-    if(TerrainTiles.Num()!=Tiles.Num())TerrainTiles.SetNum(Tiles.Num());
-    for(int32 I=0;I<Tiles.Num();++I)
+    if(TerrainTiles.Num()!=Tiles.Num()*3)TerrainTiles.SetNum(Tiles.Num()*3);
+    TileOrigins.SetNum(TerrainTiles.Num());
+    for(int32 Copy=-1;Copy<=1;++Copy)for(int32 I=0;I<Tiles.Num();++I)
     {
-        FTileBuild& Tile=Tiles[I];UProceduralMeshComponent* Mesh=TerrainTiles[I];
+        const int32 Instance=(Copy+1)*Tiles.Num()+I;
+        FTileBuild& Tile=Tiles[I];UProceduralMeshComponent* Mesh=TerrainTiles[Instance];
+        TileOrigins[Instance]=Tile.Origin;
         if(!Mesh&&(Tile.Land.Vertices.Num()||Tile.Grid.Vertices.Num()))
         {
-            Mesh=NewObject<UProceduralMeshComponent>(this,*FString::Printf(TEXT("TerrainTile_%d"),I));
+            auto* MapTile=NewObject<UWNTMapTileComponent>(this,*FString::Printf(TEXT("TerrainTile_%d"),Instance));
+            // Every tile keeps the same conservative 15-degree footprint even
+            // when its only geometry is one subpixel-wide meridian. Include
+            // vertical room for chart/terrain depth rather than a flat bound.
+            MapTile->SetGeographicHalfExtent(FVector(WNTProjection::WorldWidth/48.0,WNTProjection::WorldWidth/48.0,1000000.0));
+            Mesh=MapTile;
             Mesh->SetupAttachment(RootComponent);Mesh->SetMobility(EComponentMobility::Movable);Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-            Mesh->bUseAsyncCooking=true;Mesh->RegisterComponent();TerrainTiles[I]=Mesh;AddInstanceComponent(Mesh);
+            // Planet-wide procedural terrain must not enter the ship-scale
+            // virtual-shadow marking queue. Its relief remains fully lit.
+            Mesh->SetCastShadow(false);Mesh->SetAffectDistanceFieldLighting(false);
+            Mesh->bUseAsyncCooking=true;Mesh->RegisterComponent();TerrainTiles[Instance]=Mesh;AddInstanceComponent(Mesh);
         }
-        if(!Mesh)continue;Mesh->SetRelativeLocation(Tile.Origin);
+        if(!Mesh)continue;Mesh->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(TileOrigins[Instance],CentralMeridian,Copy));
         auto Apply=[&](int32 Section,FTileSection& Build,UMaterialInterface* Material)
         {
             if(Build.Vertices.IsEmpty()){Mesh->ClearMeshSection(Section);return;}

@@ -151,6 +151,9 @@ void AWNTOceanDetailActor::UpdateView(const FVector& CameraPosition,const FVecto
     // Fully resolved at inspection range; invisible before strategic geometry matters.
     const double Strength=1.0-Smooth(35000.0,160000.0,RayDistance);
     const bool Visible=bSceneVisible&&RayDistance>0&&RayDistance<160000.0&&Strength>.0001;
+    // Strategic views use flat, filtered water. Avoid updating dozens of
+    // near-water material uniforms and transforms when no patch is visible.
+    if(!Visible&&!bActive)return;
     SetActorLocation(FVector(Centre.X,Centre.Y,0));
     UpdateParameters(Centre,Visible?Strength:0);
     SetActive(Visible);

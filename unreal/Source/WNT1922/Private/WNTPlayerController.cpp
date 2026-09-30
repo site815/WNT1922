@@ -1,5 +1,6 @@
 #include "WNTPlayerController.h"
 #include "WNTBrowserBridge.h"
+#include "WNTBrowserPolicy.h"
 #include "WNTCameraActor.h"
 #include "WNTWorldActor.h"
 #include "WNTTerrainActor.h"
@@ -8,12 +9,15 @@
 #include "EngineUtils.h"
 #include "UnrealClient.h"
 #include "WNTProjection.h"
+#include "WNTWindowPolicy.h"
+#include "Components/PrimitiveComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
 #include "Framework/Application/SlateApplication.h"
-#include "SWebBrowser.h"
-#include "WebBrowserModule.h"
+#include "Engine/Engine.h"
+#include "SWNTWebBrowser.h"
+#include "WNTWebBrowserModule.h"
 #include "Widgets/SWindow.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SBorder.h"
@@ -121,6 +125,13 @@ FVector2D WrappedFocus(const FVector& Point,double Meridian)
     const double Lat=Latitude.IsSet()?Latitude->Y:0;
     const double Edge=WNTProjection::ForwardUnwrapped(FVector2D(180,Lat)).Y;
     return FVector2D(WNTProjection::WrapLongitude(Meridian+180*Point.Y/Edge),Lat);
+}
+double MaxWorldTilt(double Zoom)
+{
+    // Strategic navigation stays north-up and overhead. Tilt opens gradually
+    // only when individual hulls are large enough to inspect (about 16 km).
+    const double T=FMath::Clamp(FMath::Log2(FMath::Max(1.0,Zoom)/2048.0),0.0,1.0);
+    return 70.0*T*T*(3.0-2.0*T);
 }
 }
 
@@ -239,11 +250,9 @@ void AWNTPlayerController::Tick(float DeltaSeconds)
                 HostOutput.RightChopInline(Newline + 1);
                 const TSharedPtr<FJsonObject> Packet = Decode(Line);
                 const FString Candidate = String(Packet, TEXT("origin"));
-                if (Candidate.StartsWith(TEXT("http://127.0.0.1:")))
+                if (WNTBrowserPolicy::IsLocalOrigin(Candidate))
                 {
-                    const FString Port = Candidate.Mid(17);
-                    if (Port.IsNumeric() && FCString::Atoi(*Port) > 0 && FCString::Atoi(*Port) <= 65535)
-                    { Origin = Candidate; UE_LOG(LogTemp, Display, TEXT("WNT campaign service ready at %s"), *Origin); OpenHUD(); break; }
+                    Origin = Candidate; UE_LOG(LogTemp, Display, TEXT("WNT campaign service ready at %s"), *Origin); OpenHUD(); break;
                 }
                 if (!Line.IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Campaign service: %s"), *Line.Left(2000));
             }
@@ -262,6 +271,21 @@ void AWNTPlayerController::Tick(float DeltaSeconds)
     }
     int32 ViewWidth,ViewHeight;GetViewportSize(ViewWidth,ViewHeight);
     if(LastViewport!=FIntPoint(ViewWidth,ViewHeight))bCameraDirty=true;
+    if(SceneCamera&&WorldScene&&!FMath::IsNearlyEqual(Zoom,TargetZoom,1e-10))
+    {
+        const double Difference=FMath::Loge(TargetZoom/Zoom);
+        Zoom=FMath::Abs(Difference)<.001?TargetZoom:Zoom*FMath::Exp(Difference*(1-FMath::Exp(-18.0*FMath::Min(double(DeltaSeconds),.1))));
+        if(Mode!=TEXT("battle"))Tilt=FMath::Min(Tilt,WNTCameraMath::MaxWorldTilt(Zoom));
+        if(bHasZoomAnchor)
+        {
+            if(Mode!=TEXT("battle"))ZoomAnchor.Y-=WNTProjection::WrapLongitude(Meridian-ZoomAnchorMeridian)/360.0*WNTProjection::WorldWidth;
+            ZoomAnchorMeridian=Meridian;
+            AnchorPoint(ZoomAnchor,ZoomPointer);
+            if(Mode!=TEXT("battle"))ZoomAnchor.Y-=WNTProjection::WrapLongitude(Meridian-ZoomAnchorMeridian)/360.0*WNTProjection::WorldWidth;
+            ZoomAnchorMeridian=Meridian;
+        }
+        bCameraDirty=true;
+    }
     if (SceneCamera && bCameraDirty) UpdateCamera();
 }
 
@@ -271,32 +295,56 @@ void AWNTPlayerController::OpenHUD()
     UE_LOG(LogTemp, Display, TEXT("WNT opening the native browser interface."));
     // UE 5.8's Slate browser assumes the UMG browser plugin has loaded this
     // module. Our direct Slate integration must initialize it explicitly.
-    if (!IWebBrowserModule::Get().IsWebModuleAvailable())
+    if (!IWNTWebBrowserModule::Get().IsWebModuleAvailable())
     {
         Fail(TEXT("Unreal's Chromium runtime is unavailable. Verify the engine installation and native package browser files."));
         return;
     }
+    FWNTWebBrowserInitSettings BrowserSettings;
+    BrowserSettings.OfflineProxy = Origin;
+    IWNTWebBrowserModule::Get().CustomInitialize(BrowserSettings);
     Window = GetWorld()->GetGameViewport()->GetWindow();
-    SAssignNew(Browser, SWebBrowser)
+    const auto ExplainOffline = [this]()
+    {
+        auto Event = MakeShared<FJsonObject>(); Event->SetStringField(TEXT("type"), TEXT("error"));
+        Event->SetStringField(TEXT("message"), TEXT("Single-player stays offline. Reference links do not open a web browser; complete credits are included in the game's assets/licenses folder."));
+        Send(Event);
+    };
+    SAssignNew(Browser, SWNTWebBrowser)
         .InitialURL(TEXT("about:blank"))
         .SupportsTransparency(true)
         .BackgroundColor(FColor::Transparent)
         .ShowControls(false).ShowAddressBar(false).ShowInitialThrobber(false)
         .BrowserFrameRate(60)
         .OnLoadError_Lambda([this]() { Fail(TEXT("The local campaign interface could not load. Close the test game and inspect its launch log.")); })
-        .OnBeforeNavigation_Lambda([this](const FString& URL, const FWebNavigationRequest&)
+        .OnLoadUrl_Lambda([this](const FString&, const FString& URL, FString& Response)
         {
-            // A permanent UObject binding must never reach a remote page.
-            if (URL == TEXT("about:blank") || URL.StartsWith(Origin + TEXT("/"))) return false;
-            if (URL.StartsWith(TEXT("https://"))) FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
+            if (WNTBrowserPolicy::AllowsResource(URL, Origin)) return false;
+            Response.Empty(); // CEF serves this local empty response, never the remote resource.
             return true;
         })
-        .OnBeforePopup_Lambda([this](FString URL, FString)
+        .OnBeforeNavigation_Lambda([this, ExplainOffline](const FString& URL, const FWNTWebNavigationRequest&)
         {
-            if (URL.StartsWith(TEXT("https://")) || URL.StartsWith(Origin + TEXT("/"))) FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
+            // A permanent UObject binding must never reach a remote page.
+            if (WNTBrowserPolicy::AllowsNavigation(URL, Origin)) return false;
+            ExplainOffline();
+            return true;
+        })
+        .OnBeforePopup_Lambda([ExplainOffline](FString, FString)
+        {
+            ExplainOffline();
             return true;
         });
     Browser->BindUObject(TEXT("wnt"), Bridge, true);
+    // Offscreen CEF tests inject real DOM input through their explicit debug
+    // connection. Slate can still synthesize desktop cursor moves (including
+    // buttonless moves) into FNullWindow, racing those gestures at high DPI.
+    // Exclude only this invisible automation widget from native hit testing;
+    // normal physical windows retain their complete mouse/keyboard input.
+    // Available in the tested Shipping binary only with an explicit save override.
+    if(WNTBrowserPolicy::AllowsAutomation(FCommandLine::Get())
+        &&FSlateApplication::Get().IsRenderingOffScreen())
+        Browser->SetVisibility(EVisibility::HitTestInvisible);
     Overlay = Browser;
     GetWorld()->GetGameViewport()->AddViewportWidgetContent(Overlay.ToSharedRef(), 10);
     // Embedded PIE can expose the editor's main SWindow. Its close lifecycle
@@ -368,6 +416,7 @@ void AWNTPlayerController::SetMode(const FString& NewMode, const FString& NewIns
     if (Mode == TEXT("world")) WorldZoom = Zoom;
     else if (Mode == TEXT("battle")) BattleZoom = Zoom;
     Mode = NewMode; Zoom = Mode == TEXT("battle") ? BattleZoom : WorldZoom;
+    TargetZoom=Zoom;bHasZoomAnchor=false;
     WorldScene->SetSceneMode(Mode); bCameraDirty = true;
 }
 
@@ -377,8 +426,11 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
     if (!SceneCamera || !WorldScene || Width <= 0 || Height <= 0) return;
     bCameraDirty = false;LastViewport=FIntPoint(Width,Height);
     const bool Battle = Mode == TEXT("battle");
-    const double Distance = (Battle ? BattleDistance : 3.2e9) / Zoom;
-    const double Angle = Battle ? BattleTilt : Tilt;
+    // Fill the window vertically at strategic scale, rather than exposing a
+    // bright sky border beyond the finite north/south edges of the chart.
+    const double WorldDistance=WNTProjection::WorldWidth*.5*ViewRect.W/(2*FMath::Tan(FMath::DegreesToRadians(22.5)))*.99;
+    const double Distance = (Battle ? BattleDistance : WorldDistance) / Zoom;
+    const double Angle = Battle ? BattleTilt : FMath::Min(Tilt,WNTCameraMath::MaxWorldTilt(Zoom));
     FVector Target = BattleTarget;
     if (!Battle)
     {
@@ -387,7 +439,20 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
     }
     WNTCameraMath::ConfigureProjection(SceneCamera->View,LastViewport,ViewRect);
     WNTCameraMath::Orbit(SceneCamera->View,Target,Distance,Angle,Battle?BattleYaw:0);
-    WNTCameraMath::EnsureClearance(SceneCamera->View,Target,[&](const FVector& Point)
+    if(!Battle&&Angle<=0)
+    {
+        const auto North=WNTCameraMath::PlaneHit(SceneCamera->View,FVector2D(.5,0),0);
+        const auto South=WNTCameraMath::PlaneHit(SceneCamera->View,FVector2D(.5,1),0);
+        if(North.IsSet()&&South.IsSet())
+        {
+            const double Pole=WNTProjection::WorldWidth*.25;
+            const double Lower=-Pole-(South->X-Target.X),Upper=Pole-(North->X-Target.X);
+            Target.X=Lower<=Upper?FMath::Clamp(Target.X,Lower,Upper):(Lower+Upper)*.5;
+            FocusGeo.Y=Target.X/WNTProjection::WorldWidth*360;
+            WNTCameraMath::Orbit(SceneCamera->View,Target,Distance,0,0);
+        }
+    }
+    if(Battle||Angle>0||Distance<2000000.0)WNTCameraMath::EnsureClearance(SceneCamera->View,Target,[&](const FVector& Point)
     {
         if(Battle||!WorldScene->GetTerrain())return 0.0;
         const auto Geo=WNTProjection::Inverse(Point,Meridian);
@@ -445,31 +510,34 @@ void AWNTPlayerController::MoveCameraTarget(const FVector& Offset)
     if(Mode==TEXT("battle")){BattleTarget+=FVector(Offset.X,Offset.Y,0);return;}
     const FVector Position=WNTProjection::Forward(FocusGeo,Meridian)+FVector(Offset.X,Offset.Y,0);
     FocusGeo=WNTCameraMath::WrappedFocus(Position,Meridian);
-    // Reprojection is deliberately infrequent: ordinary drag translates the
-    // camera over unchanged local mesh buffers; only the edge moves the seam.
-    if(FMath::Abs(WNTProjection::WrapLongitude(FocusGeo.X-Meridian))>135)
-    {Meridian=FocusGeo.X;WorldScene->SetCentralMeridian(Meridian);}
+    // Keep the rendered world copy centered on the camera. The fixed terrain
+    // translates without mesh work, and nearby actors stay on the visible copy.
+    Meridian=FocusGeo.X;WorldScene->SetCentralMeridian(Meridian);
 }
 
 void AWNTPlayerController::AnchorPoint(const FVector& Original,const FVector2D& Pointer)
 {
     const bool Battle=Mode==TEXT("battle");
-    const FVector2D Geo=Battle?FVector2D::ZeroVector:WNTCameraMath::WrappedFocus(Original,Meridian);
+    FVector Anchor=Original;
     for(int32 I=0;I<12;++I)
     {
         UpdateCamera(false);
-        const FVector Anchor=Battle?Original:WNTProjection::Forward(Geo,Meridian,Original.Z/100.0);
         const auto Current=WNTCameraMath::PlaneHit(SceneCamera->View,Pointer,Anchor.Z);
         if(!Current.IsSet())break;
         const auto Screen=WNTCameraMath::Project(SceneCamera->View,Anchor);
         if(Screen.IsSet()&&FMath::Abs(Screen->X-Pointer.X)*LastViewport.X<.15&&FMath::Abs(Screen->Y-Pointer.Y)*LastViewport.Y<.15)break;
+        const double PreviousMeridian=Meridian;
         MoveCameraTarget(Anchor-Current.GetValue());
+        // Preserve the exact repeated copy under the cursor, even when it is
+        // outside ±180 degrees. Folding its longitude would jump a full world.
+        if(!Battle)Anchor.Y-=WNTProjection::WrapLongitude(Meridian-PreviousMeridian)/360.0*WNTProjection::WorldWidth;
     }
     bCameraDirty=true;
 }
 
 void AWNTPlayerController::FitBattle()
 {
+    if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
     const FBox Bounds = WorldScene->GetSceneBounds();
     if (Bounds.IsValid)
     {
@@ -481,13 +549,14 @@ void AWNTPlayerController::FitBattle()
         BattleDistance = FMath::Max(35000., Bounds.GetExtent().Size() / FMath::Sin(HalfAngle) * 1.2);
     }
     BattleZoom = 1; if (Mode == TEXT("battle")) Zoom = 1;
+    TargetZoom=Zoom;bHasZoomAnchor=false;
     bCameraDirty = true;
 }
 
 void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
 {
     if (FParse::Param(FCommandLine::Get(), TEXT("WNTAutomation")) &&
-        (String(Packet, TEXT("action")) == TEXT("diagnostics") || String(Packet, TEXT("action")) == TEXT("capture")))
+        (String(Packet, TEXT("action")) == TEXT("diagnostics") || String(Packet, TEXT("action")) == TEXT("capture") || String(Packet,TEXT("action"))==TEXT("resize") || String(Packet,TEXT("action"))==TEXT("maximize") || String(Packet,TEXT("action"))==TEXT("restore")))
     { AutomationRequest(Packet); return; }
     if (String(Packet, TEXT("instanceId")) != InstanceId || Mode==TEXT("hidden") || !SceneCamera) return;
     const FString Action = String(Packet, TEXT("action"));
@@ -498,11 +567,17 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     const FVector2D Previous(Number(Packet,TEXT("previousX"),Pointer.X-Number(Packet,TEXT("dx"))/FMath::Max(1,LastViewport.X)),Number(Packet,TEXT("previousY"),Pointer.Y-Number(Packet,TEXT("dy"))/FMath::Max(1,LastViewport.Y)));
     TOptional<FVector> Anchor;
     if(Action==TEXT("zoom")||Action==TEXT("pan")||Action==TEXT("tilt"))Anchor=SurfacePoint(Action==TEXT("zoom")?Pointer:Previous,true);
-    if (Action == TEXT("zoom")) Zoom = FMath::Clamp(Zoom * FMath::Exp(-Number(Packet, TEXT("delta")) * .0015), Battle ? .1 : 1., Battle ? 1000. : 1000000.);
+    if (Action == TEXT("zoom"))
+    {
+        TargetZoom=FMath::Clamp(TargetZoom*FMath::Exp(-Number(Packet,TEXT("delta"))*.0015),Battle?.1:1.,Battle?1000.:1000000.);
+        bHasZoomAnchor=Anchor.IsSet();ZoomPointer=Pointer;
+        if(bHasZoomAnchor){ZoomAnchor=Anchor.GetValue();ZoomAnchorMeridian=Meridian;}
+        return;
+    }
     else if (Action == TEXT("tilt"))
     {
         if (Battle) { BattleTilt = FMath::Clamp(BattleTilt + Number(Packet, TEXT("dy")) * .25, 10., 85.); BattleYaw -= Number(Packet, TEXT("dx")) * .3; }
-        else Tilt = FMath::Clamp(Tilt + Number(Packet, TEXT("dy")) * .25, 0., 70.);
+        else {if(WNTCameraMath::MaxWorldTilt(Zoom)<=0)return;Tilt = FMath::Clamp(Tilt + Number(Packet, TEXT("dy")) * .25, 0., WNTCameraMath::MaxWorldTilt(Zoom));}
     }
     else if (Action == TEXT("pan"))
     {
@@ -511,11 +586,13 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     }
     else if (Action == TEXT("home"))
     {
+        if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
         if (Battle) FitBattle();
         else { Zoom = 1; Tilt = 0; FocusGeo = FVector2D::ZeroVector; Meridian = 0; WorldScene->SetCentralMeridian(0); }
     }
     else if (Action == TEXT("focus"))
     {
+        if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
         if (Battle)
         {
             const auto Position = WorldScene->GetSelectedPosition(TEXT("battle-ship"), String(Packet, TEXT("id")), int32(Number(Packet, TEXT("hullIndex"))),String(Packet,TEXT("side")));
@@ -529,14 +606,30 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         }
     }
     if(Anchor.IsSet())AnchorPoint(Anchor.GetValue(),Pointer);
+    TargetZoom=Zoom;bHasZoomAnchor=false;
     bCameraDirty = true;
 }
 
 void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Packet)
 {
-#if !UE_BUILD_SHIPPING
     // Opt-in local test instrumentation; no console execution or arbitrary paths.
-    if (!FParse::Param(FCommandLine::Get(), TEXT("WNTAutomation")) || !WorldScene || !SceneCamera) return;
+    if (!WNTBrowserPolicy::AllowsAutomation(FCommandLine::Get()) || !WorldScene || !SceneCamera) return;
+    if(String(Packet,TEXT("action"))==TEXT("resize"))
+    {
+        const double Width=Number(Packet,TEXT("width")),Height=Number(Packet,TEXT("height"));
+        if(Width>0&&Width<=7680&&Height>0&&Height<=4320&&Width==FMath::FloorToDouble(Width)&&Height==FMath::FloorToDouble(Height))
+            WNTWindowPolicy::RequestWindowSize(GetWorld()->GetGameViewport(),FIntPoint(int32(Width),int32(Height)));
+        return;
+    }
+    if(String(Packet,TEXT("action"))==TEXT("maximize")||String(Packet,TEXT("action"))==TEXT("restore"))
+    {
+        if(Window.IsValid()&&GetWorld()->WorldType==EWorldType::Game)
+        {
+            if(String(Packet,TEXT("action"))==TEXT("maximize"))Window.Pin()->Maximize();
+            else Window.Pin()->Restore();
+        }
+        return;
+    }
     if (String(Packet, TEXT("action")) == TEXT("capture"))
     {
         const FString Name = String(Packet, TEXT("name"));
@@ -545,6 +638,13 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
         const FString Path = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Name + TEXT(".png"));
         bool bIncludeUI = false; Packet->TryGetBoolField(TEXT("includeUI"), bIncludeUI);
         FScreenshotRequest::RequestScreenshot(Path, bIncludeUI, false);
+        // Match UE's Shot command: a previous UI capture otherwise leaves a
+        // stale crop size when the next no-UI capture follows a window resize.
+        if(auto* Client=GetWorld()->GetGameViewport())if(Client->Viewport)
+        {
+            const FIntPoint Size=Client->Viewport->GetRenderTargetTextureSizeXY();
+            GScreenshotResolutionX=Size.X;GScreenshotResolutionY=Size.Y;
+        }
         return;
     }
     if (bCameraDirty) UpdateCamera(false);
@@ -554,15 +654,33 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetBoolField(TEXT("nativeWorldInitialized"), WorldScene->GetLoadError().IsEmpty());
     Event->SetStringField(TEXT("renderer"), TEXT("Unreal Engine native UWorld"));
     Event->SetNumberField(TEXT("zoom"), Zoom);
+    int32 NativeWidth,NativeHeight;GetViewportSize(NativeWidth,NativeHeight);
+    Event->SetNumberField(TEXT("viewportWidth"),NativeWidth);Event->SetNumberField(TEXT("viewportHeight"),NativeHeight);
+    Event->SetNumberField(TEXT("windowMode"),Window.IsValid()?int32(Window.Pin()->GetWindowMode()):-1);
+    Event->SetBoolField(TEXT("renderingOffscreen"),FSlateApplication::Get().IsRenderingOffScreen());
+    Event->SetNumberField(TEXT("configuredWindowMode"),GEngine&&GEngine->GetGameUserSettings()?int32(GEngine->GetGameUserSettings()->GetFullscreenMode()):-1);
+    Event->SetBoolField(TEXT("windowMaximized"),Window.IsValid()&&Window.Pin()->IsWindowMaximized());
+    Event->SetNumberField(TEXT("targetZoom"),TargetZoom);
+    Event->SetNumberField(TEXT("maxWorldTilt"),WNTCameraMath::MaxWorldTilt(Zoom));
+    int32 PrimitiveCount=0,VisiblePrimitives=0,ShadowPrimitives=0;
+    for(TActorIterator<AActor> It(GetWorld());It;++It)
+    {
+        TArray<UPrimitiveComponent*> Components;It->GetComponents(Components);
+        for(const auto* Component:Components){++PrimitiveCount;if(!It->IsHidden()&&Component->IsVisible()){++VisiblePrimitives;if(Component->CastShadow)++ShadowPrimitives;}}
+    }
+    Event->SetNumberField(TEXT("primitiveComponentCount"),PrimitiveCount);
+    Event->SetNumberField(TEXT("visiblePrimitiveCount"),VisiblePrimitives);
+    Event->SetNumberField(TEXT("shadowCastingPrimitiveCount"),ShadowPrimitives);
     Event->SetNumberField(TEXT("tilt"), SceneCamera->View.Rotation.Pitch + 90);
     Event->SetNumberField(TEXT("yaw"), SceneCamera->View.Rotation.Yaw);
     Event->SetNumberField(TEXT("longitude"), FocusGeo.X); Event->SetNumberField(TEXT("latitude"), FocusGeo.Y);
-    int32 Ships = 0, VisibleShips = 0, DetailedModels = 0, VisibleDetailedModels = 0, PendingModels = 0, ModelErrors = 0;
+    int32 Ships = 0, VisibleShips = 0, DetailedModels = 0, VisibleDetailedModels = 0, DeferredModels = 0, PendingModels = 0, ModelErrors = 0;
     for (TActorIterator<AWNTShipActor> It(GetWorld()); It; ++It)
     {
         ++Ships;
         if (!It->IsHidden()) ++VisibleShips;
         if (It->HasRenderableModel()) ++DetailedModels;
+        if (It->IsModelDeferred()) ++DeferredModels;
         if (It->IsDetailedModelVisible()) ++VisibleDetailedModels;
         if (It->IsModelPending()) ++PendingModels;
         if (It->HasModelLoadError()) ++ModelErrors;
@@ -570,6 +688,7 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetNumberField(TEXT("shipActorCount"), Ships);
     Event->SetNumberField(TEXT("visibleShipCount"), VisibleShips);
     Event->SetNumberField(TEXT("detailedModelCount"), DetailedModels);
+    Event->SetNumberField(TEXT("deferredModelCount"), DeferredModels);
     Event->SetNumberField(TEXT("visibleDetailedShipCount"), VisibleDetailedModels);
     Event->SetNumberField(TEXT("pendingModelCount"), PendingModels);
     Event->SetNumberField(TEXT("modelLoadErrors"), ModelErrors);
@@ -602,7 +721,6 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     }
     Event->SetArrayField(TEXT("targets"), Targets);
     Send(Event);
-#endif
 }
 
 void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHover)

@@ -111,6 +111,10 @@ class NativeScene {
       if (delta) {event.preventDefault(); this.input('pan', {dx:delta[0],dy:delta[1]});}
     }, options);
     this.resize = new ResizeObserver(() => {if (activeScene === this) this.activate();}); this.resize.observe(canvas);
+    // A centered, max-width panel can move while its canvas size stays fixed.
+    // ResizeObserver alone then leaves the native camera at its old offset,
+    // until pointerdown jumps it and the click misses the displayed ship.
+    window.addEventListener('resize', () => {if (activeScene === this) this.activate();}, options);
     // Scrolling a clipped battle/gallery panel moves its native viewport without
     // resizing the canvas. Keep projection and input aligned before the next pick.
     document.addEventListener('scroll', () => {if (activeScene === this) this.activate();},
@@ -184,7 +188,7 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D Equal Earth world. North is up. Scroll to zoom, drag to pan, right drag to tilt. Home restores the strategic view.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Scroll to zoom, drag to pan. Right drag tilts at ship-inspection zoom above 2048 times. Home restores the overhead strategic view.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
@@ -232,9 +236,12 @@ export class UnrealBattleScene extends NativeScene {
     this.attach(canvas); this.activate();
     if (changed) {
       this.started = performance.now();
-      send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,!matchMedia('(prefers-reduced-motion: reduce)').matches));
+      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,!matchMedia('(prefers-reduced-motion: reduce)').matches));
     }
     this.view = {native:true};
+    // Callers that fit a newly selected model must wait for the native packet:
+    // receiving a new report also resets the native battle camera.
+    return this.battleReady || Promise.resolve();
   }
   draw() {if (this.canvas?.isConnected && this.frame) this.activate();}
   fit() {this.zoom = 1; this.input('home');}

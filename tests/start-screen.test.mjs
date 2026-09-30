@@ -44,11 +44,17 @@ test('historical demo identities, official sources and selected model limitation
       assert(ship.modelNote.length > 50);
       if (ship.classId === 'demo-bismarck') assert.match(ship.modelNote,/everlasting17th.*CC BY 4.0.*approximate/);
       else {
-        assert.match(ship.modelNote,/3D artwork pending/);
-        assert.match(ship.modelNote,/navigation symbol/);
+        assert.match(ship.modelNote,/reconstructed from historical references/);
+        assert.match(ship.modelNote,/hull sections and small fittings are inferred/);
+        assert.match(ship.modelNote,/Art info for sources and fit limits/);
+        assert.doesNotMatch(ship.modelNote,/artwork pending|navigation symbol|not displayed/i);
         assert.doesNotMatch(ship.modelNote,/representative|silhouette|earlier.*fit.*used/i);
       }
-      if (['akagi','kaga'].includes(ship.id)) assert.match(ship.modelNote,/1942 carrier fit is not displayed/);
+      if (['akagi','kaga'].includes(ship.id)) {
+        assert.equal(ship.classId,'demo-'+ship.id+'1942','Midway must use the completed rebuilt carrier fit');
+        assert.match(ship.modelNote,/1942/);
+      }
+      if(ship.id==='hood')assert.equal(ship.classId,'demo-hood1941','Denmark Strait must use the completed 1941 fit');
     }
   }
 });

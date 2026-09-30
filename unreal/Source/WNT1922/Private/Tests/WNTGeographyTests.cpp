@@ -5,6 +5,7 @@
 #include "Misc/Parse.h"
 #include "WNTProjection.h"
 #include "WNTTerrainActor.h"
+#include "WNTMapTileComponent.h"
 
 namespace
 {
@@ -25,7 +26,7 @@ namespace
     }
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTEqualEarthProjectionTest,"WNT.Geography.EqualEarthProjection",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTEqualEarthProjectionTest,"WNT.Geography.WrappingTerrainProjection",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTEqualEarthProjectionTest::RunTest(const FString& Parameters)
 {
     for(double Meridian:{-179.5,0.0,87.25,179.5})for(double Lon:{-540.0,-180.0,-179.999,0.0,123.456,179.999,540.0})for(double Lat:{-90.0,-75.0,-12.5,0.0,49.3,89.0,90.0})
@@ -43,7 +44,15 @@ bool FWNTEqualEarthProjectionTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Prime equator at origin"),Origin.IsNearlyZero());
     TestTrue(TEXT("North is +X with zero roll"),North.X>0&&FMath::Abs(North.Y)<1e-8);
     TestTrue(TEXT("East is +Y"),East.Y>0&&FMath::Abs(East.X)<1e-8);
-    TestFalse(TEXT("Outside outline cannot pick land"),WNTProjection::Inverse(FVector(0,1e12,0)).IsSet());
+    TestFalse(TEXT("Beyond the poles cannot pick land"),WNTProjection::Inverse(FVector(1e12,0,0)).IsSet());
+    for(double Lat:{-85.0,0.0,85.0})for(double Turns:{-7.0,-1.0,0.0,1.0,7.0})
+    {
+        const FVector Point=WNTProjection::ForwardUnwrapped(FVector2D(42+360*Turns,Lat),321);
+        const auto Inverse=WNTProjection::Inverse(Point);
+        TestTrue(TEXT("Repeated world copies pick the same geography"),Inverse.IsSet()&&Inverse->Equals(FVector2D(42,Lat),1e-7));
+        const FVector Shift=WNTProjection::ForwardUnwrapped(FVector2D(42+360,Lat))-WNTProjection::ForwardUnwrapped(FVector2D(42,Lat));
+        TestTrue(TEXT("Seam joins by one constant translation at every latitude"),Shift.Equals(FVector(0,WNTProjection::WorldWidth,0),1e-5));
+    }
     TestTrue(TEXT("Seam endpoints have distinct positions"),WNTProjection::ForwardUnwrapped(FVector2D(180,0)).Y>0&&WNTProjection::ForwardUnwrapped(FVector2D(-180,0)).Y<0);
     return true;
 }
@@ -90,6 +99,61 @@ bool FWNTGeographicSeamsTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Crossed historical boundary resolves before triangulation"),WNTTerrainGeometry::TriangulatePolygon(CrossedBoundary,Triangles,Error));
     Total=0;for(const auto& T:Triangles)Total+=Area(T);
     TestTrue(TEXT("Intersection repair keeps both lobes without filling outside land"),FMath::Abs(Total-8.0)<1e-6);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWrappedTileCoverageTest,"WNT.Geography.RepeatedTileCoverage",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTWrappedTileCoverageTest::RunTest(const FString& Parameters)
+{
+    const double Width=WNTProjection::WorldWidth,TileWidth=Width/24.0;
+    for(double Meridian:{-720.25,-179.999,-147.,0.,89.,179.999,540.2})
+    {
+        TArray<double> Centres;
+        for(int32 Copy=-1;Copy<=1;++Copy)for(int32 Column=0;Column<24;++Column)
+        {
+            const FVector Origin=WNTProjection::ForwardUnwrapped(FVector2D(-172.5+Column*15.0,37),123);
+            const FVector Placed=WNTTerrainGeometry::WrappedTileOrigin(Origin,Meridian,Copy);
+            Centres.Add(Placed.Y);
+            const auto Geo=WNTProjection::Inverse(Placed,Meridian);
+            TestTrue(TEXT("Every repeated tile still maps to its original geography"),Geo.IsSet()
+                &&FMath::Abs(WNTProjection::WrapLongitude(Geo->X-(-172.5+Column*15.0)))<1e-8
+                &&FMath::Abs(Geo->Y-37)<1e-8&&FMath::Abs(Placed.Z-12300)<.001);
+        }
+        Centres.Sort();
+        bool NoGaps=true;
+        for(int32 I=1;I<Centres.Num();++I)NoGaps&=FMath::Abs(Centres[I]-Centres[I-1]-TileWidth)<.001;
+        TestTrue(TEXT("Three repeated worlds have no gaps or duplicated tiles"),NoGaps);
+        TestTrue(TEXT("Coverage remains centered across an ultrawide strategic view"),
+            Centres[0]-TileWidth*.5<=-Width*1.47&&Centres.Last()+TileWidth*.5>=Width*1.47);
+    }
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTConservativeChartBoundsTest,"WNT.Geography.ConservativeChartBounds",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTConservativeChartBoundsTest::RunTest(const FString& Parameters)
+{
+    auto* Tile=NewObject<UWNTMapTileComponent>();
+    if(!TestNotNull(TEXT("Native map tile component"),Tile))return false;
+    const double Half=WNTProjection::WorldWidth/48.0;
+    const FVector Extent(Half,Half,1000000.0);
+    Tile->SetGeographicHalfExtent(Extent);
+    const TArray<FVector> Vertices{FVector(-Half,-Half,10000),FVector(Half,-Half,10000),FVector(Half,-Half+400000,10000)};
+    Tile->CreateMeshSection_LinearColor(0,Vertices,TArray<int32>{0,2,1},TArray<FVector>(),TArray<FVector2D>(),TArray<FLinearColor>(),TArray<FProcMeshTangent>(),false,false);
+    const auto* Allocation=Tile->GetProcMeshSection(0)->ProcVertexBuffer.GetData();
+    for(const FVector Translation:{FVector::ZeroVector,FVector(700000000,-2500000000,0),FVector(-700000000,5100000000,0)})
+    {
+        const FBox Bounds=Tile->CalcBounds(FTransform(Translation)).GetBox();
+        TestTrue(TEXT("A single thin line retains the complete geographic tile footprint"),
+            Bounds.IsInsideOrOn(Translation-Extent)&&Bounds.IsInsideOrOn(Translation+Extent));
+        TestTrue(TEXT("Flat chart geometry has nonzero conservative depth bounds"),Bounds.GetExtent().Z>=1000000.0);
+        for(const FVector& Vertex:Vertices)TestTrue(TEXT("Conservative bounds always include visible geometry"),Bounds.IsInsideOrOn(Translation+Vertex));
+    }
+    TestTrue(TEXT("Bounds calculations never modify or allocate geometry"),Allocation==Tile->GetProcMeshSection(0)->ProcVertexBuffer.GetData());
+    for(double PixelMetres:{120.0,500.0,4000.0,18000.0,32000.0,44000.0})
+    {
+        const double Width=WNTTerrainGeometry::GraticuleWidthForPixelSize(PixelMetres*100.0);
+        TestTrue(TEXT("Strategic grid quantization stays between one and sqrt(2) pixels"),Width>=PixelMetres&&Width<=PixelMetres*FMath::Sqrt(2.0)+1e-7);
+    }
     return true;
 }
 

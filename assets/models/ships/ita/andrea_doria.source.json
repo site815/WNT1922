@@ -1,0 +1,1973 @@
+{
+  "id": "andrea_doria",
+  "name": "Andrea Doria class",
+  "year": 1912,
+  "type": "BB",
+  "nation": "ITA",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "ita/andrea_doria.glb",
+  "dimensions": {
+    "length": 187.586,
+    "beam": 26.421,
+    "draft": 8.19051
+  },
+  "origin": "historical",
+  "configuration": "Original five-turret configuration: thirteen 12-inch guns in three triple and two twin turrets, before the extensive 1930s rebuild.",
+  "accuracy": "Major equipment stations reviewed against the identified recognition plan. Longitudinal coordinates are measured proportions of that ship drawing, not shipyard frame offsets. Hull body sections, turret casings, bridge details, small fittings and underwater surfaces remain inferred exterior artwork. Campaign secondary counts are retained where the catalog differs from the illustrated refit. No claim of a survey-accurate or exact individual wartime refit.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Plate 24 in \"Brassey's Naval Annual\" 1923. Same drawing was used in Brassey's 1915 Annual, plate 44. Downloaded from https://archive.org/details/brasseysnavala1923brasuoft",
+      "file": "assets/recognition/ships/ITA/andrea_doria.jpg",
+      "url": "https://commons.wikimedia.org/wiki/File:Andrea_Doria_class_battleship_diagrams_Brasseys_1923.jpg",
+      "license": "Public domain in the United States",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Illustration estimates from catalog displacement and type",
+  "layoutProvenance": "Independent station review, 2026-09-30; preserved class recognition reference in sources. Andrea Doria original fit: 3/2/3/2/3 main turrets and two funnels, distinct 6-inch secondary battery.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      6.197
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      6.197
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      6.197
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      6.197
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      6.197
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      6.197
+    ],
+    [
+      0,
+      1,
+      1,
+      6.197
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      6.197
+    ],
+    [
+      0.45,
+      0.83,
+      0.9544999999999999,
+      6.2260631
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      6.441420671
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      6.785527775
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      7.108418816
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      7.33227734375
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      7.424915975
+    ]
+  ],
+  "stations": [
+    {
+      "role": "main",
+      "x": 50.085,
+      "y": 0,
+      "z": 6.377,
+      "w": 7.62,
+      "d": 8.87,
+      "h": 2.621,
+      "barrels": 3,
+      "caliber": 304.79999999999995,
+      "bearing": 0,
+      "enclosed": true
+    },
+    {
+      "role": "main",
+      "x": 32.64,
+      "y": 0,
+      "z": 9.377,
+      "w": 7.62,
+      "d": 7.62,
+      "h": 2.621,
+      "barrels": 2,
+      "caliber": 304.79999999999995,
+      "bearing": 0,
+      "enclosed": true
+    },
+    {
+      "role": "main",
+      "x": -6.941,
+      "y": 0,
+      "z": 6.377,
+      "w": 7.62,
+      "d": 8.87,
+      "h": 2.621,
+      "barrels": 3,
+      "caliber": 304.79999999999995,
+      "bearing": 180,
+      "enclosed": true
+    },
+    {
+      "role": "main",
+      "x": -39.393,
+      "y": 0,
+      "z": 9.377,
+      "w": 7.62,
+      "d": 7.62,
+      "h": 2.621,
+      "barrels": 2,
+      "caliber": 304.79999999999995,
+      "bearing": 180,
+      "enclosed": true
+    },
+    {
+      "role": "main",
+      "x": -55.525,
+      "y": 0,
+      "z": 6.377,
+      "w": 7.62,
+      "d": 8.87,
+      "h": 2.621,
+      "barrels": 3,
+      "caliber": 304.79999999999995,
+      "bearing": 180,
+      "enclosed": true
+    },
+    {
+      "role": "funnel",
+      "x": 14.819,
+      "y": 0,
+      "z": 6.297,
+      "w": 5.5,
+      "d": 4.84,
+      "h": 11
+    },
+    {
+      "role": "funnel",
+      "x": -24.386,
+      "y": 0,
+      "z": 6.297,
+      "w": 5.5,
+      "d": 4.84,
+      "h": 11
+    },
+    {
+      "role": "bridge-base",
+      "x": 22.51,
+      "y": 0,
+      "z": 6.197,
+      "w": 7.5,
+      "d": 9,
+      "h": 2.8
+    },
+    {
+      "role": "bridge",
+      "x": 22.51,
+      "y": 0,
+      "z": 8.997,
+      "w": 5.55,
+      "d": 7.2,
+      "h": 2.8
+    },
+    {
+      "role": "bridge-base",
+      "x": -30.014,
+      "y": 0,
+      "z": 6.197,
+      "w": 6,
+      "d": 7,
+      "h": 2
+    },
+    {
+      "role": "bridge",
+      "x": -30.014,
+      "y": 0,
+      "z": 8.197,
+      "w": 4.44,
+      "d": 5.6,
+      "h": 2.8
+    },
+    {
+      "role": "mast",
+      "x": 18.008,
+      "y": 0,
+      "z": 6.197,
+      "w": 0.65,
+      "d": 0.65,
+      "h": 24,
+      "style": "tripod",
+      "baseRadius": 2.8
+    },
+    {
+      "role": "mast",
+      "x": -18.759,
+      "y": 0,
+      "z": 6.197,
+      "w": 0.65,
+      "d": 0.65,
+      "h": 22,
+      "style": "tripod",
+      "baseRadius": 2.8
+    },
+    {
+      "role": "secondary",
+      "x": 37.517,
+      "y": 10.727,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 37.517,
+      "y": -10.727,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 26.798,
+      "y": 11.784,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 26.798,
+      "y": -11.784,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 16.079,
+      "y": 12.239,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 16.079,
+      "y": -12.239,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 5.36,
+      "y": 12.42,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": 5.36,
+      "y": -12.42,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -5.36,
+      "y": 12.511,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -5.36,
+      "y": -12.51,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -16.079,
+      "y": 12.511,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -16.079,
+      "y": -12.51,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -26.798,
+      "y": 12.511,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -26.798,
+      "y": -12.51,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -37.517,
+      "y": 12.352,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": 90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "secondary",
+      "x": -37.517,
+      "y": -12.352,
+      "z": 3.997,
+      "w": 3.2,
+      "d": 2.1,
+      "h": 1.6,
+      "barrels": 1,
+      "caliber": 152.4,
+      "bearing": -90,
+      "enclosed": false,
+      "casemate": true
+    },
+    {
+      "role": "boat",
+      "x": 5.065,
+      "y": -6.869,
+      "z": 8.697,
+      "w": 8.2,
+      "d": 2.4,
+      "h": 1.4
+    },
+    {
+      "role": "boat",
+      "x": 5.065,
+      "y": 6.869,
+      "z": 8.697,
+      "w": 8.2,
+      "d": 2.4,
+      "h": 1.4
+    }
+  ],
+  "armament": {
+    "caliber": 304.79999999999995,
+    "barrels": 13,
+    "torpedoTubes": 0,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [
+      {
+        "count": 16,
+        "caliber_in": 6,
+        "mounts": "casemate"
+      }
+    ],
+    "torpedoFit": null
+  },
+  "shafts": 4,
+  "complement": 1000,
+  "displacement": 22960,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "reviewed": "2026-09-30",
+    "expectedMainBarrels": 13,
+    "mainMountBarrels": [
+      3,
+      2,
+      3,
+      2,
+      3
+    ],
+    "expectedFunnels": 2,
+    "notes": "Andrea Doria original fit: 3/2/3/2/3 main turrets and two funnels, distinct 6-inch secondary battery.",
+    "secondaryBasis": "Catalog totals; casemate versus deck mount explicit. Detailed placement inferred within the class secondary battery area."
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.385,
+        0.4,
+        0.41,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.4,
+        0.34,
+        0.235,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "b6ace8b4562a8d67c5f8caf6cbbcf95d0abff6eb6d6687049c46fafa20918170",
+  "statistics": {
+    "id": "andrea_doria",
+    "triangles": 133800,
+    "vertices": 171816,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 7693344,
+    "bounds": {
+      "min": [
+        -93.79299926757812,
+        -8.190509796142578,
+        -19.13920021057129
+      ],
+      "max": [
+        93.79299926757812,
+        30.198610305786133,
+        19.140199661254883
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 8400,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 7644
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 444
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 17112
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 20516,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 7644,
+          "indexCount": 59040
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 2508
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
+      "triangles": 1584,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 66684,
+          "indexCount": 240
+        },
+        {
+          "material": "deck",
+          "indexStart": 2508,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 2112
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 1920
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge with glazing, doors, portholes and roof rails",
+      "triangles": 1984,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 66924,
+          "indexCount": 1200
+        },
+        {
+          "material": "deck",
+          "indexStart": 2604,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 2112,
+          "indexCount": 1728
+        },
+        {
+          "material": "glass",
+          "indexStart": 1920,
+          "indexCount": 2544
+        },
+        {
+          "material": "steel",
+          "indexStart": 384,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
+      "triangles": 1328,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 68124,
+          "indexCount": 240
+        },
+        {
+          "material": "deck",
+          "indexStart": 2700,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 3840,
+          "indexCount": 1728
+        },
+        {
+          "material": "glass",
+          "indexStart": 4464,
+          "indexCount": 1536
+        },
+        {
+          "material": "steel",
+          "indexStart": 768,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge with glazing, doors, portholes and roof rails",
+      "triangles": 1656,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 68364,
+          "indexCount": 1200
+        },
+        {
+          "material": "deck",
+          "indexStart": 2796,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 5568,
+          "indexCount": 1344
+        },
+        {
+          "material": "glass",
+          "indexStart": 6000,
+          "indexCount": 1944
+        },
+        {
+          "material": "steel",
+          "indexStart": 1152,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 1 3 x 304.79999999999995 mm",
+      "triangles": 1696,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 69564,
+          "indexCount": 2112
+        },
+        {
+          "material": "boot",
+          "indexStart": 444,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 1536,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 2 x 304.79999999999995 mm",
+      "triangles": 1632,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 71676,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 1020,
+          "indexCount": 384
+        },
+        {
+          "material": "steel",
+          "indexStart": 3936,
+          "indexCount": 2112
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 3 3 x 304.79999999999995 mm",
+      "triangles": 1696,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 74076,
+          "indexCount": 2112
+        },
+        {
+          "material": "boot",
+          "indexStart": 1404,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 6048,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 4 2 x 304.79999999999995 mm",
+      "triangles": 1632,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 76188,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 1980,
+          "indexCount": 384
+        },
+        {
+          "material": "steel",
+          "indexStart": 8448,
+          "indexCount": 2112
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 5 3 x 304.79999999999995 mm",
+      "triangles": 1696,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 78588,
+          "indexCount": 2112
+        },
+        {
+          "material": "boot",
+          "indexStart": 2364,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 10560,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 1",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 80700,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 2940,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 6912,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 12960,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 2",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 82908,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 3420,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7032,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 15024,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 3",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 85116,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 3900,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7152,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 17088,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 4",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 87324,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 4380,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7272,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 19152,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 5",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 89532,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 4860,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7392,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 21216,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 6",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 91740,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 5340,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7512,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 23280,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 7",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 93948,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 5820,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7632,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 25344,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 8",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 96156,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 6300,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7752,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 27408,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 9",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 98364,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 6780,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7872,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 29472,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 10",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 100572,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 7260,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 7992,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 31536,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 11",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 102780,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 7740,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8112,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 33600,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 12",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 104988,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 8220,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8232,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 35664,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 13",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 107196,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 8700,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8352,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 37728,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 14",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 109404,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 9180,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8472,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 39792,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 15",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 111612,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 9660,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8592,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 41856,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 16",
+      "triangles": 1624,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 113820,
+          "indexCount": 2208
+        },
+        {
+          "material": "boot",
+          "indexStart": 10140,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 8712,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 43920,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 2088,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 116028,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 10620,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 45984,
+          "indexCount": 4608
+        }
+      ]
+    },
+    {
+      "name": "Funnel 2 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 2088,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 116844,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 11460,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 50592,
+          "indexCount": 4608
+        }
+      ]
+    },
+    {
+      "name": "Mast 1 with taper, yards, rigging and access ladder",
+      "triangles": 4160,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 117660,
+          "indexCount": 4032
+        },
+        {
+          "material": "steel",
+          "indexStart": 55200,
+          "indexCount": 8448
+        }
+      ]
+    },
+    {
+      "name": "Mast 2 with taper, yards, rigging and access ladder",
+      "triangles": 3936,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 121692,
+          "indexCount": 4032
+        },
+        {
+          "material": "steel",
+          "indexStart": 63648,
+          "indexCount": 7776
+        }
+      ]
+    },
+    {
+      "name": "Open boat 1 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 125724,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 2892,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 71424,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 0,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Open boat 2 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 128412,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 3372,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 71616,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 6336,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 13808,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 131100,
+          "indexCount": 15456
+        },
+        {
+          "material": "boot",
+          "indexStart": 12300,
+          "indexCount": 1920
+        },
+        {
+          "material": "steel",
+          "indexStart": 71808,
+          "indexCount": 24048
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 29888,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 146556,
+          "indexCount": 49728
+        },
+        {
+          "material": "brass",
+          "indexStart": 8832,
+          "indexCount": 19968
+        },
+        {
+          "material": "glass",
+          "indexStart": 7944,
+          "indexCount": 19968
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 1564,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 196284,
+          "indexCount": 1860
+        },
+        {
+          "material": "brass",
+          "indexStart": 28800,
+          "indexCount": 1872
+        },
+        {
+          "material": "steel",
+          "indexStart": 95856,
+          "indexCount": 960
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 0,
+        "mount": [
+          50.085,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          64.26419830322266,
+          8.180649757385254,
+          -2.2174999713897705
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 0,
+        "mount": [
+          50.085,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          64.26419830322266,
+          8.180649757385254,
+          0
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 0,
+        "mount": [
+          50.085,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          64.26419830322266,
+          8.180649757385254,
+          2.2174999713897705
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 0,
+        "mount": [
+          32.64,
+          9.377,
+          0
+        ],
+        "muzzle": [
+          46.81919860839844,
+          11.180649757385254,
+          -1.2699999809265137
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 0,
+        "mount": [
+          32.64,
+          9.377,
+          0
+        ],
+        "muzzle": [
+          46.81919860839844,
+          11.180649757385254,
+          1.2699999809265137
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -6.941,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -21.12019920349121,
+          8.180649757385254,
+          2.2174999713897705
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -6.941,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -21.12019920349121,
+          8.180649757385254,
+          1.736451211430969e-15
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -6.941,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -21.12019920349121,
+          8.180649757385254,
+          -2.2174999713897705
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -39.393,
+          9.377,
+          0
+        ],
+        "muzzle": [
+          -53.572200775146484,
+          11.180649757385254,
+          1.2699999809265137
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -39.393,
+          9.377,
+          0
+        ],
+        "muzzle": [
+          -53.572200775146484,
+          11.180649757385254,
+          -1.2699999809265137
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -55.525,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -69.7042007446289,
+          8.180649757385254,
+          2.2174999713897705
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -55.525,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -69.7042007446289,
+          8.180649757385254,
+          1.736451211430969e-15
+        ]
+      },
+      {
+        "caliber": 304.79999999999995,
+        "bearing": 180,
+        "mount": [
+          -55.525,
+          6.377,
+          0
+        ],
+        "muzzle": [
+          -69.7042007446289,
+          8.180649757385254,
+          -2.2174999713897705
+        ]
+      }
+    ],
+    "secondaryBarrels": [
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          37.517,
+          3.997,
+          10.727
+        ],
+        "muzzle": [
+          37.516998291015625,
+          5.13700008392334,
+          17.356199264526367
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          37.517,
+          3.997,
+          -10.727
+        ],
+        "muzzle": [
+          37.516998291015625,
+          5.13700008392334,
+          -17.356199264526367
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          26.798,
+          3.997,
+          11.784
+        ],
+        "muzzle": [
+          26.79800033569336,
+          5.13700008392334,
+          18.41320037841797
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          26.798,
+          3.997,
+          -11.784
+        ],
+        "muzzle": [
+          26.79800033569336,
+          5.13700008392334,
+          -18.41320037841797
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          16.079,
+          3.997,
+          12.239
+        ],
+        "muzzle": [
+          16.07900047302246,
+          5.13700008392334,
+          18.868200302124023
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          16.079,
+          3.997,
+          -12.239
+        ],
+        "muzzle": [
+          16.07900047302246,
+          5.13700008392334,
+          -18.868200302124023
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          5.36,
+          3.997,
+          12.42
+        ],
+        "muzzle": [
+          5.360000133514404,
+          5.13700008392334,
+          19.0492000579834
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          5.36,
+          3.997,
+          -12.42
+        ],
+        "muzzle": [
+          5.360000133514404,
+          5.13700008392334,
+          -19.0492000579834
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          -5.36,
+          3.997,
+          12.511
+        ],
+        "muzzle": [
+          -5.360000133514404,
+          5.13700008392334,
+          19.140199661254883
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          -5.36,
+          3.997,
+          -12.51
+        ],
+        "muzzle": [
+          -5.360000133514404,
+          5.13700008392334,
+          -19.13920021057129
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          -16.079,
+          3.997,
+          12.511
+        ],
+        "muzzle": [
+          -16.07900047302246,
+          5.13700008392334,
+          19.140199661254883
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          -16.079,
+          3.997,
+          -12.51
+        ],
+        "muzzle": [
+          -16.07900047302246,
+          5.13700008392334,
+          -19.13920021057129
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          -26.798,
+          3.997,
+          12.511
+        ],
+        "muzzle": [
+          -26.79800033569336,
+          5.13700008392334,
+          19.140199661254883
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          -26.798,
+          3.997,
+          -12.51
+        ],
+        "muzzle": [
+          -26.79800033569336,
+          5.13700008392334,
+          -19.13920021057129
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": 90,
+        "mount": [
+          -37.517,
+          3.997,
+          12.352
+        ],
+        "muzzle": [
+          -37.516998291015625,
+          5.13700008392334,
+          18.981199264526367
+        ]
+      },
+      {
+        "caliber": 152.4,
+        "bearing": -90,
+        "mount": [
+          -37.517,
+          3.997,
+          -12.352
+        ],
+        "muzzle": [
+          -37.516998291015625,
+          5.13700008392334,
+          -18.981199264526367
+        ]
+      }
+    ],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 13,
+  "modelledExternalTorpedoTubes": 0
+}

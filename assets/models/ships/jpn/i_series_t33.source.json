@@ -1,0 +1,438 @@
+{
+  "id": "i_series_t33",
+  "name": "I-series",
+  "year": 1933,
+  "type": "SS",
+  "nation": "JPN",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "jpn/i_series_t33.glb",
+  "dimensions": {
+    "length": 89,
+    "beam": 7.7,
+    "draft": 4.4
+  },
+  "origin": "original",
+  "configuration": "1933 catalog fit. Catalog hull length 89 m and beam 7.7 m; unspecified superstructure details are original illustration choices. Main battery 0 × 0 mm. Internal torpedo tubes are not shown as exposed deck mounts.",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Original shared-geometry recognition drawing",
+      "file": "assets/recognition/originals/ships/jpn/i_series_t33.svg",
+      "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/originals/ships/jpn/i_series_t33.svg",
+      "license": "Original project artwork",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Catalog hull dimensions",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from jpn/i_series_t33.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.025,
+      0.025,
+      1.737
+    ],
+    [
+      -0.97,
+      0.14,
+      0.2687970912252936,
+      1.737
+    ],
+    [
+      -0.9,
+      0.37,
+      0.4503632554650915,
+      1.737
+    ],
+    [
+      -0.78,
+      0.81,
+      0.6278290996257473,
+      1.737
+    ],
+    [
+      -0.6,
+      0.94,
+      0.7957268904648718,
+      1.737
+    ],
+    [
+      -0.35,
+      1,
+      0.9337471478043112,
+      1.737
+    ],
+    [
+      0,
+      1,
+      1,
+      1.737
+    ],
+    [
+      0.25,
+      0.97,
+      0.9665283534785406,
+      1.737
+    ],
+    [
+      0.45,
+      0.78,
+      0.8888931748931292,
+      1.737
+    ],
+    [
+      0.64,
+      0.58,
+      0.7646813598887539,
+      1.737
+    ],
+    [
+      0.8,
+      0.31,
+      0.6035210420148092,
+      1.737
+    ],
+    [
+      0.91,
+      0.12,
+      0.43055968215769386,
+      1.737
+    ],
+    [
+      0.975,
+      0.025,
+      0.24854083358478596,
+      1.737
+    ],
+    [
+      1,
+      0.0008,
+      0.025,
+      1.737
+    ]
+  ],
+  "stations": [
+    {
+      "role": "conning-tower",
+      "x": 1,
+      "y": 0,
+      "z": 2.017,
+      "w": 10.5,
+      "d": 3.4,
+      "h": 3.4
+    },
+    {
+      "role": "periscope",
+      "x": -0.365,
+      "y": 0,
+      "z": 5.417,
+      "w": 0.13,
+      "d": 0.13,
+      "h": 3.2
+    },
+    {
+      "role": "periscope",
+      "x": 2.89,
+      "y": 0,
+      "z": 5.417,
+      "w": 0.13,
+      "d": 0.13,
+      "h": 3.2
+    }
+  ],
+  "armament": {
+    "caliber": 0,
+    "barrels": 0,
+    "torpedoTubes": 8,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [],
+    "torpedoFit": null
+  },
+  "shafts": 2,
+  "complement": 50,
+  "displacement": 1600,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "date": "2026-09-30",
+    "status": "Original exterior reconstruction reviewed for coherent class fit; not an engineering survey",
+    "stationAxes": "x bow-positive; y starboard-positive; z height above waterline, all metres. Exporter converts to glTF X/Y-up/Z.",
+    "viewConsistency": "One mesh and one equipment-station ledger generate every view; no independent side/top geometry.",
+    "notes": [
+      "Class-specific fairwater proportions and periscope stations are inferred exterior artwork. Two narrow periscopes replace oversized half-metre posts. Deck gun count, direction and internal-tube representation are checked against the named catalog/reference fit.",
+      "Scenario design: the name does not assert identity with an actual historical submarine. Hull dimensions and combat fit remain the game catalog; all detailed exterior fittings are original design choices."
+    ],
+    "expectedMainBarrels": 0,
+    "expectedSecondaryBarrels": 0,
+    "expectedElevators": 0,
+    "expectedFunnels": 0
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.27,
+        0.285,
+        0.29,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.17,
+        0.185,
+        0.19,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "efd155cb5847ad5add1b3ffe80f38fbf3f838b1ef2af0d39c3d987b59c2ddf56",
+  "statistics": {
+    "id": "i_series_t33",
+    "triangles": 17656,
+    "vertices": 20625,
+    "materials": 6,
+    "embeddedTextures": 3,
+    "bytes": 1450372,
+    "bounds": {
+      "min": [
+        -44.5,
+        -4.400000095367432,
+        -5.493949890136719
+      ],
+      "max": [
+        44.5,
+        8.696999549865723,
+        5.493949890136719
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 3200,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 2472
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 1236
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 5892
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 396,
+      "ranges": [
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 1188
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 2112,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 2472,
+          "indexCount": 192
+        },
+        {
+          "material": "boot",
+          "indexStart": 1236,
+          "indexCount": 4608
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 1536
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 7936,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 2664,
+          "indexCount": 23808
+        }
+      ]
+    },
+    {
+      "name": "Streamlined conning fairwater, periscopes, casing vents and diving planes",
+      "triangles": 3392,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 26472,
+          "indexCount": 7200
+        },
+        {
+          "material": "deck",
+          "indexStart": 1188,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 1536,
+          "indexCount": 2496
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 620,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 33672,
+          "indexCount": 444
+        },
+        {
+          "material": "steel",
+          "indexStart": 4032,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 936
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [],
+    "secondaryBarrels": [],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 0,
+  "modelledExternalTorpedoTubes": 0
+}

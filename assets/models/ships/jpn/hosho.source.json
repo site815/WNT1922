@@ -1,0 +1,805 @@
+{
+  "id": "hosho",
+  "name": "Hosho",
+  "year": 1919,
+  "type": "CVL",
+  "nation": "JPN",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "jpn/hosho.glb",
+  "dimensions": {
+    "length": 168.2496,
+    "beam": 18.8976,
+    "draft": 4.572
+  },
+  "origin": "historical",
+  "configuration": "Hosho in 1939: islandless post-1924 carrier arrangement, two lifts, three hinged starboard funnels and four single 140 mm guns below the flight deck. Published modern historical reconstruction. The original 1922 island has already been removed; this is a stated later reference fit.",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Line Drawing of Japanese Aircraft Carrier Hosho 1939.",
+      "file": "assets/recognition/ships/JPN/hosho.png",
+      "url": "https://commons.wikimedia.org/wiki/File:Drawing_of_Japanese_Aircraft_Carrier_HOSHO_1939.png",
+      "license": "CC BY-SA 3.0",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    },
+    {
+      "title": "ONI Japanese naval vessels, CVL HOSHO characteristics, Combined Arms Research Library",
+      "url": "https://cgsc.contentdm.oclc.org/digital/api/collection/p4013coll8/id/4661/download",
+      "license": "Factual reference only; no source image or traced mesh redistributed",
+      "usedFor": "Dated US Navy intelligence dimensions, two elevators, two shafts and four 5.5-inch guns."
+    }
+  ],
+  "dimensionBasis": "US wartime ONI 222 CVL HOSHO data: 552 ft overall, 62 ft hull beam, 74 ft flight deck, 15 ft maximum draft. These are intelligence estimates for the later reference, not claimed original yard measurements.",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from jpn/hosho.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      4.4603
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      4.4603
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      4.4603
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      4.4603
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      4.4603
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      4.4603
+    ],
+    [
+      0,
+      1,
+      1,
+      4.4603
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      4.4603
+    ],
+    [
+      0.45,
+      0.75,
+      0.8624999999999999,
+      4.4811
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      4.6351
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      4.8812
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      5.1122
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      5.2723
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      5.3385
+    ]
+  ],
+  "stations": [
+    {
+      "role": "flight-deck",
+      "x": 0,
+      "y": 0,
+      "z": 7.9368,
+      "w": 158.1544,
+      "d": 22.5552,
+      "h": 0.6615
+    },
+    {
+      "role": "hangar",
+      "x": 0,
+      "y": 0,
+      "z": 4.7249,
+      "w": 131.796,
+      "d": 11.3397,
+      "h": 3.2129
+    },
+    {
+      "role": "hinged-exhaust",
+      "x": -8.4125,
+      "y": 7.7478,
+      "z": 4.7249,
+      "w": 5.8885,
+      "d": 3.4019,
+      "h": 2.2679,
+      "exhaustDirection": "side"
+    },
+    {
+      "role": "hinged-exhaust",
+      "x": -21.8722,
+      "y": 7.7478,
+      "z": 4.7249,
+      "w": 5.8885,
+      "d": 3.4019,
+      "h": 2.2679,
+      "exhaustDirection": "side"
+    },
+    {
+      "role": "hinged-exhaust",
+      "x": -35.3328,
+      "y": 7.7478,
+      "z": 4.7249,
+      "w": 5.8885,
+      "d": 3.4019,
+      "h": 2.2679,
+      "exhaustDirection": "side"
+    },
+    {
+      "role": "secondary",
+      "x": 45.4274,
+      "y": -9.4,
+      "z": 5.7,
+      "w": 3.08,
+      "d": 1.68,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 140,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "secondary",
+      "x": -48.7924,
+      "y": -9.4,
+      "z": 5.7,
+      "w": 3.08,
+      "d": 1.68,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 140,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "secondary",
+      "x": 45.4274,
+      "y": 9.4,
+      "z": 5.7,
+      "w": 3.08,
+      "d": 1.68,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 140,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "secondary",
+      "x": -48.7924,
+      "y": 9.4,
+      "z": 5.7,
+      "w": 3.08,
+      "d": 1.68,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 140,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "lift",
+      "x": -44.2832,
+      "y": 0,
+      "z": 8.2268,
+      "w": 9.4893,
+      "d": 9.9243,
+      "h": 0.08
+    },
+    {
+      "role": "lift",
+      "x": 39.5386,
+      "y": 0,
+      "z": 8.2268,
+      "w": 9.4893,
+      "d": 9.9243,
+      "h": 0.08
+    }
+  ],
+  "armament": {
+    "caliber": 0,
+    "barrels": 0,
+    "torpedoTubes": 0,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [],
+    "torpedoFit": null
+  },
+  "shafts": 2,
+  "complement": 512,
+  "displacement": 7470,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "date": "2026-09-30",
+    "status": "Original exterior reconstruction reviewed for coherent class fit; not an engineering survey",
+    "stationAxes": "x bow-positive; y starboard-positive; z height above waterline, all metres. Exporter converts to glTF X/Y-up/Z.",
+    "viewConsistency": "One mesh and one equipment-station ledger generate every view; no independent side/top geometry.",
+    "notes": [
+      "Retains the stated islandless 1939 reference with three hinged starboard funnels. No late-war deck extension or original 1922 island is substituted."
+    ],
+    "expectedMainBarrels": 0,
+    "expectedSecondaryBarrels": 4,
+    "expectedElevators": 2,
+    "expectedFunnels": 3
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.27,
+        0.285,
+        0.29,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.4,
+        0.34,
+        0.235,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "a0cfbd6f159fa89448e948865e4194a95a96d0309f9fef9128a8458f3ae11694",
+  "statistics": {
+    "id": "hosho",
+    "triangles": 77372,
+    "vertices": 91985,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 4455264,
+    "bounds": {
+      "min": [
+        -84.12480163574219,
+        -4.572000026702881,
+        -15.526800155639648
+      ],
+      "max": [
+        84.12480163574219,
+        8.356800079345703,
+        15.526800155639648
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 7520,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 6852
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 684
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 15024
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 18316,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 6852,
+          "indexCount": 52704
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 2244
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 1",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 59556,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 684,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 2",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 60948,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 876,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 2064,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 120,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 3",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 62340,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1068,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 4128,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 240,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Secondary mount 4",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 63732,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1260,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 6192,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 360,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 7152,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 65124,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 8256,
+          "indexCount": 20976
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 11776,
+      "ranges": [
+        {
+          "material": "brass",
+          "indexStart": 480,
+          "indexCount": 17664
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 17664
+        }
+      ]
+    },
+    {
+      "name": "Enclosed hangar sides with doors, galleries and structural frames",
+      "triangles": 13680,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 65604,
+          "indexCount": 37728
+        },
+        {
+          "material": "boot",
+          "indexStart": 1452,
+          "indexCount": 3312
+        }
+      ]
+    },
+    {
+      "name": "Continuous flight-deck with beams, planking, safety net, landing markings and arresting wires",
+      "triangles": 10864,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 103332,
+          "indexCount": 25920
+        },
+        {
+          "material": "deck",
+          "indexStart": 2244,
+          "indexCount": 3696
+        },
+        {
+          "material": "steel",
+          "indexStart": 29232,
+          "indexCount": 1344
+        },
+        {
+          "material": "white",
+          "indexStart": 0,
+          "indexCount": 1632
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 129252,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 30576,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 129348,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 31776,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Carrier hinged-exhaust uptake with curved outlet",
+      "triangles": 416,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 129444,
+          "indexCount": 864
+        },
+        {
+          "material": "boot",
+          "indexStart": 4764,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Carrier hinged-exhaust uptake with curved outlet",
+      "triangles": 416,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 130308,
+          "indexCount": 864
+        },
+        {
+          "material": "boot",
+          "indexStart": 5148,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Carrier hinged-exhaust uptake with curved outlet",
+      "triangles": 416,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 131172,
+          "indexCount": 864
+        },
+        {
+          "material": "boot",
+          "indexStart": 5532,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 928,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 132036,
+          "indexCount": 1368
+        },
+        {
+          "material": "steel",
+          "indexStart": 32976,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 18144,
+          "indexCount": 936
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [],
+    "secondaryBarrels": [
+      {
+        "caliber": 140,
+        "bearing": -90,
+        "mount": [
+          45.4274,
+          5.7,
+          -9.4
+        ],
+        "muzzle": [
+          45.427398681640625,
+          6.644999980926514,
+          -15.526800155639648
+        ]
+      },
+      {
+        "caliber": 140,
+        "bearing": -90,
+        "mount": [
+          -48.7924,
+          5.7,
+          -9.4
+        ],
+        "muzzle": [
+          -48.79240036010742,
+          6.644999980926514,
+          -15.526800155639648
+        ]
+      },
+      {
+        "caliber": 140,
+        "bearing": 90,
+        "mount": [
+          45.4274,
+          5.7,
+          9.4
+        ],
+        "muzzle": [
+          45.427398681640625,
+          6.644999980926514,
+          15.526800155639648
+        ]
+      },
+      {
+        "caliber": 140,
+        "bearing": 90,
+        "mount": [
+          -48.7924,
+          5.7,
+          9.4
+        ],
+        "muzzle": [
+          -48.79240036010742,
+          6.644999980926514,
+          15.526800155639648
+        ]
+      }
+    ],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 0,
+  "modelledExternalTorpedoTubes": 0
+}

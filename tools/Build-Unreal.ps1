@@ -11,6 +11,7 @@ $ErrorActionPreference = 'Stop'
 $setup = & (Join-Path $PSScriptRoot 'Check-Unreal.ps1') -EngineRoot $EngineRoot -NodePath $NodePath -PassThru -RequireReady
 $repo=$setup.Repository; $project=$setup.Project; $engine=$setup.Engine
 Set-Location -LiteralPath $repo
+& (Join-Path $PSScriptRoot 'Prepare-OfflineBrowser.ps1') -EngineRoot $engine.Root
 $projectConfig=Get-Content -Raw -LiteralPath (Join-Path $repo 'unreal\Config\DefaultGame.ini')
 $versionMatch=[regex]::Match($projectConfig,'(?m)^ProjectVersion=((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)\s*$')
 if (-not $versionMatch.Success) { throw 'Native DefaultGame.ini ProjectVersion must be a valid semantic version.' }
@@ -24,7 +25,7 @@ $expectedTests=@(Get-ChildItem -LiteralPath (Join-Path $repo 'unreal\Source') -F
     [regex]::Matches($source,'IMPLEMENT_SIMPLE_AUTOMATION_TEST\s*\([^,]+,\s*"(WNT\.[^"]+)"') | ForEach-Object { $_.Groups[1].Value }
 })
 if (@($expectedTests | Select-Object -Unique).Count -ne $expectedTests.Count) { throw 'Native WNT automation test paths must be unique.' }
-foreach ($group in @('Geography','Camera','World','Ships')) {
+foreach ($group in @('Geography','Camera','World','Ships','Window')) {
     if (@($expectedTests | Where-Object { $_ -like ('WNT.'+$group+'.*') }).Count -eq 0) { throw ('Missing native automation coverage: WNT.'+$group) }
 }
 $run = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff')

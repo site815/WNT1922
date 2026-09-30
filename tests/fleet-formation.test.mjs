@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
 import { CATALOG } from '../worker/catalog-loader.mjs';
 import { newGame } from '../mechanics/engine.mjs';
 import { fleetPosition } from '../mechanics/task-forces.mjs';
@@ -157,5 +158,76 @@ test('both campaigns and all navies account for every completed naval hull and u
       assert(frame.hulls.every(h => h.position.every(Number.isFinite)));
     }
     assert.equal(JSON.stringify(s), before);
+  }
+});
+
+test('co-located forces have separate stable display stations while their routes and internal formations stay intact', () => {
+  const forces = [fleet('a', [[179.999, 70], [-178, 70]]), fleet('b', [[179.999, 70], [179.999, 72]]),
+    fleet('c', [[179.999, 70]], { speed: 0 }), fleet('unrelated', [[179.7, 70], [179.7, 72]])];
+  const groups = forces.flatMap(f => [group(`${f.id}-heavy`, 'bb', { fleetId: f.id }),
+    group(`${f.id}-escort`, 'dd', { fleetId: f.id, count: 6 })]);
+  const s = state(groups, forces), before = structuredClone(s);
+  const dimensionsFor = () => ({ length: 900, beam: 160 });
+  const rows = ownFormationScene(s, { classes }, [], { dimensionsFor });
+  const frames = rows.map(row => formationAt(s, row));
+  for (const [index, frame] of frames.entries()) {
+    assert.deepEqual(frame.anchor, fleetPosition(s, forces[index]));
+    assert.equal(frame.heading, fleetCourse(s, forces[index]).heading);
+    const isolated = ownFormationScene(state(groups.filter(g => g.fleetId === forces[index].id), [forces[index]]), { classes }, [], { dimensionsFor })[0];
+    assert.deepEqual(rows[index].formation.slots, isolated.formation.slots);
+    assert.deepEqual(rows[index].formation.spacing, isolated.formation.spacing);
+    assert.deepEqual(rows[index].formation.center, isolated.formation.center);
+    const alone = formationAt(s, isolated), translation = rows[index].formation.separationOffsetMeters;
+    frame.hulls.forEach((hull, i) => hull.stationMeters.forEach((value, axis) => near(value - alone.hulls[i].stationMeters[axis], translation[axis])));
+  }
+  assert.deepEqual(rows.find(row => row.fleet.id === 'unrelated').formation.separationOffsetMeters, [0, 0], 'nearby distinct route anchors are not shifted');
+  for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) {
+    for (const a of frames[i].hulls) for (const b of frames[j].hulls) {
+      assert(distanceNm(a.position, b.position) * 1852 >= Math.hypot(900, 160) + 79,
+        'Rotated complete model envelopes do not overlap at a polar/dateline harbor');
+    }
+  }
+  const changed = structuredClone(s); changed.nations.USA.groups.reverse(); changed.nations.USA.fleets.reverse();
+  const reordered = ownFormationScene(changed, { classes }, [], { dimensionsFor });
+  for (const row of reordered) assert.deepEqual(row.formation, rows.find(previous => previous.fleet.id === row.fleet.id).formation);
+  changed.nations.USA.groups.find(g => g.id === 'a-escort').count = 5;
+  const next = ownFormationScene(changed, { classes }, rows, { dimensionsFor });
+  for (const row of next) {
+    const prior = frames.find(frame => frame.hulls[0].group.fleetId === row.fleet.id);
+    for (const hull of formationAt(changed, row).hulls) assert.deepEqual(hull.stationMeters, prior.hulls.find(h => h.key === hull.key).stationMeters, 'casualties retain surviving hull stations');
+  }
+  changed.fraction = .25;
+  const departed = ownFormationScene(changed, { classes }, next, { dimensionsFor });
+  for (const row of departed) {
+    const prior = next.find(previous => previous.fleet.id === row.fleet.id);
+    assert.deepEqual(row.formation.separationOffsetMeters, prior.formation.separationOffsetMeters, 'departing forces retain their assigned display stations');
+    assert.deepEqual(formationAt(changed, row).anchor, fleetPosition(changed, row.fleet), 'departure follows the unchanged authoritative route');
+  }
+  assert.deepEqual(s, before, 'display separation never changes authoritative fleet or save data');
+});
+
+test('opening Pearl Harbor forces clear actual authored model bounds instead of crossing Ranger or stacking escorts', async () => {
+  const s = newGame(CATALOG, 'USA', 3901, 'in_good_faith_1936');
+  const rows = ownFormationScene(s, CATALOG).filter(row => {
+    const anchor = formationAt(s, row).anchor;
+    return anchor && distanceNm(anchor, [-158, 21]) < .0001;
+  });
+  assert(rows.length >= 4, 'exercise the independently headed carrier, battle, submarine and escort forces at Pearl');
+  const registry = JSON.parse(await fs.readFile('assets/models/ships/index.json', 'utf8'));
+  const models = new Map(registry.models.flatMap(model => model.platforms.map(platform => [(platform.campaign ? `${platform.campaign}:` : '') + platform.id, model])));
+  const hulls = rows.flatMap(row => formationAt(s, row).hulls.map(hull => ({ ...hull, forceId: row.fleet.id })));
+  const radii = new Map();
+  for (const classId of new Set(hulls.map(hull => hull.classId))) {
+    const model = models.get(`${s.campaignId}:${classId}`) || models.get(classId);
+    assert(model, `Detailed model mapping exists for ${classId}`);
+    const source = JSON.parse(await fs.readFile('assets/models/ships/' + model.file.replace(/\.glb$/, '.source.json'), 'utf8'));
+    const bounds = source.statistics?.bounds || source.summary?.bounds;
+    assert(bounds, `Actual GLB bounds are recorded for ${classId}`);
+    radii.set(classId, Math.hypot(bounds.max[0] - bounds.min[0], bounds.max[2] - bounds.min[2]) / 2);
+  }
+  for (let i = 0; i < hulls.length; i++) for (let j = i + 1; j < hulls.length; j++) {
+    const a = hulls[i], b = hulls[j]; if (a.forceId === b.forceId) continue;
+    assert(distanceNm(a.position, b.position) * 1852 > radii.get(a.classId) + radii.get(b.classId),
+      `${a.key}/${a.forceId} and ${b.key}/${b.forceId} need clearance for their complete rotated detailed meshes`);
   }
 });

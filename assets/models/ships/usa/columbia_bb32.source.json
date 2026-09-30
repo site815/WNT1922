@@ -1,0 +1,3957 @@
+{
+  "id": "columbia_bb32",
+  "name": "Columbia class",
+  "year": 1932,
+  "type": "BB",
+  "nation": "USA",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "usa/columbia_bb32.glb",
+  "dimensions": {
+    "length": 350,
+    "beam": 46.5,
+    "draft": 14.4
+  },
+  "origin": "original",
+  "configuration": "1935 catalog fit. Catalog hull length 350 m and beam 46.5 m; unspecified superstructure details are original illustration choices. Main battery 12 × 546 mm. ",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Original shared-geometry recognition drawing",
+      "file": "assets/recognition/originals/ships/usa/columbia_bb32.svg",
+      "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/originals/ships/usa/columbia_bb32.svg",
+      "license": "Original project artwork",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Catalog hull dimensions",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from usa/columbia_bb32.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      8.12
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      8.12
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      8.12
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      8.12
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      8.12
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      8.12
+    ],
+    [
+      0,
+      1,
+      1,
+      8.12
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      8.12
+    ],
+    [
+      0.45,
+      0.83,
+      0.9544999999999999,
+      8.171149999999999
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      8.5501715
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      9.155787499999999
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      9.724063999999998
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      10.118046875
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      10.2810875
+    ]
+  ],
+  "stations": [
+    {
+      "role": "main",
+      "x": 124.25,
+      "y": 0,
+      "z": 8.4,
+      "w": 14.833,
+      "d": 11.058,
+      "h": 3.981,
+      "barrels": 3
+    },
+    {
+      "role": "main-barrel",
+      "x": 137.507,
+      "y": -2.764,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": 137.507,
+      "y": 0,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": 137.507,
+      "y": 2.765,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "turret-pedestal",
+      "x": 92.75,
+      "y": 0,
+      "z": 8.4,
+      "w": 15.426,
+      "d": 11.5,
+      "h": 3.981
+    },
+    {
+      "role": "main",
+      "x": 92.75,
+      "y": 0,
+      "z": 12.381,
+      "w": 14.833,
+      "d": 11.058,
+      "h": 3.981,
+      "barrels": 3
+    },
+    {
+      "role": "main-barrel",
+      "x": 106.007,
+      "y": -2.764,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": 106.007,
+      "y": 0,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": 106.007,
+      "y": 2.765,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "turret-pedestal",
+      "x": -78.75,
+      "y": 0,
+      "z": 8.4,
+      "w": 15.426,
+      "d": 11.5,
+      "h": 3.981
+    },
+    {
+      "role": "main",
+      "x": -78.75,
+      "y": 0,
+      "z": 12.381,
+      "w": 14.833,
+      "d": 11.058,
+      "h": 3.981,
+      "barrels": 3
+    },
+    {
+      "role": "main-barrel",
+      "x": -92.007,
+      "y": -2.764,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": -92.007,
+      "y": 0,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": -92.007,
+      "y": 2.765,
+      "z": 14.69,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main",
+      "x": -113.75,
+      "y": 0,
+      "z": 8.4,
+      "w": 14.833,
+      "d": 11.058,
+      "h": 3.981,
+      "barrels": 3
+    },
+    {
+      "role": "main-barrel",
+      "x": -127.007,
+      "y": -2.764,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": -127.007,
+      "y": 0,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "main-barrel",
+      "x": -127.007,
+      "y": 2.765,
+      "z": 10.709,
+      "w": 15.834,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "bridge-base",
+      "x": 40.25,
+      "y": 0,
+      "z": 8.4,
+      "w": 19.344,
+      "d": 23.436,
+      "h": 8.789
+    },
+    {
+      "role": "bridge",
+      "x": 40.25,
+      "y": 0,
+      "z": 17.188,
+      "w": 16.12,
+      "d": 22.32,
+      "h": 7.812
+    },
+    {
+      "role": "bridge-windows",
+      "x": 41.54,
+      "y": 0,
+      "z": 25,
+      "w": 11.606,
+      "d": 17.856,
+      "h": 2.929
+    },
+    {
+      "role": "mast",
+      "x": 31.15,
+      "y": 0,
+      "z": 8.4,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 52.5
+    },
+    {
+      "role": "funnel",
+      "x": 3.5,
+      "y": 0,
+      "z": 8.4,
+      "w": 7,
+      "d": 6.3,
+      "h": 18.135
+    },
+    {
+      "role": "funnel",
+      "x": -22.75,
+      "y": 0,
+      "z": 8.4,
+      "w": 7,
+      "d": 6.3,
+      "h": 18.135
+    },
+    {
+      "role": "mast",
+      "x": -49,
+      "y": 0,
+      "z": 8.4,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 52.5
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 49.867,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 49.867,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 38.2,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 38.2,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 26.534,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 26.534,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 14.867,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 14.867,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 3.2,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 3.2,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -8.466,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -8.466,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -20.133,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -20.133,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -31.8,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -31.8,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -43.466,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -43.466,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -55.133,
+      "y": -16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -55.133,
+      "y": -15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 44.633,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 44.633,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 32.966,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 32.966,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 21.3,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 21.3,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 9.633,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": 9.633,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -2.034,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -2.034,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -13.7,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -13.7,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -25.367,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -25.367,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -37.034,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -37.034,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -48.7,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -48.7,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -60.367,
+      "y": 15.455,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "secondary-barrel",
+      "x": -60.367,
+      "y": 16.165,
+      "z": 9.096,
+      "w": 3.175,
+      "d": 0.764,
+      "h": 0.764
+    },
+    {
+      "role": "catapult",
+      "x": -136.5,
+      "y": -10.23,
+      "z": 8.4,
+      "w": 16,
+      "d": 1,
+      "h": 1.5
+    },
+    {
+      "role": "catapult",
+      "x": -136.5,
+      "y": 10.23,
+      "z": 8.4,
+      "w": 16,
+      "d": 1,
+      "h": 1.5
+    },
+    {
+      "role": "mast",
+      "x": -156.45,
+      "y": 0,
+      "z": 8.4,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 18.6
+    },
+    {
+      "role": "crane-boom",
+      "x": -147.7,
+      "y": 0,
+      "z": 27,
+      "w": 19.25,
+      "d": 0.65,
+      "h": 0.65
+    },
+    {
+      "role": "boat",
+      "x": 15.75,
+      "y": -12.09,
+      "z": 8.4,
+      "w": 7,
+      "d": 2.1,
+      "h": 1
+    },
+    {
+      "role": "boat",
+      "x": -38.5,
+      "y": -12.09,
+      "z": 8.4,
+      "w": 7,
+      "d": 2.1,
+      "h": 1
+    },
+    {
+      "role": "boat",
+      "x": 15.75,
+      "y": 12.09,
+      "z": 8.4,
+      "w": 7,
+      "d": 2.1,
+      "h": 1
+    },
+    {
+      "role": "boat",
+      "x": -38.5,
+      "y": 12.09,
+      "z": 8.4,
+      "w": 7,
+      "d": 2.1,
+      "h": 1
+    },
+    {
+      "role": "light-aa",
+      "x": 56,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 51.13,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 46.261,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 41.391,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 36.522,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 31.652,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 26.783,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 21.913,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 17.043,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 12.174,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 7.304,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 2.435,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -2.435,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -7.304,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -12.174,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -17.043,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -21.913,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -26.783,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -31.652,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -36.522,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -41.391,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -46.261,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -51.13,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -56,
+      "y": -19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 56,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 51.13,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 46.261,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 41.391,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 36.522,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 31.652,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 26.783,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 21.913,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 17.043,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 12.174,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 7.304,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": 2.435,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -2.435,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -7.304,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -12.174,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -17.043,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -21.913,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -26.783,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -31.652,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -36.522,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -41.391,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -46.261,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -51.13,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    },
+    {
+      "role": "light-aa",
+      "x": -56,
+      "y": 19.995,
+      "z": 8.4,
+      "w": 1.3,
+      "d": 1.3,
+      "h": 1.1
+    }
+  ],
+  "armament": {
+    "caliber": 546,
+    "barrels": 12,
+    "torpedoTubes": 0,
+    "torpedoReloads": null,
+    "aa": 48,
+    "secondary": [],
+    "torpedoFit": null
+  },
+  "shafts": 4,
+  "complement": 6600,
+  "displacement": 142000,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "reviewed": "2026-09-30",
+    "expectedMainBarrels": 12,
+    "notes": "Fictional campaign design. Declared main arrangement retained; secondary barrel totals and mount types materialized from catalog. No historical identity claimed."
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.355,
+        0.38,
+        0.395,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.4,
+        0.34,
+        0.235,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "c236609f4f346b2e04cc4403903d668d7b3581d0f0fb282a7c48f11504200b4f",
+  "statistics": {
+    "id": "columbia_bb32",
+    "triangles": 243576,
+    "vertices": 304426,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 13263508,
+    "bounds": {
+      "min": [
+        -175,
+        -14.399999618530273,
+        -23.292999267578125
+      ],
+      "max": [
+        175,
+        60.900001525878906,
+        23.292999267578125
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 15600,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 14124
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 360
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 32316
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 38516,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 14124,
+          "indexCount": 110880
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 4668
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
+      "triangles": 3632,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 125004,
+          "indexCount": 240
+        },
+        {
+          "material": "deck",
+          "indexStart": 4668,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 5184
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 4992
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge with glazing, doors, portholes and roof rails",
+      "triangles": 4472,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 125244,
+          "indexCount": 1200
+        },
+        {
+          "material": "deck",
+          "indexStart": 4764,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 5184,
+          "indexCount": 4416
+        },
+        {
+          "material": "glass",
+          "indexStart": 4992,
+          "indexCount": 7320
+        },
+        {
+          "material": "steel",
+          "indexStart": 384,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 1 3 x 546 mm",
+      "triangles": 1696,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 126444,
+          "indexCount": 2112
+        },
+        {
+          "material": "boot",
+          "indexStart": 360,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 768,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 3 x 546 mm",
+      "triangles": 1888,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 128556,
+          "indexCount": 2688
+        },
+        {
+          "material": "boot",
+          "indexStart": 936,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 3168,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 3 3 x 546 mm",
+      "triangles": 1888,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 131244,
+          "indexCount": 2688
+        },
+        {
+          "material": "boot",
+          "indexStart": 1512,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 5568,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 4 3 x 546 mm",
+      "triangles": 1696,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 133932,
+          "indexCount": 2112
+        },
+        {
+          "material": "boot",
+          "indexStart": 2088,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 7968,
+          "indexCount": 2400
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 1",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 136044,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 2664,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 9600,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 10368,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 2",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 137100,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 2856,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 9720,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 12432,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 3",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 138156,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 3048,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 9840,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 14496,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 4",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 139212,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 3240,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 9960,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 16560,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 5",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 140268,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 3432,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10080,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 18624,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 6",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 141324,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 3624,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10200,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 20688,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 7",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 142380,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 3816,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10320,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 22752,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 8",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 143436,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4008,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10440,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 24816,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 9",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 144492,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4200,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10560,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 26880,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 10",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 145548,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4392,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10680,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 28944,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 11",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 146604,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4584,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10800,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 31008,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 12",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 147660,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4776,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 10920,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 33072,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 13",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 148716,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 4968,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11040,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 35136,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 14",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 149772,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 5160,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11160,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 37200,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 15",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 150828,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 5352,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11280,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 39264,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 16",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 151884,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 5544,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11400,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 41328,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 17",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 152940,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 5736,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11520,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 43392,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 18",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 153996,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 5928,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11640,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 45456,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 19",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 155052,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 6120,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11760,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 47520,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 20",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 156108,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 6312,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 11880,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 49584,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 21",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 157164,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 6504,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12000,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 51648,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 22",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 158220,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 6696,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12120,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 53712,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 23",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 159276,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 6888,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12240,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 55776,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 24",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 160332,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 7080,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12360,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 57840,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 25",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 161388,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 7272,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12480,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 59904,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 26",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 162444,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 7464,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12600,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 61968,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 27",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 163500,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 7656,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12720,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 64032,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 28",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 164556,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 7848,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12840,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 66096,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 29",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 165612,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 8040,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 12960,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 68160,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 30",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 166668,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 8232,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13080,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 70224,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 31",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 167724,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 8424,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13200,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 72288,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 32",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 168780,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 8616,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13320,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 74352,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 33",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 169836,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 8808,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13440,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 76416,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 34",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 170892,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9000,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13560,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 78480,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 35",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 171948,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9192,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13680,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 80544,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 36",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 173004,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9384,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13800,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 82608,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 37",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 174060,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9576,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13920,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 84672,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 38",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 175116,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9768,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14040,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 86736,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 39",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 176172,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 9960,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14160,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 88800,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 40",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 177228,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 10152,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14280,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 90864,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 41",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 178284,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 10344,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14400,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 92928,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 42",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 179340,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 10536,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14520,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 94992,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 43",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 180396,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 10728,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14640,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 97056,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 44",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 181452,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 10920,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14760,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 99120,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 45",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 182508,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 11112,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14880,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 101184,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 46",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 183564,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 11304,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 15000,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 103248,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 47",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 184620,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 11496,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 15120,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 105312,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Light AA pedestal 48",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 185676,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 11688,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 15240,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 107376,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 2952,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 186732,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 11880,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 109440,
+          "indexCount": 7200
+        }
+      ]
+    },
+    {
+      "name": "Funnel 2 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 2952,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 187548,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 12720,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 116640,
+          "indexCount": 7200
+        }
+      ]
+    },
+    {
+      "name": "Mast 1 with taper, yards, rigging and access ladder",
+      "triangles": 7232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 188364,
+          "indexCount": 3840
+        },
+        {
+          "material": "steel",
+          "indexStart": 123840,
+          "indexCount": 17856
+        }
+      ]
+    },
+    {
+      "name": "Mast 2 with taper, yards, rigging and access ladder",
+      "triangles": 7232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 192204,
+          "indexCount": 3840
+        },
+        {
+          "material": "steel",
+          "indexStart": 141696,
+          "indexCount": 17856
+        }
+      ]
+    },
+    {
+      "name": "Mast 3 with taper, yards, rigging and access ladder",
+      "triangles": 3488,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 196044,
+          "indexCount": 3840
+        },
+        {
+          "material": "steel",
+          "indexStart": 159552,
+          "indexCount": 6624
+        }
+      ]
+    },
+    {
+      "name": "Open boat 1 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 199884,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 4860,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 166176,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 0,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Open boat 2 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 202572,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 5340,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 166368,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 6336,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Open boat 3 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 205260,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 5820,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 166560,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 12672,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Open boat 4 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 207948,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 6300,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 166752,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 19008,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 18800,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 210636,
+          "indexCount": 26688
+        },
+        {
+          "material": "boot",
+          "indexStart": 13560,
+          "indexCount": 3360
+        },
+        {
+          "material": "steel",
+          "indexStart": 166944,
+          "indexCount": 26352
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 55360,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 237324,
+          "indexCount": 92352
+        },
+        {
+          "material": "brass",
+          "indexStart": 15360,
+          "indexCount": 36864
+        },
+        {
+          "material": "glass",
+          "indexStart": 12312,
+          "indexCount": 36864
+        }
+      ]
+    },
+    {
+      "name": "catapult lattice frame and drive machinery",
+      "triangles": 1952,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 329676,
+          "indexCount": 5856
+        }
+      ]
+    },
+    {
+      "name": "catapult lattice frame and drive machinery",
+      "triangles": 1952,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 335532,
+          "indexCount": 5856
+        }
+      ]
+    },
+    {
+      "name": "crane-boom lattice frame and drive machinery",
+      "triangles": 2568,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 341388,
+          "indexCount": 6624
+        },
+        {
+          "material": "steel",
+          "indexStart": 193296,
+          "indexCount": 1080
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 1860,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 348012,
+          "indexCount": 2748
+        },
+        {
+          "material": "brass",
+          "indexStart": 52224,
+          "indexCount": 1872
+        },
+        {
+          "material": "steel",
+          "indexStart": 194376,
+          "indexCount": 960
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          124.25,
+          8.783911015624998,
+          0
+        ],
+        "muzzle": [
+          149.95257568359375,
+          11.471561431884766,
+          -2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          124.25,
+          8.783911015624998,
+          0
+        ],
+        "muzzle": [
+          149.95257568359375,
+          11.471561431884766,
+          0
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          124.25,
+          8.783911015624998,
+          0
+        ],
+        "muzzle": [
+          149.95257568359375,
+          11.471561431884766,
+          2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          92.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          118.45258331298828,
+          15.068650245666504,
+          -2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          92.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          118.45258331298828,
+          15.068650245666504,
+          0
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 0,
+        "mount": [
+          92.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          118.45258331298828,
+          15.068650245666504,
+          2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -78.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          -104.45258331298828,
+          15.068650245666504,
+          2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -78.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          -104.45258331298828,
+          15.068650245666504,
+          3.1476582882587582e-15
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -78.75,
+          12.381,
+          0
+        ],
+        "muzzle": [
+          -104.45258331298828,
+          15.068650245666504,
+          -2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -113.75,
+          8.4,
+          0
+        ],
+        "muzzle": [
+          -139.45257568359375,
+          11.087650299072266,
+          2.7644999027252197
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -113.75,
+          8.4,
+          0
+        ],
+        "muzzle": [
+          -139.45257568359375,
+          11.087650299072266,
+          3.1476582882587582e-15
+        ]
+      },
+      {
+        "caliber": 546,
+        "bearing": 180,
+        "mount": [
+          -113.75,
+          8.4,
+          0
+        ],
+        "muzzle": [
+          -139.45257568359375,
+          11.087650299072266,
+          -2.7644999027252197
+        ]
+      }
+    ],
+    "secondaryBarrels": [],
+    "aaBarrels": [
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          56,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          56.39126968383789,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          51.13,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          51.521270751953125,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          46.261,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          46.65227127075195,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          41.391,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          41.78227233886719,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          36.522,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          36.913272857666016,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          31.652,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          32.043270111083984,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          26.783,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          27.174270629882812,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          21.913,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          22.304271697998047,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          17.043,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          17.43427085876465,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          12.174,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          12.565271377563477,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          7.304,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          7.695271015167236,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          2.435,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          2.8262710571289062,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -2.435,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -2.043729066848755,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -7.304,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -6.912728786468506,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -12.174,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -11.782729148864746,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -17.043,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -16.651729583740234,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -21.913,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -21.521728515625,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -26.783,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -26.3917293548584,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -31.652,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -31.26072883605957,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -36.522,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -36.13072967529297,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -41.391,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -40.99972915649414,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -46.261,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -45.869728088378906,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -51.13,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -50.73872756958008,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": -70,
+        "mount": [
+          -56,
+          8.4,
+          -19.995
+        ],
+        "muzzle": [
+          -55.60873031616211,
+          9.21500015258789,
+          -21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          56,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          56.39126968383789,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          51.13,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          51.521270751953125,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          46.261,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          46.65227127075195,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          41.391,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          41.78227233886719,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          36.522,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          36.913272857666016,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          31.652,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          32.043270111083984,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          26.783,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          27.174270629882812,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          21.913,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          22.304271697998047,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          17.043,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          17.43427085876465,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          12.174,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          12.565271377563477,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          7.304,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          7.695271015167236,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          2.435,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          2.8262710571289062,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -2.435,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -2.043729066848755,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -7.304,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -6.912728786468506,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -12.174,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -11.782729148864746,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -17.043,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -16.651729583740234,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -21.913,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -21.521728515625,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -26.783,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -26.3917293548584,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -31.652,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -31.26072883605957,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -36.522,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -36.13072967529297,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -41.391,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -40.99972915649414,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -46.261,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -45.869728088378906,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -51.13,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -50.73872756958008,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      },
+      {
+        "caliber": 20,
+        "bearing": 70,
+        "mount": [
+          -56,
+          8.4,
+          19.995
+        ],
+        "muzzle": [
+          -55.60873031616211,
+          9.21500015258789,
+          21.070009231567383
+        ]
+      }
+    ],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 12,
+  "modelledExternalTorpedoTubes": 0
+}

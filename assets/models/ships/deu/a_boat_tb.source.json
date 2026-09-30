@@ -1,0 +1,756 @@
+{
+  "id": "a_boat_tb",
+  "name": "A-boat class",
+  "year": 1915,
+  "type": "DD",
+  "nation": "DEU",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "deu/a_boat_tb.glb",
+  "dimensions": {
+    "length": 50,
+    "beam": 5.32,
+    "draft": 1.6492
+  },
+  "origin": "original",
+  "configuration": "A-II / A26 1917 reference for the catalog A-boat aggregate: 50 m low hull, one funnel, two slender pole masts, compact bridge, two single 88 mm guns and one 450 mm torpedo tube. Catalog armament corrected to this coherent 227-ton configuration. This is not the smaller A-I class with a single 50/52 mm gun and two tubes.",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "A-II / A26 coastal torpedo boat original recognition profile; class-specific historical configuration reference",
+      "file": "assets/recognition/ships/DEU/a_boat_tb-reconstruction.svg",
+      "url": "https://www.navypedia.org/ships/germany/ger_dd_a26.htm",
+      "license": "Original project artwork; reference illustration is not redistributed",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Existing recognition drawing dimensions (see its measurement caveats)",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from deu/a_boat_tb.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      1.7200000000000002
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      1.7200000000000002
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      1.7200000000000002
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      1.7200000000000002
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      1.7200000000000002
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      1.7200000000000002
+    ],
+    [
+      0,
+      1,
+      1,
+      1.7200000000000002
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      1.7200000000000002
+    ],
+    [
+      0.45,
+      0.64,
+      0.736,
+      1.7258520000000002
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      1.7692153200000003
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      1.8385030000000002
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      1.90351872
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      1.9485937500000001
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      1.9672470000000002
+    ]
+  ],
+  "stations": [
+    {
+      "role": "bridge-base",
+      "x": 7.5,
+      "y": 0,
+      "z": 2,
+      "w": 3.9,
+      "d": 2.905,
+      "h": 1.149
+    },
+    {
+      "role": "bridge",
+      "x": 7.5,
+      "y": 0,
+      "z": 3.149,
+      "w": 3.25,
+      "d": 2.766,
+      "h": 1.021
+    },
+    {
+      "role": "bridge-windows",
+      "x": 7.76,
+      "y": 0,
+      "z": 4.171,
+      "w": 2.34,
+      "d": 2.213,
+      "h": 0.383
+    },
+    {
+      "role": "funnel",
+      "x": 1.5,
+      "y": 0,
+      "z": 2,
+      "w": 1.6,
+      "d": 1.649,
+      "h": 2.075
+    },
+    {
+      "role": "mast",
+      "x": 7.5,
+      "y": 0,
+      "z": 4.128,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 3.937
+    },
+    {
+      "role": "mast",
+      "x": -11,
+      "y": 0,
+      "z": 2,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 3.458
+    },
+    {
+      "role": "main",
+      "x": 17,
+      "y": 0,
+      "z": 2,
+      "w": 2.288,
+      "d": 2.2,
+      "h": 1.2,
+      "barrels": 1
+    },
+    {
+      "role": "main-barrel",
+      "x": 19.188,
+      "y": 0,
+      "z": 2.696,
+      "w": 2.728,
+      "d": 0.35,
+      "h": 0.35
+    },
+    {
+      "role": "main",
+      "x": -17,
+      "y": 0,
+      "z": 2,
+      "w": 2.288,
+      "d": 2.2,
+      "h": 1.2,
+      "barrels": 1
+    },
+    {
+      "role": "main-barrel",
+      "x": -19.188,
+      "y": 0,
+      "z": 2.696,
+      "w": 2.728,
+      "d": 0.35,
+      "h": 0.35
+    },
+    {
+      "role": "torpedo-tube",
+      "x": -7,
+      "y": -0.997,
+      "z": 2,
+      "w": 3.75,
+      "d": 0.5,
+      "h": 0.55
+    }
+  ],
+  "armament": {
+    "caliber": 88,
+    "barrels": 2,
+    "torpedoTubes": 1,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [],
+    "torpedoFit": {
+      "count": 1,
+      "caliber_in": 17.7,
+      "submerged": false
+    }
+  },
+  "shafts": 2,
+  "complement": 29,
+  "displacement": 227,
+  "textureMetres": 2.5,
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.37,
+        0.39,
+        0.41,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.17,
+        0.185,
+        0.19,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "4c726039282360eacd9608f94d3491e04eb5f88a7697b35f204776491ebb036a",
+  "statistics": {
+    "id": "a_boat_tb",
+    "triangles": 46584,
+    "vertices": 62889,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 3154580,
+    "bounds": {
+      "min": [
+        -25,
+        -1.6491999626159668,
+        -2.703000068664551
+      ],
+      "max": [
+        25,
+        8.065574645996094,
+        2.703000068664551
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 3880,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 3576
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 1584
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 6480
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 9216,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 3576,
+          "indexCount": 26496
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 1152
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
+      "triangles": 64,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 30072,
+          "indexCount": 96
+        },
+        {
+          "material": "deck",
+          "indexStart": 1152,
+          "indexCount": 96
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge with glazing, doors, portholes and roof rails",
+      "triangles": 160,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 30168,
+          "indexCount": 96
+        },
+        {
+          "material": "deck",
+          "indexStart": 1248,
+          "indexCount": 96
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 288
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 1 1 x 88 mm",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 30264,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 1584,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 1 x 88 mm",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 31320,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 1776,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 2064,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 120,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Torpedo bank at -7.000:2.000:0:trained:surface m: 1 individual tubes, gearing, rings and end caps",
+      "triangles": 2400,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 32376,
+          "indexCount": 912
+        },
+        {
+          "material": "boot",
+          "indexStart": 1968,
+          "indexCount": 240
+        },
+        {
+          "material": "steel",
+          "indexStart": 4128,
+          "indexCount": 6048
+        }
+      ]
+    },
+    {
+      "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 968,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 33288,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 2208,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 10176,
+          "indexCount": 1248
+        }
+      ]
+    },
+    {
+      "name": "Mast 1 with taper, yards, rigging and access ladder",
+      "triangles": 960,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 34104,
+          "indexCount": 1152
+        },
+        {
+          "material": "steel",
+          "indexStart": 11424,
+          "indexCount": 1728
+        }
+      ]
+    },
+    {
+      "name": "Mast 2 with taper, yards, rigging and access ladder",
+      "triangles": 928,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 35256,
+          "indexCount": 1152
+        },
+        {
+          "material": "steel",
+          "indexStart": 13152,
+          "indexCount": 1632
+        }
+      ]
+    },
+    {
+      "name": "Open boat 1 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 36408,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 1344,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 14784,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 0,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Open boat 2 with thwarts and working davit geometry",
+      "triangles": 3232,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 39096,
+          "indexCount": 2688
+        },
+        {
+          "material": "deck",
+          "indexStart": 1824,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 14976,
+          "indexCount": 192
+        },
+        {
+          "material": "canvas",
+          "indexStart": 6336,
+          "indexCount": 6336
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 10480,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 41784,
+          "indexCount": 7968
+        },
+        {
+          "material": "boot",
+          "indexStart": 3048,
+          "indexCount": 960
+        },
+        {
+          "material": "steel",
+          "indexStart": 15168,
+          "indexCount": 22512
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 8064,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 49752,
+          "indexCount": 13440
+        },
+        {
+          "material": "glass",
+          "indexStart": 288,
+          "indexCount": 5376
+        },
+        {
+          "material": "brass",
+          "indexStart": 240,
+          "indexCount": 5376
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 712,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 63192,
+          "indexCount": 720
+        },
+        {
+          "material": "steel",
+          "indexStart": 37680,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 5616,
+          "indexCount": 936
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [
+      {
+        "caliber": 88,
+        "bearing": 0,
+        "mount": [
+          17,
+          2,
+          0
+        ],
+        "muzzle": [
+          20.94487953186035,
+          2.880000114440918,
+          0
+        ]
+      },
+      {
+        "caliber": 88,
+        "bearing": 180,
+        "mount": [
+          -17,
+          2,
+          0
+        ],
+        "muzzle": [
+          -20.94487953186035,
+          2.880000114440918,
+          4.831084707796016e-16
+        ]
+      }
+    ],
+    "secondaryBarrels": [],
+    "aaBarrels": [],
+    "torpedoTubes": [
+      {
+        "center": [
+          -7,
+          2.74,
+          -0.997
+        ],
+        "bearing": 0,
+        "fixed": false,
+        "submerged": false,
+        "muzzle": [
+          -5.110000133514404,
+          2.740000009536743,
+          -0.996999979019165
+        ]
+      }
+    ]
+  },
+  "modelledMainBarrels": 2,
+  "modelledExternalTorpedoTubes": 1
+}

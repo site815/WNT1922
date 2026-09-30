@@ -23,6 +23,12 @@ public:
     UFUNCTION(BlueprintCallable, Category="WNT|Ships")
     bool LoadModel(const FString& FullModelPath, UMaterialInterface* OptionalMaterial = nullptr);
 
+    /** Declare available artwork without allocating distant fleet geometry. */
+    void SetModelReference(const FString& FullModelPath);
+    /** Load within 30 km, release beyond 60 km; shared file checks every 2 seconds. */
+    void RefreshModelForCamera(const FVector& CameraLocation, bool bRefresh);
+    /** Drop inactive scene geometry while retaining its model reference and hull identity. */
+    void ReleaseResidentModel();
     void SetPendingModel();
     void UpdateSymbolForCamera(const FVector& CameraLocation, const FRotator& CameraRotation);
     void SetModelCullDistance(float Centimetres);
@@ -48,10 +54,11 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="WNT|Ships")
     TObjectPtr<UStaticMeshComponent> DetailedMesh;
 
-    /** Loaded geometry; camera-distance culling does not unload a model. */
+    /** Loaded geometry; RefreshModelForCamera can release distant references. */
     bool HasRenderableModel() const;
     bool IsDetailedModelVisible() const;
     bool IsModelPending() const { return bModelPending; }
+    bool IsModelDeferred() const { return !SourcePath.IsEmpty() && !bModelPending && !bModelLoadError && !HasRenderableModel(); }
     bool HasModelLoadError() const { return bModelLoadError; }
     FString GetVisualStatus() const;
 
@@ -59,10 +66,12 @@ public:
     static void ClearModelCache();
 
 private:
-    bool LoadDetailedModel(const FString& Filename);
+    bool LoadDetailedModel(const FString& Filename, FDateTime Timestamp, int64 Size);
+    bool LoadModelRevision(const FString& Filename, FDateTime Timestamp, int64 Size);
     void ClearDetailedModel();
     void SetSymbolState(bool bError);
     UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> SymbolRoot;
+    FString SourcePath;
     FString LoadedPath;
     FDateTime LoadedTimestamp;
     int64 LoadedSize = -1;

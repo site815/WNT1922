@@ -1,0 +1,587 @@
+{
+  "id": "argus",
+  "name": "Argus",
+  "year": 1917,
+  "type": "CV",
+  "nation": "GBR",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "gbr/argus.glb",
+  "dimensions": {
+    "length": 172.2,
+    "beam": 23.1648,
+    "draft": 7.1
+  },
+  "origin": "historical",
+  "configuration": "Argus, US Navy 1943 recognition reference: flush full-length flight deck, no permanent island, hull cut away aft and stern smoke discharge. The rounded forward flight deck and wartime light-AA positions are later alterations; this is not asserted to be the exact 1918 fitting.",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "ONI 201, British Naval Vessels (1943), Argus plate",
+      "file": "assets/recognition/ships/GBR/argus.png",
+      "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-201/index.html",
+      "license": "US government public domain",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    },
+    {
+      "title": "ONI 201 (1943), ACV1 ARGUS plate",
+      "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-201/index.html",
+      "file": "assets/recognition/ships/GBR/argus.png",
+      "license": "Factual reference only; no source image or traced mesh redistributed",
+      "usedFor": "Dated bulged hull beam 76 ft; 555 ft WL, 59 ft flight-deck height; rounded forward deck, cutaway stern, no island and aft port smoke vent."
+    }
+  ],
+  "dimensionBasis": "ONI 201 (1943): waterline 555 ft, hull beam 76 ft, flight deck height 59 ft. Model overall length 172.2 m includes an inferred 3 m bow/stern overhang; draft 7.1 m remains an exterior estimate, not a manual measurement.",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from gbr/argus.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      5.2
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      5.2
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      5.2
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      10
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      11.8
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      11.8
+    ],
+    [
+      0,
+      1,
+      1,
+      11.8
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      11.8
+    ],
+    [
+      0.45,
+      0.75,
+      0.8624999999999999,
+      11.8
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      11.8
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      11.8
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      11.8
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      11.8
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      11.8
+    ]
+  ],
+  "stations": [
+    {
+      "role": "flight-deck",
+      "x": 0,
+      "y": 0,
+      "z": 17.9832,
+      "w": 161.8677,
+      "d": 23.1648,
+      "h": 0.6508
+    },
+    {
+      "role": "hangar",
+      "x": 0,
+      "y": 0,
+      "z": 11.8,
+      "w": 130,
+      "d": 16.5,
+      "h": 6.1832
+    },
+    {
+      "role": "side-exhaust",
+      "x": -67,
+      "y": -9.8,
+      "z": 11.4,
+      "w": 16,
+      "d": 2.2,
+      "h": 2.4,
+      "exhaustDirection": "aft"
+    },
+    {
+      "role": "mast",
+      "x": -62,
+      "y": -10.8,
+      "z": 17.9832,
+      "w": 0.32,
+      "d": 0.32,
+      "h": 10.2
+    },
+    {
+      "role": "mast",
+      "x": 44,
+      "y": -10.8,
+      "z": 17.9832,
+      "w": 0.32,
+      "d": 0.32,
+      "h": 10.2
+    },
+    {
+      "role": "lift",
+      "x": -46.9416,
+      "y": 0,
+      "z": 18.2732,
+      "w": 9.7121,
+      "d": 10.1925,
+      "h": 0.08
+    },
+    {
+      "role": "lift",
+      "x": 40.4669,
+      "y": 0,
+      "z": 18.2732,
+      "w": 9.7121,
+      "d": 10.1925,
+      "h": 0.08
+    }
+  ],
+  "armament": {
+    "caliber": 0,
+    "barrels": 0,
+    "torpedoTubes": 0,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [],
+    "torpedoFit": null
+  },
+  "shafts": 4,
+  "complement": 495,
+  "displacement": 14450,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "date": "2026-09-30",
+    "status": "Original exterior reconstruction reviewed for coherent class fit; not an engineering survey",
+    "stationAxes": "x bow-positive; y starboard-positive; z height above waterline, all metres. Exporter converts to glTF X/Y-up/Z.",
+    "viewConsistency": "One mesh and one equipment-station ledger generate every view; no independent side/top geometry.",
+    "notes": [
+      "Corrected the large displacement-derived hull, deck height and erroneous midships starboard uptake. This remains the dated 1943 reference, not the original unbulged 1918 fit."
+    ],
+    "expectedMainBarrels": 0,
+    "expectedSecondaryBarrels": 0,
+    "expectedElevators": 2,
+    "expectedFunnels": 1
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.33,
+        0.355,
+        0.37,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.4,
+        0.34,
+        0.235,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "94d5d1b50cbe8fc07d3198904109d10baae37ec9b1d01c7dd2d039f8135906fd",
+  "statistics": {
+    "id": "argus",
+    "triangles": 87544,
+    "vertices": 101654,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 4885624,
+    "bounds": {
+      "min": [
+        -86.0999984741211,
+        -7.099999904632568,
+        -13.054546356201172
+      ],
+      "max": [
+        86.0999984741211,
+        28.1848087310791,
+        12.197400093078613
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 7720,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 7032
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 480
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 15648
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 18816,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 7032,
+          "indexCount": 54144
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "Mast 1 with taper, yards, rigging and access ladder",
+      "triangles": 1664,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 61176,
+          "indexCount": 1152
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 3840
+        }
+      ]
+    },
+    {
+      "name": "Mast 2 with taper, yards, rigging and access ladder",
+      "triangles": 1664,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 62328,
+          "indexCount": 1152
+        },
+        {
+          "material": "steel",
+          "indexStart": 3840,
+          "indexCount": 3840
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 7152,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 63480,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 7680,
+          "indexCount": 20976
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 12288,
+      "ranges": [
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 18432
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 18432
+        }
+      ]
+    },
+    {
+      "name": "Enclosed hangar sides with doors, galleries and structural frames",
+      "triangles": 24512,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 63960,
+          "indexCount": 70368
+        },
+        {
+          "material": "boot",
+          "indexStart": 480,
+          "indexCount": 3168
+        }
+      ]
+    },
+    {
+      "name": "Continuous flight-deck with beams, planking, safety net, landing markings and arresting wires",
+      "triangles": 11072,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 134328,
+          "indexCount": 26400
+        },
+        {
+          "material": "deck",
+          "indexStart": 2304,
+          "indexCount": 3840
+        },
+        {
+          "material": "steel",
+          "indexStart": 28656,
+          "indexCount": 1344
+        },
+        {
+          "material": "white",
+          "indexStart": 0,
+          "indexCount": 1632
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 160728,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 30000,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 160824,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 31200,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Carrier side-exhaust uptake with curved outlet",
+      "triangles": 256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 160920,
+          "indexCount": 384
+        },
+        {
+          "material": "boot",
+          "indexStart": 3648,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 1536,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 161304,
+          "indexCount": 1776
+        },
+        {
+          "material": "steel",
+          "indexStart": 32400,
+          "indexCount": 960
+        },
+        {
+          "material": "brass",
+          "indexStart": 18432,
+          "indexCount": 1872
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [],
+    "secondaryBarrels": [],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 0,
+  "modelledExternalTorpedoTubes": 0
+}

@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $build=Get-Content -Raw -LiteralPath $BuildReport | ConvertFrom-Json
-if ($build.format -ne 2 -or $build.packaged -ne $true -or $build.nativeTestsPassed -ne $true -or $build.configuration -ne 'Development') { throw 'A successful Development native package report is required for opt-in instrumentation.' }
+if ($build.format -ne 2 -or $build.packaged -ne $true -or $build.nativeTestsPassed -ne $true -or $build.configuration -ne 'Shipping') { throw 'A successful Shipping native package report is required. Player tests must not open Unreal development profiling listeners.' }
 $zip=(Resolve-Path -LiteralPath $build.archive).Path
 if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant() -ne $build.archiveSha256 -or (Get-Item -LiteralPath $zip).Length -ne $build.archiveBytes) { throw 'The archive does not match its build report.' }
 if (-not $NodePath) { $node=Get-Command node.exe -ErrorAction SilentlyContinue; if ($node) { $NodePath=$node.Source } }
@@ -43,8 +43,8 @@ try {
         if (-not $target.StartsWith($extracted+'\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid manifest path.' }
         if ((Get-Item -LiteralPath $target).Length -ne $file.bytes -or (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.sha256) { throw ('Extracted payload mismatch: '+$file.path) }
     }
-    $native=@($manifest.files | Where-Object { $_.path -match '^WNT1922/Binaries/Win64/WNT1922(?:-Win64-Development)?\.exe$' })
-    if ($native.Count -ne 1) { throw 'Cannot identify one packaged Development game executable.' }
+    $native=@($manifest.files | Where-Object { $_.path -match '^WNT1922/Binaries/Win64/WNT1922(?:-Win64-Shipping)?\.exe$' })
+    if ($native.Count -ne 1) { throw 'Cannot identify one packaged Shipping game executable.' }
     $exe=Join-Path $extracted $native[0].path
     $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$DebugPort)
     try { $listener.Start() } catch { throw 'The requested debug port is occupied; no existing game will be attached.' } finally { $listener.Stop() }
@@ -53,7 +53,7 @@ try {
     function Quote-Argument([string]$Value) { if ($Value.Contains('"') -or $Value.Contains("`n") -or $Value.Contains("`r")) { throw 'Invalid launch path.' }; return '"'+$Value+'"' }
     # UE Paths.cpp maps -UserDir to ProjectUserDir/Saved. Data and Node have NO
     # overrides: the packaged game must locate its own GameData and runtime.
-    $arguments=@('-WNTAutomation','-RenderOffscreen','-ForceRes','-windowed','-ResX=1440','-ResY=1000','-nosplash',('-cefdebug='+$DebugPort),(Quote-Argument ('-WNTSaveDir='+$saves)),(Quote-Argument ('-UserDir='+$userDir)),(Quote-Argument ('-abslog='+$log)))
+    $arguments=@('-WNTAutomation','-RenderOffscreen','-ForceRes','-windowed','-ResX=1800','-ResY=1000','-nosplash',('-cefdebug='+$DebugPort),(Quote-Argument ('-WNTSaveDir='+$saves)),(Quote-Argument ('-UserDir='+$userDir)),(Quote-Argument ('-abslog='+$log)))
     $game=Start-Process -FilePath $exe -ArgumentList $arguments -WorkingDirectory $extracted -WindowStyle Hidden -PassThru
     $process=Get-CimInstance Win32_Process -Filter ('ProcessId='+$game.Id)
     $gameStartedUtc=$game.StartTime.ToUniversalTime()
@@ -64,11 +64,14 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Extracted native package interaction verification failed; the owned process remains available for inspection.' }
     $runtime=Get-Content -Raw -LiteralPath $status.nativeRuntimeReport | ConvertFrom-Json
     if ($runtime.passed -ne $true) { throw 'Runtime verification did not pass.' }
-    if (Select-String -LiteralPath $log -Pattern 'GetLastError=4551|LogTemp: Error: WNT Unreal:|Failed to compile Material|LogShaderCompilers: Error|LogMaterial: Error|LogGLTFRuntime: Error|LogTexture: Error' -Quiet) { throw 'The extracted package logged a native asset, shader or startup failure.' }
+    if ((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern 'GetLastError=4551|LogTemp: Error: WNT Unreal:|Failed to compile Material|LogShaderCompilers: Error|LogMaterial: Error|LogGLTFRuntime: Error|LogTexture: Error' -Quiet)) { throw 'The extracted package logged a native asset, shader or startup failure.' }
+    $networkReport=Join-Path $run 'network.json'
+    & (Join-Path $PSScriptRoot 'verify-unreal-network.ps1') -ProcessId $game.Id -ProcessStartedUtc $game.StartTime.ToUniversalTime() -ExecutablePath $exe -OutputFile $networkReport -AllowAutomation
+    $status.networkReport=$networkReport
     $runtime | Add-Member -Force -NotePropertyName packageExecution -NotePropertyValue ([pscustomobject]@{executablePath=$exe;executableSha256=$native[0].sha256;processId=$game.Id;processStartedUtc=$status.processStartedUtc;archiveSha256=$build.archiveSha256})
-    $runtime.limitations=@($runtime.limitations | Where-Object { $_ -notlike '*editor-game smoke test*' })+@('This run tests a Development package extracted from the recorded archive; it does not certify Shipping performance or complete fleet artwork.')
+    $runtime.limitations=@($runtime.limitations | Where-Object { $_ -notlike '*editor-game smoke test*' })+@('This run tests the Shipping package extracted from the recorded archive using explicit local automation. Shipping omits the Unreal development log; native diagnostics and captures are checked, but this is not a frame-rate benchmark.')
     $runtime | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $status.nativeRuntimeReport -Encoding UTF8
-    $status.checksPassed=@('launch','campaignStart','shipSelection','battleWatch','saveReload','offlineAssets')
+    $status.checksPassed=@('launch','campaignStart','shipSelection','battleWatch','saveReload','offlineAssets','loopbackOnly')
     if (-not $KeepRunning) {
         $shutdown=& (Join-Path $PSScriptRoot 'Stop-UnrealTest.ps1') -ProcessId $game.Id -ProcessStartedUtc $game.StartTime.ToUniversalTime() -ExecutablePath $exe -SaveDirectory $saves -RuntimeReport $status.nativeRuntimeReport -NodePath $NodePath
         $status.shutdown=$shutdown; $runtime.gameLeftRunning=$false

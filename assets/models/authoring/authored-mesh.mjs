@@ -48,7 +48,18 @@ function makeGlb(){
   if(textures.size){json.images=[];json.textures=[];json.samplers=[{magFilter:9729,minFilter:9987,wrapS:10497,wrapT:10497}];}
   for(const [name,{bytes,mimeType}]of textures){const view=json.bufferViews.length;json.bufferViews.push({buffer:0,byteOffset:offset,byteLength:bytes.length});chunks.push(bytes);offset+=bytes.length;const padding=(4-offset%4)%4;if(padding){chunks.push(Buffer.alloc(padding));offset+=padding;}const index=json.images.length;json.images.push({name,bufferView:view,mimeType});json.textures.push({source:index,sampler:0});textureIndexes.set(name,index);}
   const append=(values,type,components)=>{const bytes=type===5126?Buffer.from(new Float32Array(values).buffer):Buffer.from(new Uint32Array(values).buffer),view=json.bufferViews.length;json.bufferViews.push({buffer:0,byteOffset:offset,byteLength:bytes.length,target:components===1?34963:34962});chunks.push(bytes);offset+=bytes.length;const acc={bufferView:view,byteOffset:0,componentType:type,count:values.length/components,type:components===1?'SCALAR':'VEC'+components};if(components===3&&type===5126){acc.min=[Infinity,Infinity,Infinity];acc.max=[-Infinity,-Infinity,-Infinity];for(let i=0;i<values.length;i++){acc.min[i%3]=Math.min(acc.min[i%3],values[i]);acc.max[i%3]=Math.max(acc.max[i%3],values[i]);}}json.accessors.push(acc);return json.accessors.length-1;};
-  for(const [name,g]of groups){const m=spec.materials[name],material=json.materials.length,definition={name,pbrMetallicRoughness:{baseColorFactor:m.color,metallicFactor:m.metallic,roughnessFactor:m.roughness}};
+  for(const [name,source]of groups){
+    // Lossless indexing of the exact Float32 values written to GLB. Normals and
+    // UV seams remain distinct, and no triangle, surface or fitting is removed.
+    let g=source;
+    if(spec.indexVertices){
+      g={positions:[],normals:[],uvs:[],indices:[]};const seen=new Map();
+      for(const index of source.indices){
+        const values=[...source.positions.slice(index*3,index*3+3),...source.normals.slice(index*3,index*3+3),...source.uvs.slice(index*2,index*2+2)].map(Math.fround),key=values.join(',');
+        let next=seen.get(key);if(next===undefined){next=g.positions.length/3;seen.set(key,next);g.positions.push(...values.slice(0,3));g.normals.push(...values.slice(3,6));g.uvs.push(...values.slice(6));}g.indices.push(next);
+      }
+    }
+    const m=spec.materials[name],material=json.materials.length,definition={name,pbrMetallicRoughness:{baseColorFactor:m.color,metallicFactor:m.metallic,roughnessFactor:m.roughness}};
     for(const role of ['baseColorTexture','metallicRoughnessTexture','normalTexture','occlusionTexture'])if(m[role]){if(!textureIndexes.has(m[role]))throw Error('Missing texture '+m[role]);const value={index:textureIndexes.get(m[role])};if(role==='normalTexture')value.scale=m.normalScale??1;(role==='baseColorTexture'||role==='metallicRoughnessTexture'?definition.pbrMetallicRoughness:definition)[role]=value;}
     json.materials.push(definition);json.meshes[0].primitives.push({attributes:{POSITION:append(g.positions,5126,3),NORMAL:append(g.normals,5126,3),TEXCOORD_0:append(g.uvs,5126,2)},indices:append(g.indices,5125,1),material,mode:4});}
   json.buffers=[{byteLength:offset}];const text=Buffer.from(JSON.stringify(json)),jp=Buffer.concat([text,Buffer.alloc((4-text.length%4)%4,32)]),binary=Buffer.concat(chunks),head=Buffer.alloc(20),bhead=Buffer.alloc(8);head.writeUInt32LE(0x46546c67,0);head.writeUInt32LE(2,4);head.writeUInt32LE(28+jp.length+binary.length,8);head.writeUInt32LE(jp.length,12);head.writeUInt32LE(0x4e4f534a,16);bhead.writeUInt32LE(binary.length);bhead.writeUInt32LE(0x004e4942,4);return Buffer.concat([head,jp,bhead,binary]);

@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
 #include "Dom/JsonObject.h"
 #include "StaticMeshResources.h"
 #include "HAL/FileManager.h"
@@ -13,6 +14,7 @@
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "Misc/ScopeExit.h"
+#include "UObject/GarbageCollection.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -31,10 +33,20 @@ bool FWNTDetailedModelsTest::RunTest(const FString& Parameters)
     const FName TestWorldName = MakeUniqueObjectName(GetTransientPackage(), UWorld::StaticClass(), TEXT("WNTDetailedModelTest"));
     UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TestWorldName, GetTransientPackage(), true, ERHIFeatureLevel::Num, &Init);
     if (!TestNotNull(TEXT("Model test world"), World)) return false;
-    ON_SCOPE_EXIT { World->DestroyWorld(false); AWNTShipActor::ClearModelCache(); };
+    GEngine->CreateNewWorldContext(EWorldType::Game).SetCurrentWorld(World);
+    ON_SCOPE_EXIT { World->DestroyWorld(false); GEngine->DestroyWorldContext(World); AWNTShipActor::ClearModelCache(); };
     for (const FString& File : Files)
     {
+        // A collection audit must not retain every high-detail ship at once.
+        // Each class is loaded and exercised, then released before the next.
+        TArray<AWNTShipActor*> TestActors;
+        ON_SCOPE_EXIT {
+            for (auto* Actor : TestActors) if (Actor) Actor->Destroy();
+            AWNTShipActor::ClearModelCache();
+            CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS);
+        };
         AWNTShipActor* Ship = World->SpawnActor<AWNTShipActor>();
+        TestActors.Add(Ship);
         if (!TestNotNull(TEXT("Detailed ship actor"), Ship)) continue;
         if (!TestTrue(FPaths::GetCleanFilename(File) + TEXT(" loads directly"), Ship->LoadModel(File))) continue;
         TestTrue(TEXT("Loaded GLB is the visible selectable model"), Ship->HasRenderableModel()
@@ -69,8 +81,32 @@ bool FWNTDetailedModelsTest::RunTest(const FString& Parameters)
                 // axis and unit conversion, not historical reconstruction.
                 TestTrue(TEXT("Native ship length matches its declared metre scale"),
                     FMath::Abs(Bounds.GetSize().X*.01-Length)<=Length*.05);
-                TestTrue(TEXT("Native transverse axis matches the declared beam"),
-                    FMath::Abs(Bounds.GetSize().Y*.01-Beam)<=Beam*(Authored?.05:.2));
+                if (!Authored)
+                    TestTrue(TEXT("Native artist model transverse scale matches the disclosed approximate beam"),
+                        FMath::Abs(Bounds.GetSize().Y*.01-Beam)<=Beam*.2);
+                else
+                {
+                    // Hull beam excludes trained wing guns, boat booms and
+                    // carrier sponsons. Compare the native fitted envelope to
+                    // the authored GLB envelope; the asset audit checks hull
+                    // beam separately from these legitimate protrusions.
+                    const TSharedPtr<FJsonObject>* Statistics=nullptr;
+                    const TSharedPtr<FJsonObject>* FittedBounds=nullptr;
+                    const TArray<TSharedPtr<FJsonValue>> *Min=nullptr,*Max=nullptr;
+                    const bool HasBounds=(Source->TryGetObjectField(TEXT("statistics"),Statistics)||Source->TryGetObjectField(TEXT("summary"),Statistics))
+                        &&(*Statistics)->TryGetObjectField(TEXT("bounds"),FittedBounds)
+                        &&(*FittedBounds)->TryGetArrayField(TEXT("min"),Min)
+                        &&(*FittedBounds)->TryGetArrayField(TEXT("max"),Max)
+                        &&Min->Num()==3&&Max->Num()==3;
+                    if(TestTrue(TEXT("Authored model declares its fitted geometry envelope"),HasBounds))
+                    {
+                        const FVector Expected(((*Max)[0]->AsNumber()-(*Min)[0]->AsNumber())*100,
+                            ((*Max)[2]->AsNumber()-(*Min)[2]->AsNumber())*100,
+                            ((*Max)[1]->AsNumber()-(*Min)[1]->AsNumber())*100);
+                        TestTrue(TEXT("Native centimetres and axes exactly preserve the authored fitted envelope"),
+                            Bounds.GetSize().Equals(Expected,.25));
+                    }
+                }
             }
         }
         TestTrue(TEXT("Full hull crosses the waterline on the native up axis"),Bounds.Min.Z<0&&Bounds.Max.Z>0);
@@ -100,6 +136,7 @@ bool FWNTDetailedModelsTest::RunTest(const FString& Parameters)
             *FPaths::GetCleanFilename(File), Reversed, WorstFacing), Faces > 0 && Reversed == 0);
         // The revision cache should share native geometry between sister ships.
         auto* Sister = World->SpawnActor<AWNTShipActor>();
+        TestActors.Add(Sister);
         TestTrue(TEXT("Shared detailed geometry cache"), Sister && Sister->LoadModel(File)
             && Sister->DetailedMesh->GetStaticMesh() == Mesh);
         Ship->SetModelCullDistance(50000);Ship->UpdateSymbolForCamera(FVector(1000000,0,0),FRotator(0,180,0));

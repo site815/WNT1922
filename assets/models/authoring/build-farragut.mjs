@@ -1,6 +1,7 @@
 // Optional original-geometry authoring. The game opens the GLB directly.
 // No voxel data, catalog geometry, external modelling library or network.
 import fs from 'node:fs/promises';
+import {validateDetailedShip} from '../../../tools/check-models.mjs';
 import {createAuthoredMesh} from './authored-mesh.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -123,7 +124,9 @@ part('Twin shafts, propeller screws, bilge keels and rudder',()=>{
 });
 if(!process.argv.includes('--write'))throw Error('Use --write to export; normal game launch never invokes authoring.');
 const output=path.join(here,'../ships/usa/farragut_dd34.glb');
-await fs.writeFile(output,makeGlb());
+const completedGlb=makeGlb();
+const statistics=validateDetailedShip(completedGlb,{id:spec.id,metadata:spec});
+await fs.writeFile(output,completedGlb);
 const summary={id:spec.id,file:'assets/models/ships/usa/farragut_dd34.glb',triangles:[...groups.values()].reduce((s,g)=>s+g.indices.length/3,0),vertices:[...groups.values()].reduce((s,g)=>s+g.positions.length/3,0),materials:groups.size,bytes:(await fs.stat(output)).size};
-await fs.writeFile(path.join(here,'../ships/usa/farragut_dd34.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/authoring/farragut-1934.json',exporter:'assets/models/authoring/build-farragut.mjs',summary},null,2)+'\n');
+await fs.writeFile(path.join(here,'../ships/usa/farragut_dd34.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/authoring/farragut-1934.json',exporter:'assets/models/authoring/build-farragut.mjs',summary,statistics},null,2)+'\n');
 console.log(JSON.stringify(summary));

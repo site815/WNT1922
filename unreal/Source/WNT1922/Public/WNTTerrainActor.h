@@ -18,6 +18,10 @@ namespace WNTTerrainGeometry
     WNT1922_API bool TriangulatePolygon(const TArray<TArray<FVector2D>>& Rings, TArray<FWNTGeographicTriangle>& OutTriangles, FString& OutError);
     /** Output longitudes are relative and clipped to [-180,+180], never joined across the seam. */
     WNT1922_API TArray<FWNTGeographicTriangle> ClipAtMeridian(const FWNTGeographicTriangle& Triangle, double CentralMeridian);
+    /** Translate a fixed geographic tile to its nearest repeat, then the requested adjacent copy. */
+    WNT1922_API FVector WrappedTileOrigin(const FVector& GeographicOrigin, double CentralMeridian, int32 Copy);
+    /** Quantized world width keeps chart lines at least one physical pixel wide. */
+    WNT1922_API double GraticuleWidthForPixelSize(double CentimetresPerPixel);
 }
 
 /** Runtime geographic terrain; local tile vertices retain precision under UE large-world coordinates. */
@@ -36,16 +40,19 @@ public:
     FString TerritoryAt(const FVector2D& LongitudeLatitude) const;
     void SetControl(const TMap<FString, FLinearColor>& TerritoryColours);
     void SetGraticuleVisible(bool Visible);
+    void SetGraticulePixelSize(double CentimetresPerPixel);
     double GetCentralMeridian() const { return CentralMeridian; }
     const FString& GetLoadError() const { return LoadError; }
 
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") FString CampaignId = TEXT("1936hindsight");
-    UPROPERTY(EditAnywhere, Category="WNT|Terrain", meta=(ClampMin="0.25",ClampMax="2.0")) double SurfaceSampleDegrees = 1.0;
+    UPROPERTY(EditAnywhere, Category="WNT|Terrain", meta=(ClampMin="0.25",ClampMax="2.0")) double SurfaceSampleDegrees = 0.5;
     // Source elevation is rendered in real metres. Only a 5 cm numerical
     // separation avoids coincident flat land/water, never a raised map plateau.
     static constexpr double LandBaseMetres = .05;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridSpacingDegrees = 30.0;
-    UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridWidthMetres = 4000.0;
+    // A readable strategic default; runtime adjusts only the grid ribbons as
+    // zoom changes. Land, coast, indices and geographic centerlines stay fixed.
+    UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridWidthMetres = 24000.0;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> TerrainMaterial;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> LineMaterial;
 
@@ -53,6 +60,7 @@ private:
     void RebuildProjectedMeshes();
     TUniquePtr<FWNTTerrainData, FWNTTerrainDataDeleter> Data;
     UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> TerrainTiles;
+    TArray<FVector> TileOrigins;
     double CentralMeridian = 0.0;
     FString LoadError;
     bool bGraticuleVisible = true;

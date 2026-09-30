@@ -1,0 +1,549 @@
+{
+  "id": "lagrange",
+  "name": "Lagrange class",
+  "year": 1913,
+  "type": "SS",
+  "nation": "FRA",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "fra/lagrange.glb",
+  "dimensions": {
+    "length": 75.2,
+    "beam": 6.3,
+    "draft": 4.2864
+  },
+  "origin": "original",
+  "configuration": "Original Lagrange-class submarine profile in the 1918 diesel-powered configuration: low long casing, compact central conning tower, two single 75 mm deck guns and no steam funnels. The eight torpedo tubes include internal/beam installations that are not exposed as deck launchers. The earlier steam concept is not depicted.",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Lagrange class original recognition profile; class-specific historical configuration reference",
+      "file": "assets/recognition/ships/FRA/lagrange-reconstruction.svg",
+      "url": "https://www.navypedia.org/ships/france/fr_ss_lagrange.htm",
+      "license": "Original project artwork; reference illustration is not redistributed",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Existing recognition drawing dimensions (see its measurement caveats)",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from fra/lagrange.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.025,
+      0.025,
+      1.52
+    ],
+    [
+      -0.97,
+      0.14,
+      0.2687970912252936,
+      1.52
+    ],
+    [
+      -0.9,
+      0.37,
+      0.4503632554650915,
+      1.52
+    ],
+    [
+      -0.78,
+      0.81,
+      0.6278290996257473,
+      1.52
+    ],
+    [
+      -0.6,
+      0.94,
+      0.7957268904648718,
+      1.52
+    ],
+    [
+      -0.35,
+      1,
+      0.9337471478043112,
+      1.52
+    ],
+    [
+      0,
+      1,
+      1,
+      1.52
+    ],
+    [
+      0.25,
+      0.97,
+      0.9665283534785406,
+      1.52
+    ],
+    [
+      0.45,
+      0.78,
+      0.8888931748931292,
+      1.52
+    ],
+    [
+      0.64,
+      0.58,
+      0.7646813598887539,
+      1.52
+    ],
+    [
+      0.8,
+      0.31,
+      0.6035210420148092,
+      1.52
+    ],
+    [
+      0.91,
+      0.12,
+      0.43055968215769386,
+      1.52
+    ],
+    [
+      0.975,
+      0.025,
+      0.24854083358478596,
+      1.52
+    ],
+    [
+      1,
+      0.0008,
+      0.025,
+      1.52
+    ]
+  ],
+  "stations": [
+    {
+      "role": "conning-tower",
+      "x": 0,
+      "y": 0,
+      "z": 1.8,
+      "w": 7.5,
+      "d": 2.4,
+      "h": 2.7
+    },
+    {
+      "role": "main",
+      "x": 17.296,
+      "y": 0,
+      "z": 1.8,
+      "w": 1.3,
+      "d": 2.52,
+      "h": 1.2,
+      "barrels": 1,
+      "caliber": 76.19999999999999,
+      "bearing": 0,
+      "enclosed": false
+    },
+    {
+      "role": "main",
+      "x": -17.296,
+      "y": 0,
+      "z": 1.8,
+      "w": 1.3,
+      "d": 2.52,
+      "h": 1.2,
+      "barrels": 1,
+      "caliber": 76.19999999999999,
+      "bearing": 180,
+      "enclosed": false
+    },
+    {
+      "role": "periscope",
+      "x": -0.975,
+      "y": 0,
+      "z": 4.5,
+      "w": 0.13,
+      "d": 0.13,
+      "h": 2.772
+    },
+    {
+      "role": "periscope",
+      "x": 1.35,
+      "y": 0,
+      "z": 4.5,
+      "w": 0.13,
+      "d": 0.13,
+      "h": 2.772
+    }
+  ],
+  "armament": {
+    "caliber": 76.19999999999999,
+    "barrels": 2,
+    "torpedoTubes": 8,
+    "torpedoReloads": null,
+    "aa": 0,
+    "secondary": [],
+    "torpedoFit": {
+      "count": 8,
+      "caliber_in": 17.7,
+      "submerged": true
+    }
+  },
+  "shafts": 2,
+  "complement": 47,
+  "displacement": 920,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "date": "2026-09-30",
+    "status": "Original exterior reconstruction reviewed for coherent class fit; not an engineering survey",
+    "stationAxes": "x bow-positive; y starboard-positive; z height above waterline, all metres. Exporter converts to glTF X/Y-up/Z.",
+    "viewConsistency": "One mesh and one equipment-station ledger generate every view; no independent side/top geometry.",
+    "notes": [
+      "Class-specific fairwater proportions and periscope stations are inferred exterior artwork. Two narrow periscopes replace oversized half-metre posts. Deck gun count, direction and internal-tube representation are checked against the named catalog/reference fit.",
+      "Diesel-powered 1918 fit: two single 75 mm guns, one fore and one aft; no steam funnels added."
+    ],
+    "expectedMainBarrels": 2,
+    "expectedSecondaryBarrels": 0,
+    "expectedElevators": 0,
+    "expectedFunnels": 0
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.39,
+        0.405,
+        0.415,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.17,
+        0.185,
+        0.19,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "f4584331abad5b103bc07e83694899240ea1b31b4e3ce583dfb91bad89427fa4",
+  "statistics": {
+    "id": "lagrange",
+    "triangles": 18588,
+    "vertices": 22477,
+    "materials": 6,
+    "embeddedTextures": 3,
+    "bytes": 1521536,
+    "bounds": {
+      "min": [
+        -37.599998474121094,
+        -4.286399841308594,
+        -4.495049953460693
+      ],
+      "max": [
+        37.599998474121094,
+        7.3520002365112305,
+        4.495049953460693
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 3104,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 2400
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 1200
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 5712
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 384,
+      "ranges": [
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 1152
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 1 1 x 76.19999999999999 mm",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 2400,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 1200,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 1 x 76.19999999999999 mm",
+      "triangles": 1144,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 3456,
+          "indexCount": 1056
+        },
+        {
+          "material": "boot",
+          "indexStart": 1392,
+          "indexCount": 192
+        },
+        {
+          "material": "steel",
+          "indexStart": 2064,
+          "indexCount": 2064
+        },
+        {
+          "material": "brass",
+          "indexStart": 120,
+          "indexCount": 120
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 2112,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 4512,
+          "indexCount": 192
+        },
+        {
+          "material": "boot",
+          "indexStart": 1584,
+          "indexCount": 4608
+        },
+        {
+          "material": "steel",
+          "indexStart": 4128,
+          "indexCount": 1536
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 6784,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 4704,
+          "indexCount": 20352
+        }
+      ]
+    },
+    {
+      "name": "Streamlined conning fairwater, periscopes, casing vents and diving planes",
+      "triangles": 3296,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 25056,
+          "indexCount": 7200
+        },
+        {
+          "material": "deck",
+          "indexStart": 1152,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 5664,
+          "indexCount": 2208
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 620,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 32256,
+          "indexCount": 444
+        },
+        {
+          "material": "steel",
+          "indexStart": 7872,
+          "indexCount": 480
+        },
+        {
+          "material": "brass",
+          "indexStart": 240,
+          "indexCount": 936
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [
+      {
+        "caliber": 76.19999999999999,
+        "bearing": 0,
+        "mount": [
+          17.296,
+          1.8,
+          0
+        ],
+        "muzzle": [
+          20.535600662231445,
+          2.680000066757202,
+          0
+        ]
+      },
+      {
+        "caliber": 76.19999999999999,
+        "bearing": 180,
+        "mount": [
+          -17.296,
+          1.8,
+          0
+        ],
+        "muzzle": [
+          -20.535600662231445,
+          2.680000066757202,
+          3.967365740876398e-16
+        ]
+      }
+    ],
+    "secondaryBarrels": [],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 2,
+  "modelledExternalTorpedoTubes": 0
+}

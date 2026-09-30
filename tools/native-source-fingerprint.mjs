@@ -17,7 +17,7 @@ async function walk(folder) {
  }
  return files;
 }
-const files=[...await projectFiles(),'LICENSE.md','unreal/WNT1922.uproject',
+const files=[...await projectFiles(),'LICENSE.md','unreal/WNT1922.uproject','tools/Prepare-OfflineBrowser.ps1',
  ...await walk('unreal/Source'),...await walk('unreal/Config'),
  ...await walk('unreal/Tools'),...await walk('unreal/Plugins')];
 const hash=createHash('sha256');

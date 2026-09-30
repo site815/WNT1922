@@ -1,0 +1,1182 @@
+{
+  "id": "ocean_cv30",
+  "name": "Krasny Okean carrier",
+  "year": 1930,
+  "type": "CV",
+  "nation": "SOV",
+  "units": "metres",
+  "axes": "right-handed: X bow-positive; Y up; Z transverse",
+  "output": "sov/ocean_cv30.glb",
+  "dimensions": {
+    "length": 243,
+    "beam": 29,
+    "draft": 8.99
+  },
+  "origin": "original",
+  "configuration": "1930 catalog fit. Hull proportions, machinery casing and unspecified mount arrangement are original illustration choices; no engineering dimensions are claimed. Main battery 10 × 130 mm. ",
+  "accuracy": "Recognition-informed exterior reconstruction. Catalog dimensions and recorded equipment stations define the class fit. Hull body sections, underwater appendages, plating, accommodation openings and small deck fittings are inferred original artwork, not a surveyed shipyard model. Historical drawing interpretation and individual refits require continuing review. No interior is modeled.",
+  "geometrySource": "New curved hull, deck and detailed fittings authored independently. The earlier recognition station ledger supplies locations and equipment counts only; no earlier vertices, faces, surface shapes or colors are imported.",
+  "sources": [
+    {
+      "title": "Original shared-geometry recognition drawing",
+      "file": "assets/recognition/originals/ships/sov/ocean_cv30.svg",
+      "url": "https://github.com/site815/WNT1922/blob/main/assets/recognition/originals/ships/sov/ocean_cv30.svg",
+      "license": "Original project artwork",
+      "usedFor": "Identity, configuration, recorded longitudinal equipment layout and recognition outline; new curved surfaces and small fittings are original inferred exterior reconstruction."
+    },
+    {
+      "title": "WNT1922 campaign catalog",
+      "file": "catalog",
+      "usedFor": "Class dimensions, armament, propulsion and complement."
+    }
+  ],
+  "dimensionBasis": "Existing recognition drawing dimensions (see its measurement caveats)",
+  "layoutProvenance": "Dimensional equipment-station ledger retained from sov/ocean_cv30.json; mesh buffers are not used.",
+  "hullStations": [
+    [
+      -1,
+      0.06,
+      0.06899999999999999,
+      6.79
+    ],
+    [
+      -0.97,
+      0.3,
+      0.345,
+      6.79
+    ],
+    [
+      -0.9,
+      0.6,
+      0.69,
+      6.79
+    ],
+    [
+      -0.78,
+      0.81,
+      0.9315,
+      6.79
+    ],
+    [
+      -0.6,
+      0.94,
+      1,
+      6.79
+    ],
+    [
+      -0.35,
+      1,
+      1,
+      6.79
+    ],
+    [
+      0,
+      1,
+      1,
+      6.79
+    ],
+    [
+      0.25,
+      0.97,
+      1,
+      6.79
+    ],
+    [
+      0.45,
+      0.75,
+      0.8624999999999999,
+      6.8219
+    ],
+    [
+      0.64,
+      0.58,
+      0.6669999999999999,
+      7.058279
+    ],
+    [
+      0.8,
+      0.31,
+      0.3565,
+      7.435975
+    ],
+    [
+      0.91,
+      0.12,
+      0.13799999999999998,
+      7.790384
+    ],
+    [
+      0.975,
+      0.025,
+      0.028749999999999998,
+      8.03609375
+    ],
+    [
+      1,
+      0.0008,
+      0.02,
+      8.137775
+    ]
+  ],
+  "stations": [
+    {
+      "role": "flight-deck",
+      "x": 0,
+      "y": 0,
+      "z": 12,
+      "w": 228.42,
+      "d": 29,
+      "h": 0.7
+    },
+    {
+      "role": "hangar",
+      "x": 0,
+      "y": 0,
+      "z": 7.07,
+      "w": 190.35,
+      "d": 17.4,
+      "h": 4.93
+    },
+    {
+      "role": "island",
+      "x": 21.87,
+      "y": 10.73,
+      "z": 12.7,
+      "w": 34.02,
+      "d": 6.09,
+      "h": 5.22
+    },
+    {
+      "role": "bridge",
+      "x": 26.73,
+      "y": 10.73,
+      "z": 17.92,
+      "w": 15.795,
+      "d": 5.8,
+      "h": 4.64
+    },
+    {
+      "role": "mast",
+      "x": 26.73,
+      "y": 10.73,
+      "z": 22.56,
+      "w": 0.75,
+      "d": 0.75,
+      "h": 9.86
+    },
+    {
+      "role": "funnel",
+      "x": -2.43,
+      "y": 10.73,
+      "z": 12.7,
+      "w": 9.72,
+      "d": 5.22,
+      "h": 10.73
+    },
+    {
+      "role": "main",
+      "x": -80.19,
+      "y": -13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": -40.095,
+      "y": -13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 0,
+      "y": -13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 40.095,
+      "y": -13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 80.19,
+      "y": -13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": -90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": -80.19,
+      "y": 13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": -40.095,
+      "y": 13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 0,
+      "y": 13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 40.095,
+      "y": 13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "main",
+      "x": 80.19,
+      "y": 13.92,
+      "z": 9.7,
+      "w": 2.86,
+      "d": 1.56,
+      "h": 1.3,
+      "barrels": 1,
+      "caliber": 130,
+      "bearing": 90,
+      "enclosed": false,
+      "sponson": true
+    },
+    {
+      "role": "lift",
+      "x": -57.105,
+      "y": 0,
+      "z": 12.29,
+      "w": 13,
+      "d": 12.76,
+      "h": 0.08
+    },
+    {
+      "role": "lift",
+      "x": 57.105,
+      "y": 0,
+      "z": 12.29,
+      "w": 13,
+      "d": 12.76,
+      "h": 0.08
+    }
+  ],
+  "armament": {
+    "caliber": 130,
+    "barrels": 10,
+    "torpedoTubes": 0,
+    "torpedoReloads": null,
+    "aa": 8,
+    "secondary": [],
+    "torpedoFit": {
+      "count": 0
+    }
+  },
+  "shafts": 4,
+  "complement": 926,
+  "displacement": 23000,
+  "textureMetres": 2.5,
+  "fitReview": {
+    "date": "2026-09-30",
+    "status": "Original exterior reconstruction reviewed for coherent class fit; not an engineering survey",
+    "stationAxes": "x bow-positive; y starboard-positive; z height above waterline, all metres. Exporter converts to glTF X/Y-up/Z.",
+    "viewConsistency": "One mesh and one equipment-station ledger generate every view; no independent side/top geometry.",
+    "notes": [
+      "Original fictional arrangement: every catalog main-battery barrel has a separate outboard mount clear of the flight deck. Mount dimensions and side stations are design choices, not historical evidence."
+    ],
+    "expectedMainBarrels": 10,
+    "expectedSecondaryBarrels": 0,
+    "expectedElevators": 2,
+    "expectedFunnels": 1
+  },
+  "indexVertices": true,
+  "materials": {
+    "paint": {
+      "color": [
+        0.33,
+        0.35,
+        0.36,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "deck": {
+      "color": [
+        0.4,
+        0.34,
+        0.235,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9,
+      "baseColorTexture": "naval-albedo",
+      "normalTexture": "naval-normal",
+      "normalScale": 0.45,
+      "metallicRoughnessTexture": "naval-orm",
+      "occlusionTexture": "naval-orm"
+    },
+    "antifouling": {
+      "color": [
+        0.25,
+        0.055,
+        0.035,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.92
+    },
+    "boot": {
+      "color": [
+        0.022,
+        0.025,
+        0.029,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.9
+    },
+    "steel": {
+      "color": [
+        0.08,
+        0.09,
+        0.105,
+        1
+      ],
+      "metallic": 0.78,
+      "roughness": 0.45
+    },
+    "glass": {
+      "color": [
+        0.045,
+        0.09,
+        0.12,
+        1
+      ],
+      "metallic": 0.12,
+      "roughness": 0.18
+    },
+    "brass": {
+      "color": [
+        0.34,
+        0.245,
+        0.105,
+        1
+      ],
+      "metallic": 0.8,
+      "roughness": 0.45
+    },
+    "canvas": {
+      "color": [
+        0.54,
+        0.51,
+        0.43,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.95
+    },
+    "white": {
+      "color": [
+        0.68,
+        0.69,
+        0.66,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.94
+    },
+    "red": {
+      "color": [
+        0.34,
+        0.028,
+        0.018,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 0.5
+    }
+  },
+  "materialSources": [
+    {
+      "name": "Original naval surface maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/naval-paint/source.json",
+      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+    }
+  ],
+  "authoringFile": "assets/models/authoring/fleet-specifications.json",
+  "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
+  "sha256": "77f6a594afe37cbc4c5cab3b84222db0ea58c2effa0568d8e2aa6f02750ac5b7",
+  "statistics": {
+    "id": "ocean_cv30",
+    "triangles": 137424,
+    "vertices": 161900,
+    "materials": 8,
+    "embeddedTextures": 3,
+    "bytes": 7415292,
+    "bounds": {
+      "min": [
+        -121.5,
+        -8.989999771118164,
+        -19.609600067138672
+      ],
+      "max": [
+        121.5,
+        32.41999816894531,
+        19.609600067138672
+      ]
+    }
+  },
+  "parts": [
+    {
+      "name": "Continuous class-specific full hull with curved bilges and underwater body",
+      "triangles": 10840,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 0,
+          "indexCount": 9840
+        },
+        {
+          "material": "boot",
+          "indexStart": 0,
+          "indexCount": 540
+        },
+        {
+          "material": "antifouling",
+          "indexStart": 0,
+          "indexCount": 22140
+        }
+      ]
+    },
+    {
+      "name": "Cambered weather deck, perimeter gutters and hull plating seams",
+      "triangles": 26616,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 9840,
+          "indexCount": 76608
+        },
+        {
+          "material": "deck",
+          "indexStart": 0,
+          "indexCount": 3240
+        }
+      ]
+    },
+    {
+      "name": "Shaped island with glazing, doors, portholes and roof rails",
+      "triangles": 7976,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 86448,
+          "indexCount": 1200
+        },
+        {
+          "material": "deck",
+          "indexStart": 3240,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 0,
+          "indexCount": 9024
+        },
+        {
+          "material": "glass",
+          "indexStart": 0,
+          "indexCount": 13224
+        },
+        {
+          "material": "steel",
+          "indexStart": 0,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Shaped bridge with glazing, doors, portholes and roof rails",
+      "triangles": 4184,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 87648,
+          "indexCount": 1200
+        },
+        {
+          "material": "deck",
+          "indexStart": 3336,
+          "indexCount": 96
+        },
+        {
+          "material": "brass",
+          "indexStart": 9024,
+          "indexCount": 4416
+        },
+        {
+          "material": "glass",
+          "indexStart": 13224,
+          "indexCount": 6456
+        },
+        {
+          "material": "steel",
+          "indexStart": 384,
+          "indexCount": 384
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 1 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 88848,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 540,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13440,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 768,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 90240,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 732,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13560,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 2832,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 3 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 91632,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 924,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13680,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 4896,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 4 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 93024,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1116,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13800,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 6960,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 5 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 94416,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1308,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 13920,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 9024,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 6 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 95808,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1500,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14040,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 11088,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 7 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 97200,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1692,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14160,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 13152,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 8 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 98592,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 1884,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14280,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 15216,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 9 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 99984,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 2076,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14400,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 17280,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 10 1 x 130 mm",
+      "triangles": 1256,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 101376,
+          "indexCount": 1392
+        },
+        {
+          "material": "boot",
+          "indexStart": 2268,
+          "indexCount": 192
+        },
+        {
+          "material": "brass",
+          "indexStart": 14520,
+          "indexCount": 120
+        },
+        {
+          "material": "steel",
+          "indexStart": 19344,
+          "indexCount": 2064
+        }
+      ]
+    },
+    {
+      "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
+      "triangles": 2024,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 102768,
+          "indexCount": 816
+        },
+        {
+          "material": "boot",
+          "indexStart": 2460,
+          "indexCount": 840
+        },
+        {
+          "material": "steel",
+          "indexStart": 21408,
+          "indexCount": 4416
+        }
+      ]
+    },
+    {
+      "name": "Mast 1 with taper, yards, rigging and access ladder",
+      "triangles": 1632,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 103584,
+          "indexCount": 1152
+        },
+        {
+          "material": "steel",
+          "indexStart": 25824,
+          "indexCount": 3744
+        }
+      ]
+    },
+    {
+      "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
+      "triangles": 7152,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 104736,
+          "indexCount": 480
+        },
+        {
+          "material": "steel",
+          "indexStart": 29568,
+          "indexCount": 20976
+        }
+      ]
+    },
+    {
+      "name": "Deck edge stanchions, lifelines and hull portholes",
+      "triangles": 17152,
+      "ranges": [
+        {
+          "material": "brass",
+          "indexStart": 14640,
+          "indexCount": 25728
+        },
+        {
+          "material": "glass",
+          "indexStart": 19680,
+          "indexCount": 25728
+        }
+      ]
+    },
+    {
+      "name": "Enclosed hangar sides with doors, galleries and structural frames",
+      "triangles": 29472,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 105216,
+          "indexCount": 83808
+        },
+        {
+          "material": "boot",
+          "indexStart": 3300,
+          "indexCount": 4608
+        }
+      ]
+    },
+    {
+      "name": "Continuous flight-deck with beams, planking, safety net, landing markings and arresting wires",
+      "triangles": 15288,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 189024,
+          "indexCount": 37440
+        },
+        {
+          "material": "deck",
+          "indexStart": 3432,
+          "indexCount": 4776
+        },
+        {
+          "material": "steel",
+          "indexStart": 50544,
+          "indexCount": 1344
+        },
+        {
+          "material": "white",
+          "indexStart": 0,
+          "indexCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 226464,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 51888,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Recessed flight-deck elevator outline and hinges",
+      "triangles": 432,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 226560,
+          "indexCount": 96
+        },
+        {
+          "material": "steel",
+          "indexStart": 53088,
+          "indexCount": 1200
+        }
+      ]
+    },
+    {
+      "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
+      "triangles": 1664,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 226656,
+          "indexCount": 2160
+        },
+        {
+          "material": "brass",
+          "indexStart": 40368,
+          "indexCount": 1872
+        },
+        {
+          "material": "steel",
+          "indexStart": 54288,
+          "indexCount": 960
+        }
+      ]
+    }
+  ],
+  "equipment": {
+    "mainBarrels": [
+      {
+        "caliber": 130,
+        "bearing": -90,
+        "mount": [
+          -80.19,
+          9.7,
+          -13.92
+        ],
+        "muzzle": [
+          -80.19000244140625,
+          10.645000457763672,
+          -19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": -90,
+        "mount": [
+          -40.095,
+          9.7,
+          -13.92
+        ],
+        "muzzle": [
+          -40.095001220703125,
+          10.645000457763672,
+          -19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": -90,
+        "mount": [
+          0,
+          9.7,
+          -13.92
+        ],
+        "muzzle": [
+          3.483875099418907e-16,
+          10.645000457763672,
+          -19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": -90,
+        "mount": [
+          40.095,
+          9.7,
+          -13.92
+        ],
+        "muzzle": [
+          40.095001220703125,
+          10.645000457763672,
+          -19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": -90,
+        "mount": [
+          80.19,
+          9.7,
+          -13.92
+        ],
+        "muzzle": [
+          80.19000244140625,
+          10.645000457763672,
+          -19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": 90,
+        "mount": [
+          -80.19,
+          9.7,
+          13.92
+        ],
+        "muzzle": [
+          -80.19000244140625,
+          10.645000457763672,
+          19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": 90,
+        "mount": [
+          -40.095,
+          9.7,
+          13.92
+        ],
+        "muzzle": [
+          -40.095001220703125,
+          10.645000457763672,
+          19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": 90,
+        "mount": [
+          0,
+          9.7,
+          13.92
+        ],
+        "muzzle": [
+          3.483875099418907e-16,
+          10.645000457763672,
+          19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": 90,
+        "mount": [
+          40.095,
+          9.7,
+          13.92
+        ],
+        "muzzle": [
+          40.095001220703125,
+          10.645000457763672,
+          19.609600067138672
+        ]
+      },
+      {
+        "caliber": 130,
+        "bearing": 90,
+        "mount": [
+          80.19,
+          9.7,
+          13.92
+        ],
+        "muzzle": [
+          80.19000244140625,
+          10.645000457763672,
+          19.609600067138672
+        ]
+      }
+    ],
+    "secondaryBarrels": [],
+    "aaBarrels": [],
+    "torpedoTubes": []
+  },
+  "modelledMainBarrels": 10,
+  "modelledExternalTorpedoTubes": 0
+}

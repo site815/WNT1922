@@ -45,8 +45,9 @@ private:
     void UpdateVisibility();
     void RepositionPorts();
     void RebuildRoute(double WidthCentimetres);
+    void RepositionWorldTiles();
     bool BuildOcean();
-    FString ModelPath(const FString& ClassId, const FString& Campaign) const;
+    FString ModelPath(const FString& ClassId, const FString& Campaign, const FString& Type = TEXT("")) const;
 
     UPROPERTY(Transient) TObjectPtr<AWNTTerrainActor> Terrain;
     UPROPERTY(Transient) TObjectPtr<AWNTOceanDetailActor> OceanDetail;
@@ -56,6 +57,8 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<USkyLightComponent> Sky;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> SkyBackground;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UProceduralMeshComponent> RouteMesh;
+    UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> RouteTiles;
+    TArray<FVector> OceanTileOrigins, RouteTileOrigins;
     TUniquePtr<FWNTWorldRuntime, FWNTWorldRuntimeDeleter> Runtime;
     FString DataDirectory, LoadError, Campaign;
     double CentralMeridian = 0.0;

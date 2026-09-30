@@ -137,7 +137,7 @@ bool FWNTPendingSceneIdentityTest::RunTest(const FString& Parameters)
             TArray<UStaticMeshComponent*> Meshes;It->GetComponents(Meshes);TestEqual(TEXT("No cuboid port scenery is created"),Meshes.Num(),0);
         }
     }
-    TestEqual(TEXT("One selectable symbol per real hull"),Hulls,2);TestEqual(TEXT("One port navigation symbol"),Ports,1);
+    TestEqual(TEXT("One selectable symbol per real hull"),Hulls,2);TestEqual(TEXT("Three wrapped port symbols retain one port identity"),Ports,3);
     TestTrue(TEXT("First hull remains at the reported geographic station"),First.Equals(WNTProjection::Forward(FVector2D(-35,25)),.01));
     TestTrue(TEXT("Formation stations remain distinct"),FVector::Distance(First,Second)>10000);
     Scene->SetSceneMode(TEXT("battle"));

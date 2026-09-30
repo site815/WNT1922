@@ -89,7 +89,7 @@ async function diagnostics(mode) {
  const d=rows.find(row=>row.event.type==='diagnostics').event;
  assert.equal(d.renderer,'Unreal Engine native UWorld');assert.equal(d.nativeWorldInitialized,true);
  assert.equal(d.modelLoadErrors,0,'Registered detailed models must load successfully');
- assert.equal(d.detailedModelCount+d.pendingModelCount,d.shipActorCount,'Every ship has detailed geometry or an explicit pending-art symbol');
+ assert.equal(d.detailedModelCount+d.deferredModelCount+d.pendingModelCount,d.shipActorCount,'Every ship has resident detailed geometry, an available deferred asset, or explicit pending artwork');
  if(mode)assert.equal(d.mode,mode);
  eventCursor=Math.max(eventCursor,...rows.map(row=>row.sequence));return d;
 }
@@ -205,11 +205,13 @@ try {
   await gallery.locator('select').selectOption(String(i));
   const model=path.basename(detailed[i].file,'.glb');
   await until(()=>diagnostics('battle'),d=>d.targets.some(t=>t.id==='gallery-ship'&&t.modelId===model&&t.visualStatus==='detailed-model'&&t.detailedModel&&!t.modelPending),{label:'actual detailed geometry '+model});
-  await delay(400);await pick('battle-ship');
+  await page.waitForFunction(id=>{const gallery=document.querySelector('.model-gallery');return gallery?.dataset.galleryReady==='true'&&gallery.dataset.galleryModel===id;},detailed[i].id);
+  await pick('battle-ship');
   assert.match(await gallery.locator('[role="status"]').textContent(),/selected/);
   await nativeCapture('native-gallery-'+i);
  }
- await gallery.locator('select').selectOption('0');await delay(600);
+ await gallery.locator('select').selectOption('0');
+ await page.waitForFunction(id=>{const gallery=document.querySelector('.model-gallery');return gallery?.dataset.galleryReady==='true'&&gallery.dataset.galleryModel===id;},detailed[0].id);
  await nativeCapture('native-gallery-interface',true);
  await gallery.locator('[data-gallery="close"]').click();await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
  assert.equal(await page.locator('#app').evaluate(el=>!el.hidden&&!el.inert),true);
@@ -228,7 +230,7 @@ try {
  const d=await diagnostics('world');assert(d.shipActorCount>=packet.forces.reduce((sum,f)=>sum+f.hulls.length,0));
  result.metrics.push({kind:'native-world',...d,targets:undefined,ownForceCount:packet.forces.length,ownHullCount:packet.forces.reduce((sum,f)=>sum+f.hulls.length,0)});
  await nativeCapture('native-world');
- assert(d.pendingModelCount>0,'Unfinished campaign artwork must be reported as pending, never replaced by old recognition geometry');
+ assert.equal(d.pendingModelCount,0,'Every starting campaign ship and opening-demo combatant must have a registered detailed model');
  result.checks.push('USA1936 starts paused; every own hull retains its identity and position, with pending artwork counted separately from detailed models and loading errors.');
 
  phase='world camera and hull picking';
@@ -243,7 +245,11 @@ try {
  assert(warshipForce);await focusOwnForce(warshipForce);await nativeCapture('native-fleet');
  const hovered=await pick('ship',{hover:true});
  await page.locator('.class-hover:not([hidden])').waitFor();
- assert.match(await page.locator('.class-hover:not([hidden])').innerText(),/Sailors aboard|Hull|Complement/);
+ // The tooltip has an intentional dwell delay and may still contain the
+ // previous territory's information after the native hit is already correct.
+ await until(()=>page.locator('.class-hover:not([hidden])').innerText(),
+  text=>/Sailors aboard|Hull|Complement/.test(text)&&text.includes(hovered.label),
+  {label:'hover information for the exact selected hull'});
  if(hovered.modelPending)assert.match(await page.locator('.class-hover:not([hidden])').innerText(),/3D.*pending|pending.*3D/i,'Pending artwork is explicit in the inspection');
  const selection=await pick('ship');
  assert(initial.nations.USA.groups.some(g=>g.id===selection.id),'Only a recorded own ship was selected');

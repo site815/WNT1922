@@ -8,7 +8,7 @@ import { ownMerchantScene } from './merchant-scene.mjs';
 // The campaign knows fleet routes, not individual helms or tactical tracks.
 // Slots below are representative operational stations around the EXACT fleet
 // position. Never move an anchor into convenient water or join unrelated fleets.
-export const FORMATION_NOTE = 'Ship stations are a representative formation around the recorded fleet position, not individual tactical tracks. Surviving ships keep their stations when another ship is lost. Port nodes and sea lanes are approximate.';
+export const FORMATION_NOTE = 'Ship stations are a representative formation around the recorded fleet position, not individual tactical tracks. Forces sharing one recorded position use separate display stations. Surviving ships keep their stations when another ship is lost. Port nodes and sea lanes are approximate.';
 export const EARTH_RADIUS_METRES = 3440.065 * 1852;
 const RAD = Math.PI / 180;
 const alive = g => Number.isSafeInteger(g.count) && g.count > 0 &&
@@ -149,7 +149,80 @@ function createLayout(row, classes, previous, dimensionsFor) {
   // recentering survivors every snapshot would make the entire fleet jump.
   const center = reuse?.center || [0, 1].map(axis =>
     Object.values(slots).reduce((sum, slot) => sum + slot.cell[axis], 0) / Math.max(1, hulls.length));
-  return { kind, spacing, columns, starts, center, slots };
+  return { kind, spacing, columns, starts, center, slots,
+    separationOffsetMeters: [...(reuse?.separationOffsetMeters || [0, 0])] };
+}
+
+// Several independent opening fleets can share one harbor/route node. Their
+// separately centered screens otherwise put a destroyer through a carrier, or
+// put whole submarine and escort groups in identical stations. Allocate only
+// these co-located forces separate presentation stations; never move a route
+// anchor or space unrelated fleets across the world. The translation is stored
+// in each force's own starboard/forward frame, so all of its hulls still turn and
+// travel together. Reuse it after departure and casualties to avoid recentering.
+function separateColocatedFormations(state, rows, classes, dimensionsFor) {
+  const clusters = new Map();
+  for (const row of rows) {
+    if (row.unlocated) continue;
+    const anchor = fleetPosition(state, row.fleet, row.sceneMinute);
+    if (!Array.isArray(anchor) || !anchor.every(Number.isFinite)) continue;
+    const key = [wrapLon(anchor[0]), anchor[1]].map(n => n.toFixed(7)).join(':');
+    if (!clusters.has(key)) clusters.set(key, []);
+    clusters.get(key).push(row);
+  }
+  for (const cluster of clusters.values()) {
+    if (cluster.length < 2) continue;
+    const entries = cluster.map(row => {
+      const heading = fleetCourse(state, row.fleet, row.sceneMinute).heading * RAD;
+      const layout = row.formation;
+      return { row, sin: Math.sin(heading), cos: Math.cos(heading),
+        hulls: row.hulls.map(hull => {
+          const cell = layout.slots[hull.key].cell, size = dimensionsOf(hull, classes, dimensionsFor);
+          return { starboard: (cell[0] - layout.center[0]) * layout.spacing[0],
+            forward: (cell[1] - layout.center[1]) * layout.spacing[1],
+            // A rotated hull stays inside this circle, including modest gun,
+            // shaft and sponson overhang beyond the catalog hull dimensions.
+            radius: Math.hypot(size.length, size.beam) / 2 + 40 };
+        }) };
+    }).sort((a, b) => Number(!!a.row.merchant) - Number(!!b.row.merchant) ||
+      a.row.fleet.id.localeCompare(b.row.fleet.id, 'en'));
+    const step = entries.reduce((max, entry) => entry.hulls.reduce((n, hull) => Math.max(n, hull.radius * 2), max), 600);
+    const occupied = new Map();
+    const key = (x, y) => `${x}:${y}`;
+    const pointsAt = (entry, offset) => entry.hulls.map(hull => {
+      const starboard = hull.starboard + offset[0], forward = hull.forward + offset[1];
+      return { x: starboard * entry.cos + forward * entry.sin,
+        y: forward * entry.cos - starboard * entry.sin, radius: hull.radius };
+    });
+    const clear = points => points.every(point => {
+      const x = Math.floor(point.x / step), y = Math.floor(point.y / step);
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        for (const other of occupied.get(key(x + dx, y + dy)) || []) {
+          if (Math.hypot(point.x - other.x, point.y - other.y) < point.radius + other.radius) return false;
+        }
+      }
+      return true;
+    });
+    for (const entry of entries) {
+      let offset = entry.row.formation.separationOffsetMeters, points = pointsAt(entry, offset);
+      if (!clear(points)) {
+        // Translate the entire formation by a deterministic lattice, preserving
+        // all internal stations, screen roles, headings and hull identities.
+        for (const cell of cellsFrom()) {
+          offset = cell.map(n => n * step);
+          points = pointsAt(entry, offset);
+          if (clear(points)) break;
+        }
+        entry.row.formation.separationOffsetMeters = offset;
+      }
+      for (const point of points) {
+        const cell = key(Math.floor(point.x / step), Math.floor(point.y / step));
+        if (!occupied.has(cell)) occupied.set(cell, []);
+        occupied.get(cell).push(point);
+      }
+    }
+  }
+  return rows;
 }
 
 // Keep the returned row as the previous row for this force on the next state
@@ -194,9 +267,10 @@ export function ownFormationScene(state, content = {}, previousRows = [], option
       positionSource: dock.unlocated ? 'unknown' : 'dock-node', hulls: instances(dock.groups, classes) });
   }
   if (options.includeMerchants !== false) rows.push(...ownMerchantScene(state, options.minute ?? campaignMinutes(state)));
-  return rows.filter(row => row.hulls.length).map(row => prepareFormation({ ...row,
+  const prepared = rows.filter(row => row.hulls.length).map(row => prepareFormation({ ...row,
     sceneScope: `${state.campaignId || ''}:${state.player}`, sceneMinute: campaignMinutes(state), scenePaused: !!state.paused },
     { classes }, previous.get(row.fleet.id), options));
+  return separateColocatedFormations(state, prepared, classes, options.dimensionsFor);
 }
 
 export function formationAt(state, row, minute = campaignMinutes(state), { fleet = row.fleet } = {}) {
@@ -207,8 +281,8 @@ export function formationAt(state, row, minute = campaignMinutes(state), { fleet
   const sin = Math.sin(course.heading * RAD), cos = Math.cos(course.heading * RAD);
   const hulls = row.hulls.map(hull => {
     const slot = layout.slots[hull.key];
-    const starboard = (slot.cell[0] - layout.center[0]) * layout.spacing[0];
-    const forward = (slot.cell[1] - layout.center[1]) * layout.spacing[1];
+    const starboard = (slot.cell[0] - layout.center[0]) * layout.spacing[0] + (layout.separationOffsetMeters?.[0] || 0);
+    const forward = (slot.cell[1] - layout.center[1]) * layout.spacing[1] + (layout.separationOffsetMeters?.[1] || 0);
     const east = starboard * cos + forward * sin, north = forward * cos - starboard * sin;
     return { ...hull, slot: { ...slot, cell: [...slot.cell] }, stationMeters: [starboard, forward], offsetMeters: [east, north],
       position: anchor && geographicOffset(anchor, east, north), heading: course.heading,

@@ -2,6 +2,50 @@
 #include "Misc/AutomationTest.h"
 #include "WNTPlayerController.h"
 #include "WNTProjection.h"
+#include "WNTWorldActor.h"
+#include "Camera/PlayerCameraManager.h"
+#include "Engine/World.h"
+#include "Misc/ScopeExit.h"
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRebaseHistoryTest,"WNT.Camera.RebaseResetsTemporalHistory",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTRebaseHistoryTest::RunTest(const FString& Parameters)
+{
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(true).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,MakeUniqueObjectName(GetTransientPackage(),UWorld::StaticClass(),TEXT("WNTRebaseHistoryTest")),GetTransientPackage(),true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Rebase test world"),World))return false;
+    ON_SCOPE_EXIT{World->DestroyWorld(false);};
+    auto* Controller=World->SpawnActor<APlayerController>();
+    auto* Scene=World->SpawnActor<AWNTWorldActor>();
+    if(!TestTrue(TEXT("Real scene and player controller exist"),Controller&&Scene))return false;
+    // This isolated world intentionally never begins play. SpawnActor therefore
+    // does not run the controller's PostInitializeComponents registration;
+    // mirror that lifecycle step before testing the real player-camera lookup.
+    World->AddController(Controller);
+    if(!TestTrue(TEXT("Fixture controller is registered in its world's player list"),World->GetFirstPlayerController()==Controller))return false;
+    if(!Controller->PlayerCameraManager)Controller->PlayerCameraManager=World->SpawnActor<APlayerCameraManager>();
+    auto* Camera=Controller->PlayerCameraManager.Get();
+    if(!TestNotNull(TEXT("Real camera manager exists"),Camera))return false;
+    auto Check=[&](double Meridian,bool Expected,const TCHAR* Label)
+    {
+        Camera->bGameCameraCutThisFrame=false;
+        Scene->SetCentralMeridian(Meridian);
+        TestEqual(Label,bool(Camera->bGameCameraCutThisFrame),Expected);
+    };
+    Check(0,false,TEXT("Initial stationary chart keeps its temporal history"));
+    Check(179,true,TEXT("Moving chart origin invalidates old route and marker history"));
+    Check(179,false,TEXT("Repeated same origin does not continually reset TSR"));
+    Check(539,false,TEXT("Equivalent wrapped longitude is not a new rebase"));
+    Check(-179,true,TEXT("Crossing the seam invalidates copied primitive history"));
+    Check(-179,false,TEXT("Settled seam view can accumulate history again"));
+    Camera->bGameCameraCutThisFrame=false;Scene->SetSceneMode(TEXT("battle"));
+    TestTrue(TEXT("World to battle cannot reuse unrelated map history"),bool(Camera->bGameCameraCutThisFrame));
+    Camera->bGameCameraCutThisFrame=false;Scene->SetSceneMode(TEXT("battle"));
+    TestFalse(TEXT("Recurring battle packets preserve stationary history"),bool(Camera->bGameCameraCutThisFrame));
+    Camera->bGameCameraCutThisFrame=false;Scene->SetSceneMode(TEXT("world"));
+    TestTrue(TEXT("Returning to the chart starts fresh history"),bool(Camera->bGameCameraCutThisFrame));
+    return true;
+}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTCameraProjectionTest,"WNT.Camera.NativeProjectionAndNorthUp",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTCameraProjectionTest::RunTest(const FString& Parameters)
@@ -81,17 +125,48 @@ bool FWNTCameraWrappingTest::RunTest(const FString& Parameters)
 {
     for(double Latitude:{-75.0,0.0,75.0})for(double Direction:{-1.0,1.0})
     {
-        FVector2D Focus(170,Latitude);double Meridian=170;int32 Recentres=0;
+        FVector2D Focus(170,Latitude);double Meridian=170;
         const double Step=WNTProjection::ForwardUnwrapped(FVector2D(5,Latitude)).Y*Direction;
         for(int32 I=0;I<144;++I)
         {
             Focus=WNTCameraMath::WrappedFocus(WNTProjection::Forward(Focus,Meridian)+FVector(0,Step,0),Meridian);
-            if(FMath::Abs(WNTProjection::WrapLongitude(Focus.X-Meridian))>135){Meridian=Focus.X;++Recentres;}
+            Meridian=Focus.X;
+            TestTrue(TEXT("Rendered camera remains centered between repeated map copies"),FMath::Abs(WNTProjection::Forward(Focus,Meridian).Y)<.001);
             TestTrue(TEXT("Panning retains latitude"),FMath::Abs(Focus.Y-Latitude)<1e-7);
             TestTrue(TEXT("Repeated wraps preserve geographic longitude"),FMath::Abs(WNTProjection::WrapLongitude(Focus.X-(170+Direction*5*(I+1))))<1e-7);
         }
-        TestTrue(TEXT("Two complete revolutions need only occasional mesh reprojection"),Recentres>=4&&Recentres<=6);
     }
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRepeatedCopyAnchorTest,"WNT.Camera.RepeatedCopyAnchor",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTRepeatedCopyAnchorTest::RunTest(const FString& Parameters)
+{
+    for(double Meridian:{-179.,0.,179.})for(double Copy:{-1.,0.,1.})for(double Delta:{-30.,30.})
+    {
+        const double Next=WNTProjection::WrapLongitude(Meridian+Delta);
+        const FVector Original=WNTProjection::ForwardUnwrapped(FVector2D(170+Copy*360,25));
+        const FVector Rebased=Original-FVector(0,WNTProjection::WrapLongitude(Next-Meridian)/360*WNTProjection::WorldWidth,0);
+        const auto Before=WNTProjection::Inverse(Original,Meridian),After=WNTProjection::Inverse(Rebased,Next);
+        TestTrue(TEXT("Rebased anchor preserves the actual geographic point"),Before.IsSet()&&After.IsSet()
+            &&FMath::Abs(WNTProjection::WrapLongitude(Before->X-After->X))<1e-8&&FMath::Abs(Before->Y-After->Y)<1e-8);
+        TestTrue(TEXT("Anchor moves only by camera translation, never by an extra world-width jump"),
+            FMath::Abs((Rebased.Y-Original.Y)+Delta/360*WNTProjection::WorldWidth)<.001);
+    }
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWorldTiltGateTest,"WNT.Camera.ShipInspectionTiltGate",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTWorldTiltGateTest::RunTest(const FString& Parameters)
+{
+    for(double Zoom:{1.0,10.0,128.0,1024.0,2048.0})
+        TestEqual(TEXT("Strategic map rejects angle changes"),WNTCameraMath::MaxWorldTilt(Zoom),0.0);
+    double Previous=0;
+    for(int32 I=0;I<=64;++I)
+    {
+        const double Angle=WNTCameraMath::MaxWorldTilt(2048.0*FMath::Pow(2.0,I/64.0));
+        TestTrue(TEXT("Ship inspection tilt opens continuously"),Angle>=Previous&&Angle-Previous<2.0);Previous=Angle;
+    }
+    TestEqual(TEXT("Close ship view allows full orbit pitch"),WNTCameraMath::MaxWorldTilt(6000.0),70.0);
+    TestEqual(TEXT("Returning to strategic scale restores overhead lock"),WNTCameraMath::MaxWorldTilt(1.0),0.0);
     return true;
 }
 #endif

@@ -14,7 +14,7 @@ $build = Get-Content -Raw -LiteralPath $BuildReport | ConvertFrom-Json
 $verification = Get-Content -Raw -LiteralPath $PackageTestReport | ConvertFrom-Json
 $packageVersion = (Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json).version
 if ($build.format -ne 2 -or -not $build.packaged -or -not $build.nativeTestsPassed -or $build.version -ne $packageVersion) { throw 'A successful current native package build report is required.' }
-if ($build.configuration -notin @('Development','Shipping')) { throw 'Unknown native package configuration.' }
+if ($build.configuration -ne 'Shipping') { throw 'Player releases must use Shipping to omit Unreal development profiling listeners.' }
 if (-not $NodePath) { $nodeCommand=Get-Command node.exe -ErrorAction SilentlyContinue; if ($nodeCommand) { $NodePath=$nodeCommand.Source } }
 if (-not $NodePath) { $NodePath=Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe' }
 $currentFingerprint = (& $NodePath tools/native-source-fingerprint.mjs).Trim()
@@ -22,12 +22,20 @@ if ($LASTEXITCODE -ne 0 -or $build.sourceSha256 -ne $currentFingerprint) { throw
 $executable = (Resolve-Path -LiteralPath $build.archive).Path
 $downloadName='WNT1922-v'+$packageVersion+'-Unreal-Windows.zip'
 if ([IO.Path]::GetFileName($executable) -ne $downloadName) { throw 'Native archive filename must retain its exact version.' }
+$archiveBytes=(Get-Item -LiteralPath $executable).Length
+# GitHub requires each release asset to be strictly smaller than 2 GiB.
+# Reject before creating a draft or uploading; use the actual file size.
+if ($archiveBytes -ge 2GB) { throw ('Native archive is '+$archiveBytes+' bytes. GitHub release assets must be smaller than 2 GiB (2147483648 bytes). Repackage and repeat extracted-package verification before publication.') }
 $digest = (Get-FileHash -LiteralPath $executable -Algorithm SHA256).Hash.ToLowerInvariant()
-if ($digest -ne $build.archiveSha256 -or (Get-Item -LiteralPath $executable).Length -ne $build.archiveBytes) { throw 'The native archive does not match its build metadata.' }
+if ($digest -ne $build.archiveSha256 -or $archiveBytes -ne $build.archiveBytes) { throw 'The native archive does not match its build metadata.' }
 if ($verification.kind -ne 'extracted-native-package' -or $verification.version -ne $packageVersion -or $verification.archiveSha256 -ne $digest -or $verification.passed -ne $true -or $verification.visualVerified -ne $true) { throw 'Successful extracted-package testing and explicit native visual review of this exact archive are required. Editor runtime checks are insufficient.' }
-foreach ($check in @('launch','campaignStart','shipSelection','battleWatch','saveReload','offlineAssets')) {
+foreach ($check in @('launch','campaignStart','shipSelection','battleWatch','saveReload','offlineAssets','loopbackOnly')) {
     if ($check -notin $verification.checksPassed) { throw ('Missing packaged-game verification: '+$check) }
 }
+$networkReport=Get-Content -Raw -LiteralPath $verification.networkReport | ConvertFrom-Json
+if (-not $networkReport.passed -or $networkReport.processId -ne $verification.processId -or $networkReport.executable -ne $verification.executablePath -or @($networkReport.violations).Count) { throw 'The extracted game and its child processes must pass network verification.' }
+$normalNetwork=Get-Content -Raw -LiteralPath $verification.normalNetworkReport | ConvertFrom-Json
+if (-not $normalNetwork.passed -or $normalNetwork.automation -ne $false -or $normalNetwork.executable -ne $verification.executablePath -or $normalNetwork.seconds -lt 15 -or [DateTimeOffset]$normalNetwork.processStartedUtc -lt [DateTimeOffset]$build.finished -or @($normalNetwork.violations).Count) { throw 'The same extracted executable also needs a fresh network check during normal play with browser debugging disabled.' }
 $runtimeReport=Get-Content -Raw -LiteralPath $verification.nativeRuntimeReport | ConvertFrom-Json
 if ($runtimeReport.passed -ne $true -or [DateTimeOffset]$runtimeReport.finishedAt -lt [DateTimeOffset]$build.finished) { throw 'A fresh successful runtime report from the extracted package is required.' }
 $extracted=(Resolve-Path -LiteralPath $verification.extractedDirectory).Path.TrimEnd('\','/')

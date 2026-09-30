@@ -2,11 +2,13 @@
 #include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "CoreGlobals.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "glTFRuntimeAsset.h"
 #include "glTFRuntimeFunctionLibrary.h"
 #include "HAL/FileManager.h"
+#include "HAL/PlatformTime.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -24,6 +26,23 @@ namespace
     };
     TMap<FString, FDetailedMeshRevision> DetailedCache;
     TMap<FString, FDetailedMeshRevision> FailedDetailedRevisions;
+    struct FFileRevision
+    {
+        FDateTime Timestamp;
+        int64 Size = -1;
+        double CheckedAt = 0;
+    };
+    TMap<FString, FFileRevision> FileRevisionCache;
+    uint64 PrefetchFrame = MAX_uint64;
+    int32 PrefetchParses = 0;
+
+    FFileRevision ReadRevision(const FString& Filename)
+    {
+        const FFileRevision Revision{IFileManager::Get().GetTimeStamp(*Filename),
+            IFileManager::Get().FileSize(*Filename),FPlatformTime::Seconds()};
+        FileRevisionCache.Add(Filename,Revision);
+        return Revision;
+    }
 }
 
 AWNTShipActor::AWNTShipActor()
@@ -64,10 +83,8 @@ AWNTShipActor::AWNTShipActor()
     DetailedMesh->SetVisibility(false);
 }
 
-bool AWNTShipActor::LoadDetailedModel(const FString& Filename)
+bool AWNTShipActor::LoadDetailedModel(const FString& Filename,FDateTime Timestamp,int64 Size)
 {
-    const FDateTime Timestamp = IFileManager::Get().GetTimeStamp(*Filename);
-    const int64 Size = IFileManager::Get().FileSize(*Filename);
     // A broken external edit is shared by every sister ship. Parse that file
     // revision once; a changed timestamp or length immediately allows repair.
     if (const auto* Failed = FailedDetailedRevisions.Find(Filename))
@@ -134,7 +151,8 @@ bool AWNTShipActor::IsDetailedModelVisible() const
 
 FString AWNTShipActor::GetVisualStatus() const
 {
-    return bModelLoadError ? TEXT("model-error") : bModelPending ? TEXT("pending-art") : TEXT("detailed-model");
+    return bModelLoadError ? TEXT("model-error") : bModelPending ? TEXT("pending-art")
+        : IsModelDeferred() ? TEXT("model-not-loaded") : TEXT("detailed-model");
 }
 
 void AWNTShipActor::ClearDetailedModel()
@@ -143,6 +161,15 @@ void AWNTShipActor::ClearDetailedModel()
     DetailedMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     DetailedMesh->SetStaticMesh(nullptr);
     LoadedPath.Reset(); LoadedTimestamp = FDateTime(); LoadedSize = -1; ModelId.Reset();
+}
+
+void AWNTShipActor::ReleaseResidentModel()
+{
+    if (!ensure(IsInGameThread()) || !HasRenderableModel()) return;
+    // Components are the strong owners; the shared cache deliberately remains
+    // weak. Keep the declaration so normal camera loading can reacquire it.
+    ClearDetailedModel();
+    if (!SourcePath.IsEmpty()) ModelId = FPaths::GetBaseFilename(SourcePath);
 }
 
 void AWNTShipActor::SetSymbolState(bool bError)
@@ -185,7 +212,7 @@ void AWNTShipActor::SetPendingModel()
 {
     if (!ensure(IsInGameThread())) return;
     const bool WasPending = bModelPending && !bModelLoadError && SymbolMesh->GetNumSections() > 0;
-    ClearDetailedModel(); bModelPending = true; bModelLoadError = false;
+    ClearDetailedModel(); SourcePath.Reset(); bModelPending = true; bModelLoadError = false;
     if (!WasPending) SetSymbolState(false);
 }
 
@@ -195,13 +222,61 @@ bool AWNTShipActor::LoadModel(const FString& FullModelPath, UMaterialInterface* 
     // Recognition JSON remains reference data only, never native ship geometry.
     if (FPaths::GetExtension(FullModelPath, true).ToLower() != TEXT(".glb")) { SetPendingModel(); return false; }
     FString Filename = FPaths::ConvertRelativePathToFull(FullModelPath); FPaths::NormalizeFilename(Filename);
+    SourcePath=Filename;
+    // Explicit loads/editor reload tests always see the current file revision.
+    const FFileRevision Revision=ReadRevision(Filename);
+    return LoadModelRevision(Filename,Revision.Timestamp,Revision.Size);
+}
+
+bool AWNTShipActor::LoadModelRevision(const FString& Filename,FDateTime Timestamp,int64 Size)
+{
     const bool HadErrorSymbol = bModelLoadError && !bModelPending && !HasRenderableModel() && SymbolMesh->GetNumSections() > 0;
     if (LoadedPath != Filename) ClearDetailedModel();
     bModelPending = false;
-    if (LoadDetailedModel(Filename)) { bModelLoadError = false; return true; }
+    if (LoadDetailedModel(Filename,Timestamp,Size)) { bModelLoadError = false; return true; }
     bModelLoadError = true;
     if (!HasRenderableModel() && !HadErrorSymbol) SetSymbolState(true);
     return false;
+}
+
+void AWNTShipActor::SetModelReference(const FString& FullModelPath)
+{
+    if(!ensure(IsInGameThread()))return;
+    if(FPaths::GetExtension(FullModelPath,true).ToLower()!=TEXT(".glb")){SetPendingModel();return;}
+    FString Filename=FPaths::ConvertRelativePathToFull(FullModelPath);FPaths::NormalizeFilename(Filename);
+    if(SourcePath==Filename&&!bModelPending)return;
+    ClearDetailedModel();SourcePath=Filename;ModelId=FPaths::GetBaseFilename(Filename);
+    bModelPending=false;bModelLoadError=false;
+    SymbolMesh->SetVisibility(false);SymbolHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AWNTShipActor::RefreshModelForCamera(const FVector& CameraLocation,bool bRefresh)
+{
+    if(!ensure(IsInGameThread())||SourcePath.IsEmpty()||bModelPending||CameraLocation.ContainsNaN())return;
+    constexpr double VisibleRange=2000000.0,LoadRange=3000000.0,ReleaseRange=6000000.0;
+    const double DistanceSquared=FVector::DistSquared(CameraLocation,GetActorLocation());
+    if(DistanceSquared>ReleaseRange*ReleaseRange)
+    {
+        if(HasRenderableModel()){ClearDetailedModel();ModelId=FPaths::GetBaseFilename(SourcePath);}
+        return;
+    }
+    if(HasRenderableModel()) { if(!bRefresh)return; }
+    else if(DistanceSquared>LoadRange*LoadRange||(!bRefresh&&bModelLoadError))return;
+
+    const FFileRevision* Known=FileRevisionCache.Find(SourcePath);
+    const FFileRevision Revision=(!Known||(bRefresh&&FPlatformTime::Seconds()-Known->CheckedAt>=2.0))
+        ? ReadRevision(SourcePath) : *Known;
+    const auto* Cached=DetailedCache.Find(SourcePath);
+    const bool NeedsParse=!Cached||!Cached->Mesh.IsValid()||Cached->Timestamp!=Revision.Timestamp||Cached->Size!=Revision.Size;
+    if(NeedsParse&&DistanceSquared>VisibleRange*VisibleRange)
+    {
+        // Limit speculative cold parses to one per frame. Visible ships load
+        // immediately, so this budget never omits a hull inside the draw range.
+        if(PrefetchFrame!=GFrameCounter){PrefetchFrame=GFrameCounter;PrefetchParses=0;}
+        if(PrefetchParses>=1)return;
+        ++PrefetchParses;
+    }
+    LoadModelRevision(SourcePath,Revision.Timestamp,Revision.Size);
 }
 
 void AWNTShipActor::UpdateSymbolForCamera(const FVector& CameraLocation, const FRotator& CameraRotation)
@@ -243,5 +318,5 @@ void AWNTShipActor::SetShipTransform(const FVector& ProjectedCentimetres, double
 
 void AWNTShipActor::ClearModelCache()
 {
-    if (ensure(IsInGameThread())) { DetailedCache.Empty(); FailedDetailedRevisions.Empty(); }
+    if (ensure(IsInGameThread())) { DetailedCache.Empty(); FailedDetailedRevisions.Empty(); FileRevisionCache.Empty(); PrefetchFrame=MAX_uint64; PrefetchParses=0; }
 }

@@ -1,0 +1,4699 @@
+{
+  "format": 1,
+  "ships": {
+    "fallback-bb": {
+      "id": "fallback-bb",
+      "name": "Original BB custom-design concept",
+      "type": "BB",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-bb.glb",
+      "dimensions": {
+        "length": 206,
+        "beam": 29,
+        "draft": 8.5
+      },
+      "origin": "original",
+      "configuration": "Original BB custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          6.09
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          6.09
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          6.09
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          6.09
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          6.09
+        ],
+        [
+          0,
+          1,
+          1,
+          6.09
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          6.17
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          6.29
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          6.49
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          6.74
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          6.9399999999999995
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          7.09
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 24.72,
+          "y": 0,
+          "z": 6.09,
+          "w": 20.6,
+          "d": 15.370000000000001,
+          "h": 4.2
+        },
+        {
+          "role": "bridge",
+          "x": 25.619999999999997,
+          "y": 0,
+          "z": 10.29,
+          "w": 15.45,
+          "d": 13.05,
+          "h": 4.4
+        },
+        {
+          "role": "funnel",
+          "x": -3.09,
+          "y": 0,
+          "z": 6.09,
+          "w": 5.8,
+          "d": 4.8,
+          "h": 11
+        },
+        {
+          "role": "funnel",
+          "x": -24.72,
+          "y": 0,
+          "z": 6.09,
+          "w": 5.2,
+          "d": 4.5,
+          "h": 10.7
+        },
+        {
+          "role": "mast",
+          "x": 24.72,
+          "y": 0,
+          "z": 9.09,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 23,
+          "style": "tripod",
+          "baseRadius": 3.77
+        },
+        {
+          "role": "mast",
+          "x": -47.38,
+          "y": 0,
+          "z": 6.09,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 17
+        },
+        {
+          "role": "main",
+          "x": 70.04,
+          "y": 0,
+          "z": 6.09,
+          "w": 8.75,
+          "d": 7.699999999999999,
+          "h": 2.8000000000000003,
+          "barrels": 2,
+          "caliber": 350,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": 47.38,
+          "y": 0,
+          "z": 9.19,
+          "w": 8.75,
+          "d": 7.699999999999999,
+          "h": 2.8000000000000003,
+          "barrels": 2,
+          "caliber": 350,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -51.5,
+          "y": 0,
+          "z": 9.19,
+          "w": 8.75,
+          "d": 7.699999999999999,
+          "h": 2.8000000000000003,
+          "barrels": 2,
+          "caliber": 350,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -78.28,
+          "y": 0,
+          "z": 6.09,
+          "w": 8.75,
+          "d": 7.699999999999999,
+          "h": 2.8000000000000003,
+          "barrels": 2,
+          "caliber": 350,
+          "enclosed": true
+        }
+      ],
+      "armament": {
+        "caliber": 350,
+        "barrels": 8,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-bc": {
+      "id": "fallback-bc",
+      "name": "Original BC custom-design concept",
+      "type": "BC",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-bc.glb",
+      "dimensions": {
+        "length": 238,
+        "beam": 30,
+        "draft": 8.7
+      },
+      "origin": "original",
+      "configuration": "Original BC custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          6.3
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          6.3
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          6.3
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          6.3
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          6.3
+        ],
+        [
+          0,
+          1,
+          1,
+          6.3
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          6.38
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          6.5
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          6.7
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          6.95
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          7.1499999999999995
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          7.3
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 28.56,
+          "y": 0,
+          "z": 6.3,
+          "w": 23.8,
+          "d": 15.9,
+          "h": 4.2
+        },
+        {
+          "role": "bridge",
+          "x": 29.459999999999997,
+          "y": 0,
+          "z": 10.5,
+          "w": 17.849999999999998,
+          "d": 13.5,
+          "h": 4.4
+        },
+        {
+          "role": "funnel",
+          "x": -3.57,
+          "y": 0,
+          "z": 6.3,
+          "w": 5.8,
+          "d": 4.8,
+          "h": 11
+        },
+        {
+          "role": "funnel",
+          "x": -28.56,
+          "y": 0,
+          "z": 6.3,
+          "w": 5.2,
+          "d": 4.5,
+          "h": 10.7
+        },
+        {
+          "role": "mast",
+          "x": 28.56,
+          "y": 0,
+          "z": 9.3,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 23,
+          "style": "tripod",
+          "baseRadius": 3.9000000000000004
+        },
+        {
+          "role": "mast",
+          "x": -54.74,
+          "y": 0,
+          "z": 6.3,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 17
+        },
+        {
+          "role": "main",
+          "x": 80.92,
+          "y": 0,
+          "z": 6.3,
+          "w": 9.5,
+          "d": 8.36,
+          "h": 3.04,
+          "barrels": 2,
+          "caliber": 380,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": 54.74,
+          "y": 0,
+          "z": 9.4,
+          "w": 9.5,
+          "d": 8.36,
+          "h": 3.04,
+          "barrels": 2,
+          "caliber": 380,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -59.5,
+          "y": 0,
+          "z": 9.4,
+          "w": 9.5,
+          "d": 8.36,
+          "h": 3.04,
+          "barrels": 2,
+          "caliber": 380,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -90.44,
+          "y": 0,
+          "z": 6.3,
+          "w": 9.5,
+          "d": 8.36,
+          "h": 3.04,
+          "barrels": 2,
+          "caliber": 380,
+          "enclosed": true
+        }
+      ],
+      "armament": {
+        "caliber": 380,
+        "barrels": 8,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-cv": {
+      "id": "fallback-cv",
+      "name": "Original CV custom-design concept",
+      "type": "CV",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-cv.glb",
+      "dimensions": {
+        "length": 218,
+        "beam": 25,
+        "draft": 7.5
+      },
+      "origin": "original",
+      "configuration": "Original CV custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          5.25
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          5.25
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          5.25
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          5.25
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          5.25
+        ],
+        [
+          0,
+          1,
+          1,
+          5.25
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          5.33
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          5.45
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          5.65
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          5.9
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          6.1
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          6.25
+        ]
+      ],
+      "stations": [
+        {
+          "role": "hangar",
+          "x": -4.36,
+          "y": 0,
+          "z": 5.25,
+          "w": 152.6,
+          "d": 17.5,
+          "h": 6.3
+        },
+        {
+          "role": "flight-deck",
+          "x": 0,
+          "y": 0,
+          "z": 11.55,
+          "w": 202.74,
+          "d": 27,
+          "h": 0.4
+        },
+        {
+          "role": "island",
+          "x": 30.520000000000003,
+          "y": 9.25,
+          "z": 11.55,
+          "w": 13,
+          "d": 4.2,
+          "h": 3.6
+        },
+        {
+          "role": "funnel",
+          "x": 9.81,
+          "y": 10,
+          "z": 11.55,
+          "w": 4.2,
+          "d": 3.4,
+          "h": 7.2
+        },
+        {
+          "role": "mast",
+          "x": 30.520000000000003,
+          "y": 9.25,
+          "z": 15.15,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 12
+        },
+        {
+          "role": "lift",
+          "x": 63.22,
+          "y": 0,
+          "z": 11.84,
+          "w": 12,
+          "d": 10.75,
+          "h": 0.04
+        },
+        {
+          "role": "lift",
+          "x": -65.39999999999999,
+          "y": 0,
+          "z": 11.84,
+          "w": 12,
+          "d": 10.75,
+          "h": 0.04
+        },
+        {
+          "role": "secondary",
+          "x": -74.12,
+          "y": -14.000000000000002,
+          "z": 9.950000000000001,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": -90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 74.12,
+          "y": -14.000000000000002,
+          "z": 9.950000000000001,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": -90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -74.12,
+          "y": 14.000000000000002,
+          "z": 9.950000000000001,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": 90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 74.12,
+          "y": 14.000000000000002,
+          "z": 9.950000000000001,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": 90,
+          "enclosed": false,
+          "sponson": true
+        }
+      ],
+      "armament": {
+        "caliber": 0,
+        "barrels": 0,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-cvl": {
+      "id": "fallback-cvl",
+      "name": "Original CVL custom-design concept",
+      "type": "CVL",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-cvl.glb",
+      "dimensions": {
+        "length": 156,
+        "beam": 20,
+        "draft": 6.2
+      },
+      "origin": "original",
+      "configuration": "Original CVL custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          4.2
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          4.2
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          4.2
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          4.2
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          4.2
+        ],
+        [
+          0,
+          1,
+          1,
+          4.2
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          4.28
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          4.4
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          4.6000000000000005
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          4.8500000000000005
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          5.05
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          5.2
+        ]
+      ],
+      "stations": [
+        {
+          "role": "hangar",
+          "x": -3.12,
+          "y": 0,
+          "z": 4.2,
+          "w": 109.19999999999999,
+          "d": 14,
+          "h": 6.3
+        },
+        {
+          "role": "flight-deck",
+          "x": 0,
+          "y": 0,
+          "z": 10.5,
+          "w": 145.08,
+          "d": 21.6,
+          "h": 0.4
+        },
+        {
+          "role": "island",
+          "x": 21.840000000000003,
+          "y": 7.4,
+          "z": 10.5,
+          "w": 13,
+          "d": 4.2,
+          "h": 3.6
+        },
+        {
+          "role": "funnel",
+          "x": 7.02,
+          "y": 8,
+          "z": 10.5,
+          "w": 4.2,
+          "d": 3.4,
+          "h": 7.2
+        },
+        {
+          "role": "mast",
+          "x": 21.840000000000003,
+          "y": 7.4,
+          "z": 14.1,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 12
+        },
+        {
+          "role": "lift",
+          "x": 45.239999999999995,
+          "y": 0,
+          "z": 10.79,
+          "w": 12,
+          "d": 8.6,
+          "h": 0.04
+        },
+        {
+          "role": "lift",
+          "x": -46.8,
+          "y": 0,
+          "z": 10.79,
+          "w": 12,
+          "d": 8.6,
+          "h": 0.04
+        },
+        {
+          "role": "secondary",
+          "x": -53.040000000000006,
+          "y": -11.200000000000001,
+          "z": 8.9,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": -90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 53.040000000000006,
+          "y": -11.200000000000001,
+          "z": 8.9,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": -90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -53.040000000000006,
+          "y": 11.200000000000001,
+          "z": 8.9,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": 90,
+          "enclosed": false,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 53.040000000000006,
+          "y": 11.200000000000001,
+          "z": 8.9,
+          "w": 3.3,
+          "d": 2.7,
+          "h": 1.5,
+          "barrels": 1,
+          "caliber": 102,
+          "bearing": 90,
+          "enclosed": false,
+          "sponson": true
+        }
+      ],
+      "armament": {
+        "caliber": 0,
+        "barrels": 0,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-ca": {
+      "id": "fallback-ca",
+      "name": "Original CA custom-design concept",
+      "type": "CA",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-ca.glb",
+      "dimensions": {
+        "length": 188,
+        "beam": 20,
+        "draft": 6.6
+      },
+      "origin": "original",
+      "configuration": "Original CA custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          4.2
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          4.2
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          4.2
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          4.2
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          4.2
+        ],
+        [
+          0,
+          1,
+          1,
+          4.2
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          4.28
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          4.4
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          4.6000000000000005
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          4.8500000000000005
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          5.05
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          5.2
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 22.56,
+          "y": 0,
+          "z": 4.2,
+          "w": 18.8,
+          "d": 10.600000000000001,
+          "h": 4.2
+        },
+        {
+          "role": "bridge",
+          "x": 23.459999999999997,
+          "y": 0,
+          "z": 8.4,
+          "w": 14.1,
+          "d": 9,
+          "h": 4.4
+        },
+        {
+          "role": "funnel",
+          "x": -2.82,
+          "y": 0,
+          "z": 4.2,
+          "w": 5.8,
+          "d": 4.8,
+          "h": 11
+        },
+        {
+          "role": "funnel",
+          "x": -22.56,
+          "y": 0,
+          "z": 4.2,
+          "w": 5.2,
+          "d": 4.5,
+          "h": 10.7
+        },
+        {
+          "role": "mast",
+          "x": 22.56,
+          "y": 0,
+          "z": 7.2,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 23,
+          "style": "tripod",
+          "baseRadius": 2.6
+        },
+        {
+          "role": "mast",
+          "x": -43.24,
+          "y": 0,
+          "z": 4.2,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 17
+        },
+        {
+          "role": "main",
+          "x": 63.92,
+          "y": 0,
+          "z": 4.2,
+          "w": 5.075,
+          "d": 4.465999999999999,
+          "h": 1.624,
+          "barrels": 2,
+          "caliber": 203,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": 43.24,
+          "y": 0,
+          "z": 7.300000000000001,
+          "w": 5.075,
+          "d": 4.465999999999999,
+          "h": 1.624,
+          "barrels": 2,
+          "caliber": 203,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -47,
+          "y": 0,
+          "z": 7.300000000000001,
+          "w": 5.075,
+          "d": 4.465999999999999,
+          "h": 1.624,
+          "barrels": 2,
+          "caliber": 203,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -71.44,
+          "y": 0,
+          "z": 4.2,
+          "w": 5.075,
+          "d": 4.465999999999999,
+          "h": 1.624,
+          "barrels": 2,
+          "caliber": 203,
+          "enclosed": true
+        }
+      ],
+      "armament": {
+        "caliber": 203,
+        "barrels": 8,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-cl": {
+      "id": "fallback-cl",
+      "name": "Original CL custom-design concept",
+      "type": "CL",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-cl.glb",
+      "dimensions": {
+        "length": 156,
+        "beam": 16.4,
+        "draft": 5.5
+      },
+      "origin": "original",
+      "configuration": "Original CL custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          3.4439999999999995
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          3.4439999999999995
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          3.4439999999999995
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          3.4439999999999995
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          3.4439999999999995
+        ],
+        [
+          0,
+          1,
+          1,
+          3.4439999999999995
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          3.5239999999999996
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          3.6439999999999997
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          3.8439999999999994
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          4.093999999999999
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          4.294
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          4.443999999999999
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 18.72,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 15.600000000000001,
+          "d": 8.692,
+          "h": 4.2
+        },
+        {
+          "role": "bridge",
+          "x": 19.619999999999997,
+          "y": 0,
+          "z": 7.644,
+          "w": 11.7,
+          "d": 7.38,
+          "h": 4.4
+        },
+        {
+          "role": "funnel",
+          "x": -2.34,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 5.8,
+          "d": 4.8,
+          "h": 11
+        },
+        {
+          "role": "funnel",
+          "x": -18.72,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 5.2,
+          "d": 4.5,
+          "h": 10.7
+        },
+        {
+          "role": "mast",
+          "x": 18.72,
+          "y": 0,
+          "z": 6.443999999999999,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 23,
+          "style": "tripod",
+          "baseRadius": 2.1319999999999997
+        },
+        {
+          "role": "mast",
+          "x": -35.88,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 17
+        },
+        {
+          "role": "main",
+          "x": 53.040000000000006,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 3.8000000000000003,
+          "d": 3.344,
+          "h": 1.216,
+          "barrels": 2,
+          "caliber": 152,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": 35.88,
+          "y": 0,
+          "z": 6.544,
+          "w": 3.8000000000000003,
+          "d": 3.344,
+          "h": 1.216,
+          "barrels": 2,
+          "caliber": 152,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -39,
+          "y": 0,
+          "z": 6.544,
+          "w": 3.8000000000000003,
+          "d": 3.344,
+          "h": 1.216,
+          "barrels": 2,
+          "caliber": 152,
+          "enclosed": true
+        },
+        {
+          "role": "main",
+          "x": -59.28,
+          "y": 0,
+          "z": 3.4439999999999995,
+          "w": 3.8000000000000003,
+          "d": 3.344,
+          "h": 1.216,
+          "barrels": 2,
+          "caliber": 152,
+          "enclosed": true
+        }
+      ],
+      "armament": {
+        "caliber": 152,
+        "barrels": 8,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-dd": {
+      "id": "fallback-dd",
+      "name": "Original DD custom-design concept",
+      "type": "DD",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-dd.glb",
+      "dimensions": {
+        "length": 110,
+        "beam": 10.6,
+        "draft": 3.5
+      },
+      "origin": "original",
+      "configuration": "Original DD custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          2.226
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          2.226
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          2.226
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          2.226
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          2.226
+        ],
+        [
+          0,
+          1,
+          1,
+          2.226
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          2.306
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          2.426
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          2.626
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          2.876
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          3.076
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          3.226
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 13.2,
+          "y": 0,
+          "z": 2.226,
+          "w": 11,
+          "d": 5.618,
+          "h": 2.2
+        },
+        {
+          "role": "bridge",
+          "x": 14.1,
+          "y": 0,
+          "z": 4.426,
+          "w": 8.25,
+          "d": 4.77,
+          "h": 2
+        },
+        {
+          "role": "funnel",
+          "x": -1.65,
+          "y": 0,
+          "z": 2.226,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 6.8
+        },
+        {
+          "role": "funnel",
+          "x": -13.2,
+          "y": 0,
+          "z": 2.226,
+          "w": 2.7,
+          "d": 2.4,
+          "h": 6.4
+        },
+        {
+          "role": "mast",
+          "x": 13.2,
+          "y": 0,
+          "z": 5.226,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 15,
+          "style": "pole",
+          "baseRadius": 1.378
+        },
+        {
+          "role": "mast",
+          "x": -25.3,
+          "y": 0,
+          "z": 2.226,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 10
+        },
+        {
+          "role": "main",
+          "x": 37.400000000000006,
+          "y": 0,
+          "z": 2.226,
+          "w": 3,
+          "d": 2.6399999999999997,
+          "h": 0.96,
+          "barrels": 1,
+          "caliber": 120,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": 26.4,
+          "y": 0,
+          "z": 2.226,
+          "w": 3,
+          "d": 2.6399999999999997,
+          "h": 0.96,
+          "barrels": 1,
+          "caliber": 120,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -34.1,
+          "y": 0,
+          "z": 2.226,
+          "w": 3,
+          "d": 2.6399999999999997,
+          "h": 0.96,
+          "barrels": 1,
+          "caliber": 120,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -44,
+          "y": 0,
+          "z": 2.226,
+          "w": 3,
+          "d": 2.6399999999999997,
+          "h": 0.96,
+          "barrels": 1,
+          "caliber": 120,
+          "enclosed": false
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -8.8,
+          "y": -0.65,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -8.8,
+          "y": 0,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -8.8,
+          "y": 0.65,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -22,
+          "y": -0.65,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -22,
+          "y": 0,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -22,
+          "y": 0.65,
+          "z": 2.226,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        }
+      ],
+      "armament": {
+        "caliber": 120,
+        "barrels": 4,
+        "torpedoTubes": 6,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-dl": {
+      "id": "fallback-dl",
+      "name": "Original DL custom-design concept",
+      "type": "DL",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-dl.glb",
+      "dimensions": {
+        "length": 126,
+        "beam": 12.1,
+        "draft": 4
+      },
+      "origin": "original",
+      "configuration": "Original DL custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          2.541
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          2.541
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          2.541
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          2.541
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          2.541
+        ],
+        [
+          0,
+          1,
+          1,
+          2.541
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          2.621
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          2.741
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          2.941
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          3.191
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          3.391
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          3.541
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 15.12,
+          "y": 0,
+          "z": 2.541,
+          "w": 12.600000000000001,
+          "d": 6.413,
+          "h": 2.2
+        },
+        {
+          "role": "bridge",
+          "x": 16.02,
+          "y": 0,
+          "z": 4.741,
+          "w": 9.45,
+          "d": 5.445,
+          "h": 2
+        },
+        {
+          "role": "funnel",
+          "x": -1.89,
+          "y": 0,
+          "z": 2.541,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 6.8
+        },
+        {
+          "role": "funnel",
+          "x": -15.12,
+          "y": 0,
+          "z": 2.541,
+          "w": 2.7,
+          "d": 2.4,
+          "h": 6.4
+        },
+        {
+          "role": "mast",
+          "x": 15.12,
+          "y": 0,
+          "z": 5.541,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 15,
+          "style": "pole",
+          "baseRadius": 1.573
+        },
+        {
+          "role": "mast",
+          "x": -28.98,
+          "y": 0,
+          "z": 2.541,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 10
+        },
+        {
+          "role": "main",
+          "x": 42.84,
+          "y": 0,
+          "z": 2.541,
+          "w": 3.25,
+          "d": 2.86,
+          "h": 1.04,
+          "barrels": 1,
+          "caliber": 130,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": 30.24,
+          "y": 0,
+          "z": 2.541,
+          "w": 3.25,
+          "d": 2.86,
+          "h": 1.04,
+          "barrels": 1,
+          "caliber": 130,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -39.06,
+          "y": 0,
+          "z": 2.541,
+          "w": 3.25,
+          "d": 2.86,
+          "h": 1.04,
+          "barrels": 1,
+          "caliber": 130,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -50.400000000000006,
+          "y": 0,
+          "z": 2.541,
+          "w": 3.25,
+          "d": 2.86,
+          "h": 1.04,
+          "barrels": 1,
+          "caliber": 130,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -27.72,
+          "y": 0,
+          "z": 2.541,
+          "w": 3.25,
+          "d": 2.86,
+          "h": 1.04,
+          "barrels": 1,
+          "caliber": 130,
+          "enclosed": false
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -10.08,
+          "y": -0.65,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -10.08,
+          "y": 0,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -10.08,
+          "y": 0.65,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -25.200000000000003,
+          "y": -0.65,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -25.200000000000003,
+          "y": 0,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -25.200000000000003,
+          "y": 0.65,
+          "z": 2.541,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        }
+      ],
+      "armament": {
+        "caliber": 130,
+        "barrels": 5,
+        "torpedoTubes": 6,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-ss": {
+      "id": "fallback-ss",
+      "name": "Original SS custom-design concept",
+      "type": "SS",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-ss.glb",
+      "dimensions": {
+        "length": 74,
+        "beam": 6.7,
+        "draft": 4.4
+      },
+      "origin": "original",
+      "configuration": "Original SS custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.015,
+          0.02,
+          1.15
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2687970912252936,
+          1.15
+        ],
+        [
+          -0.9,
+          0.58,
+          0.4503632554650915,
+          1.15
+        ],
+        [
+          -0.75,
+          0.82,
+          0.6616389352026524,
+          1.15
+        ],
+        [
+          -0.5,
+          0.965,
+          0.8615461597120171,
+          1.15
+        ],
+        [
+          0,
+          1,
+          1,
+          1.15
+        ],
+        [
+          0.3,
+          0.94,
+          0.9515876130940361,
+          1.15
+        ],
+        [
+          0.48,
+          0.74,
+          0.8729006167534163,
+          1.15
+        ],
+        [
+          0.67,
+          0.54,
+          0.7393553084527231,
+          1.15
+        ],
+        [
+          0.82,
+          0.29,
+          0.5775689720850576,
+          1.15
+        ],
+        [
+          0.94,
+          0.075,
+          0.36195954664177166,
+          1.15
+        ],
+        [
+          1,
+          0.0008,
+          0.02,
+          1.15
+        ]
+      ],
+      "stations": [
+        {
+          "role": "conning-tower",
+          "x": 0,
+          "y": 0,
+          "z": 1.15,
+          "w": 8.5,
+          "d": 3.1,
+          "h": 3
+        },
+        {
+          "role": "periscope",
+          "x": 0.85,
+          "y": 0,
+          "z": 4.15,
+          "w": 0.12,
+          "d": 0.12,
+          "h": 3.3
+        },
+        {
+          "role": "main",
+          "x": 13.32,
+          "y": 0,
+          "z": 1.15,
+          "w": 2.2,
+          "d": 1.4,
+          "h": 1.3,
+          "barrels": 1,
+          "caliber": 88,
+          "enclosed": false
+        }
+      ],
+      "armament": {
+        "caliber": 88,
+        "barrels": 1,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-sm": {
+      "id": "fallback-sm",
+      "name": "Original SM custom-design concept",
+      "type": "SM",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-sm.glb",
+      "dimensions": {
+        "length": 84,
+        "beam": 7.5,
+        "draft": 4.8
+      },
+      "origin": "original",
+      "configuration": "Original SM custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.015,
+          0.02,
+          1.15
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2687970912252936,
+          1.15
+        ],
+        [
+          -0.9,
+          0.58,
+          0.4503632554650915,
+          1.15
+        ],
+        [
+          -0.75,
+          0.82,
+          0.6616389352026524,
+          1.15
+        ],
+        [
+          -0.5,
+          0.965,
+          0.8615461597120171,
+          1.15
+        ],
+        [
+          0,
+          1,
+          1,
+          1.15
+        ],
+        [
+          0.3,
+          0.94,
+          0.9515876130940361,
+          1.15
+        ],
+        [
+          0.48,
+          0.74,
+          0.8729006167534163,
+          1.15
+        ],
+        [
+          0.67,
+          0.54,
+          0.7393553084527231,
+          1.15
+        ],
+        [
+          0.82,
+          0.29,
+          0.5775689720850576,
+          1.15
+        ],
+        [
+          0.94,
+          0.075,
+          0.36195954664177166,
+          1.15
+        ],
+        [
+          1,
+          0.0008,
+          0.02,
+          1.15
+        ]
+      ],
+      "stations": [
+        {
+          "role": "conning-tower",
+          "x": 0,
+          "y": 0,
+          "z": 1.15,
+          "w": 8.5,
+          "d": 3.1,
+          "h": 3
+        },
+        {
+          "role": "periscope",
+          "x": 0.85,
+          "y": 0,
+          "z": 4.15,
+          "w": 0.12,
+          "d": 0.12,
+          "h": 3.3
+        },
+        {
+          "role": "main",
+          "x": 15.12,
+          "y": 0,
+          "z": 1.15,
+          "w": 2.2,
+          "d": 1.4,
+          "h": 1.3,
+          "barrels": 1,
+          "caliber": 102,
+          "enclosed": false
+        },
+        {
+          "role": "bridge-base",
+          "x": -12.6,
+          "y": 0,
+          "z": 1.15,
+          "w": 12,
+          "d": 2.4,
+          "h": 0.45
+        }
+      ],
+      "armament": {
+        "caliber": 102,
+        "barrels": 1,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-ao": {
+      "id": "fallback-ao",
+      "name": "Original AO custom-design concept",
+      "type": "AO",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-ao.glb",
+      "dimensions": {
+        "length": 144,
+        "beam": 18,
+        "draft": 6.8
+      },
+      "origin": "original",
+      "configuration": "Original AO custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          3.78
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          3.78
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          3.78
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          3.78
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          3.78
+        ],
+        [
+          0,
+          1,
+          1,
+          3.78
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          3.86
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          3.98
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          4.18
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          4.43
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          4.63
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          4.779999999999999
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": -41.76,
+          "y": 0,
+          "z": 3.78,
+          "w": 24,
+          "d": 12,
+          "h": 3
+        },
+        {
+          "role": "bridge",
+          "x": -41.76,
+          "y": 0,
+          "z": 6.779999999999999,
+          "w": 14,
+          "d": 10,
+          "h": 2.6
+        },
+        {
+          "role": "funnel",
+          "x": -50.4,
+          "y": 0,
+          "z": 5.779999999999999,
+          "w": 4.5,
+          "d": 3.5,
+          "h": 7.3
+        },
+        {
+          "role": "cargo-tank",
+          "x": -15.84,
+          "y": 0,
+          "z": 3.78,
+          "w": 18,
+          "d": 12,
+          "h": 1
+        },
+        {
+          "role": "mast",
+          "x": -15.84,
+          "y": 0,
+          "z": 3.78,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 14
+        },
+        {
+          "role": "cargo-boom",
+          "x": -8.84,
+          "y": 0,
+          "z": 14.78,
+          "w": 14,
+          "d": 0.5,
+          "h": 0.5
+        },
+        {
+          "role": "cargo-tank",
+          "x": 13.68,
+          "y": 0,
+          "z": 3.78,
+          "w": 18,
+          "d": 12,
+          "h": 1
+        },
+        {
+          "role": "mast",
+          "x": 13.68,
+          "y": 0,
+          "z": 3.78,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 14
+        },
+        {
+          "role": "cargo-boom",
+          "x": 20.68,
+          "y": 0,
+          "z": 14.78,
+          "w": 14,
+          "d": 0.5,
+          "h": 0.5
+        },
+        {
+          "role": "cargo-tank",
+          "x": 43.199999999999996,
+          "y": 0,
+          "z": 3.78,
+          "w": 18,
+          "d": 12,
+          "h": 1
+        },
+        {
+          "role": "mast",
+          "x": 43.199999999999996,
+          "y": 0,
+          "z": 3.78,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 14
+        },
+        {
+          "role": "cargo-boom",
+          "x": 50.199999999999996,
+          "y": 0,
+          "z": 14.78,
+          "w": 14,
+          "d": 0.5,
+          "h": 0.5
+        },
+        {
+          "role": "main",
+          "x": -61.92,
+          "y": 0,
+          "z": 3.78,
+          "w": 3,
+          "d": 2,
+          "h": 1.4,
+          "barrels": 1,
+          "caliber": 100,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": 60.48,
+          "y": 0,
+          "z": 3.78,
+          "w": 3,
+          "d": 2,
+          "h": 1.4,
+          "barrels": 1,
+          "caliber": 100,
+          "enclosed": false
+        }
+      ],
+      "armament": {
+        "caliber": 100,
+        "barrels": 2,
+        "torpedoTubes": 0,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 1,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-de": {
+      "id": "fallback-de",
+      "name": "Original DE custom-design concept",
+      "type": "DE",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-de.glb",
+      "dimensions": {
+        "length": 86,
+        "beam": 9.6,
+        "draft": 3.1
+      },
+      "origin": "original",
+      "configuration": "Original DE custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          2.016
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          2.016
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          2.016
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          2.016
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          2.016
+        ],
+        [
+          0,
+          1,
+          1,
+          2.016
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          2.096
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          2.216
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          2.416
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          2.666
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          2.866
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          3.016
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 10.32,
+          "y": 0,
+          "z": 2.016,
+          "w": 8.6,
+          "d": 5.088,
+          "h": 2.2
+        },
+        {
+          "role": "bridge",
+          "x": 11.22,
+          "y": 0,
+          "z": 4.216,
+          "w": 6.45,
+          "d": 4.32,
+          "h": 2
+        },
+        {
+          "role": "funnel",
+          "x": -1.29,
+          "y": 0,
+          "z": 2.016,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 6.8
+        },
+        {
+          "role": "funnel",
+          "x": -10.32,
+          "y": 0,
+          "z": 2.016,
+          "w": 2.7,
+          "d": 2.4,
+          "h": 6.4
+        },
+        {
+          "role": "mast",
+          "x": 10.32,
+          "y": 0,
+          "z": 5.016,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 15,
+          "style": "pole",
+          "baseRadius": 1.248
+        },
+        {
+          "role": "mast",
+          "x": -19.78,
+          "y": 0,
+          "z": 2.016,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 10
+        },
+        {
+          "role": "main",
+          "x": 29.240000000000002,
+          "y": 0,
+          "z": 2.016,
+          "w": 2.5500000000000003,
+          "d": 2.2439999999999998,
+          "h": 0.8160000000000001,
+          "barrels": 1,
+          "caliber": 102,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": 20.64,
+          "y": 0,
+          "z": 2.016,
+          "w": 2.5500000000000003,
+          "d": 2.2439999999999998,
+          "h": 0.8160000000000001,
+          "barrels": 1,
+          "caliber": 102,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": -26.66,
+          "y": 0,
+          "z": 2.016,
+          "w": 2.5500000000000003,
+          "d": 2.2439999999999998,
+          "h": 0.8160000000000001,
+          "barrels": 1,
+          "caliber": 102,
+          "enclosed": false
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -6.88,
+          "y": -0.65,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -6.88,
+          "y": 0,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -6.88,
+          "y": 0.65,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -17.2,
+          "y": -0.65,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -17.2,
+          "y": 0,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -17.2,
+          "y": 0.65,
+          "z": 2.016,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        }
+      ],
+      "armament": {
+        "caliber": 102,
+        "barrels": 3,
+        "torpedoTubes": 6,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "fallback-tb": {
+      "id": "fallback-tb",
+      "name": "Original TB custom-design concept",
+      "type": "TB",
+      "nation": "GBR",
+      "year": 1932,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "generic/fallback-tb.glb",
+      "dimensions": {
+        "length": 59,
+        "beam": 7.3,
+        "draft": 2.3
+      },
+      "origin": "original",
+      "configuration": "Original TB custom-design concept",
+      "accuracy": "Detailed original exterior artwork for a custom-design category. It is not a named historical class. Fixed artwork is illustrative: player-selected displacement, gun counts, machinery and refits remain authoritative in game data and are not inferred from the illustration. Body sections and fittings are original design choices; no interior is modeled.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Original design choices for an illustrative category asset, not a historical ship or a naval-engineering claim.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "Original WNT1922 custom-design exterior specification",
+          "file": "assets/models/authoring/create-additional-fleet-specifications.mjs",
+          "license": "Original project artwork",
+          "usedFor": "All dimensions, hull sections and equipment arrangement."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          1.533
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          1.533
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          1.533
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          1.533
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          1.533
+        ],
+        [
+          0,
+          1,
+          1,
+          1.533
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          1.613
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          1.7329999999999999
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          1.9329999999999998
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          2.183
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          2.383
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          2.533
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 7.08,
+          "y": 0,
+          "z": 1.533,
+          "w": 5.9,
+          "d": 3.869,
+          "h": 2.2
+        },
+        {
+          "role": "bridge",
+          "x": 7.98,
+          "y": 0,
+          "z": 3.733,
+          "w": 4.425,
+          "d": 3.285,
+          "h": 2
+        },
+        {
+          "role": "funnel",
+          "x": -0.885,
+          "y": 0,
+          "z": 1.533,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 6.8
+        },
+        {
+          "role": "funnel",
+          "x": -7.08,
+          "y": 0,
+          "z": 1.533,
+          "w": 2.7,
+          "d": 2.4,
+          "h": 6.4
+        },
+        {
+          "role": "mast",
+          "x": 7.08,
+          "y": 0,
+          "z": 4.5329999999999995,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 15,
+          "style": "pole",
+          "baseRadius": 0.949
+        },
+        {
+          "role": "mast",
+          "x": -13.57,
+          "y": 0,
+          "z": 1.533,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 10
+        },
+        {
+          "role": "main",
+          "x": 20.060000000000002,
+          "y": 0,
+          "z": 1.533,
+          "w": 1.9000000000000001,
+          "d": 1.672,
+          "h": 0.608,
+          "barrels": 1,
+          "caliber": 76,
+          "enclosed": false
+        },
+        {
+          "role": "main",
+          "x": 14.16,
+          "y": 0,
+          "z": 1.533,
+          "w": 1.9000000000000001,
+          "d": 1.672,
+          "h": 0.608,
+          "barrels": 1,
+          "caliber": 76,
+          "enclosed": false
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -4.72,
+          "y": -0.65,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -4.72,
+          "y": 0,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -4.72,
+          "y": 0.65,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -11.8,
+          "y": -0.65,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -11.8,
+          "y": 0,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -11.8,
+          "y": 0.65,
+          "z": 1.533,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54
+        }
+      ],
+      "armament": {
+        "caliber": 76,
+        "barrels": 2,
+        "torpedoTubes": 6,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [],
+        "torpedoFit": null
+      },
+      "shafts": 2,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fallback": true
+    },
+    "demo-prinz-eugen": {
+      "id": "demo-prinz-eugen",
+      "name": "Prinz Eugen, 1941 exterior interpretation",
+      "type": "CA",
+      "nation": "DEU",
+      "year": 1941,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "historical/demo-prinz-eugen.glb",
+      "dimensions": {
+        "length": 207.8736,
+        "beam": 21.6916,
+        "draft": 6.4
+      },
+      "origin": "historical",
+      "configuration": "Prinz Eugen, 1941 exterior interpretation",
+      "accuracy": "Source-informed original exterior reconstruction. Primary recognition drawings establish dimensions and major arrangement. Body sections, minor fittings and individual small wartime changes are inferred and are not a surveyed engineering reconstruction. No interiors or exact battle damage are modeled. Neutral paint replaces specific temporary camouflage. Source drawings are period intelligence reconstructions; draft and body sections are inferred, and no claim is made to exact May24 small-AA equipment. Boat decks, aft deckhouse tiers and open-rear secondary gun shields follow the cited silhouette; their small dimensions and detailed fittings remain inferred.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Declared sources and class-specific recognition outline; estimates are stated in source notes.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "US Navy ONI204, Prinz Eugen CA3, August1942 plate48",
+          "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-204/img/ONI-204-48.JPG",
+          "license": "US government public domain",
+          "usedFor": "682ft overall and71ft2in beam; measured plan/profile stations, one funnel, four twin203mm, six twin105mm, four triple torpedo banks. Period draft15ft5in is intelligence mean draft, not used as a full-load engineering draft."
+        },
+        {
+          "title": "ONI204, Prinz Eugen photographs plate53",
+          "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-204/img/ONI-204-53.JPG",
+          "license": "US government public domain",
+          "usedFor": "Bow sheer, tower shape, funnel cap, catapult against funnel and mainmast proportions."
+        },
+        {
+          "title": "NHHC photoNH69735, early1941",
+          "url": "https://www.history.navy.mil/our-collections/photography/numerical-list-of-images/nhhc-series/nh-series/NH-69000/NH-69735.html",
+          "usedFor": "Early1941 rangefinder radar rather than late-war AA fit."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.13,
+          0.03,
+          5.6
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          5.6
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          5.6
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          5.6
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          5.6
+        ],
+        [
+          0,
+          1,
+          1,
+          5.6
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          5.68
+        ],
+        [
+          0.48,
+          0.73,
+          0.89,
+          5.8
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          6
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          6.25
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          6.449999999999999
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          6.6
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 19.4,
+          "y": 0,
+          "z": 5.8,
+          "w": 23,
+          "d": 13,
+          "h": 4.2
+        },
+        {
+          "role": "bridge",
+          "x": 21.8,
+          "y": 0,
+          "z": 10,
+          "w": 15,
+          "d": 10,
+          "h": 4.1
+        },
+        {
+          "role": "bridge",
+          "x": 22.6,
+          "y": 0,
+          "z": 14.1,
+          "w": 10,
+          "d": 7.6,
+          "h": 3.1
+        },
+        {
+          "role": "bridge",
+          "x": 21.5,
+          "y": 0,
+          "z": 17.2,
+          "w": 6.2,
+          "d": 5,
+          "h": 3
+        },
+        {
+          "role": "funnel",
+          "x": 6,
+          "y": 0,
+          "z": 5.9,
+          "w": 6.8,
+          "d": 5.7,
+          "h": 14.5
+        },
+        {
+          "role": "mast",
+          "x": -20,
+          "y": 0,
+          "z": 6,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 33,
+          "style": "tripod",
+          "baseRadius": 3
+        },
+        {
+          "role": "mast",
+          "x": 23.8,
+          "y": 0,
+          "z": 20.2,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 12
+        },
+        {
+          "role": "director",
+          "x": 21.5,
+          "y": 0,
+          "z": 20.2,
+          "w": 4,
+          "d": 3,
+          "h": 2.5
+        },
+        {
+          "role": "director",
+          "x": -36,
+          "y": 0,
+          "z": 11.1,
+          "w": 3.2,
+          "d": 2.8,
+          "h": 2.1
+        },
+        {
+          "role": "radar",
+          "x": 21.5,
+          "y": 0,
+          "z": 22.7,
+          "w": 3.7,
+          "d": 0.1,
+          "h": 1.1
+        },
+        {
+          "role": "catapult",
+          "x": -13,
+          "y": 0,
+          "z": 10.3,
+          "w": 17,
+          "d": 1.1,
+          "h": 1,
+          "bearing": 90
+        },
+        {
+          "role": "crane-boom",
+          "x": -15,
+          "y": -6.8,
+          "z": 7.5,
+          "w": 12,
+          "d": 1.1,
+          "h": 6
+        },
+        {
+          "role": "main",
+          "x": 54,
+          "y": 0,
+          "z": 5.8,
+          "w": 7.3,
+          "d": 6.1,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": 42,
+          "y": 0,
+          "z": 9.3,
+          "w": 7.3,
+          "d": 6.1,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": -49,
+          "y": 0,
+          "z": 9,
+          "w": 7.3,
+          "d": 6.1,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": -64,
+          "y": 0,
+          "z": 5.7,
+          "w": 7.3,
+          "d": 6.1,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "secondary",
+          "x": -35,
+          "y": -8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -5,
+          "y": -8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 30,
+          "y": -8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -35,
+          "y": 8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -5,
+          "y": 8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 30,
+          "y": 8.1,
+          "z": 7,
+          "w": 3.5,
+          "d": 3,
+          "h": 2,
+          "barrels": 2,
+          "caliber": 105,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": -8.14,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": -7.5,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": -6.86,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": -8.14,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": -7.5,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": -6.86,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": 6.86,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": 7.5,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -27,
+          "y": 8.14,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:-27:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": 6.86,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": 7.5,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": 10,
+          "y": 8.14,
+          "z": 5.8,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-prinz-eugen:10:1"
+        },
+        {
+          "role": "deckhouse",
+          "x": -30,
+          "y": 0,
+          "z": 5.8,
+          "w": 29,
+          "d": 11.4,
+          "h": 2.8
+        },
+        {
+          "role": "bridge",
+          "x": -34,
+          "y": 0,
+          "z": 8.6,
+          "w": 12,
+          "d": 7.2,
+          "h": 2.5
+        },
+        {
+          "role": "deckhouse",
+          "x": -1.5,
+          "y": 0,
+          "z": 5.8,
+          "w": 27,
+          "d": 12.2,
+          "h": 1.65
+        },
+        {
+          "role": "deckhouse",
+          "x": 8.5,
+          "y": 0,
+          "z": 7.45,
+          "w": 8,
+          "d": 8,
+          "h": 1.6
+        },
+        {
+          "role": "boat",
+          "x": -3.5,
+          "y": -6.6,
+          "z": 7.6,
+          "w": 8.2,
+          "d": 1.8,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -31,
+          "y": -5.5,
+          "z": 8.7,
+          "w": 6.2,
+          "d": 1.5,
+          "h": 1
+        },
+        {
+          "role": "light-aa",
+          "x": -24,
+          "y": -5.3,
+          "z": 8.7,
+          "w": 2,
+          "d": 1.8,
+          "h": 1.2,
+          "barrels": 2,
+          "caliber": 37,
+          "bearing": -90,
+          "shielded": false
+        },
+        {
+          "role": "searchlight",
+          "x": 7,
+          "y": -4,
+          "z": 9.2,
+          "w": 1,
+          "d": 1,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -3.5,
+          "y": 6.6,
+          "z": 7.6,
+          "w": 8.2,
+          "d": 1.8,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -31,
+          "y": 5.5,
+          "z": 8.7,
+          "w": 6.2,
+          "d": 1.5,
+          "h": 1
+        },
+        {
+          "role": "light-aa",
+          "x": -24,
+          "y": 5.3,
+          "z": 8.7,
+          "w": 2,
+          "d": 1.8,
+          "h": 1.2,
+          "barrels": 2,
+          "caliber": 37,
+          "bearing": 90,
+          "shielded": false
+        },
+        {
+          "role": "searchlight",
+          "x": 7,
+          "y": 4,
+          "z": 9.2,
+          "w": 1,
+          "d": 1,
+          "h": 1
+        }
+      ],
+      "armament": {
+        "caliber": 203.2,
+        "barrels": 8,
+        "torpedoTubes": 12,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [
+          {
+            "count": 12,
+            "caliber_mm": 105,
+            "mounts": "6x2"
+          }
+        ],
+        "torpedoFit": null
+      },
+      "shafts": 3,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fitReview": {
+        "expectedMainBarrels": 8,
+        "expectedSecondaryBarrels": 12,
+        "expectedExternalTorpedoTubes": 12,
+        "expectedFunnels": 1
+      }
+    },
+    "demo-norfolk": {
+      "id": "demo-norfolk",
+      "name": "HMS Norfolk, 1943 exterior interpretation",
+      "type": "CA",
+      "nation": "GBR",
+      "year": 1943,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "historical/demo-norfolk.glb",
+      "dimensions": {
+        "length": 192.8622,
+        "beam": 20.1168,
+        "draft": 6.1
+      },
+      "origin": "historical",
+      "configuration": "HMS Norfolk, 1943 exterior interpretation",
+      "accuracy": "Source-informed original exterior reconstruction. Primary recognition drawings establish dimensions and major arrangement. Body sections, minor fittings and individual small wartime changes are inferred and are not a surveyed engineering reconstruction. No interiors or exact battle damage are modeled. Boat decks, aft deckhouse tiers and open-rear secondary gun shields follow the cited silhouette; their small dimensions and detailed fittings remain inferred.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Declared sources and class-specific recognition outline; estimates are stated in source notes.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "US Navy ONI201, Devonshire/Norfolk drawing plate36",
+          "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-201/img/oni201-36.PNG",
+          "license": "US government public domain",
+          "usedFor": "Four twin8in mounts, three raked funnels with wider middle funnel, high flush deck,66ft beam,624ft waterline; overall length inferred from extended stem/stern outline."
+        },
+        {
+          "title": "US Navy ONI201, Norfolk photograph December1942, plate37",
+          "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-201/img/oni201-37.PNG",
+          "license": "US government public domain",
+          "usedFor": "Late1942 pre-NorthCape silhouette; retains Xturret, before1944 removal."
+        },
+        {
+          "title": "Royal Museums Greenwich NPB7894 main-deck plan, alterations1932–1943",
+          "url": "https://prints.rmg.co.uk/products/main-deck-plan-for-hms-norfolk-1928-m1194",
+          "usedFor": "Builder-plan identity and fit period. No print pixels embedded."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.08,
+          0.03,
+          8.23
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          8.23
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          8.23
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          8.23
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          8.23
+        ],
+        [
+          0,
+          1,
+          1,
+          8.23
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          8.31
+        ],
+        [
+          0.48,
+          0.8,
+          0.89,
+          8.43
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          8.63
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          8.88
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          9.08
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          9.23
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 30,
+          "y": 0,
+          "z": 8.25,
+          "w": 24,
+          "d": 12.6,
+          "h": 3.2
+        },
+        {
+          "role": "bridge",
+          "x": 31,
+          "y": 0,
+          "z": 11.45,
+          "w": 14.5,
+          "d": 10.4,
+          "h": 3.8
+        },
+        {
+          "role": "bridge",
+          "x": 32,
+          "y": 0,
+          "z": 15.25,
+          "w": 9,
+          "d": 7.2,
+          "h": 2.5
+        },
+        {
+          "role": "funnel",
+          "x": 18,
+          "y": 0,
+          "z": 9.5,
+          "w": 3.5,
+          "d": 3.4,
+          "h": 13.2
+        },
+        {
+          "role": "funnel",
+          "x": 6,
+          "y": 0,
+          "z": 9.5,
+          "w": 4.5,
+          "d": 4.3,
+          "h": 13.2
+        },
+        {
+          "role": "funnel",
+          "x": -6,
+          "y": 0,
+          "z": 9.5,
+          "w": 3.7,
+          "d": 3.6,
+          "h": 13.2
+        },
+        {
+          "role": "mast",
+          "x": 26,
+          "y": 0,
+          "z": 8.25,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 26,
+          "style": "pole"
+        },
+        {
+          "role": "mast",
+          "x": -43,
+          "y": 0,
+          "z": 8.25,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 25,
+          "style": "pole"
+        },
+        {
+          "role": "bridge-base",
+          "x": -29,
+          "y": 0,
+          "z": 8.25,
+          "w": 20,
+          "d": 9.5,
+          "h": 3.1
+        },
+        {
+          "role": "director",
+          "x": 33,
+          "y": 0,
+          "z": 17.8,
+          "w": 3.5,
+          "d": 2.4,
+          "h": 2
+        },
+        {
+          "role": "catapult",
+          "x": -23,
+          "y": 0,
+          "z": 12,
+          "w": 14,
+          "d": 1,
+          "h": 1,
+          "bearing": 90
+        },
+        {
+          "role": "crane-boom",
+          "x": -31,
+          "y": -4,
+          "z": 11.5,
+          "w": 11,
+          "d": 0.7,
+          "h": 5
+        },
+        {
+          "role": "radar",
+          "x": 26,
+          "y": 0,
+          "z": 34.3,
+          "w": 2.6,
+          "d": 0.1,
+          "h": 1.1
+        },
+        {
+          "role": "main",
+          "x": 63,
+          "y": 0,
+          "z": 8.5,
+          "w": 6.9,
+          "d": 5.9,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": 48,
+          "y": 0,
+          "z": 11.5,
+          "w": 6.9,
+          "d": 5.9,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": -48,
+          "y": 0,
+          "z": 11.3,
+          "w": 6.9,
+          "d": 5.9,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "main",
+          "x": -63,
+          "y": 0,
+          "z": 8.4,
+          "w": 6.9,
+          "d": 5.9,
+          "h": 2.6,
+          "barrels": 2,
+          "caliber": 203.2
+        },
+        {
+          "role": "secondary",
+          "x": -19,
+          "y": -6.9,
+          "z": 11.5,
+          "w": 3.1,
+          "d": 2.5,
+          "h": 1.6,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -34,
+          "y": -6.9,
+          "z": 11.5,
+          "w": 3.1,
+          "d": 2.5,
+          "h": 1.6,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -19,
+          "y": 6.9,
+          "z": 11.5,
+          "w": 3.1,
+          "d": 2.5,
+          "h": 1.6,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -34,
+          "y": 6.9,
+          "z": 11.5,
+          "w": 3.1,
+          "d": 2.5,
+          "h": 1.6,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": -7.074999999999999,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": -6.425,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": -5.7749999999999995,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": -5.125,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": 5.125,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": 5.7749999999999995,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": 6.425,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -3,
+          "y": 7.074999999999999,
+          "z": 8.3,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-norfolk:-3:1"
+        },
+        {
+          "role": "deckhouse",
+          "x": -14,
+          "y": 0,
+          "z": 8.25,
+          "w": 28,
+          "d": 10.5,
+          "h": 2.9
+        },
+        {
+          "role": "bridge",
+          "x": -35,
+          "y": 0,
+          "z": 11.35,
+          "w": 7.5,
+          "d": 6,
+          "h": 2.2
+        },
+        {
+          "role": "boat",
+          "x": -14,
+          "y": -5.1,
+          "z": 11.3,
+          "w": 7.4,
+          "d": 1.6,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -29,
+          "y": -4.9,
+          "z": 11.4,
+          "w": 5.6,
+          "d": 1.4,
+          "h": 1
+        },
+        {
+          "role": "searchlight",
+          "x": -8,
+          "y": -4.2,
+          "z": 11.2,
+          "w": 1,
+          "d": 1,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -14,
+          "y": 5.1,
+          "z": 11.3,
+          "w": 7.4,
+          "d": 1.6,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": -29,
+          "y": 4.9,
+          "z": 11.4,
+          "w": 5.6,
+          "d": 1.4,
+          "h": 1
+        },
+        {
+          "role": "searchlight",
+          "x": -8,
+          "y": 4.2,
+          "z": 11.2,
+          "w": 1,
+          "d": 1,
+          "h": 1
+        }
+      ],
+      "armament": {
+        "caliber": 203.2,
+        "barrels": 8,
+        "torpedoTubes": 8,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [
+          {
+            "count": 8,
+            "caliber_mm": 101.6,
+            "mounts": "4x2"
+          }
+        ],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fitReview": {
+        "expectedMainBarrels": 8,
+        "expectedSecondaryBarrels": 8,
+        "expectedExternalTorpedoTubes": 8,
+        "expectedFunnels": 3
+      }
+    },
+    "demo-belfast": {
+      "id": "demo-belfast",
+      "name": "HMS Belfast, 1943 exterior interpretation",
+      "type": "CL",
+      "nation": "GBR",
+      "year": 1943,
+      "units": "metres",
+      "axes": "right-handed: X bow-positive; Y up; Z transverse",
+      "output": "historical/demo-belfast.glb",
+      "dimensions": {
+        "length": 187,
+        "beam": 21,
+        "draft": 6.1
+      },
+      "origin": "historical",
+      "configuration": "HMS Belfast, 1943 exterior interpretation",
+      "accuracy": "Source-informed original exterior reconstruction. Primary recognition drawings establish dimensions and major arrangement. Body sections, minor fittings and individual small wartime changes are inferred and are not a surveyed engineering reconstruction. No interiors or exact battle damage are modeled. Rounded museum dimensions are used; bulge body sections and radar aerial minor detail are inferred. The original wartime pole/tripod masts and six twin4in positions are retained, not the later museum lattice-mast refit. Boat decks, aft deckhouse tiers and open-rear secondary gun shields follow the cited silhouette; their small dimensions and detailed fittings remain inferred.",
+      "geometrySource": "Independent continuous loft and detailed fitted geometry from an explicit dimensional specification. No unrelated ship mesh is scaled or reused.",
+      "dimensionBasis": "Declared sources and class-specific recognition outline; estimates are stated in source notes.",
+      "layoutProvenance": "Independently placed equipment stations from the cited primary-source plan/profile, with original inferred small fittings.",
+      "sources": [
+        {
+          "title": "National Historic Ships register123, HMSBelfast",
+          "url": "https://www.nationalhistoricships.org.uk/register/123/hms-belfast",
+          "usedFor": "Published rounded overall187m,beam21m,depth6.1m. Draft is an original operating-waterline estimate, not depth equated to an exact trial condition."
+        },
+        {
+          "title": "US Navy ONI201-I, British cruisers, page7",
+          "url": "https://www.ibiblio.org/hyperwar/USN/ref/ONI/ONI-201/ONI-201-I/ONI-201-I.pdf",
+          "license": "US government public domain",
+          "usedFor": "Belfast individual two-raked-funnel silhouette, four triple6in mounts; separate from generic Southampton geometry."
+        },
+        {
+          "title": "Royal Navy official photograph FL1656, IWM",
+          "url": "https://commons.wikimedia.org/wiki/File:HMS_Belfast_during_the_Second_World_War_FL1656.jpg",
+          "usedFor": "Post-mine-repair1942–1944 war-service superstructure and mast arrangement. No photograph pixels embedded."
+        }
+      ],
+      "hullStations": [
+        [
+          -1,
+          0.2,
+          0.03,
+          6.3
+        ],
+        [
+          -0.97,
+          0.28,
+          0.2,
+          6.3
+        ],
+        [
+          -0.9,
+          0.58,
+          0.6,
+          6.3
+        ],
+        [
+          -0.75,
+          0.82,
+          0.9,
+          6.3
+        ],
+        [
+          -0.5,
+          0.965,
+          1,
+          6.3
+        ],
+        [
+          0,
+          1,
+          1,
+          6.3
+        ],
+        [
+          0.3,
+          0.94,
+          0.96,
+          6.38
+        ],
+        [
+          0.48,
+          0.78,
+          0.89,
+          6.5
+        ],
+        [
+          0.67,
+          0.54,
+          0.69,
+          6.7
+        ],
+        [
+          0.82,
+          0.29,
+          0.45,
+          6.95
+        ],
+        [
+          0.94,
+          0.075,
+          0.17,
+          7.1499999999999995
+        ],
+        [
+          1,
+          0.0008,
+          0.015,
+          7.3
+        ]
+      ],
+      "stations": [
+        {
+          "role": "bridge-base",
+          "x": 25,
+          "y": 0,
+          "z": 6.4,
+          "w": 27,
+          "d": 14,
+          "h": 3.6
+        },
+        {
+          "role": "bridge",
+          "x": 29,
+          "y": 0,
+          "z": 10,
+          "w": 14,
+          "d": 11,
+          "h": 3.4
+        },
+        {
+          "role": "bridge",
+          "x": 30,
+          "y": 0,
+          "z": 13.4,
+          "w": 8,
+          "d": 8,
+          "h": 2.8
+        },
+        {
+          "role": "funnel",
+          "x": 12,
+          "y": 0,
+          "z": 7,
+          "w": 5.1,
+          "d": 4.5,
+          "h": 13.3
+        },
+        {
+          "role": "funnel",
+          "x": -19,
+          "y": 0,
+          "z": 7,
+          "w": 4.9,
+          "d": 4.5,
+          "h": 13
+        },
+        {
+          "role": "mast",
+          "x": 26,
+          "y": 0,
+          "z": 6.4,
+          "w": 0.4,
+          "d": 0.4,
+          "h": 27,
+          "style": "tripod",
+          "baseRadius": 2.4
+        },
+        {
+          "role": "mast",
+          "x": -33,
+          "y": 0,
+          "z": 6.4,
+          "w": 0.3,
+          "d": 0.3,
+          "h": 23,
+          "style": "tripod",
+          "baseRadius": 2
+        },
+        {
+          "role": "director",
+          "x": 28,
+          "y": 0,
+          "z": 16.3,
+          "w": 3.4,
+          "d": 2.5,
+          "h": 2.1
+        },
+        {
+          "role": "radar",
+          "x": 26,
+          "y": 0,
+          "z": 33.4,
+          "w": 3.3,
+          "d": 0.1,
+          "h": 1.2
+        },
+        {
+          "role": "catapult",
+          "x": -2,
+          "y": 0,
+          "z": 9.5,
+          "w": 14,
+          "d": 1,
+          "h": 1,
+          "bearing": 90
+        },
+        {
+          "role": "crane-boom",
+          "x": -7,
+          "y": -5.8,
+          "z": 9.2,
+          "w": 10,
+          "d": 0.7,
+          "h": 5
+        },
+        {
+          "role": "main",
+          "x": 58,
+          "y": 0,
+          "z": 6.5,
+          "w": 6.5,
+          "d": 6.7,
+          "h": 2.5,
+          "barrels": 3,
+          "caliber": 152.4
+        },
+        {
+          "role": "main",
+          "x": 44,
+          "y": 0,
+          "z": 9.6,
+          "w": 6.5,
+          "d": 6.7,
+          "h": 2.5,
+          "barrels": 3,
+          "caliber": 152.4
+        },
+        {
+          "role": "main",
+          "x": -49,
+          "y": 0,
+          "z": 9.5,
+          "w": 6.5,
+          "d": 6.7,
+          "h": 2.5,
+          "barrels": 3,
+          "caliber": 152.4
+        },
+        {
+          "role": "main",
+          "x": -63,
+          "y": 0,
+          "z": 6.5,
+          "w": 6.5,
+          "d": 6.7,
+          "h": 2.5,
+          "barrels": 3,
+          "caliber": 152.4
+        },
+        {
+          "role": "secondary",
+          "x": -34,
+          "y": -7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -20,
+          "y": -7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 3,
+          "y": -7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": -90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -34,
+          "y": 7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": -20,
+          "y": 7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "secondary",
+          "x": 3,
+          "y": 7.6,
+          "z": 9.2,
+          "w": 3.5,
+          "d": 3,
+          "h": 1.7,
+          "barrels": 2,
+          "caliber": 101.6,
+          "bearing": 90,
+          "enclosed": false,
+          "shielded": true,
+          "sponson": true
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": -7.65,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": -7,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": -6.35,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:-1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": 6.35,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": 7,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:1"
+        },
+        {
+          "role": "torpedo-tube",
+          "x": -9,
+          "y": 7.65,
+          "z": 6.5,
+          "w": 6.2,
+          "d": 0.54,
+          "h": 0.54,
+          "bankId": "demo-belfast:-9:1"
+        },
+        {
+          "role": "deckhouse",
+          "x": -25,
+          "y": 0,
+          "z": 6.4,
+          "w": 34,
+          "d": 11.2,
+          "h": 2.8
+        },
+        {
+          "role": "bridge",
+          "x": -33,
+          "y": 0,
+          "z": 9.2,
+          "w": 12,
+          "d": 8.4,
+          "h": 2.5
+        },
+        {
+          "role": "hangar-house",
+          "x": 5.5,
+          "y": -4.6,
+          "z": 6.4,
+          "w": 12,
+          "d": 4.8,
+          "h": 3.1
+        },
+        {
+          "role": "hangar-house",
+          "x": 5.5,
+          "y": 4.6,
+          "z": 6.4,
+          "w": 12,
+          "d": 4.8,
+          "h": 3.1
+        },
+        {
+          "role": "director",
+          "x": -33,
+          "y": 0,
+          "z": 11.7,
+          "w": 3.2,
+          "d": 2.5,
+          "h": 2
+        },
+        {
+          "role": "boat",
+          "x": -18.5,
+          "y": -5.9,
+          "z": 9.3,
+          "w": 8,
+          "d": 1.8,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": 8,
+          "y": -5.2,
+          "z": 9.6,
+          "w": 5.3,
+          "d": 1.4,
+          "h": 1
+        },
+        {
+          "role": "light-aa",
+          "x": 19,
+          "y": -6,
+          "z": 10.1,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 1.3,
+          "barrels": 8,
+          "barrelRows": 2,
+          "caliber": 40,
+          "bearing": -90
+        },
+        {
+          "role": "boat",
+          "x": -18.5,
+          "y": 5.9,
+          "z": 9.3,
+          "w": 8,
+          "d": 1.8,
+          "h": 1
+        },
+        {
+          "role": "boat",
+          "x": 8,
+          "y": 5.2,
+          "z": 9.6,
+          "w": 5.3,
+          "d": 1.4,
+          "h": 1
+        },
+        {
+          "role": "light-aa",
+          "x": 19,
+          "y": 6,
+          "z": 10.1,
+          "w": 2.6,
+          "d": 2.4,
+          "h": 1.3,
+          "barrels": 8,
+          "barrelRows": 2,
+          "caliber": 40,
+          "bearing": 90
+        }
+      ],
+      "armament": {
+        "caliber": 152.4,
+        "barrels": 12,
+        "torpedoTubes": 6,
+        "torpedoReloads": 0,
+        "aa": 0,
+        "secondary": [
+          {
+            "count": 12,
+            "caliber_mm": 101.6,
+            "mounts": "6x2"
+          }
+        ],
+        "torpedoFit": null
+      },
+      "shafts": 4,
+      "complement": 0,
+      "displacement": 0,
+      "textureMetres": 2.5,
+      "fitReview": {
+        "expectedMainBarrels": 12,
+        "expectedSecondaryBarrels": 12,
+        "expectedExternalTorpedoTubes": 6,
+        "expectedFunnels": 2
+      }
+    }
+  }
+}
