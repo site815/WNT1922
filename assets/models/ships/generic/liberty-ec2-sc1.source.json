@@ -5,15 +5,11 @@
   "textureMetres": 2.5,
   "materialSources": [
     {
-      "title": "Poly Haven — Blue Metal Plate by Rob Tuytel",
-      "url": "https://polyhaven.com/a/blue_metal_plate",
-      "license": "CC0-1.0",
-      "usedFor": "Unmodified OpenGL normal and packed occlusion/roughness/metalness maps; color is original neutral naval paint, not the source blue diffuse image."
-    },
-    {
-      "title": "Original naval painted steel",
-      "file": "assets/models/textures/naval-paint/source.json",
-      "usedFor": "Original neutral paint albedo. Plate weathering is illustrative and is not a measured EC2-S-C1 plating map."
+      "name": "Original fleet paint, timber, nonslip decking and canvas PBR maps",
+      "author": "WNT1922",
+      "license": "Original project artwork",
+      "manifest": "assets/models/textures/fleet-surfaces/source.json",
+      "usage": "Embedded physically scaled albedo, OpenGL normal and packed occlusion/roughness/metalness. Original inferred weathering, not an exact camouflage or refit claim."
     }
   ],
   "type": "AK",
@@ -253,11 +249,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-paint",
+      "roughness": 1,
+      "normalScale": 0.65,
+      "baseColorTexture": "paint-albedo",
       "normalTexture": "paint-normal",
       "metallicRoughnessTexture": "paint-orm",
-      "normalScale": 0.4
+      "occlusionTexture": "paint-orm"
     },
     "house": {
       "color": [
@@ -267,11 +264,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.85,
-      "baseColorTexture": "naval-paint",
+      "roughness": 1,
+      "normalScale": 0.65,
+      "baseColorTexture": "paint-albedo",
       "normalTexture": "paint-normal",
       "metallicRoughnessTexture": "paint-orm",
-      "normalScale": 0.3
+      "occlusionTexture": "paint-orm"
     },
     "deck": {
       "color": [
@@ -282,10 +280,11 @@
       ],
       "metallic": 0,
       "roughness": 1,
-      "baseColorTexture": "naval-paint",
-      "normalTexture": "paint-normal",
-      "metallicRoughnessTexture": "paint-orm",
-      "normalScale": 0.35
+      "normalScale": 0.6,
+      "baseColorTexture": "steel-deck-albedo",
+      "normalTexture": "steel-deck-normal",
+      "metallicRoughnessTexture": "steel-deck-orm",
+      "occlusionTexture": "steel-deck-orm"
     },
     "antifouling": {
       "color": [
@@ -295,7 +294,12 @@
         1
       ],
       "metallic": 0.015,
-      "roughness": 0.84
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "boot": {
       "color": [
@@ -305,7 +309,12 @@
         1
       ],
       "metallic": 0.015,
-      "roughness": 0.79
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "steel": {
       "color": [
@@ -315,7 +324,10 @@
         1
       ],
       "metallic": 0.72,
-      "roughness": 0.5
+      "roughness": 0.5,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "canvas": {
       "color": [
@@ -325,7 +337,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.96
+      "roughness": 1,
+      "baseColorTexture": "canvas-albedo",
+      "normalTexture": "canvas-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "canvas-orm",
+      "occlusionTexture": "canvas-orm"
     },
     "rope": {
       "color": [
@@ -335,7 +352,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.95
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "wood": {
       "color": [
@@ -345,7 +367,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.83
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "glass": {
       "color": [
@@ -365,7 +392,10 @@
         1
       ],
       "metallic": 0.92,
-      "roughness": 0.4
+      "roughness": 0.4,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "lamp": {
       "color": [
@@ -375,7 +405,12 @@
         1
       ],
       "metallic": 0.06,
-      "roughness": 0.27
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "rust": {
       "color": [
@@ -385,20 +420,55 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.98
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     }
+  },
+  "indexVertices": true,
+  "curveToleranceMetres": 0.003,
+  "surfaceProfile": {
+    "version": 1,
+    "tileMetres": 2.5,
+    "textureSize": 256,
+    "deckFinish": "steel-deck",
+    "curveToleranceMetres": 0.003,
+    "geometryPolicy": "Preserve hull loft, fittings and weapon stations. Reduced cylinder and ring tessellation adds at most 3 mm radial error; already coarser original fittings are unchanged. Lossless Float32 vertex indexing preserves UV and hard-normal seams."
   },
   "authoringFile": "assets/models/source/liberty-ec2-sc1.json",
   "exporter": "tools/author-liberty-model.mjs",
   "summary": {
     "id": "liberty-ec2-sc1",
     "file": "assets/models/ships/generic/liberty-ec2-sc1.glb",
-    "triangles": 221176,
-    "vertices": 663528,
+    "triangles": 198164,
+    "vertices": 316725,
     "materials": 13,
     "components": 10,
     "auditedHullVertices": 13146,
-    "bytes": 28634056
+    "bytes": 12916292
+  },
+  "statistics": {
+    "id": "liberty-ec2-sc1",
+    "triangles": 198164,
+    "vertices": 316725,
+    "materials": 13,
+    "embeddedTextures": 9,
+    "bytes": 12916292,
+    "bounds": {
+      "min": [
+        -67.28459930419922,
+        -7.702549934387207,
+        -8.702924728393555
+      ],
+      "max": [
+        67.28459930419922,
+        28.649999618530273,
+        8.702924728393555
+      ]
+    }
   },
   "components": [
     {
@@ -424,7 +494,7 @@
     },
     {
       "name": "Cambered steel weather deck and sheer-following bulwarks with drainage scuppers",
-      "triangles": 10756,
+      "triangles": 10308,
       "ranges": [
         {
           "material": "paint",
@@ -444,7 +514,7 @@
         {
           "material": "house",
           "indexStart": 0,
-          "indexCount": 13716
+          "indexCount": 12372
         },
         {
           "material": "rust",
@@ -455,7 +525,7 @@
     },
     {
       "name": "Five cargo hatch coamings, rounded corners, battens, canvas-covered boards and securing cleats",
-      "triangles": 9840,
+      "triangles": 9200,
       "ranges": [
         {
           "material": "paint",
@@ -480,18 +550,18 @@
         {
           "material": "steel",
           "indexStart": 0,
-          "indexCount": 13680
+          "indexCount": 11760
         }
       ]
     },
     {
       "name": "Stepped amidships accommodation, bridge wings, navigation glazing, doors, scuttles and roof equipment",
-      "triangles": 14440,
+      "triangles": 10880,
       "ranges": [
         {
           "material": "paint",
           "indexStart": 15804,
-          "indexCount": 9840
+          "indexCount": 7392
         },
         {
           "material": "boot",
@@ -505,69 +575,69 @@
         },
         {
           "material": "house",
-          "indexStart": 13716,
-          "indexCount": 2016
+          "indexStart": 12372,
+          "indexCount": 1920
         },
         {
           "material": "steel",
-          "indexStart": 13680,
-          "indexCount": 8064
+          "indexStart": 11760,
+          "indexCount": 5616
         },
         {
           "material": "brass",
           "indexStart": 0,
-          "indexCount": 7968
+          "indexCount": 5232
         },
         {
           "material": "glass",
           "indexStart": 0,
-          "indexCount": 7944
+          "indexCount": 5760
         },
         {
           "material": "rope",
           "indexStart": 0,
-          "indexCount": 6144
+          "indexCount": 5376
         }
       ]
     },
     {
       "name": "Oval funnel with open sooty uptake, reinforcing collars, steam pipes and climbing rungs",
-      "triangles": 6152,
+      "triangles": 5840,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 25644,
-          "indexCount": 1104
+          "indexStart": 23196,
+          "indexCount": 912
         },
         {
           "material": "boot",
           "indexStart": 11532,
-          "indexCount": 936
+          "indexCount": 840
         },
         {
           "material": "house",
-          "indexStart": 15732,
-          "indexCount": 288
+          "indexStart": 14292,
+          "indexCount": 216
         },
         {
           "material": "steel",
-          "indexStart": 21744,
-          "indexCount": 16128
+          "indexStart": 17376,
+          "indexCount": 15552
         }
       ]
     },
     {
       "name": "Three cargo mast houses, ten stowed working derricks, goosenecks, tackle blocks, rigging and steam winches",
-      "triangles": 74752,
+      "triangles": 65980,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 26748,
-          "indexCount": 15696
+          "indexStart": 24108,
+          "indexCount": 11808
         },
         {
           "material": "boot",
-          "indexStart": 12468,
+          "indexStart": 12372,
           "indexCount": 216
         },
         {
@@ -577,100 +647,100 @@
         },
         {
           "material": "house",
-          "indexStart": 16020,
+          "indexStart": 14508,
           "indexCount": 504
         },
         {
           "material": "steel",
-          "indexStart": 37872,
-          "indexCount": 101520
+          "indexStart": 32928,
+          "indexCount": 79272
         },
         {
           "material": "brass",
-          "indexStart": 7968,
-          "indexCount": 432
+          "indexStart": 5232,
+          "indexCount": 252
         },
         {
           "material": "rope",
-          "indexStart": 6144,
+          "indexStart": 5376,
           "indexCount": 105600
         }
       ]
     },
     {
       "name": "Four open lifeboats with continuous shaped hulls, thwarts, gunwales, oars and paired davits",
-      "triangles": 35072,
+      "triangles": 33760,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 42444,
+          "indexStart": 35916,
           "indexCount": 768
         },
         {
           "material": "house",
-          "indexStart": 16524,
-          "indexCount": 24576
+          "indexStart": 15012,
+          "indexCount": 23424
         },
         {
           "material": "wood",
           "indexStart": 12480,
-          "indexCount": 69696
+          "indexCount": 69504
         },
         {
           "material": "steel",
-          "indexStart": 139392,
-          "indexCount": 9216
+          "indexStart": 112200,
+          "indexCount": 6912
         },
         {
           "material": "rope",
-          "indexStart": 111744,
-          "indexCount": 960
+          "indexStart": 110976,
+          "indexCount": 672
         }
       ]
     },
     {
       "name": "Cowl ventilators, engine-room air intakes, lockers, plumbing and cargo-deck lamps",
-      "triangles": 26144,
+      "triangles": 20752,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 43212,
-          "indexCount": 864
+          "indexStart": 36684,
+          "indexCount": 648
         },
         {
           "material": "boot",
-          "indexStart": 12684,
-          "indexCount": 7776
+          "indexStart": 12588,
+          "indexCount": 6936
         },
         {
           "material": "house",
-          "indexStart": 41100,
-          "indexCount": 68064
+          "indexStart": 38436,
+          "indexCount": 53448
         },
         {
           "material": "steel",
-          "indexStart": 148608,
+          "indexStart": 119112,
           "indexCount": 288
         },
         {
           "material": "lamp",
           "indexStart": 0,
-          "indexCount": 1440
+          "indexCount": 936
         }
       ]
     },
     {
       "name": "Forecastle and poop houses, anchor windlass, capstans, paired bitts, chain and stockless anchors",
-      "triangles": 26904,
+      "triangles": 24532,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 44076,
-          "indexCount": 13248
+          "indexStart": 37332,
+          "indexCount": 10776
         },
         {
           "material": "boot",
-          "indexStart": 20460,
+          "indexStart": 19524,
           "indexCount": 144
         },
         {
@@ -680,34 +750,34 @@
         },
         {
           "material": "house",
-          "indexStart": 109164,
+          "indexStart": 91884,
           "indexCount": 336
         },
         {
           "material": "steel",
-          "indexStart": 148896,
-          "indexCount": 53256
+          "indexStart": 119400,
+          "indexCount": 49884
         },
         {
           "material": "brass",
-          "indexStart": 8400,
-          "indexCount": 1632
+          "indexStart": 5484,
+          "indexCount": 984
         },
         {
           "material": "glass",
-          "indexStart": 7944,
-          "indexCount": 1344
+          "indexStart": 5760,
+          "indexCount": 720
         },
         {
           "material": "rope",
-          "indexStart": 112704,
+          "indexStart": 111648,
           "indexCount": 10560
         }
       ]
     },
     {
       "name": "Single shaft, four bladed 18 ft 6 in bronze screw, faired sternpost, rudder and paired bilge keels",
-      "triangles": 4588,
+      "triangles": 4384,
       "ranges": [
         {
           "material": "antifouling",
@@ -716,35 +786,15 @@
         },
         {
           "material": "steel",
-          "indexStart": 202152,
-          "indexCount": 816
+          "indexStart": 169284,
+          "indexCount": 456
         },
         {
           "material": "brass",
-          "indexStart": 10032,
-          "indexCount": 10944
+          "indexStart": 6468,
+          "indexCount": 10692
         }
       ]
     }
-  ],
-  "statistics": {
-    "id": "liberty-ec2-sc1",
-    "triangles": 221176,
-    "vertices": 663528,
-    "materials": 13,
-    "embeddedTextures": 3,
-    "bytes": 28634056,
-    "bounds": {
-      "min": [
-        -67.28459930419922,
-        -7.702549934387207,
-        -8.702924728393555
-      ],
-      "max": [
-        67.28459930419922,
-        28.649999618530273,
-        8.702924728393555
-      ]
-    }
-  }
+  ]
 }

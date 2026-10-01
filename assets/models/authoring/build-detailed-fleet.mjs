@@ -1,11 +1,12 @@
 // Optional exterior authoring. The game loads the completed GLBs directly.
 // This reads dimensional class specifications, never old recognition meshes.
 import fs from 'node:fs/promises';
+import {writeStoredAsset} from './write-stored-asset.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
-import {createAuthoredMesh} from './authored-mesh.mjs';
+import {createNavalMesh} from './fleet-materials.mjs';
 import {validateDetailedShip} from '../../../tools/check-models.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../..');
 const option=name=>process.argv.find(a=>a.startsWith(name+'='))?.slice(name.length+1);
@@ -14,7 +15,6 @@ const overrides={ships:{}};
 for(const name of ['fleet-fit-overrides.json','capital-fit-overrides.json','surface-fit-overrides.json','additional-fleet-specifications.json'])Object.assign(overrides.ships,JSON.parse(await fs.readFile(path.join(root,'assets/models/authoring',name),'utf8').catch(()=>'{"ships":{}}')).ships);
 const known=new Set(source.ships.map(s=>s.id));
 for(const [id,s]of Object.entries(overrides.ships))if(!known.has(id)){assert(s.id===id&&s.output&&s.dimensions&&s.stations&&s.hullStations,'New class needs a complete specification: '+id);source.ships.push(s);}
-const textures=await Promise.all(['albedo.png','normal.png','orm.png'].map(n=>fs.readFile(path.join(root,'assets/models/textures/naval-paint',n))));
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),lerp=(a,b,t)=>a+(b-a)*t;
 const paint=(color,roughness=.9)=>({color:[...color,1],metallic:0,roughness,baseColorTexture:'naval-albedo',normalTexture:'naval-normal',normalScale:.45,metallicRoughnessTexture:'naval-orm',occlusionTexture:'naval-orm'});
 const palette={GBR:[.33,.355,.37],USA:[.355,.38,.395],JPN:[.27,.285,.29],FRA:[.39,.405,.415],ITA:[.385,.4,.41],DEU:[.37,.39,.41],SOV:[.33,.35,.36]};
@@ -23,10 +23,8 @@ const summary=[];
 for(const base of source.ships){
   if(option('--only')&&!option('--only').split(',').includes(base.id))continue;
   const spec={...base,...(overrides.ships?.[base.id]||{}),indexVertices:true};
-  spec.materials={paint:paint(palette[spec.nation]||palette.GBR),deck:paint(woodNations.has(spec.type)?[.40,.34,.235]:[.17,.185,.19]),antifouling:{color:[.25,.055,.035,1],metallic:0,roughness:.92},boot:{color:[.022,.025,.029,1],metallic:0,roughness:.9},steel:{color:[.08,.09,.105,1],metallic:.78,roughness:.45},glass:{color:[.045,.09,.12,1],metallic:.12,roughness:.18},brass:{color:[.34,.245,.105,1],metallic:.8,roughness:.45},canvas:{color:[.54,.51,.43,1],metallic:0,roughness:.95},white:{color:[.68,.69,.66,1],metallic:0,roughness:.94},red:{color:[.34,.028,.018,1],metallic:0,roughness:.5}};
-  spec.materialSources=[{name:'Original naval surface maps',author:'WNT1922',license:'Original project artwork',manifest:'assets/models/textures/naval-paint/source.json',usage:'Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates.'}];
-  const M=createAuthoredMesh(spec),{groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,house,rail,ladder}=M;
-  ['naval-albedo','naval-normal','naval-orm'].forEach((n,i)=>M.addTexture(n,textures[i]));
+  spec.materials={upperdeck:paint([.14,.155,.16]),paint:paint(palette[spec.nation]||palette.GBR),deck:paint(woodNations.has(spec.type)?[.40,.34,.235]:[.17,.185,.19]),antifouling:{color:[.25,.055,.035,1],metallic:0,roughness:.92},boot:{color:[.022,.025,.029,1],metallic:0,roughness:.9},steel:{color:[.08,.09,.105,1],metallic:.78,roughness:.45},glass:{color:[.045,.09,.12,1],metallic:.12,roughness:.18},brass:{color:[.34,.245,.105,1],metallic:.8,roughness:.45},canvas:{color:[.54,.51,.43,1],metallic:0,roughness:.95},white:{color:[.68,.69,.66,1],metallic:0,roughness:.94},red:{color:[.34,.028,.018,1],metallic:0,roughness:.5}};
+  const M=await createNavalMesh(spec),{groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,house,rail,ladder}=M;
   const {length:L,beam:B,draft:D}=spec.dimensions,submarine=['SS','SM'].includes(spec.type),carrier=['CV','CVL'].includes(spec.type),auxiliary=spec.type==='AO';
   const stations=spec.stations,deck0=spec.hullStations.find(p=>p[0]===0)[3],equipment={mainBarrels:[],secondaryBarrels:[],aaBarrels:[],torpedoTubes:[]};
   function curve(t,k){const s=spec.hullStations;let i=0;while(i<s.length-2&&s[i+1][0]<t)i++;const p=s[i],q=s[i+1],a=s[Math.max(0,i-1)],b=s[Math.min(s.length-1,i+2)],u=clamp((t-p[0])/(q[0]-p[0]),0,1),d=q[0]-p[0];return clamp((2*u**3-3*u*u+1)*p[k]+(u**3-2*u*u+u)*(q[k]-a[k])/(q[0]-a[0])*d+(-2*u**3+3*u*u)*q[k]+(u**3-u*u)*(b[k]-p[k])/(b[0]-p[0])*d,Math.min(p[k],q[k]),Math.max(p[k],q[k]));}
@@ -53,16 +51,40 @@ for(const base of source.ships){
   function door(x,z,y){const side=Math.sign(z)||1;house('paint',x,z,.69,.075,y,y+1.72,.11);for(const yy of [.27,1.34])cylinder('steel',[x-.29,y+yy,z+side*.04],[x-.12,y+yy,z+side*.04],.024,.024,8);cylinder('brass',[x+.14,y+.92,z+side*.05],[x+.24,y+.92,z+side*.05],.025,.025,8);}
   function cowl(x,z,y,height=1.5,r=.23){cylinder('paint',[x,y,z],[x,y+height-.25,z],r,r,20);const p=t=>[x+Math.sin(t)*r*1.3,y+height-.25+(1-Math.cos(t))*r*1.3,z];for(let i=0;i<7;i++)cylinder('paint',p(i/7*Math.PI/2),p((i+1)/7*Math.PI/2),r,r,16);const end=p(Math.PI/2);cylinder('paint',end,add(end,[r*.22,0,0]),r,r*1.28,20);cylinder('boot',add(end,[r*.223,0,0]),add(end,[r*.228,0,0]),r*1.12,r*1.12,20);}
   function houseDetailed(s){const y=Math.max(s.z,deck(s.x)),h=Math.max(.5,s.h),w=s.w,d=s.d,bevel=Math.min(w,d)*.13;
-    house('paint',s.x,s.y,w,d,y,y+h,bevel,.975);house('deck',s.x,s.y,w+.16,d+.16,y+h,y+h+.1,bevel);
-    if(w>2&&d>1.6)for(const side of [-1,1]){const zz=s.y+side*(d/2+.022);if(h>1.8){for(let x=s.x-w/2+.65;x<s.x+w/2-.3;x+=1.45)port(x,y+Math.min(h-.5,1.6),zz,.12);door(s.x-w*.32,zz,y+.10);}if(s.role==='bridge'||s.role==='island'){const count=Math.max(2,Math.floor(w/1.2));for(let i=0;i<count;i++)house('glass',s.x-w*.38+i*w*.76/(count-1),zz,.65,.025,y+h-.88,y+h-.28,.045);}}
-    if((s.role==='bridge'||s.role==='island')&&h>1.1){for(let z=s.y-d*.38;z<=s.y+d*.38;z+=1.0)house('glass',s.x+w/2+.008,z,.025,.68,y+h-.88,y+h-.28,.03);rail([[s.x-w*.43,y+h+.13,s.y-d*.46],[s.x+w*.43,y+h+.13,s.y-d*.46],[s.x+w*.43,y+h+.13,s.y+d*.46],[s.x-w*.43,y+h+.13,s.y+d*.46]],[.45,.9]);}
+    if(s.outline){const outline=s.outline.map(([x,z])=>[s.x+x*w,s.y+z*d]);prism('paint',outline,y,y+h,.985);prism('upperdeck',outline,y+h,y+h+.12);}
+    else{house('paint',s.x,s.y,w,d,y,y+h,bevel,.975);house('upperdeck',s.x,s.y,w+.16,d+.16,y+h,y+h+.12,bevel);}
+    if(w>2&&d>1.6&&!s.outline)for(const side of [-1,1]){const zz=s.y+side*(d/2+.022);if(h>1.8){for(let x=s.x-w/2+.65;x<s.x+w/2-.3;x+=1.45)port(x,y+Math.min(h-.5,1.6),zz,.12);door(s.x-w*.32,zz,y+.10);}if(s.role==='bridge'||s.role==='island'){const count=Math.max(2,Math.floor(w/1.2));for(let i=0;i<count;i++)house('glass',s.x-w*.38+i*w*.76/(count-1),zz,.65,.025,y+h-.88,y+h-.28,.045);}}
+    if((s.role==='bridge'||s.role==='island')&&h>1.1){for(let z=s.y-d*.38;z<=s.y+d*.38;z+=1.0)house('glass',s.x+w/2+.008,z,.025,.68,y+h-.88,y+h-.28,.03);rail([[s.x-w*.43,y+h+.15,s.y-d*.46],[s.x+w*.43,y+h+.15,s.y-d*.46],[s.x+w*.43,y+h+.15,s.y+d*.46],[s.x-w*.43,y+h+.15,s.y+d*.46]],[.45,.9]);
+      // Station-local bridge equipment is inferred exterior detail, keeping the
+      // reviewed footprint and height. Break up the blank roof with binnacles,
+      // voice pipes and chart shelter rather than expanding arbitrary towers.
+      house('paint',s.x-w*.20,s.y,w*.29,d*.36,y+h+.13,y+h+.88,Math.min(.35,d*.1));
+      house('upperdeck',s.x-w*.20,s.y,w*.33,d*.40,y+h+.88,y+h+1.0,.24);
+      for(const side of[-1,1]){const zz=s.y+side*d*.34;cylinder('brass',[s.x+w*.24,y+h+.13,zz],[s.x+w*.24,y+h+.83,zz],.115,.085,12);cylinder('paint',[s.x+w*.24,y+h+.83,zz],[s.x+w*.24,y+h+.98,zz],.22,.18,16);cylinder('paint',[s.x-w*.34,y+h+.13,zz],[s.x-w*.34,y+h+.8,zz],.045,.045,8);}
+      ladder([s.x-w*.48,y+.18,s.y+d*.35],[s.x-w*.48,y+h+.11,s.y+d*.35],.48);
+    }
+    if(s.role==='deckhouse'||s.role==='bridge-base'){
+      for(const side of[-1,1]){const x=s.x-w*.25,z=s.y+side*d*.22;cowl(x,z,y+h+.13,Math.min(1.3,h*.45),.17);}
+      if(!s.outline)for(const side of[-1,1])for(let x=s.x-w*.31;x<s.x+w*.35;x+=Math.max(2.4,w/4)){const z=s.y+side*(d*.45);house('paint',x,z,1.3,.35,y+.25,y+Math.min(1.55,h*.7),.06);for(let v=.40;v<Math.min(1.45,h*.65);v+=.18)cylinder('steel',[x-.48,y+v,z+side*.20],[x+.48,y+v,z+side*.20],.035,.035,6);}
+    }
   }
   for(const s of stations.filter(p=>['bridge-base','bridge','island','deckhouse','hangar-house','pump-house'].includes(p.role)))part('Shaped '+s.role+' with glazing, doors, portholes and roof rails',()=>houseDetailed(s));
+  for(const s of stations.filter(p=>p.role==='bridge-platform'))part('Source-plan bridge wings with railings and underside knee braces',()=>{
+    const y=s.z,outline=s.outline.map(([x,z])=>[s.x+x*s.w,s.y+z*s.d]);prism('paint',outline,y,y+.16);prism('upperdeck',outline,y+.16,y+.20);rail([...outline,outline[0]].map(([x,z])=>[x,y+.22,z]),[.48,.96]);
+    for(const side of[-1,1])for(const dx of[-s.w*.32,0])cylinder('paint',[s.x+dx,y-1.35,s.y+side*s.d*.22],[s.x+dx,y-.02,s.y+side*s.d*.46],.065,.06,10);
+  });
   function gun(x,z,y,barrels,caliber,bearing=0,enclosed=true,wOverride,group='secondaryBarrels',shielded=false,shape={}){
     const angle=bearing*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),p=(a,b,d)=>[x+a*c-d*s,y+b,z+a*s+d*c],radius=Math.max(.24,caliber/1000*3.6),w=wOverride||Math.max(1.3,caliber/1000*(barrels>1?24:14)),height=shape.h||Math.max(.95,caliber/1000*8.6),length=shape.w||Math.max(1.6,caliber/1000*25),columns=Math.ceil(barrels/(shape.barrelRows||1)),pitch=columns>1?w/(columns+1):0;
     cylinder('paint',p(0,0,0),p(0,.25,0),w*.40,w*.40,32);cylinder('paint',p(0,.25,0),p(0,Math.min(height*.45,.9),0),enclosed?w*.34:.21,enclosed?w*.34:.18,32);
     const corners=[[-length*.50,-w*.43],[-length*.36,-w*.50],[length*.32,-w*.5],[length*.5,-w*.34],[length*.5,w*.34],[length*.32,w*.5],[-length*.36,w*.5],[-length*.5,w*.43]].map(([a,d])=>p(a,0,d));
-    if(enclosed){prism('paint',corners.map(a=>[a[0],a[2]]),y+.22,y+height,.88);for(const dz of [-w*.26,w*.26]){const q=p(-length*.18,height,dz);hatch(q[0],q[2],q[1],Math.min(.9,length*.28),Math.min(.55,w*.2));}const a=p(-length*.39,height*.65,0),b=p(-length*.39,height*.65,w*.62);cylinder('paint',a,b,.07,.07,16);}
+    if(enclosed){
+      if(caliber>=200){
+        const shoulder=height*.70,lo=corners.map(a=>[a[0],y+shoulder,a[2]]),hi=[[-length*.46,-w*.37],[-length*.34,-w*.44],[length*.17,-w*.44],[length*.29,-w*.31],[length*.29,w*.31],[length*.17,w*.44],[-length*.34,w*.44],[-length*.46,w*.37]].map(([a,d])=>p(a,height,d));
+        prism('paint',corners.map(a=>[a[0],a[2]]),y+.22,y+shoulder);for(let i=0;i<lo.length;i++){const j=(i+1)%lo.length;quad('paint',lo[i],hi[i],hi[j],lo[j]);tri('paint',p(-length*.055,height,0),hi[j],hi[i]);}
+        for(const side of[-1,1]){const q=p(length*.02,height,side*w*.31);house('paint',q[0],q[2],Math.min(1.3,length*.17),Math.min(.72,w*.10),q[1],q[1]+.32,.15);}
+      }else prism('paint',corners.map(a=>[a[0],a[2]]),y+.22,y+height,.88);
+      for(const dz of [-w*.26,w*.26]){const q=p(-length*.18,height,dz);hatch(q[0],q[2],q[1],Math.min(.9,length*.28),Math.min(.55,w*.2));}const a=p(-length*.39,height*.65,0),b=p(-length*.39,height*.65,w*.62);cylinder('paint',a,b,.07,.07,16);
+    }
     if(shielded&&!enclosed){const panel=(a,b)=>{const dx=b[0]-a[0],dz=b[1]-a[1],len=Math.hypot(dx,dz),nx=-dz/len*.045,nz=dx/len*.045;prism('paint',[[a[0]+nx,a[1]+nz],[b[0]+nx,b[1]+nz],[b[0]-nx,b[1]-nz],[a[0]-nx,a[1]-nz]].map(([u,v])=>{const q=p(u,0,v);return[q[0],q[2]];}),y+.28,y+height+.20,.98);};panel([length*.3,-w*.53],[length*.3,w*.53]);for(const side of[-1,1])panel([-length*.30,side*w*.53],[length*.3,side*w*.53]);}
     for(let j=0;j<barrels;j++){const dz=(j%columns-(columns-1)/2)*pitch,gh=height*.65+Math.floor(j/columns)*.24,root=length*.26,reach=caliber/1000*(caliber>200?40:caliber>75?38:40),breech=caliber/1000*(caliber>75?1.4:2.3);cylinder('paint',p(root-.32,gh,dz),p(root+reach*.28,gh+.03,dz),Math.max(.07,breech),Math.max(.06,breech*.82),24);cylinder('steel',p(root+reach*.28,gh+.03,dz),p(root+reach,gh+.1,dz),Math.max(.05,breech*.83),Math.max(.025,caliber/2000*.80),24);cylinder('boot',p(root+reach+.001,gh+.1,dz),p(root+reach+.006,gh+.1,dz),Math.max(.015,caliber/2200),Math.max(.015,caliber/2200),16);equipment[group].push({caliber,bearing,mount:[x,y,z],muzzle:p(root+reach+.006,gh+.1,dz).map(Math.fround)});
       if(!enclosed){cylinder('steel',p(-.4,gh,dz),p(.45,gh,dz),Math.max(.07,breech),Math.max(.07,breech),20);for(const side of [-1,1]){const q=p(-.3,gh-.18,dz+side*.35);ring('steel',q,.18,.018,Math.abs(c)>.5?'z':'x',16);}cylinder('brass',p(-.4,gh+.23,dz-.2),p(.2,gh+.23,dz-.2),.021,.021,10);}
@@ -97,8 +119,12 @@ for(const base of source.ships){
   });
   for(const [i,s]of stations.filter(p=>p.role==='funnel').entries())part('Funnel '+(i+1)+' with curved open uptake, cap, steam pipes and stays',()=>{
     const y=Math.max(s.z,deck(s.x)),top=y+s.h+Math.max(.3,s.h*.13),rake=spec.year<1925?Math.min(.7,s.h*.07):.1,N=40;
+    house('paint',s.x,s.y,s.w*1.14,s.d*1.16,y,y+Math.min(1.2,s.h*.12),Math.min(s.w,s.d)*.24,.93);
     const point=(a,h,inset=0)=>[s.x-(h-y)/(top-y)*rake+Math.cos(a)*(s.w/2-inset),h,s.y+Math.sin(a)*(s.d/2-inset)];
-    for(let j=0;j<N;j++){const a=j/N*Math.PI*2,b=(j+1)/N*Math.PI*2;for(const [lo,hi,mat]of [[y,top-.4,'paint'],[top-.4,top,'boot']]){quad(mat,point(b,lo),point(a,lo),point(a,hi),point(b,hi));}quad('boot',point(a,top),point(a,top,.12),point(b,top,.12),point(b,top));quad('boot',point(a,top,.12),point(a,top-.5,.12),point(b,top-.5,.12),point(b,top,.12));tri('boot',[s.x-rake,top-.51,s.y],point(b,top-.5,.12),point(a,top-.5,.12));}
+    const cap=Math.min(1.3,s.h*.1+.2);
+    for(let j=0;j<N;j++){const a=j/N*Math.PI*2,b=(j+1)/N*Math.PI*2;for(const [lo,hi,mat]of [[y,top-cap,'paint'],[top-cap,top,'boot']]){quad(mat,point(b,lo),point(a,lo),point(a,hi),point(b,hi));}quad('boot',point(a,top),point(a,top,.12),point(b,top,.12),point(b,top));quad('boot',point(a,top,.12),point(a,top-.5,.12),point(b,top-.5,.12),point(b,top,.12));tri('boot',[s.x-rake,top-.51,s.y],point(b,top-.5,.12),point(a,top-.5,.12));}
+    for(const f of[.33,.67])for(let j=0;j<N;j++){const a=j/N*Math.PI*2,b=(j+1)/N*Math.PI*2,h=y+(top-y)*f;quad('paint',point(b,h,-.035),point(a,h,-.035),point(a,h+.08,-.035),point(b,h+.08,-.035));}
+    for(const side of[-1,1])cylinder('boot',[s.x-rake-s.w*.40,top-.15,s.y+side*s.d*.18],[s.x-rake+s.w*.40,top-.15,s.y+side*s.d*.18],.07,.07,10);
     for(const side of [-1,1]){cylinder('paint',[s.x,y,s.y+side*(s.d/2+.1)],[s.x-rake,top+.18,s.y+side*(s.d/2+.1)],.065,.065,16);for(const dx of [-s.w*.8,s.w*.8])cylinder('steel',[s.x-rake,top-.7,s.y+side*s.d*.45],[s.x+dx,deck(s.x+dx),s.y+side*(s.d*.65)],.013,.013,8);}ladder([s.x-s.w/2-.13,y,s.y],[s.x-s.w/2-rake-.13,top-.25,s.y],.35);
   });
   for(const [i,s]of stations.filter(p=>p.role==='mast').entries())part('Mast '+(i+1)+' with taper, yards, rigging and access ladder',()=>{
@@ -110,6 +136,11 @@ for(const base of source.ships){
       for(let k=0;k<=9;k++)for(let j=0;j<24;j++)cylinder('paint',point(k/9,j*Math.PI*2/24),point(k/9,(j+1)*Math.PI*2/24),.036,.036,8);
       cylinder('paint',[s.x-rake*.74,y+cageHeight,s.y],[s.x-rake,top,s.y],r*.65,r*.23,20);cylinder('paint',[s.x-rake*.74,y+cageHeight,s.y],[s.x-rake*.74,y+cageHeight+.25,s.y],radius*.72,radius*.72,32);rail(Array.from({length:13},(_,j)=>[s.x-rake*.74+Math.cos(j/12*Math.PI*2)*radius*.69,y+cageHeight+.27,s.y+Math.sin(j/12*Math.PI*2)*radius*.69]),[.45,.9]);
     }else{cylinder('paint',[s.x,y,s.y],[s.x-rake,top,s.y],r,r*.23,24);if(s.style==='tripod')for(const side of [-1,1]){const span=s.baseRadius||Math.min(B*.17,3.5),foot=[s.x-span,y,s.y+side*span];cylinder('paint',foot,[s.x-rake*.74,y+s.h*.74,s.y],r*.78,r*.45,20);}}
+    if(s.style==='tripod'){
+      const py=y+s.h*.69,px=s.x-rake*.69,pw=Math.min(6.6,B*.23),pd=Math.min(4.8,B*.17);house('paint',px,s.y,pw,pd,py,py+.18,.55);house('upperdeck',px,s.y,pw*.98,pd*.98,py+.18,py+.23,.52);house('paint',px,s.y,pw*.55,pd*.52,py+.23,py+1.50,.38);house('upperdeck',px,s.y,pw*.61,pd*.60,py+1.50,py+1.60,.40);
+      for(const side of[-1,1]){house('glass',px,s.y+side*pd*.265,pw*.42,.025,py+.88,py+1.27,.035);cylinder('paint',[px,py+1.7,s.y-pd*.48],[px,py+1.7,s.y+pd*.48],.12,.12,16);}
+      rail([[px-pw*.45,py+.25,s.y-pd*.43],[px+pw*.45,py+.25,s.y-pd*.43],[px+pw*.45,py+.25,s.y+pd*.43],[px-pw*.45,py+.25,s.y+pd*.43],[px-pw*.45,py+.25,s.y-pd*.43]],[.47,.92]);
+    }
     for(const h of [.67,.84]){const py=y+s.h*h,x=s.x-rake*h,w=Math.min(B*.30,s.h*.22);cylinder('paint',[x,py,s.y-w],[x,py,s.y+w],.045,.032,16);for(const z of [-w,w])cylinder('steel',[x,py,s.y+z],[s.x,y+1,s.y],.011,.011,8);}
     for(const side of [-1,1])cylinder('steel',[s.x-rake,top-.25,s.y],[s.x-Math.min(L*.07,9),deck(s.x-Math.min(L*.07,9)),side*Math.min(B*.27,3.1)],.015,.015,8);ladder([s.x-.19,y,s.y],[s.x-rake-.14,top-.8,s.y],.32);
     if(!submarine&&L>120&&s.h>16){const py=y+s.h*.50;cylinder('paint',[s.x-rake*.5,py,s.y],[s.x-rake*.5,py+.15,s.y],.7,.7,24);rail(Array.from({length:9},(_,j)=>[s.x-rake*.5+Math.cos(j/8*Math.PI*2)*.67,py+.17,s.y+Math.sin(j/8*Math.PI*2)*.67]),[.45,.9]);}
@@ -203,10 +234,10 @@ for(const base of source.ships){
     for(const [material,g]of groups)for(let i=0;i<g.indices.length;i+=3){const ix=g.indices.slice(i,i+3),p=ix.map(k=>g.positions.slice(k*3,k*3+3).map(Math.fround)),n=ix.map(k=>g.normals.slice(k*3,k*3+3).map(Math.fround)),face=cross(sub(p[1],p[0]),sub(p[2],p[0])),norm=add(add(n[0],n[1]),n[2]);if(face.reduce((s,v,k)=>s+v*norm[k],0)<-1e-6){const component=parts.find(p=>p.ranges.some(r=>r.material===material&&i>=r.indexStart&&i<r.indexStart+r.indexCount));throw Error(spec.id+' '+component?.name+' '+material+' triangle '+i+': '+JSON.stringify({p,n})+'; '+error.message);}}
     throw Error(spec.id+': '+error.message);
   }
-  assert(statistics.embeddedTextures===3);assert(statistics.bounds.min[1]<-.25&&statistics.bounds.max[1]>2);assert(statistics.triangles>=10000,'Detailed exterior must contain actual fitted geometry');
+  assert(statistics.embeddedTextures>=6);assert(statistics.bounds.min[1]<-.25&&statistics.bounds.max[1]>2);assert(statistics.triangles>=10000,'Detailed exterior must contain actual fitted geometry');
   const metadata={...spec,authoringFile:'assets/models/authoring/fleet-specifications.json',exporter:'assets/models/authoring/build-detailed-fleet.mjs',sha256:crypto.createHash('sha256').update(bytes).digest('hex'),statistics,parts,equipment,modelledMainBarrels:mainTotal,modelledExternalTorpedoTubes:tubeStations.length};
   if(!process.argv.includes('--write'))throw Error('Use --write to export the separately stored GLBs.');
-  const target=path.join(root,'assets/models/ships',spec.output);await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,bytes);await fs.writeFile(target.replace(/\.glb$/,'.source.json'),JSON.stringify(metadata,null,2)+'\n');
+  const target=path.join(root,'assets/models/ships',spec.output);await fs.mkdir(path.dirname(target),{recursive:true});await writeStoredAsset(target,bytes);await writeStoredAsset(target.replace(/\.glb$/,'.source.json'),JSON.stringify(metadata,null,2)+'\n');
   summary.push({id:spec.id,...statistics});console.log(JSON.stringify({id:spec.id,triangles:statistics.triangles,vertices:statistics.vertices,bytes:statistics.bytes}));
 }
-await fs.mkdir(path.join(root,'test-output'),{recursive:true});await fs.writeFile(path.join(root,'test-output/detailed-fleet-authoring.json'),JSON.stringify({createdAt:new Date().toISOString(),models:summary},null,2)+'\n');
+await fs.mkdir(path.join(root,'test-output'),{recursive:true});await writeStoredAsset(path.join(root,'test-output/detailed-fleet-authoring.json'),JSON.stringify({createdAt:new Date().toISOString(),models:summary},null,2)+'\n');

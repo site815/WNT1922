@@ -1325,6 +1325,21 @@
   },
   "indexVertices": true,
   "materials": {
+    "upperdeck": {
+      "color": [
+        0.14,
+        0.155,
+        0.16,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 1,
+      "normalScale": 0.6,
+      "baseColorTexture": "steel-deck-albedo",
+      "normalTexture": "steel-deck-normal",
+      "metallicRoughnessTexture": "steel-deck-orm",
+      "occlusionTexture": "steel-deck-orm"
+    },
     "paint": {
       "color": [
         0.355,
@@ -1333,27 +1348,27 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.65,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "deck": {
       "color": [
-        0.4,
-        0.34,
-        0.235,
+        0.42,
+        0.39,
+        0.33,
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.8,
+      "baseColorTexture": "timber-albedo",
+      "normalTexture": "timber-normal",
+      "metallicRoughnessTexture": "timber-orm",
+      "occlusionTexture": "timber-orm"
     },
     "antifouling": {
       "color": [
@@ -1363,7 +1378,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.92
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "boot": {
       "color": [
@@ -1373,7 +1393,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "steel": {
       "color": [
@@ -1383,7 +1408,10 @@
         1
       ],
       "metallic": 0.78,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "glass": {
       "color": [
@@ -1403,7 +1431,10 @@
         1
       ],
       "metallic": 0.8,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "canvas": {
       "color": [
@@ -1413,7 +1444,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.95
+      "roughness": 1,
+      "baseColorTexture": "canvas-albedo",
+      "normalTexture": "canvas-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "canvas-orm",
+      "occlusionTexture": "canvas-orm"
     },
     "white": {
       "color": [
@@ -1423,7 +1459,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.94
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "red": {
       "color": [
@@ -1433,28 +1474,42 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.5
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     }
   },
+  "curveToleranceMetres": 0.003,
   "materialSources": [
     {
-      "name": "Original naval surface maps",
+      "name": "Original fleet paint, timber, nonslip decking and canvas PBR maps",
       "author": "WNT1922",
       "license": "Original project artwork",
-      "manifest": "assets/models/textures/naval-paint/source.json",
-      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+      "manifest": "assets/models/textures/fleet-surfaces/source.json",
+      "usage": "Embedded physically scaled albedo, OpenGL normal and packed occlusion/roughness/metalness. Original inferred weathering, not an exact camouflage or refit claim."
     }
   ],
+  "surfaceProfile": {
+    "version": 1,
+    "tileMetres": 2.5,
+    "textureSize": 256,
+    "deckFinish": "timber",
+    "curveToleranceMetres": 0.003,
+    "geometryPolicy": "Preserve hull loft, fittings and weapon stations. Reduced cylinder and ring tessellation adds at most 3 mm radial error; already coarser original fittings are unchanged. Lossless Float32 vertex indexing preserves UV and hard-normal seams."
+  },
   "authoringFile": "assets/models/authoring/fleet-specifications.json",
   "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
-  "sha256": "db82caebda1a398d49f64ec703bc3754c2ba11f9e1425334e7995342069fcd64",
+  "sha256": "a03ab49765c054450bf876526e43dbfcb46d367f7408b1b0b4dd2fb4d2e6ba75",
   "statistics": {
     "id": "republic_bb41",
-    "triangles": 272900,
-    "vertices": 336752,
-    "materials": 8,
-    "embeddedTextures": 3,
-    "bytes": 14650288,
+    "triangles": 241824,
+    "vertices": 306990,
+    "materials": 9,
+    "embeddedTextures": 12,
+    "bytes": 13245588,
     "bounds": {
       "min": [
         -210,
@@ -1508,1548 +1563,1553 @@
     },
     {
       "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
-      "triangles": 3632,
+      "triangles": 5576,
       "ranges": [
         {
           "material": "paint",
           "indexStart": 150276,
-          "indexCount": 240
+          "indexCount": 4368
         },
         {
-          "material": "deck",
-          "indexStart": 5604,
+          "material": "boot",
+          "indexStart": 408,
+          "indexCount": 432
+        },
+        {
+          "material": "upperdeck",
+          "indexStart": 0,
           "indexCount": 96
         },
         {
           "material": "brass",
           "indexStart": 0,
-          "indexCount": 5184
+          "indexCount": 4848
         },
         {
           "material": "glass",
           "indexStart": 0,
-          "indexCount": 4992
+          "indexCount": 4056
         },
         {
           "material": "steel",
           "indexStart": 0,
-          "indexCount": 384
+          "indexCount": 2928
         }
       ]
     },
     {
       "name": "Shaped bridge with glazing, doors, portholes and roof rails",
-      "triangles": 4544,
+      "triangles": 5280,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 150516,
-          "indexCount": 1200
+          "indexStart": 154644,
+          "indexCount": 1848
         },
         {
-          "material": "deck",
-          "indexStart": 5700,
-          "indexCount": 96
+          "material": "upperdeck",
+          "indexStart": 96,
+          "indexCount": 192
         },
         {
           "material": "brass",
-          "indexStart": 5184,
+          "indexStart": 4848,
           "indexCount": 4416
         },
         {
           "material": "glass",
-          "indexStart": 4992,
-          "indexCount": 7536
+          "indexStart": 4056,
+          "indexCount": 6744
         },
         {
           "material": "steel",
-          "indexStart": 384,
-          "indexCount": 384
+          "indexStart": 2928,
+          "indexCount": 2640
         }
       ]
     },
     {
       "name": "Main battery mount 1 3 x 546 mm",
-      "triangles": 1696,
+      "triangles": 1732,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 151716,
-          "indexCount": 2112
+          "indexStart": 156492,
+          "indexCount": 2316
         },
         {
           "material": "boot",
-          "indexStart": 408,
-          "indexCount": 576
-        },
-        {
-          "material": "steel",
-          "indexStart": 768,
-          "indexCount": 2400
-        }
-      ]
-    },
-    {
-      "name": "Main battery mount 2 3 x 546 mm",
-      "triangles": 1888,
-      "ranges": [
-        {
-          "material": "paint",
-          "indexStart": 153828,
-          "indexCount": 2688
-        },
-        {
-          "material": "boot",
-          "indexStart": 984,
-          "indexCount": 576
-        },
-        {
-          "material": "steel",
-          "indexStart": 3168,
-          "indexCount": 2400
-        }
-      ]
-    },
-    {
-      "name": "Main battery mount 3 3 x 546 mm",
-      "triangles": 1888,
-      "ranges": [
-        {
-          "material": "paint",
-          "indexStart": 156516,
-          "indexCount": 2688
-        },
-        {
-          "material": "boot",
-          "indexStart": 1560,
+          "indexStart": 840,
           "indexCount": 576
         },
         {
           "material": "steel",
           "indexStart": 5568,
-          "indexCount": 2400
+          "indexCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 2 3 x 546 mm",
+      "triangles": 1924,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 158808,
+          "indexCount": 2892
+        },
+        {
+          "material": "boot",
+          "indexStart": 1416,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 7872,
+          "indexCount": 2304
+        }
+      ]
+    },
+    {
+      "name": "Main battery mount 3 3 x 546 mm",
+      "triangles": 1924,
+      "ranges": [
+        {
+          "material": "paint",
+          "indexStart": 161700,
+          "indexCount": 2892
+        },
+        {
+          "material": "boot",
+          "indexStart": 1992,
+          "indexCount": 576
+        },
+        {
+          "material": "steel",
+          "indexStart": 10176,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Main battery mount 4 3 x 546 mm",
-      "triangles": 1888,
+      "triangles": 1924,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 159204,
-          "indexCount": 2688
+          "indexStart": 164592,
+          "indexCount": 2892
         },
         {
           "material": "boot",
-          "indexStart": 2136,
+          "indexStart": 2568,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 7968,
-          "indexCount": 2400
+          "indexStart": 12480,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Main battery mount 5 3 x 546 mm",
-      "triangles": 1888,
+      "triangles": 1924,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 161892,
-          "indexCount": 2688
+          "indexStart": 167484,
+          "indexCount": 2892
         },
         {
           "material": "boot",
-          "indexStart": 2712,
+          "indexStart": 3144,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 10368,
-          "indexCount": 2400
+          "indexStart": 14784,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Main battery mount 6 3 x 546 mm",
-      "triangles": 1696,
+      "triangles": 1732,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 164580,
-          "indexCount": 2112
+          "indexStart": 170376,
+          "indexCount": 2316
         },
         {
           "material": "boot",
-          "indexStart": 3288,
+          "indexStart": 3720,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 12768,
-          "indexCount": 2400
+          "indexStart": 17088,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Light AA pedestal 1",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 166692,
-          "indexCount": 1056
+          "indexStart": 172692,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 3864,
-          "indexCount": 192
+          "indexStart": 4296,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9600,
-          "indexCount": 120
+          "indexStart": 9264,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 15168,
-          "indexCount": 2064
+          "indexStart": 19392,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 2",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 167748,
-          "indexCount": 1056
+          "indexStart": 173412,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 4056,
-          "indexCount": 192
+          "indexStart": 4368,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9720,
-          "indexCount": 120
+          "indexStart": 9336,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 17232,
-          "indexCount": 2064
+          "indexStart": 21180,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 3",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 168804,
-          "indexCount": 1056
+          "indexStart": 174132,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 4248,
-          "indexCount": 192
+          "indexStart": 4440,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9840,
-          "indexCount": 120
+          "indexStart": 9408,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 19296,
-          "indexCount": 2064
+          "indexStart": 22968,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 4",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 169860,
-          "indexCount": 1056
+          "indexStart": 174852,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 4440,
-          "indexCount": 192
+          "indexStart": 4512,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9960,
-          "indexCount": 120
+          "indexStart": 9480,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 21360,
-          "indexCount": 2064
+          "indexStart": 24756,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 5",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 170916,
-          "indexCount": 1056
+          "indexStart": 175572,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 4632,
-          "indexCount": 192
+          "indexStart": 4584,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10080,
-          "indexCount": 120
+          "indexStart": 9552,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 23424,
-          "indexCount": 2064
+          "indexStart": 26544,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 6",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 171972,
-          "indexCount": 1056
+          "indexStart": 176292,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 4824,
-          "indexCount": 192
+          "indexStart": 4656,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10200,
-          "indexCount": 120
+          "indexStart": 9624,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 25488,
-          "indexCount": 2064
+          "indexStart": 28332,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 7",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 173028,
-          "indexCount": 1056
+          "indexStart": 177012,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5016,
-          "indexCount": 192
+          "indexStart": 4728,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10320,
-          "indexCount": 120
+          "indexStart": 9696,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 27552,
-          "indexCount": 2064
+          "indexStart": 30120,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 8",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 174084,
-          "indexCount": 1056
+          "indexStart": 177732,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5208,
-          "indexCount": 192
+          "indexStart": 4800,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10440,
-          "indexCount": 120
+          "indexStart": 9768,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 29616,
-          "indexCount": 2064
+          "indexStart": 31908,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 9",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 175140,
-          "indexCount": 1056
+          "indexStart": 178452,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5400,
-          "indexCount": 192
+          "indexStart": 4872,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10560,
-          "indexCount": 120
+          "indexStart": 9840,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 31680,
-          "indexCount": 2064
+          "indexStart": 33696,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 10",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 176196,
-          "indexCount": 1056
+          "indexStart": 179172,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5592,
-          "indexCount": 192
+          "indexStart": 4944,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10680,
-          "indexCount": 120
+          "indexStart": 9912,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 33744,
-          "indexCount": 2064
+          "indexStart": 35484,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 11",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 177252,
-          "indexCount": 1056
+          "indexStart": 179892,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5784,
-          "indexCount": 192
+          "indexStart": 5016,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10800,
-          "indexCount": 120
+          "indexStart": 9984,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 35808,
-          "indexCount": 2064
+          "indexStart": 37272,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 12",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 178308,
-          "indexCount": 1056
+          "indexStart": 180612,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 5976,
-          "indexCount": 192
+          "indexStart": 5088,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10920,
-          "indexCount": 120
+          "indexStart": 10056,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 37872,
-          "indexCount": 2064
+          "indexStart": 39060,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 13",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 179364,
-          "indexCount": 1056
+          "indexStart": 181332,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 6168,
-          "indexCount": 192
+          "indexStart": 5160,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11040,
-          "indexCount": 120
+          "indexStart": 10128,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 39936,
-          "indexCount": 2064
+          "indexStart": 40848,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 14",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 180420,
-          "indexCount": 1056
+          "indexStart": 182052,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 6360,
-          "indexCount": 192
+          "indexStart": 5232,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11160,
-          "indexCount": 120
+          "indexStart": 10200,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 42000,
-          "indexCount": 2064
+          "indexStart": 42636,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 15",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 181476,
-          "indexCount": 1056
+          "indexStart": 182772,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 6552,
-          "indexCount": 192
+          "indexStart": 5304,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11280,
-          "indexCount": 120
+          "indexStart": 10272,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 44064,
-          "indexCount": 2064
+          "indexStart": 44424,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 16",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 182532,
-          "indexCount": 1056
+          "indexStart": 183492,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 6744,
-          "indexCount": 192
+          "indexStart": 5376,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11400,
-          "indexCount": 120
+          "indexStart": 10344,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 46128,
-          "indexCount": 2064
+          "indexStart": 46212,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 17",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 183588,
-          "indexCount": 1056
+          "indexStart": 184212,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 6936,
-          "indexCount": 192
+          "indexStart": 5448,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11520,
-          "indexCount": 120
+          "indexStart": 10416,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 48192,
-          "indexCount": 2064
+          "indexStart": 48000,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 18",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 184644,
-          "indexCount": 1056
+          "indexStart": 184932,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 7128,
-          "indexCount": 192
+          "indexStart": 5520,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11640,
-          "indexCount": 120
+          "indexStart": 10488,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 50256,
-          "indexCount": 2064
+          "indexStart": 49788,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 19",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 185700,
-          "indexCount": 1056
+          "indexStart": 185652,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 7320,
-          "indexCount": 192
+          "indexStart": 5592,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11760,
-          "indexCount": 120
+          "indexStart": 10560,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 52320,
-          "indexCount": 2064
+          "indexStart": 51576,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 20",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 186756,
-          "indexCount": 1056
+          "indexStart": 186372,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 7512,
-          "indexCount": 192
+          "indexStart": 5664,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 11880,
-          "indexCount": 120
+          "indexStart": 10632,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 54384,
-          "indexCount": 2064
+          "indexStart": 53364,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 21",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 187812,
-          "indexCount": 1056
+          "indexStart": 187092,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 7704,
-          "indexCount": 192
+          "indexStart": 5736,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12000,
-          "indexCount": 120
+          "indexStart": 10704,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 56448,
-          "indexCount": 2064
+          "indexStart": 55152,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 22",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 188868,
-          "indexCount": 1056
+          "indexStart": 187812,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 7896,
-          "indexCount": 192
+          "indexStart": 5808,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12120,
-          "indexCount": 120
+          "indexStart": 10776,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 58512,
-          "indexCount": 2064
+          "indexStart": 56940,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 23",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 189924,
-          "indexCount": 1056
+          "indexStart": 188532,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 8088,
-          "indexCount": 192
+          "indexStart": 5880,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12240,
-          "indexCount": 120
+          "indexStart": 10848,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 60576,
-          "indexCount": 2064
+          "indexStart": 58728,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 24",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 190980,
-          "indexCount": 1056
+          "indexStart": 189252,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 8280,
-          "indexCount": 192
+          "indexStart": 5952,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12360,
-          "indexCount": 120
+          "indexStart": 10920,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 62640,
-          "indexCount": 2064
+          "indexStart": 60516,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 25",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 192036,
-          "indexCount": 1056
+          "indexStart": 189972,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 8472,
-          "indexCount": 192
+          "indexStart": 6024,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12480,
-          "indexCount": 120
+          "indexStart": 10992,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 64704,
-          "indexCount": 2064
+          "indexStart": 62304,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 26",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 193092,
-          "indexCount": 1056
+          "indexStart": 190692,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 8664,
-          "indexCount": 192
+          "indexStart": 6096,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12600,
-          "indexCount": 120
+          "indexStart": 11064,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 66768,
-          "indexCount": 2064
+          "indexStart": 64092,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 27",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 194148,
-          "indexCount": 1056
+          "indexStart": 191412,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 8856,
-          "indexCount": 192
+          "indexStart": 6168,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12720,
-          "indexCount": 120
+          "indexStart": 11136,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 68832,
-          "indexCount": 2064
+          "indexStart": 65880,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 28",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 195204,
-          "indexCount": 1056
+          "indexStart": 192132,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 9048,
-          "indexCount": 192
+          "indexStart": 6240,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12840,
-          "indexCount": 120
+          "indexStart": 11208,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 70896,
-          "indexCount": 2064
+          "indexStart": 67668,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 29",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 196260,
-          "indexCount": 1056
+          "indexStart": 192852,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 9240,
-          "indexCount": 192
+          "indexStart": 6312,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 12960,
-          "indexCount": 120
+          "indexStart": 11280,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 72960,
-          "indexCount": 2064
+          "indexStart": 69456,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 30",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 197316,
-          "indexCount": 1056
+          "indexStart": 193572,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 9432,
-          "indexCount": 192
+          "indexStart": 6384,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13080,
-          "indexCount": 120
+          "indexStart": 11352,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 75024,
-          "indexCount": 2064
+          "indexStart": 71244,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 31",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 198372,
-          "indexCount": 1056
+          "indexStart": 194292,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 9624,
-          "indexCount": 192
+          "indexStart": 6456,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13200,
-          "indexCount": 120
+          "indexStart": 11424,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 77088,
-          "indexCount": 2064
+          "indexStart": 73032,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 32",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 199428,
-          "indexCount": 1056
+          "indexStart": 195012,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 9816,
-          "indexCount": 192
+          "indexStart": 6528,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13320,
-          "indexCount": 120
+          "indexStart": 11496,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 79152,
-          "indexCount": 2064
+          "indexStart": 74820,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 33",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 200484,
-          "indexCount": 1056
+          "indexStart": 195732,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10008,
-          "indexCount": 192
+          "indexStart": 6600,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13440,
-          "indexCount": 120
+          "indexStart": 11568,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 81216,
-          "indexCount": 2064
+          "indexStart": 76608,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 34",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 201540,
-          "indexCount": 1056
+          "indexStart": 196452,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10200,
-          "indexCount": 192
+          "indexStart": 6672,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13560,
-          "indexCount": 120
+          "indexStart": 11640,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 83280,
-          "indexCount": 2064
+          "indexStart": 78396,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 35",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 202596,
-          "indexCount": 1056
+          "indexStart": 197172,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10392,
-          "indexCount": 192
+          "indexStart": 6744,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13680,
-          "indexCount": 120
+          "indexStart": 11712,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 85344,
-          "indexCount": 2064
+          "indexStart": 80184,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 36",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 203652,
-          "indexCount": 1056
+          "indexStart": 197892,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10584,
-          "indexCount": 192
+          "indexStart": 6816,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13800,
-          "indexCount": 120
+          "indexStart": 11784,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 87408,
-          "indexCount": 2064
+          "indexStart": 81972,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 37",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 204708,
-          "indexCount": 1056
+          "indexStart": 198612,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10776,
-          "indexCount": 192
+          "indexStart": 6888,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 13920,
-          "indexCount": 120
+          "indexStart": 11856,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 89472,
-          "indexCount": 2064
+          "indexStart": 83760,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 38",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 205764,
-          "indexCount": 1056
+          "indexStart": 199332,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 10968,
-          "indexCount": 192
+          "indexStart": 6960,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14040,
-          "indexCount": 120
+          "indexStart": 11928,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 91536,
-          "indexCount": 2064
+          "indexStart": 85548,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 39",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 206820,
-          "indexCount": 1056
+          "indexStart": 200052,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 11160,
-          "indexCount": 192
+          "indexStart": 7032,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14160,
-          "indexCount": 120
+          "indexStart": 12000,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 93600,
-          "indexCount": 2064
+          "indexStart": 87336,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 40",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 207876,
-          "indexCount": 1056
+          "indexStart": 200772,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 11352,
-          "indexCount": 192
+          "indexStart": 7104,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14280,
-          "indexCount": 120
+          "indexStart": 12072,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 95664,
-          "indexCount": 2064
+          "indexStart": 89124,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 41",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 208932,
-          "indexCount": 1056
+          "indexStart": 201492,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 11544,
-          "indexCount": 192
+          "indexStart": 7176,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14400,
-          "indexCount": 120
+          "indexStart": 12144,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 97728,
-          "indexCount": 2064
+          "indexStart": 90912,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 42",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 209988,
-          "indexCount": 1056
+          "indexStart": 202212,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 11736,
-          "indexCount": 192
+          "indexStart": 7248,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14520,
-          "indexCount": 120
+          "indexStart": 12216,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 99792,
-          "indexCount": 2064
+          "indexStart": 92700,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 43",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 211044,
-          "indexCount": 1056
+          "indexStart": 202932,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 11928,
-          "indexCount": 192
+          "indexStart": 7320,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14640,
-          "indexCount": 120
+          "indexStart": 12288,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 101856,
-          "indexCount": 2064
+          "indexStart": 94488,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 44",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 212100,
-          "indexCount": 1056
+          "indexStart": 203652,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 12120,
-          "indexCount": 192
+          "indexStart": 7392,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14760,
-          "indexCount": 120
+          "indexStart": 12360,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 103920,
-          "indexCount": 2064
+          "indexStart": 96276,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 45",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 213156,
-          "indexCount": 1056
+          "indexStart": 204372,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 12312,
-          "indexCount": 192
+          "indexStart": 7464,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 14880,
-          "indexCount": 120
+          "indexStart": 12432,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 105984,
-          "indexCount": 2064
+          "indexStart": 98064,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 46",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 214212,
-          "indexCount": 1056
+          "indexStart": 205092,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 12504,
-          "indexCount": 192
+          "indexStart": 7536,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 15000,
-          "indexCount": 120
+          "indexStart": 12504,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 108048,
-          "indexCount": 2064
+          "indexStart": 99852,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 47",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 215268,
-          "indexCount": 1056
+          "indexStart": 205812,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 12696,
-          "indexCount": 192
+          "indexStart": 7608,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 15120,
-          "indexCount": 120
+          "indexStart": 12576,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 110112,
-          "indexCount": 2064
+          "indexStart": 101640,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 48",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 216324,
-          "indexCount": 1056
+          "indexStart": 206532,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 12888,
-          "indexCount": 192
+          "indexStart": 7680,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 15240,
-          "indexCount": 120
+          "indexStart": 12648,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 112176,
-          "indexCount": 2064
+          "indexStart": 103428,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
-      "triangles": 3272,
+      "triangles": 2816,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 217380,
-          "indexCount": 816
+          "indexStart": 207252,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 13080,
-          "indexCount": 840
+          "indexStart": 7752,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 114240,
-          "indexCount": 8160
+          "indexStart": 105216,
+          "indexCount": 6120
         }
       ]
     },
     {
       "name": "Funnel 2 with curved open uptake, cap, steam pipes and stays",
-      "triangles": 3272,
+      "triangles": 2816,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 218196,
-          "indexCount": 816
+          "indexStart": 208500,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 13920,
-          "indexCount": 840
+          "indexStart": 8832,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 122400,
-          "indexCount": 8160
+          "indexStart": 111336,
+          "indexCount": 6120
         }
       ]
     },
     {
       "name": "Mast 1 with taper, yards, rigging and access ladder",
-      "triangles": 8384,
+      "triangles": 6372,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 219012,
-          "indexCount": 3840
+          "indexStart": 209748,
+          "indexCount": 3132
         },
         {
           "material": "steel",
-          "indexStart": 130560,
-          "indexCount": 21312
+          "indexStart": 117456,
+          "indexCount": 15984
         }
       ]
     },
     {
       "name": "Mast 2 with taper, yards, rigging and access ladder",
-      "triangles": 8384,
+      "triangles": 6372,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 222852,
-          "indexCount": 3840
+          "indexStart": 212880,
+          "indexCount": 3132
         },
         {
           "material": "steel",
-          "indexStart": 151872,
-          "indexCount": 21312
+          "indexStart": 133440,
+          "indexCount": 15984
         }
       ]
     },
     {
       "name": "Mast 3 with taper, yards, rigging and access ladder",
-      "triangles": 3776,
+      "triangles": 2916,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 226692,
-          "indexCount": 3840
+          "indexStart": 216012,
+          "indexCount": 3132
         },
         {
           "material": "steel",
-          "indexStart": 173184,
-          "indexCount": 7488
+          "indexStart": 149424,
+          "indexCount": 5616
         }
       ]
     },
     {
       "name": "Open boat 1 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 230532,
-          "indexCount": 2688
+          "indexStart": 219144,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 5796,
+          "indexStart": 5604,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 180672,
-          "indexCount": 192
+          "indexStart": 155040,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -3060,22 +3120,22 @@
     },
     {
       "name": "Open boat 2 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 233220,
-          "indexCount": 2688
+          "indexStart": 221544,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 6276,
+          "indexStart": 6084,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 180864,
-          "indexCount": 192
+          "indexStart": 155184,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -3086,22 +3146,22 @@
     },
     {
       "name": "Open boat 3 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 235908,
-          "indexCount": 2688
+          "indexStart": 223944,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 6756,
+          "indexStart": 6564,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 181056,
-          "indexCount": 192
+          "indexStart": 155328,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -3112,22 +3172,22 @@
     },
     {
       "name": "Open boat 4 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 238596,
-          "indexCount": 2688
+          "indexStart": 226344,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 7236,
+          "indexStart": 7044,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 181248,
-          "indexCount": 192
+          "indexStart": 155472,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -3138,101 +3198,101 @@
     },
     {
       "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
-      "triangles": 18800,
+      "triangles": 18504,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 241284,
+          "indexStart": 228744,
           "indexCount": 26688
         },
         {
           "material": "boot",
-          "indexStart": 14760,
+          "indexStart": 9912,
           "indexCount": 3360
         },
         {
           "material": "steel",
-          "indexStart": 181440,
-          "indexCount": 26352
+          "indexStart": 155616,
+          "indexCount": 25464
         }
       ]
     },
     {
       "name": "Deck edge stanchions, lifelines and hull portholes",
-      "triangles": 66176,
+      "triangles": 52088,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 267972,
-          "indexCount": 110208
+          "indexStart": 255432,
+          "indexCount": 87264
         },
         {
           "material": "brass",
-          "indexStart": 15360,
-          "indexCount": 44160
+          "indexStart": 12720,
+          "indexCount": 35880
         },
         {
           "material": "glass",
-          "indexStart": 12528,
-          "indexCount": 44160
+          "indexStart": 10800,
+          "indexCount": 33120
         }
       ]
     },
     {
       "name": "catapult lattice frame and drive machinery",
-      "triangles": 1952,
+      "triangles": 1712,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 378180,
-          "indexCount": 5856
+          "indexStart": 342696,
+          "indexCount": 5136
         }
       ]
     },
     {
       "name": "catapult lattice frame and drive machinery",
-      "triangles": 1952,
+      "triangles": 1712,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 384036,
-          "indexCount": 5856
+          "indexStart": 347832,
+          "indexCount": 5136
         }
       ]
     },
     {
       "name": "crane-boom lattice frame and drive machinery",
-      "triangles": 2952,
+      "triangles": 2616,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 389892,
-          "indexCount": 7776
+          "indexStart": 352968,
+          "indexCount": 6816
         },
         {
           "material": "steel",
-          "indexStart": 207792,
-          "indexCount": 1080
+          "indexStart": 181080,
+          "indexCount": 1032
         }
       ]
     },
     {
       "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
-      "triangles": 1984,
+      "triangles": 1936,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 397668,
-          "indexCount": 3120
+          "indexStart": 359784,
+          "indexCount": 2976
         },
         {
           "material": "brass",
-          "indexStart": 59520,
+          "indexStart": 48600,
           "indexCount": 1872
         },
         {
           "material": "steel",
-          "indexStart": 208872,
+          "indexStart": 182112,
           "indexCount": 960
         }
       ]

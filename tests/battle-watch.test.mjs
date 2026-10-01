@@ -7,6 +7,19 @@ const group = (id, count, sunk = 0) => ({id, classId:'queen_elizabeth', name:'Gr
 const frame = (at, groupsA = [group('a',3)], groupsB = [group('b',2)]) => ({at, stage:3, round:1, label:'Main action', status:'ongoing', groupsA, groupsB, lossesA:losses, lossesB:losses, deltaA:losses, deltaB:losses});
 const report = () => ({id:1,a:'GBR',b:'JPN',startedAt:100,status:'ongoing',replay:{frames:[frame(100),frame(115,[group('a',3,2)])]}});
 
+test('battle heading preserves recorded round totals without appending a duplicate round', () => {
+  const r = report();
+  for (const round of [1,2]) {
+    const label = 'Main engagement · round ' + round + ' / 2';
+    Object.assign(r.replay.frames.at(-1),{label,round});
+    assert.equal(battleWatchView(r,'campaign_1922').match(/<h3>(.*?)<\/h3>/)[1],label);
+  }
+  r.replay.frames.at(-1).label = 'Main action';
+  assert.match(battleWatchView(r,'campaign_1922'),/<h3>Main action · round 2<\/h3>/,'Older stage-only labels retain their round number');
+  Object.assign(r.replay.frames.at(-1),{stage:2,label:'Opening exchange'});
+  assert.match(battleWatchView(r,'campaign_1922'),/<h3>Opening exchange<\/h3>/);
+});
+
 test('battle frames clamp playback indices and never invent a chronology for older reports', () => {
   const r = report();
   assert.equal(watchFrame(r).frame.at,115);

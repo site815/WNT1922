@@ -28,12 +28,12 @@
       "path": "assets/maps/geometry.json",
       "title": "Natural Earth shared map geometry",
       "source": "https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-details/",
-      "changes": "Extracted and deduplicated geometry; authored names and political ownership are in campaign Markdown catalogs.",
+      "changes": "Extracted and deduplicated geometry with source coastal and shared administrative border vertices restored between retained endpoints; authored historical cuts and campaign identities preserved. Reproduce with tools/restore-map-coastlines.mjs, then --shared-borders.",
       "creator": "Natural Earth contributors; game overlays by WNT1922",
       "license": "Public domain",
       "licenseUrl": "https://www.naturalearthdata.com/about/terms-of-use/",
-      "sha256": "5d953b9893a13bd1d8eadc12c2c7e1991cff6758d4c72e434c1537b099e39f7a",
-      "bytes": 560211
+      "sha256": "ffa2aa2ae3f1e98ab80e76e62e02b73b11d75480909548520b4c752087b8f017",
+      "bytes": 1824577
     },
     {
       "path": "assets/maps/navigation-mask.geojson",

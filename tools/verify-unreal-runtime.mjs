@@ -248,7 +248,7 @@ try {
  await until(()=>diagnostics(),after=>after.zoom>before.zoom,{label:'real keyboard zoom'});
  await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'strategic Home'});
  const warshipForce=packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.some(h=>['BB','BC','CV'].includes(h.type)))||packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.length);
- assert(warshipForce);await focusOwnForce(warshipForce);await nativeCapture('native-fleet');
+ assert(warshipForce);await focusOwnForce(warshipForce);assert.equal((await diagnostics()).tilt,0,'Fleet view remains overhead');await nativeCapture('native-fleet');
  const hovered=await pick('ship',{hover:true});
  await page.locator('.class-hover:not([hidden])').waitFor();
  // The tooltip has an intentional dwell delay and may still contain the
@@ -264,10 +264,12 @@ try {
  await page.locator('.modal [data-action="close"]').first().click();await worldReady();
  await focusOwnForce(warshipForce,60000);await nativeCapture('native-ship');
  const beforeTilt=await diagnostics(),p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+38,p.y+40,{steps:8});await page.mouse.up({button:'right'});
- if(Number.isFinite(beforeTilt.tilt))await until(()=>diagnostics(),d=>d.tilt!==beforeTilt.tilt,{label:'real right-drag changes native tilt'});
- assert.equal(await page.locator('.modal').count(),0,'An orbit gesture must not open a selection dialog');
+ assert(beforeTilt.tilt>0&&beforeTilt.tilt<=beforeTilt.maxWorldTilt,'Individual ship zoom chooses its inspection tilt automatically');
+ const afterPan=await until(()=>diagnostics(),d=>Math.abs(d.longitude-beforeTilt.longitude)>1e-10||Math.abs(d.latitude-beforeTilt.latitude)>1e-10,{label:'real right-drag pans the native map'});
+ assert(Math.abs(afterPan.tilt-beforeTilt.tilt)<.01,'Right drag preserves automatic inspection tilt');
+ assert.equal(await page.locator('.modal').count(),0,'A pan gesture must not open a selection dialog');
  await nativeCapture('native-ship-tilted');
- result.checks.push('Real wheel/PageUp/Home input changes the native camera; own fleet focus, native surface hover and ship click reach exact game inspections; right drag does not click.');
+ result.checks.push('Real wheel/PageUp/Home input changes the native camera; fleet view stays overhead, ship zoom tilts automatically, and right drag pans without changing tilt or selecting. Native hull hover/click reach exact game inspections.');
  result.metrics.push({kind:'hovered-ship',selection:hovered});
 
  phase='merchant hulls';
@@ -311,7 +313,15 @@ try {
  await page.reload({waitUntil:'domcontentloaded'});eventCursor=0;
  await page.locator('[data-action="continue"]').click();await dismissDispatches();await worldReady();
  assert.equal(await page.locator('[data-dialog-type="battle-watch"]').count(),0,'A decisive action alerts without opening the viewer automatically');
- await page.locator('.decisive-alert [data-action="watch-battle"]').click();
+ // Diagnostics exposes a bounded set of ray-tested targets. Bring the actual
+ // engagement into view before picking; Home can put it beyond a narrow
+ // viewport or behind the first 24 strategic port/convoy targets.
+ await input('focus',{longitude:engagement.position[0],latitude:engagement.position[1],zoom:12});
+ await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-12)<.001,{label:'regional battle location'});
+ await until(()=>diagnostics('world'),d=>d.targets.some(t=>t.kind==='battle'&&String(t.id)===String(engagement.id)),{label:'ongoing decisive map marker'});
+ await nativeCapture('native-campaign-battle-marker');
+ const battlePick=await pick('battle');
+ assert.equal(String(battlePick.id),String(engagement.id),'Map marker selects its own live engagement');
  const watch=page.locator('[data-dialog-type="battle-watch"]');await watch.waitFor();
  await watch.locator('.battle-stage').scrollIntoViewIfNeeded();
  await until(()=>diagnostics('battle'),d=>d.targets.some(t=>t.kind==='battle-ship'),{label:'campaign battle native hulls'});
@@ -331,7 +341,7 @@ try {
  assert.equal(recording.replay.frames.at(-1).at,campaignMinutes(watched));
  await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(watched));
  result.metrics.push({kind:'campaign-battle-watch',reportId:engagement.id,minutesAdvanced:15,ticksAdvanced:1,paused:watched.paused,frames:recording.replay.frames.length});
- result.checks.push('A real decisive engagement raises an optional alert; native battle selection works, live Next tick advances exactly 15 campaign minutes once, recorded replay advances no time, and closing keeps the campaign paused.');
+ result.checks.push('A real decisive engagement raises an optional alert and a clickable native map badge; selecting that badge opens its battle, live Next tick advances exactly 15 campaign minutes once, recorded replay advances no time, and closing keeps the campaign paused.');
  await collectEvidence();
  assert(!contexts.some(type=>/webgl|experimental-webgl/i.test(type)),'Unreal mode must not create a browser WebGL scene');
  result.metrics.push({kind:'browser-context-requests',contexts});

@@ -128,10 +128,14 @@ FVector2D WrappedFocus(const FVector& Point,double Meridian)
 }
 double MaxWorldTilt(double Zoom)
 {
-    // Strategic navigation stays north-up and overhead. Tilt opens gradually
-    // only when individual hulls are large enough to inspect (about 16 km).
-    const double T=FMath::Clamp(FMath::Log2(FMath::Max(1.0,Zoom)/2048.0),0.0,1.0);
-    return 70.0*T*T*(3.0-2.0*T);
+    // Automatic framing begins only at individual-hull scale. Keep fleets and
+    // all strategic navigation north-up; no user pitch state survives zooming.
+    const double T=FMath::Clamp(FMath::Log2(FMath::Max(1.0,Zoom)/16384.0),0.0,1.0);
+    return 52.0*T*T*(3.0-2.0*T);
+}
+bool NeedsOriginRebase(double Longitude,double Meridian)
+{
+    return FMath::Abs(WNTProjection::WrapLongitude(Longitude-Meridian))>45.0;
 }
 }
 
@@ -237,6 +241,8 @@ void AWNTPlayerController::StartHost()
 void AWNTPlayerController::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    if(FrameSamples.Num()<240)FrameSamples.Add(DeltaSeconds*1000.0);
+    else {FrameSamples[FrameSampleCursor]=DeltaSeconds*1000.0;FrameSampleCursor=(FrameSampleCursor+1)%240;}
     if (HostProcess.IsValid() && !bHostFailed)
     {
         const FString Output = FPlatformProcess::ReadPipe(HostRead);
@@ -275,7 +281,6 @@ void AWNTPlayerController::Tick(float DeltaSeconds)
     {
         const double Difference=FMath::Loge(TargetZoom/Zoom);
         Zoom=FMath::Abs(Difference)<.001?TargetZoom:Zoom*FMath::Exp(Difference*(1-FMath::Exp(-18.0*FMath::Min(double(DeltaSeconds),.1))));
-        if(Mode!=TEXT("battle"))Tilt=FMath::Min(Tilt,WNTCameraMath::MaxWorldTilt(Zoom));
         if(bHasZoomAnchor)
         {
             if(Mode!=TEXT("battle"))ZoomAnchor.Y-=WNTProjection::WrapLongitude(Meridian-ZoomAnchorMeridian)/360.0*WNTProjection::WorldWidth;
@@ -430,7 +435,7 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
     // bright sky border beyond the finite north/south edges of the chart.
     const double WorldDistance=WNTProjection::WorldWidth*.5*ViewRect.W/(2*FMath::Tan(FMath::DegreesToRadians(22.5)))*.99;
     const double Distance = (Battle ? BattleDistance : WorldDistance) / Zoom;
-    const double Angle = Battle ? BattleTilt : FMath::Min(Tilt,WNTCameraMath::MaxWorldTilt(Zoom));
+    const double Angle = Battle ? BattleTilt : WNTCameraMath::MaxWorldTilt(Zoom);
     FVector Target = BattleTarget;
     if (!Battle)
     {
@@ -510,9 +515,11 @@ void AWNTPlayerController::MoveCameraTarget(const FVector& Offset)
     if(Mode==TEXT("battle")){BattleTarget+=FVector(Offset.X,Offset.Y,0);return;}
     const FVector Position=WNTProjection::Forward(FocusGeo,Meridian)+FVector(Offset.X,Offset.Y,0);
     FocusGeo=WNTCameraMath::WrappedFocus(Position,Meridian);
-    // Keep the rendered world copy centered on the camera. The fixed terrain
-    // translates without mesh work, and nearby actors stay on the visible copy.
-    Meridian=FocusGeo.X;WorldScene->SetCentralMeridian(Meridian);
+    // Move the camera across stable geometry. Rebasing every pointer event used
+    // to move hundreds of tiles/markers and erase temporal history every frame.
+    // Three world copies allow ordinary pans without changing their transforms.
+    if(WNTCameraMath::NeedsOriginRebase(FocusGeo.X,Meridian))
+    {Meridian=FocusGeo.X;WorldScene->SetCentralMeridian(Meridian);}
 }
 
 void AWNTPlayerController::AnchorPoint(const FVector& Original,const FVector2D& Pointer)
@@ -569,7 +576,10 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     if(Action==TEXT("zoom")||Action==TEXT("pan")||Action==TEXT("tilt"))Anchor=SurfacePoint(Action==TEXT("zoom")?Pointer:Previous,true);
     if (Action == TEXT("zoom"))
     {
-        TargetZoom=FMath::Clamp(TargetZoom*FMath::Exp(-Number(Packet,TEXT("delta"))*.0015),Battle?.1:1.,Battle?1000.:1000000.);
+        // Gallery fitting scales to each hull's authored dimensions, including
+        // small torpedo boats. The ship-distance cap applies to the world map.
+        const double Maximum=Battle?1000.0:WNTCameraMath::MaxWorldZoom;
+        TargetZoom=FMath::Clamp(TargetZoom*FMath::Exp(-Number(Packet,TEXT("delta"))*.0015),Battle?.1:1.,Maximum);
         bHasZoomAnchor=Anchor.IsSet();ZoomPointer=Pointer;
         if(bHasZoomAnchor){ZoomAnchor=Anchor.GetValue();ZoomAnchorMeridian=Meridian;}
         return;
@@ -577,7 +587,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     else if (Action == TEXT("tilt"))
     {
         if (Battle) { BattleTilt = FMath::Clamp(BattleTilt + Number(Packet, TEXT("dy")) * .25, 10., 85.); BattleYaw -= Number(Packet, TEXT("dx")) * .3; }
-        else {if(WNTCameraMath::MaxWorldTilt(Zoom)<=0)return;Tilt = FMath::Clamp(Tilt + Number(Packet, TEXT("dy")) * .25, 0., WNTCameraMath::MaxWorldTilt(Zoom));}
+        else return; // World pitch is determined solely by the inspection scale.
     }
     else if (Action == TEXT("pan"))
     {
@@ -588,7 +598,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     {
         if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
         if (Battle) FitBattle();
-        else { Zoom = 1; Tilt = 0; FocusGeo = FVector2D::ZeroVector; Meridian = 0; WorldScene->SetCentralMeridian(0); }
+        else { Zoom = 1; FocusGeo = FVector2D::ZeroVector; Meridian = 0; WorldScene->SetCentralMeridian(0); }
     }
     else if (Action == TEXT("focus"))
     {
@@ -602,7 +612,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         {
             FocusGeo = FVector2D(WNTProjection::WrapLongitude(Number(Packet, TEXT("longitude"))), FMath::Clamp(Number(Packet, TEXT("latitude")), -89.9, 89.9));
             Meridian = FocusGeo.X; WorldScene->SetCentralMeridian(Meridian);
-            Zoom = FMath::Clamp(Number(Packet, TEXT("zoom"), 6000), 1., 1000000.);
+            Zoom = FMath::Clamp(Number(Packet, TEXT("zoom"), 6000), 1., WNTCameraMath::MaxWorldZoom);
         }
     }
     if(Anchor.IsSet())AnchorPoint(Anchor.GetValue(),Pointer);
@@ -662,6 +672,15 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetBoolField(TEXT("windowMaximized"),Window.IsValid()&&Window.Pin()->IsWindowMaximized());
     Event->SetNumberField(TEXT("targetZoom"),TargetZoom);
     Event->SetNumberField(TEXT("maxWorldTilt"),WNTCameraMath::MaxWorldTilt(Zoom));
+    Event->SetNumberField(TEXT("maxWorldZoom"),WNTCameraMath::MaxWorldZoom);
+    Event->SetNumberField(TEXT("centralMeridian"),Meridian);
+    if(!FrameSamples.IsEmpty())
+    {
+        auto Sorted=FrameSamples;Sorted.Sort();double Total=0;for(double Sample:Sorted)Total+=Sample;
+        Event->SetNumberField(TEXT("frameMeanMs"),Total/Sorted.Num());
+        Event->SetNumberField(TEXT("frameP95Ms"),Sorted[FMath::Min(Sorted.Num()-1,FMath::FloorToInt(Sorted.Num()*.95))]);
+        Event->SetNumberField(TEXT("frameSampleCount"),Sorted.Num());
+    }
     int32 PrimitiveCount=0,VisiblePrimitives=0,ShadowPrimitives=0;
     for(TActorIterator<AActor> It(GetWorld());It;++It)
     {
@@ -749,6 +768,9 @@ void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHov
         }
     }
     auto Event = MakeShared<FJsonObject>(); Event->SetStringField(TEXT("type"), bHover ? TEXT("hover") : TEXT("select"));
+    // The interface rejects hover replies superseded by camera or pointer input.
+    // Echo on misses too, so a current empty pick can clear the previous tooltip.
+    if (bHover) Event->SetNumberField(TEXT("requestId"), Number(Packet, TEXT("requestId")));
     Event->SetNumberField(TEXT("x"), Number(Packet, TEXT("x"))); Event->SetNumberField(TEXT("y"), Number(Packet, TEXT("y")));
     bool bZoom=false;Packet->TryGetBoolField(TEXT("zoom"),bZoom);Event->SetBoolField(TEXT("zoom"),bZoom);
     if (Selection.IsValid()) Event->SetObjectField(TEXT("selection"), Selection);

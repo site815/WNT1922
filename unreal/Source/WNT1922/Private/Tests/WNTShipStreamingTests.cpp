@@ -1,6 +1,7 @@
 #if WITH_DEV_AUTOMATION_TESTS
 #include "WNTShipActor.h"
 #include "WNTWorldActor.h"
+#include "CoreGlobals.h"
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Engine/World.h"
@@ -53,6 +54,14 @@ bool FWNTShipStreamingTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("A nearby missing file becomes an explicit load error"),Ship->HasModelLoadError()&&!Ship->IsModelDeferred()&&!Ship->IsModelPending());
     Ship->SetPendingModel();
     TestTrue(TEXT("Pending art removes the declared model reference"),Ship->IsModelPending()&&!Ship->IsModelDeferred()&&!Ship->HasModelLoadError());
+    Ship->SetModelReference(FPaths::Combine(Root,TEXT("assets/models/ships/usa/farragut_dd34.glb")));
+    Ship->RefreshModelForCamera(FVector(100000,0,0),false);
+    TestTrue(TEXT("A second cold class waits instead of hitching the same frame"),Ship->IsModelDeferred());
+    {
+        TGuardValue<uint64> NextFrame(GFrameCounter,GFrameCounter+1);
+        Ship->RefreshModelForCamera(FVector(100000,0,0),false);
+        TestTrue(TEXT("Queued visible hull loads on the next frame"),Ship->HasRenderableModel());
+    }
     return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTShipSceneResidencyTest,"WNT.Ships.SceneTransitionResidency",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)

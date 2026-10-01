@@ -1,14 +1,14 @@
 // Optional authoring; the game loads the finished GLB directly without rebuilding.
 // Original three-island freighter reconstruction from the companion 1920 plans.
 import fs from 'node:fs/promises';
+import {writeStoredAsset} from '../assets/models/authoring/write-stored-asset.mjs';
 import {validateDetailedShip} from './check-models.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {createAuthoredMesh} from '../assets/models/authoring/authored-mesh.mjs';
+import {createNavalMesh} from '../assets/models/authoring/fleet-materials.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const spec=JSON.parse(await fs.readFile(path.join(root,'assets/models/source/hog-island-1022.json'),'utf8'));
-const {groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,house,rail,ladder,addTexture,makeGlb}=createAuthoredMesh(spec);
-for(const [name,file,mime]of [['paint-albedo','naval-paint/albedo.png','image/png'],['paint-normal','blue_metal_plate/blue_metal_plate_nor_gl_1k.png','image/png'],['paint-orm','blue_metal_plate/blue_metal_plate_arm_1k.jpg','image/jpeg']])addTexture(name,await fs.readFile(path.join(root,'assets/models/textures',file)),mime);
+const {groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,house,rail,ladder,addTexture,makeGlb}=await createNavalMesh(spec);
 const {length:L,beam:B,draft:D}=spec.dimensions;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,t)=>a+(b-a)*t;
 function curve(t,k){
@@ -252,7 +252,7 @@ if(!process.argv.includes('--write'))throw Error('Pass --write to author the fin
 const output=path.join(root,'assets/models/ships/generic/hog-island-1022.glb');
 const completedGlb=makeGlb();
 const statistics=validateDetailedShip(completedGlb,{id:spec.id,metadata:spec});
-await fs.writeFile(output,completedGlb);
-const summary={id:spec.id,file:path.relative(root,output).replaceAll('\\','/'),triangles:[...groups.values()].reduce((n,g)=>n+g.indices.length/3,0),vertices:[...groups.values()].reduce((n,g)=>n+g.positions.length/3,0),materials:groups.size,components:parts.length,auditedHullVertices,bytes:(await fs.stat(output)).size};
-await fs.writeFile(output.replace(/\.glb$/,'.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/source/hog-island-1022.json',exporter:'tools/author-hog-island-model.mjs',summary,statistics,components:parts},null,2)+'\n');
+await writeStoredAsset(output,completedGlb);
+const summary={id:spec.id,file:path.relative(root,output).replaceAll('\\','/'),triangles:[...groups.values()].reduce((n,g)=>n+g.indices.length/3,0),vertices:statistics.vertices,materials:groups.size,components:parts.length,auditedHullVertices,bytes:(await fs.stat(output)).size};
+await writeStoredAsset(output.replace(/\.glb$/,'.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/source/hog-island-1022.json',exporter:'tools/author-hog-island-model.mjs',summary,statistics,components:parts},null,2)+'\n');
 console.log(JSON.stringify(summary));

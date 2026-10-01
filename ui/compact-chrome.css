@@ -127,6 +127,15 @@
 .map-scene .game-body .resource-bar .resource-reserve { font-size: 10px; line-height: 10px; }
 .map-scene .game-body .resource-bar .resource-change { margin-top: 0; font-size: 9px; line-height: 10px; }
 .map-scene .game-body .resource-bar .resource-war strong { font-size: 10px; line-height: 11px; }
+/* At the minimum native window size (900 CSS px at 200% DPI), eight
+   resource columns fit. Give the six-opponent war summary the two remaining
+   cells in its nine-column row, and wrap longer rates without hiding text. */
+@container game-body (min-width: 681px) and (max-width: 1450px) {
+  .map-scene .game-body .resource-bar .resource-war { grid-column: span 2; }
+}
+@container game-body (max-width: 800px) {
+  .map-scene .game-body .resource-bar .resource-change { white-space: normal; overflow: visible; text-overflow: clip; }
+}
 
 /* Wrap control groups only when a complete single line no longer fits. */
 @container game-body (max-width: 1000px) {
@@ -148,3 +157,10 @@
   .map-scene .time-bar .actual-speed { width: 76px; min-width: 76px; max-width: 76px; }
   .map-scene .time-bar .header-audio { flex-wrap: wrap; justify-content: flex-end; }
 }
+
+/* The outliner remains narrow; its title and count use separate lines rather
+   than spilling into the map or vanishing behind the panel edge. */
+.map-scene .command-side-panel > .panel-title { flex-wrap:wrap; align-items:baseline; }
+.map-scene .command-side-panel > .panel-title h2,
+.map-scene .command-side-panel > .panel-title > span { white-space:normal; }
+.map-scene .command-side-panel > .panel-title > span { margin-left:0; }

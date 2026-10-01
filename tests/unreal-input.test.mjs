@@ -1,0 +1,154 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { UnrealWorldScene, UnrealBattleScene } from '../ui/unreal-scene.mjs';
+
+// Exercise the actual input listeners without a browser or native renderer.
+class Surface {
+  constructor() { this.listeners = new Map(); this.captured = new Set(); this.classList = {add() {}}; this.isConnected = true; }
+  addEventListener(type, listener, options = {}) {
+    const entries = this.listeners.get(type) || [];
+    entries.push({listener, signal:options.signal}); this.listeners.set(type, entries);
+  }
+  emit(type, properties = {}) {
+    const event = {button:0, pointerId:1, clientX:100, clientY:100, shiftKey:false,
+      preventDefault() {this.defaultPrevented = true;}, ...properties};
+    for (const {listener, signal} of this.listeners.get(type) || []) if (!signal?.aborted) listener(event);
+    return event;
+  }
+  focus(options) {this.focusOptions = options;}
+  setPointerCapture(id) {this.captured.add(id);}
+  hasPointerCapture(id) {return this.captured.has(id);}
+  releasePointerCapture(id) {this.captured.delete(id);}
+  getBoundingClientRect() {return {left:0,top:0,right:1000,bottom:500,width:1000,height:500};}
+}
+
+function fixture(t, mode = 'world') {
+  const previous = new Map();
+  for (const [key, value] of Object.entries({innerWidth:1000, innerHeight:500,
+    window:new Surface(), document:Object.assign(new Surface(),{
+      documentElement:{dataset:{}}, querySelectorAll:()=>[], body:{prepend() {}},
+      createElement:()=>({isConnected:true,style:{},remove() {}}),
+    }),
+    ue:{wnt:{viewport() {}}},
+    ResizeObserver:class {observe() {} disconnect() {}},
+  })) {
+    previous.set(key, Object.getOwnPropertyDescriptor(globalThis,key));
+    Object.defineProperty(globalThis,key,{value, configurable:true, writable:true});
+  }
+  const Scene = mode === 'battle' ? UnrealBattleScene : UnrealWorldScene;
+  const scene = new Scene({root:{querySelector:()=>null}, chart:() => ({}), active:() => true});
+  const inputs = [], canvas = new Surface();
+  scene.input = (action, values = {}) => {inputs.push({action,...values});};
+  scene.attach(canvas);
+  scene.activate();
+  t.after(() => {
+    scene.destroy();
+    for (const [key, descriptor] of previous) {
+      if (descriptor) Object.defineProperty(globalThis,key,descriptor); else delete globalThis[key];
+    }
+  });
+  return {scene, canvas, inputs};
+}
+
+for (const [label, button, shiftKey] of [['left',0,false],['middle',1,false],['right',2,false],['Shift-left',0,true]]) {
+  test('world '+label+' drag pans and never picks or manually tilts', t => {
+    const {canvas, inputs} = fixture(t);
+    canvas.emit('pointerdown',{button,shiftKey});
+    assert.deepEqual(canvas.focusOptions,{preventScroll:true});
+    assert(canvas.hasPointerCapture(1));
+    canvas.emit('pointermove',{button,shiftKey,clientX:125,clientY:115});
+    canvas.emit('pointerup',{button,shiftKey,clientX:125,clientY:115});
+    assert.deepEqual(inputs,[{action:'pan',dx:25,dy:15,previousX:.1,previousY:.2,x:.125,y:.23}]);
+    assert(!canvas.hasPointerCapture(1));
+  });
+}
+
+for (const [label, button, expected] of [['left',0,['pick']],['middle',1,[]],['right',2,[]]]) {
+  test('world '+label+' click has the correct selection policy', t => {
+    const {canvas, inputs} = fixture(t);
+    canvas.emit('pointerdown',{button});
+    canvas.emit('pointermove',{button,clientX:102,clientY:101});
+    canvas.emit('pointerup',{button,clientX:102,clientY:101});
+    assert.deepEqual(inputs.map(input => input.action),expected);
+    if (expected.length) assert.deepEqual(inputs[0],{action:'pick',x:.102,y:.202});
+  });
+}
+
+for (const [label, button, shiftKey, action] of [['left',0,false,'pan'],['middle',1,false,'pan'],['right',2,false,'tilt'],['Shift-left',0,true,'tilt']]) {
+  test('battle '+label+' drag retains '+action+' inspection control without selecting', t => {
+    const {canvas, inputs} = fixture(t,'battle');
+    canvas.emit('pointerdown',{button,shiftKey});
+    canvas.emit('pointermove',{button,shiftKey,clientX:125,clientY:115});
+    canvas.emit('pointerup',{button,shiftKey,clientX:125,clientY:115});
+    assert.deepEqual(inputs,[{action,dx:25,dy:15,previousX:.1,previousY:.2,x:.125,y:.23}]);
+  });
+}
+
+test('cancelled gestures and detached surfaces cannot select or move the camera', t => {
+  const {scene, canvas, inputs} = fixture(t);
+  canvas.emit('pointerdown'); canvas.emit('pointercancel'); canvas.emit('pointerup');
+  assert.deepEqual(inputs,[]);
+  const replacement = new Surface(); scene.attach(replacement);
+  canvas.emit('pointerdown'); canvas.emit('pointermove',{clientX:150}); canvas.emit('pointerup');
+  assert.deepEqual(inputs,[]);
+  replacement.emit('pointerdown'); replacement.emit('pointerup');
+  assert.deepEqual(inputs,[{action:'pick',x:.1,y:.2}]);
+});
+
+test('world wheel and keyboard controls keep zoom units and cardinal pan direction', t => {
+  const {scene, canvas, inputs} = fixture(t);
+  const hovers=[]; scene.onHover=value=>hovers.push(value);
+  for (const deltaMode of [0,1,2]) assert(canvas.emit('wheel',{deltaY:2,deltaMode}).defaultPrevented);
+  assert.deepEqual(canvas.focusOptions,{preventScroll:true},'Wheel navigation takes focus from the outliner so Home/Page Up work and its focus hover closes');
+  for (const key of ['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'])
+    assert(canvas.emit('keydown',{key}).defaultPrevented);
+  assert.deepEqual(hovers,Array(10).fill(null),'Camera navigation dismisses stale ship information');
+  assert.deepEqual(inputs,[
+    {action:'zoom',delta:2,x:.1,y:.2},{action:'zoom',delta:32,x:.1,y:.2},{action:'zoom',delta:1000,x:.1,y:.2},
+    {action:'home'},{action:'zoom',delta:-300},{action:'zoom',delta:300},
+    {action:'pan',dx:40,dy:0},{action:'pan',dx:-40,dy:0},{action:'pan',dx:0,dy:40},{action:'pan',dx:0,dy:-40},
+  ]);
+});
+
+test('late native hover replies cannot reopen after zoom, and a fresh request works after settling', t => {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const {scene,canvas,inputs}=fixture(t),hovers=[];
+  scene.onHover=(selection,point)=>hovers.push({selection,point});
+  canvas.emit('pointermove');t.mock.timers.tick(70);
+  const old=inputs.find(input=>input.action==='hover');assert(old.requestId>0);
+  canvas.emit('wheel',{deltaY:-300,deltaMode:0});
+  scene.receiveHover({...old,selection:{kind:'country',id:'CHN'}});
+  assert.deepEqual(hovers.map(row=>row.selection),[null],'An in-flight country reply is cancelled by wheel navigation');
+  assert.equal(hovers[0].point.immediate,true);
+  scene.cameraChanged({zoom:10,longitude:0,latitude:0,tilt:0});
+  canvas.emit('pointermove',{clientX:200});t.mock.timers.tick(70);
+  const fresh=inputs.filter(input=>input.action==='hover').at(-1);assert(fresh.requestId>old.requestId);
+  scene.receiveHover({...old,selection:{kind:'country',id:'CHN'}});
+  scene.receiveHover({...fresh,selection:{kind:'ship',id:'current'}});
+  assert.equal(hovers.at(-1).selection.id,'current');
+  const count=hovers.length;
+  scene.cameraChanged({zoom:10,longitude:0,latitude:0,tilt:0});
+  assert.equal(hovers.length,count,'An unchanged camera report leaves a stationary hover visible');
+  scene.cameraChanged({zoom:11,longitude:0,latitude:0,tilt:0});
+  scene.receiveHover({...fresh,selection:{kind:'ship',id:'current'}});
+  assert.equal(hovers.at(-1).selection,null,'A genuine camera change invalidates the previous pick');
+});
+
+test('native hover accepts only the latest pointer request and rejects replies after leaving or switching scenes', t => {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const {scene,canvas,inputs}=fixture(t),hovers=[];scene.onHover=selection=>hovers.push(selection);
+  canvas.emit('pointermove');t.mock.timers.tick(70);
+  const first=inputs.at(-1);
+  canvas.emit('pointermove',{clientX:200});t.mock.timers.tick(70);
+  const second=inputs.at(-1);
+  scene.receiveHover({...first,selection:{id:'stale'}});
+  scene.receiveHover({selection:{id:'untagged'}});
+  assert.deepEqual(hovers,[]);
+  scene.receiveHover({...second,selection:{id:'current'}});assert.equal(hovers.at(-1).id,'current');
+  canvas.emit('pointerleave');scene.receiveHover({...second,selection:{id:'late'}});
+  assert.equal(hovers.at(-1),null);
+  canvas.emit('pointermove');t.mock.timers.tick(70);
+  const third=inputs.at(-1);scene.suspend();
+  scene.receiveHover({...third,selection:{id:'late-scene'}});
+  assert.equal(hovers.at(-1),null);
+});

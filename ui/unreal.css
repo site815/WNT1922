@@ -10,7 +10,15 @@ html.unreal-mode, .unreal-mode body, .unreal-mode #app,
 .unreal-mode .modal[data-dialog-type="battle-watch"] .modal-body {background:transparent!important;}
 .unreal-mode .modal[data-dialog-type="battle-watch"] > header,
 .unreal-mode .modal[data-dialog-type="battle-watch"] > footer {background:#132632;}
-.unreal-mode .battle-watch > :not(.battle-stage) { background:#132632; }
+.unreal-mode .battle-watch-information,
+.unreal-mode .battle-watch-scene > :not(.battle-stage) { background:#132632; }
+/* Native imagery is below the complete browser surface. Do not paint the
+   command workspace through the battle scene's deliberately clear aperture. */
+.unreal-mode[data-unreal-scene="battle"] .game-shell > .world-board,
+.unreal-mode[data-unreal-scene="battle"] .game-shell .workspace { visibility:hidden; }
+@media(max-height:650px) {
+  .unreal-mode[data-unreal-scene="battle"] .game-shell { visibility:hidden; }
+}
 .unreal-mode .start-screen, .unreal-mode .start, .unreal-mode .start-demo, .unreal-mode .start-demo-host { background:transparent!important; }
 .unreal-mode .start > :not(.start-grid), .unreal-mode .start-demo > :not(.start-demo-stage) { background:#111f2b; }
 .unreal-mode .unreal-input:focus-visible {outline:2px solid #d9bd80; outline-offset:-2px;}

@@ -22,6 +22,8 @@ namespace WNTCameraMath
     WNT1922_API void EnsureClearance(FMinimalViewInfo& View, const FVector& Target, TFunctionRef<double(const FVector&)> SurfaceHeight);
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
     WNT1922_API double MaxWorldTilt(double Zoom);
+    constexpr double MaxWorldZoom = 65536.0;
+    WNT1922_API bool NeedsOriginRebase(double Longitude, double Meridian);
 }
 
 UCLASS()
@@ -58,7 +60,9 @@ private:
     FVector2D ZoomPointer = FVector2D(.5,.5);
     double ZoomAnchorMeridian = 0;
     bool bHasZoomAnchor = false;
-    double Tilt = 0, BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
+    double BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
+    TArray<double> FrameSamples;
+    int32 FrameSampleCursor = 0;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;
     bool bClosing = false, bHostFailed = false, bCameraDirty = true;
     bool bOwnsCloseOverride = false;

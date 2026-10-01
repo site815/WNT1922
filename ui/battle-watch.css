@@ -1,13 +1,21 @@
 .modal[data-dialog-type="battle-watch"] { width:min(1500px,calc(100vw - var(--dialog-left,0px) - var(--dialog-right,0px) - 32px)); max-width:none; height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 24px); }
-.battle-watch { min-width:0; }
+.modal[data-dialog-type="battle-watch"] > header { min-height:48px; padding:8px 14px; }
+.modal[data-dialog-type="battle-watch"] > header h2 { font-size:20px; }
+.modal[data-dialog-type="battle-watch"] > footer { min-height:46px; padding:5px 14px; }
+.modal[data-dialog-type="battle-watch"] > footer > button { min-height:34px; }
+.modal[data-dialog-type="battle-watch"] > .modal-body { padding:10px 14px; overflow:hidden; }
+.battle-watch { min-width:0; min-height:0; height:100%; display:grid; grid-template-columns:minmax(0,1fr) clamp(230px,27%,360px); gap:16px; }
+.battle-watch-scene { display:grid; grid-template-rows:auto auto minmax(100px,1fr) auto; min-width:0; min-height:0; }
+.battle-watch-information { min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; padding:0 8px; scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
+.battle-watch-information .battle-side-ledger,.battle-watch-information .battle-rosters { grid-template-columns:1fr; }
 .battle-watch-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .battle-watch-heading h3 { margin:4px 0; font-size:20px; }
 .battle-watch-heading > strong { white-space:nowrap; color:var(--gold); font-variant-numeric:tabular-nums; }
 .battle-qualification { color:var(--muted); margin:6px 0 10px; font-size:13px; line-height:1.4; }
-.battle-watch-controls { display:flex; align-items:center; flex-wrap:wrap; gap:7px; position:sticky; top:-1px; z-index:3; padding:8px 0; background:#13232e; }
+.battle-watch-controls { display:flex; align-items:center; flex-wrap:wrap; gap:7px; padding:8px 0; background:#13232e; }
 .battle-watch-controls button { min-height:32px; }
 .battle-watch-note { margin:2px 0 10px; font-size:12px; line-height:1.4; color:var(--muted); }
-.battle-stage { height:clamp(290px,44vh,530px); width:100%; border:1px solid #54717a; border-radius:4px; overflow:hidden; background:#17363d; }
+.battle-stage { height:100%; min-height:0; width:100%; border:1px solid #54717a; border-radius:4px; overflow:hidden; background:#17363d; }
 .battle-canvas { display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
 .battle-canvas:focus-visible { outline:2px solid var(--gold); outline-offset:-3px; }
 .battle-watch-legend { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:6px 0 10px; font-size:11px; color:var(--muted); }
@@ -39,3 +47,14 @@
 .report-watch-link { display:block; color:var(--gold); margin:8px 0 0; }
 .decisive-alert { max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-color:var(--gold); color:var(--gold); }
 @media(max-width:800px) { .battle-side-ledger,.battle-rosters {grid-template-columns:1fr;} .battle-watch-heading {align-items:flex-start;} .battle-watch-heading h3 {font-size:17px;} .battle-watch-controls {position:static;} }
+@media(max-height:650px) {
+  .modal-backdrop:has(.modal[data-dialog-type="battle-watch"]) { inset:0; padding:8px; }
+  .modal[data-dialog-type="battle-watch"] { width:min(1500px,calc(100vw - 16px)); height:calc(100dvh - 16px); max-height:calc(100dvh - 16px); }
+  .battle-watch-heading h3 { font-size:17px; margin:2px 0; }
+  .battle-watch-controls { gap:5px; padding:6px 0; }
+  .battle-watch-controls button { min-height:28px; padding:5px 8px; font-size:12px; }
+  .battle-watch-legend { padding:5px 0 0; font-size:10px; }
+}
+@media(max-width:680px) {
+  .battle-watch { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(220px,1fr) minmax(0,120px); gap:8px; }
+}

@@ -11,11 +11,13 @@ export const SUPPLY_BANDS = data.SUPPLY_BANDS;
 export const ENDURANCE_BANDS = data.ENDURANCE_BANDS;
 const paths = new Map();
 const laneDistance = (a, b) => {
-  const k = a + ":" + b;
-  if (!paths.has(k))
-    paths.set(k, routeLength(seaRoute(a, b).map((n) => NODES[n])));
-  return paths.get(k);
+  let destinations = paths.get(a);
+  if (!destinations) { destinations = new Map(); paths.set(a,destinations); }
+  if (!destinations.has(b))
+    destinations.set(b, routeLength(seaRoute(a, b).map((n) => NODES[n])));
+  return destinations.get(b);
 };
+const localPortLatitudeDegrees = 25 / (3440.065 * Math.PI / 180);
 export function nearestSupplyPort(s, id, position) {
   const ports = usablePorts(s, id).filter(port => (s.ports?.[port]?.health ?? 1) > 0);
   let nearest = null,
@@ -24,7 +26,11 @@ export function nearestSupplyPort(s, id, position) {
     const node = nearestSeaNode(position, undefined, true);
     const offset = distanceNm(position, NODES[node]);
     for (const port of ports) {
-      const direct = distanceNm(position, NODES[port]);
+      // Only a port inside 25 nm can bypass the navigable lane graph. The
+      // north/south arc is an exact lower bound on spherical distance, so most
+      // distant ports need neither trig nor a square root on every query.
+      const direct = Math.abs(position[1]-NODES[port][1]) < localPortLatitudeDegrees
+        ? distanceNm(position, NODES[port]) : 25;
       const d =
         direct < 25 ? direct : offset + laneDistance(node, port);
       if (d < distance) {

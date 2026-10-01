@@ -278,6 +278,7 @@ export function aircraftCatalogView(s, c) {
               role +
               ' model yet. Catalog models become ready automatically on their listed date."') +
           ">" +
+          (choices.length ? "" : '<option value="">No eligible aircraft</option>') +
           choices
             .map(
               (a) =>

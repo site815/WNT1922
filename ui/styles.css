@@ -8969,7 +8969,7 @@ summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   .map-scene .game-body .resource-bar { grid-template-columns: repeat(8,minmax(0,1fr)); }
   .map-scene .game-body .resource-bar:has(.resource-war) { grid-template-columns: repeat(9,minmax(0,1fr)); }
 }
-@container game-body (max-width: 800px) {
+@container game-body (max-width: 680px) {
   .map-scene .game-body .resource-bar { grid-template-columns: repeat(4,minmax(0,1fr)); }
   .map-scene .game-body .resource-bar:has(.resource-war) { grid-template-columns: repeat(5,minmax(0,1fr)); }
 }

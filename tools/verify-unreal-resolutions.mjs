@@ -51,7 +51,7 @@ async function input(action,values={}){await page.evaluate(({action,values})=>{
 },{action,values});}
 async function diagnostics(mode){const before=await cursor();await input('diagnostics');const rows=await until(()=>events(before),r=>r.some(e=>e.event.type==='diagnostics'),'native diagnostics');const d=rows.find(e=>e.event.type==='diagnostics').event;
  assert.equal(d.renderer,'Unreal Engine native UWorld');assert.equal(d.nativeWorldInitialized,true);assert.equal(d.modelLoadErrors,0);if(mode)assert.equal(d.mode,mode);return d;}
-const counts=d=>Object.fromEntries(['primitiveComponentCount','visiblePrimitiveCount','shadowCastingPrimitiveCount','terrainTileCount','shipActorCount','visibleShipCount','detailedModelCount','pendingModelCount','drawCalls','meshDrawCalls','trianglesDrawn'].filter(k=>Number.isFinite(d[k])).map(k=>[k,d[k]]));
+const counts=d=>Object.fromEntries(['primitiveComponentCount','visiblePrimitiveCount','shadowCastingPrimitiveCount','terrainTileCount','shipActorCount','visibleShipCount','detailedModelCount','pendingModelCount','drawCalls','meshDrawCalls','trianglesDrawn','frameMeanMs','frameP95Ms','frameSampleCount'].filter(k=>Number.isFinite(d[k])).map(k=>[k,d[k]]));
 async function resize(size,mode){
  await input('resize',size);
  const d=await until(()=>diagnostics(),d=>d.viewportWidth===size.width&&d.viewportHeight===size.height,'actual Unreal resize '+size.width+'x'+size.height,45000);
@@ -132,8 +132,13 @@ try{
   await input('focus',{kind:'fleet',id:force.id,longitude:force.position[0],latitude:force.position[1],zoom:12000});await until(()=>diagnostics(),d=>Math.abs(d.zoom-12000)<.01,'fleet focus');await delay(250);
   await pick('ship',true);const selected=await pick('ship');await page.locator('[data-dialog-type="ship"]').waitFor();assert.equal(await page.locator('[data-dialog-type="ship"]').getAttribute('data-key'),'dialog-ship-'+selected.id);
   await page.locator('.modal [data-action="close"]').first().click();await worldReady();await capture('fleet-'+size.width+'x'+size.height,size,true);
-  const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+30,p.y+100,{steps:8});await page.mouse.up({button:'right'});
-  await until(()=>diagnostics(),d=>d.tilt>5&&d.tilt<=d.maxWorldTilt+.001,'close ship inspection tilt');
+  assert.equal((await diagnostics()).tilt,0,'Fleet-scale view remains overhead');
+  await input('focus',{kind:'fleet',id:force.id,longitude:force.position[0],latitude:force.position[1],zoom:40000});
+  const inspection=await until(()=>diagnostics(),d=>d.tilt>5&&d.tilt<=d.maxWorldTilt+.001,'automatic close ship inspection tilt');
+  const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+30,p.y+25,{steps:8});await page.mouse.up({button:'right'});
+  assert(Math.abs((await diagnostics()).tilt-inspection.tilt)<.01,'Right drag pans without changing inspection pitch');
+  await input('zoom',{delta:-100000});await until(()=>diagnostics(),d=>d.zoom===d.maxWorldZoom,'zoom clamps at useful ship scale');
+  assert.equal((await diagnostics()).zoom,65536);
   await capture('fleet-tilted-'+size.width+'x'+size.height,size,true);
  }
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');

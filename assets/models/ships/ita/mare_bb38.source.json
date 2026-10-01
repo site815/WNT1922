@@ -433,6 +433,21 @@
   },
   "indexVertices": true,
   "materials": {
+    "upperdeck": {
+      "color": [
+        0.14,
+        0.155,
+        0.16,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 1,
+      "normalScale": 0.6,
+      "baseColorTexture": "steel-deck-albedo",
+      "normalTexture": "steel-deck-normal",
+      "metallicRoughnessTexture": "steel-deck-orm",
+      "occlusionTexture": "steel-deck-orm"
+    },
     "paint": {
       "color": [
         0.385,
@@ -441,27 +456,27 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.65,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "deck": {
       "color": [
-        0.4,
-        0.34,
-        0.235,
+        0.42,
+        0.39,
+        0.33,
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.8,
+      "baseColorTexture": "timber-albedo",
+      "normalTexture": "timber-normal",
+      "metallicRoughnessTexture": "timber-orm",
+      "occlusionTexture": "timber-orm"
     },
     "antifouling": {
       "color": [
@@ -471,7 +486,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.92
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "boot": {
       "color": [
@@ -481,7 +501,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "steel": {
       "color": [
@@ -491,7 +516,10 @@
         1
       ],
       "metallic": 0.78,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "glass": {
       "color": [
@@ -511,7 +539,10 @@
         1
       ],
       "metallic": 0.8,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "canvas": {
       "color": [
@@ -521,7 +552,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.95
+      "roughness": 1,
+      "baseColorTexture": "canvas-albedo",
+      "normalTexture": "canvas-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "canvas-orm",
+      "occlusionTexture": "canvas-orm"
     },
     "white": {
       "color": [
@@ -531,7 +567,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.94
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "red": {
       "color": [
@@ -541,28 +582,42 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.5
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     }
   },
+  "curveToleranceMetres": 0.003,
   "materialSources": [
     {
-      "name": "Original naval surface maps",
+      "name": "Original fleet paint, timber, nonslip decking and canvas PBR maps",
       "author": "WNT1922",
       "license": "Original project artwork",
-      "manifest": "assets/models/textures/naval-paint/source.json",
-      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+      "manifest": "assets/models/textures/fleet-surfaces/source.json",
+      "usage": "Embedded physically scaled albedo, OpenGL normal and packed occlusion/roughness/metalness. Original inferred weathering, not an exact camouflage or refit claim."
     }
   ],
+  "surfaceProfile": {
+    "version": 1,
+    "tileMetres": 2.5,
+    "textureSize": 256,
+    "deckFinish": "timber",
+    "curveToleranceMetres": 0.003,
+    "geometryPolicy": "Preserve hull loft, fittings and weapon stations. Reduced cylinder and ring tessellation adds at most 3 mm radial error; already coarser original fittings are unchanged. Lossless Float32 vertex indexing preserves UV and hard-normal seams."
+  },
   "authoringFile": "assets/models/authoring/fleet-specifications.json",
   "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
-  "sha256": "9948d88a6aa035bd2e3881b855c06a919bb408e541c49cbc58c46db87b52689a",
+  "sha256": "6141dc45fd9dea5655999e8c18669e061081dce596033ab4ded8594b9afb6705",
   "statistics": {
     "id": "mare_bb38",
-    "triangles": 146184,
-    "vertices": 180132,
-    "materials": 8,
-    "embeddedTextures": 3,
-    "bytes": 8104828,
+    "triangles": 134604,
+    "vertices": 169635,
+    "materials": 9,
+    "embeddedTextures": 12,
+    "bytes": 7550744,
     "bounds": {
       "min": [
         -122.5,
@@ -616,429 +671,434 @@
     },
     {
       "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
-      "triangles": 3632,
+      "triangles": 5576,
       "ranges": [
         {
           "material": "paint",
           "indexStart": 87420,
-          "indexCount": 240
+          "indexCount": 4368
         },
         {
-          "material": "deck",
-          "indexStart": 3276,
+          "material": "boot",
+          "indexStart": 480,
+          "indexCount": 432
+        },
+        {
+          "material": "upperdeck",
+          "indexStart": 0,
           "indexCount": 96
         },
         {
           "material": "brass",
           "indexStart": 0,
-          "indexCount": 5184
+          "indexCount": 4848
         },
         {
           "material": "glass",
           "indexStart": 0,
-          "indexCount": 4992
+          "indexCount": 4056
         },
         {
           "material": "steel",
           "indexStart": 0,
-          "indexCount": 384
+          "indexCount": 2928
         }
       ]
     },
     {
       "name": "Shaped bridge with glazing, doors, portholes and roof rails",
-      "triangles": 4352,
+      "triangles": 4800,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 87660,
-          "indexCount": 1200
+          "indexStart": 91788,
+          "indexCount": 1848
         },
         {
-          "material": "deck",
-          "indexStart": 3372,
-          "indexCount": 96
+          "material": "upperdeck",
+          "indexStart": 96,
+          "indexCount": 192
         },
         {
           "material": "brass",
-          "indexStart": 5184,
+          "indexStart": 4848,
           "indexCount": 4416
         },
         {
           "material": "glass",
-          "indexStart": 4992,
-          "indexCount": 6960
+          "indexStart": 4056,
+          "indexCount": 6168
         },
         {
           "material": "steel",
-          "indexStart": 384,
-          "indexCount": 384
+          "indexStart": 2928,
+          "indexCount": 1776
         }
       ]
     },
     {
       "name": "Main battery mount 1 3 x 381 mm",
-      "triangles": 1696,
+      "triangles": 1732,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 88860,
-          "indexCount": 2112
+          "indexStart": 93636,
+          "indexCount": 2316
         },
         {
           "material": "boot",
-          "indexStart": 480,
+          "indexStart": 912,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 768,
-          "indexCount": 2400
+          "indexStart": 4704,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Main battery mount 2 3 x 381 mm",
-      "triangles": 1888,
+      "triangles": 1924,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 90972,
-          "indexCount": 2688
+          "indexStart": 95952,
+          "indexCount": 2892
         },
         {
           "material": "boot",
-          "indexStart": 1056,
+          "indexStart": 1488,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 3168,
-          "indexCount": 2400
+          "indexStart": 7008,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Main battery mount 3 3 x 381 mm",
-      "triangles": 1696,
+      "triangles": 1732,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 93660,
-          "indexCount": 2112
+          "indexStart": 98844,
+          "indexCount": 2316
         },
         {
           "material": "boot",
-          "indexStart": 1632,
+          "indexStart": 2064,
           "indexCount": 576
         },
         {
           "material": "steel",
-          "indexStart": 5568,
-          "indexCount": 2400
+          "indexStart": 9312,
+          "indexCount": 2304
         }
       ]
     },
     {
       "name": "Light AA pedestal 1",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 95772,
-          "indexCount": 1056
+          "indexStart": 101160,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 2208,
-          "indexCount": 192
+          "indexStart": 2640,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9600,
-          "indexCount": 120
+          "indexStart": 9264,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 7968,
-          "indexCount": 2064
+          "indexStart": 11616,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 2",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 96828,
-          "indexCount": 1056
+          "indexStart": 101880,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 2400,
-          "indexCount": 192
+          "indexStart": 2712,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9720,
-          "indexCount": 120
+          "indexStart": 9336,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 10032,
-          "indexCount": 2064
+          "indexStart": 13404,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 3",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 97884,
-          "indexCount": 1056
+          "indexStart": 102600,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 2592,
-          "indexCount": 192
+          "indexStart": 2784,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9840,
-          "indexCount": 120
+          "indexStart": 9408,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 12096,
-          "indexCount": 2064
+          "indexStart": 15192,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 4",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 98940,
-          "indexCount": 1056
+          "indexStart": 103320,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 2784,
-          "indexCount": 192
+          "indexStart": 2856,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 9960,
-          "indexCount": 120
+          "indexStart": 9480,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 14160,
-          "indexCount": 2064
+          "indexStart": 16980,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 5",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 99996,
-          "indexCount": 1056
+          "indexStart": 104040,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 2976,
-          "indexCount": 192
+          "indexStart": 2928,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10080,
-          "indexCount": 120
+          "indexStart": 9552,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 16224,
-          "indexCount": 2064
+          "indexStart": 18768,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 6",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 101052,
-          "indexCount": 1056
+          "indexStart": 104760,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 3168,
-          "indexCount": 192
+          "indexStart": 3000,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10200,
-          "indexCount": 120
+          "indexStart": 9624,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 18288,
-          "indexCount": 2064
+          "indexStart": 20556,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 7",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 102108,
-          "indexCount": 1056
+          "indexStart": 105480,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 3360,
-          "indexCount": 192
+          "indexStart": 3072,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10320,
-          "indexCount": 120
+          "indexStart": 9696,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 20352,
-          "indexCount": 2064
+          "indexStart": 22344,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Light AA pedestal 8",
-      "triangles": 1144,
+      "triangles": 884,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 103164,
-          "indexCount": 1056
+          "indexStart": 106200,
+          "indexCount": 720
         },
         {
           "material": "boot",
-          "indexStart": 3552,
-          "indexCount": 192
+          "indexStart": 3144,
+          "indexCount": 72
         },
         {
           "material": "brass",
-          "indexStart": 10440,
-          "indexCount": 120
+          "indexStart": 9768,
+          "indexCount": 72
         },
         {
           "material": "steel",
-          "indexStart": 22416,
-          "indexCount": 2064
+          "indexStart": 24132,
+          "indexCount": 1788
         }
       ]
     },
     {
       "name": "Funnel 1 with curved open uptake, cap, steam pipes and stays",
-      "triangles": 2248,
+      "triangles": 2048,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 104220,
-          "indexCount": 816
+          "indexStart": 106920,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 3744,
-          "indexCount": 840
+          "indexStart": 3216,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 24480,
-          "indexCount": 5088
+          "indexStart": 25920,
+          "indexCount": 3816
         }
       ]
     },
     {
       "name": "Funnel 2 with curved open uptake, cap, steam pipes and stays",
-      "triangles": 2248,
+      "triangles": 2048,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 105036,
-          "indexCount": 816
+          "indexStart": 108168,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 4584,
-          "indexCount": 840
+          "indexStart": 4296,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 29568,
-          "indexCount": 5088
+          "indexStart": 29736,
+          "indexCount": 3816
         }
       ]
     },
     {
       "name": "Mast 1 with taper, yards, rigging and access ladder",
-      "triangles": 5472,
+      "triangles": 4188,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 105852,
-          "indexCount": 3840
+          "indexStart": 109416,
+          "indexCount": 3132
         },
         {
           "material": "steel",
-          "indexStart": 34656,
-          "indexCount": 12576
+          "indexStart": 33552,
+          "indexCount": 9432
         }
       ]
     },
     {
       "name": "Mast 2 with taper, yards, rigging and access ladder",
-      "triangles": 5472,
+      "triangles": 4188,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 109692,
-          "indexCount": 3840
+          "indexStart": 112548,
+          "indexCount": 3132
         },
         {
           "material": "steel",
-          "indexStart": 47232,
-          "indexCount": 12576
+          "indexStart": 42984,
+          "indexCount": 9432
         }
       ]
     },
     {
       "name": "Open boat 1 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 113532,
-          "indexCount": 2688
+          "indexStart": 115680,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 3468,
+          "indexStart": 3276,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 59808,
-          "indexCount": 192
+          "indexStart": 52416,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1049,22 +1109,22 @@
     },
     {
       "name": "Open boat 2 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 116220,
-          "indexCount": 2688
+          "indexStart": 118080,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 3948,
+          "indexStart": 3756,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 60000,
-          "indexCount": 192
+          "indexStart": 52560,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1075,22 +1135,22 @@
     },
     {
       "name": "Open boat 3 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 118908,
-          "indexCount": 2688
+          "indexStart": 120480,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 4428,
+          "indexStart": 4236,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 60192,
-          "indexCount": 192
+          "indexStart": 52704,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1101,22 +1161,22 @@
     },
     {
       "name": "Open boat 4 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 121596,
-          "indexCount": 2688
+          "indexStart": 122880,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 4908,
+          "indexStart": 4716,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 60384,
-          "indexCount": 192
+          "indexStart": 52848,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1127,64 +1187,64 @@
     },
     {
       "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
-      "triangles": 17136,
+      "triangles": 16856,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 124284,
+          "indexStart": 125280,
           "indexCount": 22944
         },
         {
           "material": "boot",
-          "indexStart": 5424,
+          "indexStart": 5376,
           "indexCount": 2880
         },
         {
           "material": "steel",
-          "indexStart": 60576,
-          "indexCount": 25584
+          "indexStart": 52992,
+          "indexCount": 24744
         }
       ]
     },
     {
       "name": "Deck edge stanchions, lifelines and hull portholes",
-      "triangles": 38720,
+      "triangles": 30480,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 147228,
-          "indexCount": 64704
+          "indexStart": 148224,
+          "indexCount": 51240
         },
         {
           "material": "brass",
-          "indexStart": 10560,
-          "indexCount": 25728
+          "indexStart": 9840,
+          "indexCount": 20904
         },
         {
           "material": "glass",
-          "indexStart": 11952,
-          "indexCount": 25728
+          "indexStart": 10224,
+          "indexCount": 19296
         }
       ]
     },
     {
       "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
-      "triangles": 1668,
+      "triangles": 1604,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 211932,
-          "indexCount": 2172
+          "indexStart": 199464,
+          "indexCount": 2028
         },
         {
           "material": "brass",
-          "indexStart": 36288,
+          "indexStart": 30744,
           "indexCount": 1872
         },
         {
           "material": "steel",
-          "indexStart": 86160,
-          "indexCount": 960
+          "indexStart": 77736,
+          "indexCount": 912
         }
       ]
     }

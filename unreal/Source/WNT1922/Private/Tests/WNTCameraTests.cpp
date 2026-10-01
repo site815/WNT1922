@@ -157,15 +157,20 @@ bool FWNTRepeatedCopyAnchorTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWorldTiltGateTest,"WNT.Camera.ShipInspectionTiltGate",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTWorldTiltGateTest::RunTest(const FString& Parameters)
 {
-    for(double Zoom:{1.0,10.0,128.0,1024.0,2048.0})
+    for(double Zoom:{1.0,10.0,128.0,1024.0,2048.0,12000.0,16384.0})
         TestEqual(TEXT("Strategic map rejects angle changes"),WNTCameraMath::MaxWorldTilt(Zoom),0.0);
     double Previous=0;
     for(int32 I=0;I<=64;++I)
     {
-        const double Angle=WNTCameraMath::MaxWorldTilt(2048.0*FMath::Pow(2.0,I/64.0));
+        const double Angle=WNTCameraMath::MaxWorldTilt(16384.0*FMath::Pow(2.0,I/64.0));
         TestTrue(TEXT("Ship inspection tilt opens continuously"),Angle>=Previous&&Angle-Previous<2.0);Previous=Angle;
     }
-    TestEqual(TEXT("Close ship view allows full orbit pitch"),WNTCameraMath::MaxWorldTilt(6000.0),70.0);
+    TestEqual(TEXT("Close ship view has automatic inspection pitch"),WNTCameraMath::MaxWorldTilt(32768.0),52.0);
+    TestEqual(TEXT("Maximum zoom stays at ship scale"),WNTCameraMath::MaxWorldZoom,65536.0);
+    TestEqual(TEXT("Pitch stays bounded at the zoom limit"),WNTCameraMath::MaxWorldTilt(WNTCameraMath::MaxWorldZoom),52.0);
+    TestFalse(TEXT("Small pans retain stable terrain and temporal history"),WNTCameraMath::NeedsOriginRebase(20,0));
+    TestFalse(TEXT("Date-line crossing near current origin needs no rebase"),WNTCameraMath::NeedsOriginRebase(-179,179));
+    TestTrue(TEXT("Long journeys rebase before leaving the repeated world"),WNTCameraMath::NeedsOriginRebase(46,0));
     TestEqual(TEXT("Returning to strategic scale restores overhead lock"),WNTCameraMath::MaxWorldTilt(1.0),0.0);
     return true;
 }

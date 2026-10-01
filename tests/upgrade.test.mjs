@@ -65,7 +65,7 @@ test("all supported speed settings process every crossed fifteen-minute tick, in
     const before = campaignMinutes(s);
     sim.tick(s, c, 0.72);
     assert.ok(Math.abs(campaignMinutes(s) - before - 120 * speed) < 1e-6);
-    assert.equal(s.minuteTicks, Math.floor(120 * speed / 15));
+    assert.equal(s.minuteTicks || 0, Math.floor(120 * speed / 15));
   }
 });
 
@@ -78,7 +78,7 @@ test("fractional animation frames never duplicate or omit operational ticks", ()
     assert.ok(
       Math.abs(campaignMinutes(s) - before - (speed * 10000) / 6) < 0.001,
     );
-    assert.equal(s.minuteTicks, Math.floor((speed * 10000) / 90));
+    assert.equal(s.minuteTicks || 0, Math.floor((speed * 10000) / 90));
   }
 });
 test("scrapping immediately removes the selected hull, returns salvage and preserves personnel and aircraft", () => {

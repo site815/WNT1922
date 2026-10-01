@@ -177,7 +177,8 @@ test('worker battle stepping discards time credit and preserves a blocked cabine
   assert.equal(campaignMinutes(messages.at(-1).state), before + 15);
   assert.equal(messages.at(-1).state.paused, true); assert.equal(messages.at(-1).metrics.queuedMinutes, 0);
   time += 60000; callback();
-  assert.equal(campaignMinutes(messages.at(-1).state), before + 15, 'The next worker loop must not resume a watched battle');
+  assert.equal(messages.at(-1).type, 'heartbeat', 'An unchanged paused campaign needs only a liveness message');
+  assert.equal(campaignMinutes(messages.findLast(m => m.state).state), before + 15, 'The next worker loop must not resume a watched battle');
   const blocked = newGame(CATALOG, 'USA', 360036, 'in_good_faith_1936'); blocked.autoPause = true; blocked.paused = true;
   const br = engage(blocked, contentFor(CATALOG, blocked)), original = JSON.stringify(blocked);
   host.receive({ type: 'initialize', state: blocked, generation: 2, requestId: 3 });

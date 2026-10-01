@@ -48,7 +48,7 @@
   },
   "sourceRevision": "Pinned public Objaverse snapshot; may differ from the current Sketchfab revision",
   "geometrySource": "Artist-authored licensed asset; no voxel or generated recognition geometry",
-  "modifications": "WNT1922 baked static node hierarchy and metre scale, centered the hull, oriented bow +X and up +Y, merged primitives by material without mesh simplification, retained every embedded image byte and all artist UVs, assigned unused planar UVs to untextured rigging, normalized vertex normals, removed Float32-degenerate faces and orientation-unstable microscopic slivers, and repaired normals-disagreeing winding. Native centimetre/int16 precision is checked explicitly; only unstable slivers within eight coordinate ULPs can be discarded. Counts below identify these repairs.",
+  "modifications": "WNT1922 baked static node hierarchy and metre scale, centered the hull, oriented bow +X and up +Y, merged primitives by material without mesh simplification, retained all artist UVs and created 512 px budget derivatives of embedded images, with source and derivative hashes retained, assigned unused planar UVs to untextured rigging, normalized vertex normals, removed Float32-degenerate faces and orientation-unstable microscopic slivers, and repaired normals-disagreeing winding. Native centimetre/int16 precision is checked explicitly; only unstable slivers within eight coordinate ULPs can be discarded. Counts below identify these repairs.",
   "normalization": {
     "sourceBounds": {
       "min": [
@@ -92,14 +92,14 @@
       "rule": "Drop only collapsed faces or winding-unstable slivers whose altitude is at most eight Float32 position ULPs; robust source winding is corrected, not discarded."
     }
   },
-  "sha256": "0ee6071bc9387a4c7990d619197008fba322d2408d90a99e70f12482259c5c0b",
+  "sha256": "94899197cda8a06d3901b5bb94ad53fe136a66dbeb6437c34dcc0fc8736bc1de",
   "statistics": {
     "id": "bismarck-everlasting17th",
     "triangles": 258134,
     "vertices": 315258,
     "materials": 27,
     "embeddedTextures": 49,
-    "bytes": 45041352,
+    "bytes": 25029164,
     "bounds": {
       "min": [
         -128.49057006835938,
@@ -117,345 +117,645 @@
     {
       "index": 0,
       "mimeType": "image/png",
-      "bytes": 469637,
-      "sha256": "6c5a98e6df29f0c0ad4ecc94c3051f02700763a601b7d94adca3647274116de6",
-      "origin": "Unmodified embedded image 0 from pinned artist source GLB"
+      "bytes": 151418,
+      "sha256": "7613d42f7b99dfb4e07fb61d05935cfac63a7fdb9f661347f1ca8ff051a6cb30",
+      "sourceBytes": 469637,
+      "sourceSha256": "6c5a98e6df29f0c0ad4ecc94c3051f02700763a601b7d94adca3647274116de6",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 0; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 1,
       "mimeType": "image/png",
-      "bytes": 244923,
-      "sha256": "92591825b04b0f5c39df4eda4e5e0aa7d23792adb023cf72b76cfaa2da15daeb",
-      "origin": "Unmodified embedded image 1 from pinned artist source GLB"
+      "bytes": 85945,
+      "sha256": "e78b610e969a445cd8e5468622e63dd92510c893da2e95b18b16449c089a10d0",
+      "sourceBytes": 244923,
+      "sourceSha256": "92591825b04b0f5c39df4eda4e5e0aa7d23792adb023cf72b76cfaa2da15daeb",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 1; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 2,
       "mimeType": "image/png",
-      "bytes": 328631,
-      "sha256": "9a7a8a13ad9e928a3ae919884ec56fd2b80d74969a94b530e141d1abb5e1dd15",
-      "origin": "Unmodified embedded image 2 from pinned artist source GLB"
+      "bytes": 118670,
+      "sha256": "15c08dae41bd94880a64dd50cdf67b82edc7125e492ce0a36234bcefc4eef884",
+      "sourceBytes": 328631,
+      "sourceSha256": "9a7a8a13ad9e928a3ae919884ec56fd2b80d74969a94b530e141d1abb5e1dd15",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 2; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 3,
       "mimeType": "image/png",
-      "bytes": 676336,
-      "sha256": "ebfdced537f773524ac013131f96950d6d371d453ac963fb2919e83878955a7e",
-      "origin": "Unmodified embedded image 3 from pinned artist source GLB"
+      "bytes": 209491,
+      "sha256": "4a8c16edff0584c93695a119c54a2de05fc9ade77b7867f37351fcfdecf26274",
+      "sourceBytes": 676336,
+      "sourceSha256": "ebfdced537f773524ac013131f96950d6d371d453ac963fb2919e83878955a7e",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 3; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 4,
       "mimeType": "image/png",
-      "bytes": 738407,
-      "sha256": "6aa16ae013f17aff5cdd7bd000ca15925c6e6313f8a8b200b9250d94e2318aba",
-      "origin": "Unmodified embedded image 4 from pinned artist source GLB"
+      "bytes": 226548,
+      "sha256": "a7b9371009b7ebac47a44f1bbea5098c598ceb20b651fd6f16be52589ba02181",
+      "sourceBytes": 738407,
+      "sourceSha256": "6aa16ae013f17aff5cdd7bd000ca15925c6e6313f8a8b200b9250d94e2318aba",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 4; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 5,
       "mimeType": "image/png",
-      "bytes": 669962,
-      "sha256": "5b4cdd5310f4c86c2998de7915123dc5e01d983111d6d026641de86439faa4f9",
-      "origin": "Unmodified embedded image 5 from pinned artist source GLB"
+      "bytes": 203987,
+      "sha256": "02a17b67ed1bdd7e942e2d552c44be9741bf7601cc39a82791c0855d307f10e1",
+      "sourceBytes": 669962,
+      "sourceSha256": "5b4cdd5310f4c86c2998de7915123dc5e01d983111d6d026641de86439faa4f9",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 5; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 6,
       "mimeType": "image/png",
-      "bytes": 235642,
-      "sha256": "8f2ac99f686ec956a76fbde6c70065a58bbcb0a84e835f42523df0b244772e06",
-      "origin": "Unmodified embedded image 6 from pinned artist source GLB"
+      "bytes": 126561,
+      "sha256": "9de50e01ab02301dc95f9a42b3b3dce4214e87c7210642db3015bcc6d9ecd57b",
+      "sourceBytes": 235642,
+      "sourceSha256": "8f2ac99f686ec956a76fbde6c70065a58bbcb0a84e835f42523df0b244772e06",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 6; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 7,
       "mimeType": "image/png",
-      "bytes": 374077,
-      "sha256": "5e0ef52c105be1691cb1ecc9877fd13594269c65bdd2e8c3a89019139d7bafcc",
-      "origin": "Unmodified embedded image 7 from pinned artist source GLB"
+      "bytes": 131989,
+      "sha256": "4f32ced16a3beb7968c5797df189596ae2c713496739e1c2760577e94337642a",
+      "sourceBytes": 374077,
+      "sourceSha256": "5e0ef52c105be1691cb1ecc9877fd13594269c65bdd2e8c3a89019139d7bafcc",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 7; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 8,
       "mimeType": "image/png",
-      "bytes": 777567,
-      "sha256": "72d5644255cbc4c147630a3d03123a4b2299baaa3a38adc86d55617dca8fc42c",
-      "origin": "Unmodified embedded image 8 from pinned artist source GLB"
+      "bytes": 229861,
+      "sha256": "f06c408644a1340a2a637583d8ce3dc5ba1b8a8e8bbb0662bc4997e27a9f8ba5",
+      "sourceBytes": 777567,
+      "sourceSha256": "72d5644255cbc4c147630a3d03123a4b2299baaa3a38adc86d55617dca8fc42c",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 8; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 9,
       "mimeType": "image/png",
-      "bytes": 782844,
-      "sha256": "19b2264ff3b3916595c91af5dd037b71dc8b5941086b9e9cc0587307497e60c6",
-      "origin": "Unmodified embedded image 9 from pinned artist source GLB"
+      "bytes": 238886,
+      "sha256": "af7c15a11eed1b1781bb00013adfeda05b5d84ac146efa8536724b6425c2c6ad",
+      "sourceBytes": 782844,
+      "sourceSha256": "19b2264ff3b3916595c91af5dd037b71dc8b5941086b9e9cc0587307497e60c6",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 9; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 10,
       "mimeType": "image/png",
-      "bytes": 787522,
-      "sha256": "f17871f7fd6019195ff4b44de500cc26376762edd18b5e202b10c6fd2abb37fc",
-      "origin": "Unmodified embedded image 10 from pinned artist source GLB"
+      "bytes": 236891,
+      "sha256": "e46cd62c81bc829c941a1fe05a865145a0fa9778ce817c2fa3804a8d31989640",
+      "sourceBytes": 787522,
+      "sourceSha256": "f17871f7fd6019195ff4b44de500cc26376762edd18b5e202b10c6fd2abb37fc",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 10; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 11,
       "mimeType": "image/png",
-      "bytes": 855625,
-      "sha256": "f6e8870a9745b7c171915b3c6f315b74e0e8417913d8e11d66a5c1bbb377e478",
-      "origin": "Unmodified embedded image 11 from pinned artist source GLB"
+      "bytes": 260276,
+      "sha256": "b9bf62f0e2ac975eb8e55358893c08735cb4caad5101b72b75bfb6f98c01d680",
+      "sourceBytes": 855625,
+      "sourceSha256": "f6e8870a9745b7c171915b3c6f315b74e0e8417913d8e11d66a5c1bbb377e478",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 11; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 12,
       "mimeType": "image/png",
-      "bytes": 584218,
-      "sha256": "080ead447d15d54eb601aa5dc3044d507251e24905c93b36396ca33f54d1639c",
-      "origin": "Unmodified embedded image 12 from pinned artist source GLB"
+      "bytes": 178770,
+      "sha256": "c5a663dbc949a3223263fd3c9bd4fe03ef6b954cf8d39b835946c8ec56543c05",
+      "sourceBytes": 584218,
+      "sourceSha256": "080ead447d15d54eb601aa5dc3044d507251e24905c93b36396ca33f54d1639c",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 12; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 13,
       "mimeType": "image/png",
-      "bytes": 295500,
-      "sha256": "a2e219bbad60870d9b289c3b2f0387253af0a38abd21c4ce34cc5f340194e75f",
-      "origin": "Unmodified embedded image 13 from pinned artist source GLB"
+      "bytes": 109890,
+      "sha256": "f04bdc9d0ffe5a48e5420658cac264c9973fca28a458423f503fa5a23407ce52",
+      "sourceBytes": 295500,
+      "sourceSha256": "a2e219bbad60870d9b289c3b2f0387253af0a38abd21c4ce34cc5f340194e75f",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 13; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 14,
       "mimeType": "image/png",
-      "bytes": 668827,
-      "sha256": "608a11fab85190add07c8137ed05d1016bfd94921080c8ddcd9ed8eb83b3e910",
-      "origin": "Unmodified embedded image 14 from pinned artist source GLB"
+      "bytes": 204773,
+      "sha256": "02a9ef389e33220dd74f296840dd22052ce428fe1cf055c5e5da6afb45f50ac9",
+      "sourceBytes": 668827,
+      "sourceSha256": "608a11fab85190add07c8137ed05d1016bfd94921080c8ddcd9ed8eb83b3e910",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 14; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 15,
       "mimeType": "image/png",
-      "bytes": 683232,
-      "sha256": "042de68ac694093cba43c90bab1d410e962f68d4c7453c8959f2c1f0fbcae0a8",
-      "origin": "Unmodified embedded image 15 from pinned artist source GLB"
+      "bytes": 223710,
+      "sha256": "bc705d9d51b40be6f641db1f12a797d2d1fc0d4a228d3c98b15a48c5a9fb8266",
+      "sourceBytes": 683232,
+      "sourceSha256": "042de68ac694093cba43c90bab1d410e962f68d4c7453c8959f2c1f0fbcae0a8",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 15; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 16,
       "mimeType": "image/png",
-      "bytes": 719061,
-      "sha256": "69026d46a182e098e8ce59f4db6f0a447ec7ac8eb74926cb90f0a6ee1a7b9b56",
-      "origin": "Unmodified embedded image 16 from pinned artist source GLB"
+      "bytes": 221123,
+      "sha256": "09f7f2435f1daf7c03a41b11b003b415063b18f3b73fda38d68718b083185b09",
+      "sourceBytes": 719061,
+      "sourceSha256": "69026d46a182e098e8ce59f4db6f0a447ec7ac8eb74926cb90f0a6ee1a7b9b56",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 16; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 17,
       "mimeType": "image/png",
-      "bytes": 604191,
-      "sha256": "2e12ce8c146d31bdf8d3f39e9d223bf0d4f822e3bc6c81fe4d0097b9de264f59",
-      "origin": "Unmodified embedded image 17 from pinned artist source GLB"
+      "bytes": 183420,
+      "sha256": "962984148853c79b101cc378b79a3a0cd63ee97c83fd49319a56dc9785660a0b",
+      "sourceBytes": 604191,
+      "sourceSha256": "2e12ce8c146d31bdf8d3f39e9d223bf0d4f822e3bc6c81fe4d0097b9de264f59",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 17; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 18,
       "mimeType": "image/png",
-      "bytes": 645927,
-      "sha256": "fbe37e10c8cf25fa7437a0bf0130c1942805e3cd3a5856edfae90137e66e151d",
-      "origin": "Unmodified embedded image 18 from pinned artist source GLB"
+      "bytes": 209809,
+      "sha256": "e89dfeb5778297d9e76e1b20b3d6929b6125ee9b42c64bffcd4e411f43024414",
+      "sourceBytes": 645927,
+      "sourceSha256": "fbe37e10c8cf25fa7437a0bf0130c1942805e3cd3a5856edfae90137e66e151d",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 18; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 19,
       "mimeType": "image/png",
-      "bytes": 652433,
-      "sha256": "5c226d220b82e300e4b63a9edd217853a62ef522703df4c50dff9a78440eb1ce",
-      "origin": "Unmodified embedded image 19 from pinned artist source GLB"
+      "bytes": 205505,
+      "sha256": "317291e081bf1c56e34f39d002e56e25f5bcef59dd670189daf16662e9e2d1fe",
+      "sourceBytes": 652433,
+      "sourceSha256": "5c226d220b82e300e4b63a9edd217853a62ef522703df4c50dff9a78440eb1ce",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 19; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 20,
       "mimeType": "image/png",
-      "bytes": 394944,
-      "sha256": "bcbe7aba4bafedf8be18bec260523116f751cacefdb7f78146dc692a00590f13",
-      "origin": "Unmodified embedded image 20 from pinned artist source GLB"
+      "bytes": 156662,
+      "sha256": "a2df7094fd9d6297164f559b2b5dc30ed9d902146ee328041659d28520eb76d3",
+      "sourceBytes": 394944,
+      "sourceSha256": "bcbe7aba4bafedf8be18bec260523116f751cacefdb7f78146dc692a00590f13",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 20; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 21,
       "mimeType": "image/png",
-      "bytes": 624753,
-      "sha256": "c73169a766d51fd0af41e7d5a75a5c40f55edd6e74e3225f51f9d1887b9e6642",
-      "origin": "Unmodified embedded image 21 from pinned artist source GLB"
+      "bytes": 183107,
+      "sha256": "2335f257f6cb99b86e78385124f6a63bddf41b65895850ae37d840ed367d97b6",
+      "sourceBytes": 624753,
+      "sourceSha256": "c73169a766d51fd0af41e7d5a75a5c40f55edd6e74e3225f51f9d1887b9e6642",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 21; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 22,
       "mimeType": "image/png",
-      "bytes": 525841,
-      "sha256": "68c4678c4806d98361701f760ee57888f57bb02410f6b6aaae85e54e2511cc4e",
-      "origin": "Unmodified embedded image 22 from pinned artist source GLB"
+      "bytes": 160014,
+      "sha256": "22c65ff67a33c581f4c11141f48fbb46072d129b7590bc5e98d96e334b1f54a7",
+      "sourceBytes": 525841,
+      "sourceSha256": "68c4678c4806d98361701f760ee57888f57bb02410f6b6aaae85e54e2511cc4e",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 22; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 23,
       "mimeType": "image/png",
-      "bytes": 564241,
-      "sha256": "a6643a87e5adc04a90d0d753b5c9079a6c45d70ab9b1ed3dffd01605163bea07",
-      "origin": "Unmodified embedded image 23 from pinned artist source GLB"
+      "bytes": 179609,
+      "sha256": "8ca6670ab2b54c54e26198a48db900fa850fc78bb8df2fe53ffce233935773ec",
+      "sourceBytes": 564241,
+      "sourceSha256": "a6643a87e5adc04a90d0d753b5c9079a6c45d70ab9b1ed3dffd01605163bea07",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 23; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 24,
       "mimeType": "image/png",
-      "bytes": 659127,
-      "sha256": "a8d09ed3ebe75ba64b18364a379fcc6eb987496fe048f9fddd9d8e73d563057e",
-      "origin": "Unmodified embedded image 24 from pinned artist source GLB"
+      "bytes": 193210,
+      "sha256": "5b71e9b2a0762c87aef57278cbce634d4a7dffe90fdbf9700293fba58e18f7c5",
+      "sourceBytes": 659127,
+      "sourceSha256": "a8d09ed3ebe75ba64b18364a379fcc6eb987496fe048f9fddd9d8e73d563057e",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 24; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 25,
       "mimeType": "image/png",
-      "bytes": 589676,
-      "sha256": "d801497a8d2f14ed429f5694a6355c79f694c57c1e1c01c8f951ec611ca174c0",
-      "origin": "Unmodified embedded image 25 from pinned artist source GLB"
+      "bytes": 194451,
+      "sha256": "cf8ec9b81af819ebf17a50ea211dfbac94152c14d2cf1e9e76cc4967f0c74bee",
+      "sourceBytes": 589676,
+      "sourceSha256": "d801497a8d2f14ed429f5694a6355c79f694c57c1e1c01c8f951ec611ca174c0",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 25; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 26,
       "mimeType": "image/png",
-      "bytes": 339044,
-      "sha256": "24090fd6c4ff47282b399d596253435823f5573f26e4ab7bdbcec7d665f241fb",
-      "origin": "Unmodified embedded image 26 from pinned artist source GLB"
+      "bytes": 135217,
+      "sha256": "2f0b0e9d9af41c9ac0ad1ecde4446b9ff27b588a3320305347b413a1528a696b",
+      "sourceBytes": 339044,
+      "sourceSha256": "24090fd6c4ff47282b399d596253435823f5573f26e4ab7bdbcec7d665f241fb",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 26; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 27,
       "mimeType": "image/png",
-      "bytes": 512825,
-      "sha256": "b66d316080b1fc14a68709005890579614fc253c0850afeee9196a6dfe2b2694",
-      "origin": "Unmodified embedded image 27 from pinned artist source GLB"
+      "bytes": 150466,
+      "sha256": "a1d697571131554ad8ed156ebeeaec2f8740c11da63cf0ec8f0c94c91480cd5b",
+      "sourceBytes": 512825,
+      "sourceSha256": "b66d316080b1fc14a68709005890579614fc253c0850afeee9196a6dfe2b2694",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 27; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 28,
       "mimeType": "image/png",
-      "bytes": 594479,
-      "sha256": "e0ee8311faad196605a5afe9b3decedbf454462b2603709c6c0ba1c21afaa285",
-      "origin": "Unmodified embedded image 28 from pinned artist source GLB"
+      "bytes": 184662,
+      "sha256": "97129621807bb6f75080596217a9001cd4a52e58e8c1b547f8cf5035d95290a9",
+      "sourceBytes": 594479,
+      "sourceSha256": "e0ee8311faad196605a5afe9b3decedbf454462b2603709c6c0ba1c21afaa285",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 28; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 29,
       "mimeType": "image/png",
-      "bytes": 659568,
-      "sha256": "cab65698359fddd337445e77c16a7852c37479d613e5d85c9f8c923ce022a406",
-      "origin": "Unmodified embedded image 29 from pinned artist source GLB"
+      "bytes": 221634,
+      "sha256": "e0b25c7beada373c9e6495f58f57938b5d83865f18dd0da92770a4a58a16c56d",
+      "sourceBytes": 659568,
+      "sourceSha256": "cab65698359fddd337445e77c16a7852c37479d613e5d85c9f8c923ce022a406",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 29; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 30,
       "mimeType": "image/png",
-      "bytes": 674253,
-      "sha256": "c96e6b56ed3075bf4085ca2c8cf43250319407c1fd3063bd88ccff62cfe5c2fb",
-      "origin": "Unmodified embedded image 30 from pinned artist source GLB"
+      "bytes": 202094,
+      "sha256": "247cceda20c36722b44a509709ed89ecf2411fa1f0a6ce136c9128f5f68fc616",
+      "sourceBytes": 674253,
+      "sourceSha256": "c96e6b56ed3075bf4085ca2c8cf43250319407c1fd3063bd88ccff62cfe5c2fb",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 30; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 31,
       "mimeType": "image/png",
-      "bytes": 789397,
-      "sha256": "73df65b919299e6f64342033ce4ff6188ead70cf237722d728b43418ccbd4569",
-      "origin": "Unmodified embedded image 31 from pinned artist source GLB"
+      "bytes": 248541,
+      "sha256": "8e67e5fc0d1f508e5768df0b8863687329678f9230f2f60df90381b3eb105055",
+      "sourceBytes": 789397,
+      "sourceSha256": "73df65b919299e6f64342033ce4ff6188ead70cf237722d728b43418ccbd4569",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 31; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 32,
       "mimeType": "image/png",
-      "bytes": 701583,
-      "sha256": "eac0f4b3d49c469e1935adf407dbef23f934e62a6e8d877bea0105bbd3fdd013",
-      "origin": "Unmodified embedded image 32 from pinned artist source GLB"
+      "bytes": 213884,
+      "sha256": "1c19168fcc90ecb357cc520c13905ebf17da5aa4919edb287a7b7aee4ae93f13",
+      "sourceBytes": 701583,
+      "sourceSha256": "eac0f4b3d49c469e1935adf407dbef23f934e62a6e8d877bea0105bbd3fdd013",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 32; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 33,
       "mimeType": "image/png",
-      "bytes": 639610,
-      "sha256": "1a16280d02e5bad78fbffad905198abcf82356a21790ba556112ddf26f2492c8",
-      "origin": "Unmodified embedded image 33 from pinned artist source GLB"
+      "bytes": 189698,
+      "sha256": "2431e612b05d942e57fa05c778bad86d1655dfa9c4dfb0e979b3e5eceb77191f",
+      "sourceBytes": 639610,
+      "sourceSha256": "1a16280d02e5bad78fbffad905198abcf82356a21790ba556112ddf26f2492c8",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 33; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 34,
       "mimeType": "image/png",
-      "bytes": 754205,
-      "sha256": "0d2e7ebc2a2ddab96c82db42af9014369368a6add533f954ba171f99f79cc018",
-      "origin": "Unmodified embedded image 34 from pinned artist source GLB"
+      "bytes": 238386,
+      "sha256": "017dfc6e420aa12d4f880e094a7317f76e232df0dcbce404a29019df9c67ee41",
+      "sourceBytes": 754205,
+      "sourceSha256": "0d2e7ebc2a2ddab96c82db42af9014369368a6add533f954ba171f99f79cc018",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 34; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 35,
       "mimeType": "image/png",
-      "bytes": 671831,
-      "sha256": "0104195844af924f40679d8adccbcd27a00940f2c4d489351f590dd5848e94b3",
-      "origin": "Unmodified embedded image 35 from pinned artist source GLB"
+      "bytes": 204865,
+      "sha256": "ad597f5e9091c64414cfa525f4de7842437bbc65e99222029918a990db936ca8",
+      "sourceBytes": 671831,
+      "sourceSha256": "0104195844af924f40679d8adccbcd27a00940f2c4d489351f590dd5848e94b3",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 35; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 36,
       "mimeType": "image/png",
-      "bytes": 712550,
-      "sha256": "b0bd02f8fd71f1d33a6d121bc021737030fc05f83d6242238a0cb30c4388745f",
-      "origin": "Unmodified embedded image 36 from pinned artist source GLB"
+      "bytes": 208065,
+      "sha256": "b956abd370099e98ae893efa5242c732815416a7a82d91c1136b26645ddb6a9b",
+      "sourceBytes": 712550,
+      "sourceSha256": "b0bd02f8fd71f1d33a6d121bc021737030fc05f83d6242238a0cb30c4388745f",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 36; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 37,
       "mimeType": "image/png",
-      "bytes": 683309,
-      "sha256": "339fe17ae65311a0a8120cf2b6333656f1d590c0fc92d197ccc6b92d00420294",
-      "origin": "Unmodified embedded image 37 from pinned artist source GLB"
+      "bytes": 211904,
+      "sha256": "b8bcca1d27fbb7e49b2d7febabe6e02dc31001d182e3811fd9ae95aee9098468",
+      "sourceBytes": 683309,
+      "sourceSha256": "339fe17ae65311a0a8120cf2b6333656f1d590c0fc92d197ccc6b92d00420294",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 37; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 38,
       "mimeType": "image/png",
-      "bytes": 719241,
-      "sha256": "45eed3443b3ac86f27cac31b987db169bd5a2ced968740e08ac90b6dc0fba9f0",
-      "origin": "Unmodified embedded image 38 from pinned artist source GLB"
+      "bytes": 215717,
+      "sha256": "88a4ef0f93a33b7fde8331a9c33fba8e0beb89a83ea9745bbbd2b52ccee1c007",
+      "sourceBytes": 719241,
+      "sourceSha256": "45eed3443b3ac86f27cac31b987db169bd5a2ced968740e08ac90b6dc0fba9f0",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 38; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 39,
       "mimeType": "image/png",
-      "bytes": 665444,
-      "sha256": "b08c1f363e95192de5b82e85096223a2b7874d40eeffddaee69d906ac9781810",
-      "origin": "Unmodified embedded image 39 from pinned artist source GLB"
+      "bytes": 195576,
+      "sha256": "6b3919048b9f76553393843374f332d3a799a181ca69a0e17ca268613a2cd78a",
+      "sourceBytes": 665444,
+      "sourceSha256": "b08c1f363e95192de5b82e85096223a2b7874d40eeffddaee69d906ac9781810",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 39; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 40,
       "mimeType": "image/png",
-      "bytes": 654804,
-      "sha256": "d1dbf4c71abfb83210f82a0dc0484a328051c08d70f76be102b6ee1cc32d469e",
-      "origin": "Unmodified embedded image 40 from pinned artist source GLB"
+      "bytes": 196852,
+      "sha256": "8418060b4f7d1a5704d09e0024181b38b09ee7448a5687dde173c3bc7f9d8ccd",
+      "sourceBytes": 654804,
+      "sourceSha256": "d1dbf4c71abfb83210f82a0dc0484a328051c08d70f76be102b6ee1cc32d469e",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 40; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 41,
       "mimeType": "image/png",
-      "bytes": 486910,
-      "sha256": "4cb4bbec7cd80b36e8aaab19e73e8c118565c68eb533e519e59f8d60d87740a4",
-      "origin": "Unmodified embedded image 41 from pinned artist source GLB"
+      "bytes": 153732,
+      "sha256": "23def3f44dd7365aa834e33d73050e07e117e45b9657ab23ade234f7b9ddf3a9",
+      "sourceBytes": 486910,
+      "sourceSha256": "4cb4bbec7cd80b36e8aaab19e73e8c118565c68eb533e519e59f8d60d87740a4",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 41; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 42,
       "mimeType": "image/png",
-      "bytes": 201799,
-      "sha256": "ba1bf9f67e753f1a4593b4656ba9d4a86d0c98ad7ab0072f46c5746fc0b8fd20",
-      "origin": "Unmodified embedded image 42 from pinned artist source GLB"
+      "bytes": 121189,
+      "sha256": "73902d1b3fc5445830387b48bceae88de6063d27e01c918d162e6caf12e028c2",
+      "sourceBytes": 201799,
+      "sourceSha256": "ba1bf9f67e753f1a4593b4656ba9d4a86d0c98ad7ab0072f46c5746fc0b8fd20",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 42; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 43,
       "mimeType": "image/png",
-      "bytes": 360173,
-      "sha256": "99412326362ef2083451e3d98357ef118b596fa3a7a08ea0ebaad4c1ab0ee625",
-      "origin": "Unmodified embedded image 43 from pinned artist source GLB"
+      "bytes": 117084,
+      "sha256": "d45b256629ed864b96cd26b9cb8c4bacb8326d5ee5186d2ddcc33b15ab9df0ed",
+      "sourceBytes": 360173,
+      "sourceSha256": "99412326362ef2083451e3d98357ef118b596fa3a7a08ea0ebaad4c1ab0ee625",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 43; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 44,
       "mimeType": "image/png",
-      "bytes": 671953,
-      "sha256": "29f36bae5aeef22fc5d5fcc08461879cf4a6708728dad855998da134302173b6",
-      "origin": "Unmodified embedded image 44 from pinned artist source GLB"
+      "bytes": 191550,
+      "sha256": "7880e07177a980303c0c72c67907d7e0d907d118b4c2ba5fc2466d788464920b",
+      "sourceBytes": 671953,
+      "sourceSha256": "29f36bae5aeef22fc5d5fcc08461879cf4a6708728dad855998da134302173b6",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 44; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 45,
       "mimeType": "image/png",
-      "bytes": 629091,
-      "sha256": "62e49254c4942472bf7c3691e1c8b485a3f022b21d5e2a19d841225c95641bb3",
-      "origin": "Unmodified embedded image 45 from pinned artist source GLB"
+      "bytes": 186585,
+      "sha256": "b36c8c337695c08ee5292cc990f3bb0c942888e087a024d1733ee105f6a89fec",
+      "sourceBytes": 629091,
+      "sourceSha256": "62e49254c4942472bf7c3691e1c8b485a3f022b21d5e2a19d841225c95641bb3",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 45; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 46,
       "mimeType": "image/png",
-      "bytes": 548934,
-      "sha256": "f68a42556c7ff0ccb969c4a1856520e5a4e20223bce0dac5db23380731be273b",
-      "origin": "Unmodified embedded image 46 from pinned artist source GLB"
+      "bytes": 159301,
+      "sha256": "e8c35559e6bfd7f09902d6d48073ad196d9a2ceab727a135db3d30f6ae65d435",
+      "sourceBytes": 548934,
+      "sourceSha256": "f68a42556c7ff0ccb969c4a1856520e5a4e20223bce0dac5db23380731be273b",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 46; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 47,
       "mimeType": "image/png",
-      "bytes": 794114,
-      "sha256": "c1b8cbd1f2c768884464b1ccd1968eab1ae6f6e74de4b4853ec85201bdf04258",
-      "origin": "Unmodified embedded image 47 from pinned artist source GLB"
+      "bytes": 232882,
+      "sha256": "f9b851b44e2761d21778f1e434f631ef59b702ddcdcfeca7c961bcfa5386c7de",
+      "sourceBytes": 794114,
+      "sourceSha256": "c1b8cbd1f2c768884464b1ccd1968eab1ae6f6e74de4b4853ec85201bdf04258",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 47; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     },
     {
       "index": 48,
       "mimeType": "image/png",
-      "bytes": 568891,
-      "sha256": "bac777172ae14b4ecc898d839e3c44cdaf8ffa9dd05c22e1cb96dd446bf46db3",
-      "origin": "Unmodified embedded image 48 from pinned artist source GLB"
+      "bytes": 170384,
+      "sha256": "12a76a01ef4ae13f879819c0f994389c3890a5734f2017e2ab9c77dad23f9bbc",
+      "sourceBytes": 568891,
+      "sourceSha256": "bac777172ae14b4ecc898d839e3c44cdaf8ffa9dd05c22e1cb96dd446bf46db3",
+      "sourceWidth": 1024,
+      "sourceHeight": 1024,
+      "width": 512,
+      "height": 512,
+      "origin": "512 px budget derivative of pinned artist image 48; Lanczos resampling, color-aware albedo filtering and renormalized tangent normals. Artist UVs and paint retained."
     }
-  ]
+  ],
+  "textureBudget": {
+    "maxDimension": 512,
+    "sourcePixelCount": 51380224,
+    "pixelCount": 12845056,
+    "geometryUnchanged": true
+  }
 }

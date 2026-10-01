@@ -98,7 +98,7 @@ export function commandView(s, content, ui = {}) {
   const merchantPanel = convoy ? `<section class="merchant-inspection" data-convoy-id="${esc(convoy.id)}" data-hull-index="${ui.merchantHullIndex ?? ''}"><button data-action="map-overview">Naval commands</button>${Number.isInteger(ui.merchantHullIndex) ? `<p>Merchant hull ${Math.min(convoy.count,ui.merchantHullIndex + 1)} of ${convoy.count}</p>` : ''}${mapHover(s,content,'convoy:'+convoy.id)}<p class="panel-note">Representative freighter geometry. Hull identities and spacing are for inspection; the simulation records the convoy's shared voyage and surviving count.</p></section>` : '';
   const panel = ui.sidePanel || merchantPanel || fleetList;
   const legend =
-    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · drag to pan · right-drag or Shift-drag to tilt · double-click a force for ships · Home for strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
+    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · drag to pan · the camera tilts automatically only when inspecting individual ships · double-click a force for ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
     PROFILES[s.player].color +
     '">▲ Fleet</span><span style="color:' +
     PROFILES[s.player].color +

@@ -1,4 +1,5 @@
 import { airOperationsText } from "../mechanics/air-operations.mjs";
+import { battleMapHover } from './battle-map.mjs';
 import { recognitionThumbnail } from "./recognition.mjs";
 import { shipDescription, aircraftDescription, aircraftSpeed } from "./catalog-presentation.mjs";
 import { finiteTorpedoOutfit, torpedoesPerHull } from '../mechanics/torpedo-ammunition.mjs';
@@ -45,6 +46,7 @@ const list = (rows) =>
   "</dl>";
 export function mapHover(s, c, key, data = {}) {
   const [kind, id] = key.split(":");
+  if (kind === 'battle') return battleMapHover(s,id);
   if (kind === "port" && PORTS[id])
     return (
       "<h3>" +

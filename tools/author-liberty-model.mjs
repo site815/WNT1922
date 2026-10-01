@@ -1,17 +1,15 @@
 // Optional authoring tool. Runtime reads the finished GLB directly.
 // All surfaces originate here and in the companion survey-based specification.
 import fs from 'node:fs/promises';
+import {writeStoredAsset} from '../assets/models/authoring/write-stored-asset.mjs';
 import {validateDetailedShip} from './check-models.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {createAuthoredMesh} from '../assets/models/authoring/authored-mesh.mjs';
+import {createNavalMesh} from '../assets/models/authoring/fleet-materials.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const spec=JSON.parse(await fs.readFile(path.join(root,'assets/models/source/liberty-ec2-sc1.json'),'utf8'));
-const {groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,roundedOutline,house,rail,ladder,addTexture,makeGlb}=createAuthoredMesh(spec);
-addTexture('naval-paint',await fs.readFile(path.join(root,'assets/models/textures/naval-paint/albedo.png')));
-addTexture('paint-normal',await fs.readFile(path.join(root,'assets/models/textures/blue_metal_plate/blue_metal_plate_nor_gl_1k.png')));
-addTexture('paint-orm',await fs.readFile(path.join(root,'assets/models/textures/blue_metal_plate/blue_metal_plate_arm_1k.jpg')),'image/jpeg');
+const {groups,parts,add,sub,mul,cross,unit,tri,quad,part,cylinder,ring,prism,roundedOutline,house,rail,ladder,addTexture,makeGlb}=await createNavalMesh(spec);
 const {length:L,beam:B,draft:D}=spec.dimensions;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,t)=>a+(b-a)*t;
 function curve(t,column){
@@ -307,7 +305,7 @@ if(!process.argv.includes('--write'))throw Error('Pass --write to author the GLB
 const output=path.join(root,'assets/models/ships/generic/liberty-ec2-sc1.glb');
 const completedGlb=makeGlb();
 const statistics=validateDetailedShip(completedGlb,{id:spec.id,metadata:spec});
-await fs.writeFile(output,completedGlb);
-const summary={id:spec.id,file:path.relative(root,output).replaceAll('\\','/'),triangles:[...groups.values()].reduce((n,g)=>n+g.indices.length/3,0),vertices:[...groups.values()].reduce((n,g)=>n+g.positions.length/3,0),materials:groups.size,components:parts.length,auditedHullVertices,bytes:(await fs.stat(output)).size};
-await fs.writeFile(output.replace(/\.glb$/,'.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/source/liberty-ec2-sc1.json',exporter:'tools/author-liberty-model.mjs',summary,statistics,components:parts},null,2)+'\n');
+await writeStoredAsset(output,completedGlb);
+const summary={id:spec.id,file:path.relative(root,output).replaceAll('\\','/'),triangles:[...groups.values()].reduce((n,g)=>n+g.indices.length/3,0),vertices:statistics.vertices,materials:groups.size,components:parts.length,auditedHullVertices,bytes:(await fs.stat(output)).size};
+await writeStoredAsset(output.replace(/\.glb$/,'.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/source/liberty-ec2-sc1.json',exporter:'tools/author-liberty-model.mjs',summary,statistics,components:parts},null,2)+'\n');
 console.log(JSON.stringify(summary));

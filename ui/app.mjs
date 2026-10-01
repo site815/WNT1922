@@ -9,7 +9,7 @@ import { SCORE_NAVAL_TONS_PER_POINT } from '../mechanics/campaign-impact.mjs';
 import { politicalPopup } from "./diplomacy-popup.mjs";
 import { bulkPlan } from "../mechanics/bulk-fleet.mjs";
 import { resourceHover } from "./resource-breakdown.mjs";
-import { UnrealWorldScene, UnrealBattleScene } from './unreal-scene.mjs';
+import { UNREAL_MODE, UnrealWorldScene, UnrealBattleScene } from './unreal-scene.mjs';
 import { battleWatchView, watchFrame, attritionView } from './battle-watch.mjs';
 import { chartPosition } from "./map-focus.mjs";
 import { landView, strategicAirView } from "./land-view.mjs";
@@ -116,6 +116,7 @@ import { CATALOG } from "../worker/catalog-loader.mjs";
 import { newsDestination } from "./news-navigation.mjs";
 import { activeDispatch } from "../mechanics/alert-lifecycle.mjs";
 import { loadRecognition, recognitionCard, recognitionExpanded, recognitionCredits } from "./recognition.mjs";
+import { HoverTask } from "./hover-task.mjs";
 import { shipDescription, aircraftDescription } from "./catalog-presentation.mjs";
 import { readDocument } from '../worker/documents.mjs';
 const DECISIVE_RULES = (await readDocument('common/rules/battle-stages.md')).DECISIVE;
@@ -187,10 +188,16 @@ const worldScene = new UnrealWorldScene({
   onHover: inspectScene,
   onCameraChange: () => { if (state) render(); },
 });
+function showBattleInspection() {
+  const panel = app.querySelector('.battle-watch-information');
+  const inspection = panel?.querySelector('.battle-ship-inspection');
+  if (inspection) panel.scrollTop += inspection.getBoundingClientRect().top - panel.getBoundingClientRect().top - 8;
+}
 const battleScene = new UnrealBattleScene({root: app, onSelect: selected => {
   if (dialog?.type !== 'battle-watch') return;
   dialog.selected = selected;
   render();
+  showBattleInspection();
 }});
 const simulation = new SimulationClient({
   onState: receiveSimulation,
@@ -488,6 +495,10 @@ function commandView(backgroundOnly = false) {
 async function selectScene(selection) {
   if (!state || dialog) return;
   hideClassHover();
+  if (selection.kind === 'battle') {
+    await openBattleWatch(selection.id);
+    return;
+  }
   if (selection.kind === 'merchant') {
     focusMap('convoy', selection.id, !!selection.zoom);
     chart.merchantHullIndex = selection.hullIndex;
@@ -1138,11 +1149,11 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag to pan the north-up wrapping 3D terrain map; scroll continuously from the strategic world down to individual ships. The strategic camera stays overhead. At close ship zoom, right-drag or Shift-drag tilts the camera. Double-click a fleet or convoy to inspect its ships; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Ship stations form stable formations around their recorded fleet positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 2,500× to 1,000,000×. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Drag to pan the north-up wrapping 3D terrain map; scroll continuously from the strategic world down to individual ships. The camera stays overhead across the strategic map and tilts automatically only when you zoom in to inspect individual ships. Zooming back out restores the overhead view. Double-click a fleet or convoy to inspect its ships; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Ship stations form stable formations around their recorded fleet positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Diamonds are fading intelligence reports, not live enemy positions. Hover shows information; click centers the map and double-click zooms; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Decisive battles raise an optional Watch alert. Opening the viewer pauses play; Next tick advances the whole world by fifteen minutes and remains paused. Recorded ticks can be replayed without changing the campaign. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 60× to 1,000,000×. Tactical 60× runs one game minute per real second, so live map battles remain readable; a full simulation tick occurs every fifteen seconds. Click a crossed-gun battle badge to pause and watch. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
-    body = `<p>${PROFILES[state.player].name} · ${smallDate(state.day)}</p><div class="menu-actions">${btn("Export save file", "export")}${btn("Import save file", "import")}${btn("Return to navy selection", "title-screen")}${btn("How to play", "help")}${btn("Toggle full window / fullscreen", "fullscreen")}</div>${musicCredits()}<p><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Third-party licenses and credits</a></p><p class="panel-note">Saves: %APPDATA%/WNT1922/saves. The previous disk save is kept as campaign.backup.json.</p>`;
+    body = `<p>${PROFILES[state.player].name} · ${smallDate(state.day)}</p><div class="menu-actions">${btn("Export save file", "export")}${btn("Import save file", "import")}${btn("Return to navy selection", "title-screen")}${btn("How to play", "help")}${UNREAL_MODE ? '' : btn("Toggle full window / fullscreen", "fullscreen")}</div>${musicCredits()}<p><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Third-party licenses and credits</a></p><p class="panel-note">Saves: %APPDATA%/WNT1922/saves. The previous disk save is kept as campaign.backup.json.</p>`;
   }
   if (dialog.type === "spec") body = '<p class="catalog-description">' + esc(shipDescription(content.classes[dialog.id])) + '</p>' + recognitionCard("ship", dialog.id, { campaign: state.campaignId }) + body;
   if (dialog.type === "aircraft-spec") {
@@ -1304,8 +1315,10 @@ app.addEventListener("click", async (event) => {
       }
       if (dialog === current) {
         render();
-        if (['battle-select', 'battle-hull-next', 'battle-hull-previous'].includes(action) && current.selected)
-          { battleScene.focus(current.selected.side, current.selected.id, current.selected.hullIndex); app.querySelector('.battle-stage')?.scrollIntoView({block: 'center'}); }
+        if (['battle-select', 'battle-hull-next', 'battle-hull-previous'].includes(action) && current.selected) {
+          battleScene.focus(current.selected.side, current.selected.id, current.selected.hullIndex);
+          showBattleInspection();
+        }
       }
       return;
     }
@@ -1348,7 +1361,7 @@ app.addEventListener("click", async (event) => {
       render();
       return;
     }
-    if (action === "fullscreen") {
+    if (action === "fullscreen" && !UNREAL_MODE) {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
       return;
@@ -1915,7 +1928,7 @@ document.addEventListener("keydown", (event) => {
   if (
     !state ||
     dialog ||
-    state.decisions.some((d) => d.popup) ||
+    state.decisions.some(activeDispatch) ||
     event.ctrlKey || event.metaKey || event.altKey ||
     event.target.isContentEditable ||
     ["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName)
@@ -2013,7 +2026,8 @@ function importCampaign() {
   };
   input.click();
 }
-let hoverTimer, hoverHideTimer,
+const hoverTask = new HoverTask();
+let hoverHideTimer,
   hoverTarget = null, hoverPending = null, sceneHoverKey = null;
 let resizeTimer;
 window.addEventListener("resize", () => {
@@ -2029,7 +2043,7 @@ classTip.setAttribute("role", "tooltip");
 classTip.hidden = true;
 document.body.append(classTip);
 function hideClassHover() {
-  clearTimeout(hoverTimer);
+  hoverTask.cancel();
   clearTimeout(hoverHideTimer);
   if (classTip) classTip.hidden = true;
   hoverTarget = null;
@@ -2042,18 +2056,22 @@ let hoverPoint = null,
   hoverScrollTimer;
 function inspectScene(selection, point = {}) {
   if (!selection || dialog || !state) {
-    clearTimeout(hoverTimer);
+    hoverTask.cancel();
+    sceneHoverKey = null;
+    hoverPending = null;
     clearTimeout(hoverHideTimer);
+    if (point.immediate || dialog || !state) {hideClassHover(); return;}
     hoverHideTimer = setTimeout(hideClassHover, 240);
     return;
   }
   clearTimeout(hoverHideTimer);
   const key = selection.kind + ':' + selection.id + ':' + (selection.hullIndex ?? '') + ':' + (selection.visualStatus || '');
   if (key === sceneHoverKey) return;
-  clearTimeout(hoverTimer);
+  hoverPending = null;
   sceneHoverKey = key;
-  hoverTimer = setTimeout(async () => {
+  hoverTask.schedule(async () => {
     if (selection.kind === 'ship') await loadRecognition().catch(() => {});
+  }, () => {
     if (sceneHoverKey !== key || !state || dialog) return;
     const group = selection.kind === 'ship' ? player().groups.find(g => g.id === selection.id) : null;
     const fleet = selection.kind === 'fleet' ? player().fleets.find(f => f.id === selection.id) : null;
@@ -2075,7 +2093,7 @@ function inspectScene(selection, point = {}) {
     classTip.scrollTop = 0;
     classTip.style.left = (rightSpace >= classTip.offsetWidth ? pointerX + 16 : Math.max(8, pointerX - classTip.offsetWidth - 16)) + 'px';
     classTip.style.top = Math.max(8, Math.min(innerHeight - classTip.offsetHeight - 8, (point.clientY || 0) + 12)) + 'px';
-  }, 220);
+  });
 }
 function inspectHover(event) {
   if (Number.isFinite(event.clientX))
@@ -2086,21 +2104,22 @@ function inspectHover(event) {
   if (!target) return;
   clearTimeout(hoverHideTimer);
   if (target === hoverTarget) {
-    clearTimeout(hoverTimer);
+    hoverTask.cancel();
     hoverPending = null;
     return;
   }
   if (target === hoverPending) return;
-  clearTimeout(hoverTimer);
+  sceneHoverKey = null;
   hoverPending = target;
-  hoverTimer = setTimeout(async () => {
+  hoverTask.schedule(async () => {
     if (target.matches("[data-ship], [data-class], [data-aircraft]")) {
       // A register can be the first screen visited after loading a campaign.
       // Keep this target pending while its drawings load; later pointer/focus
       // changes invalidate it so an old async response cannot reopen a tooltip.
       await loadRecognition().catch(() => {});
-      if (hoverPending !== target) return;
     }
+  }, () => {
+    if (hoverPending !== target || !state) return;
     hoverPending = null;
     if (!target.isConnected || !target.matches(':hover, :focus-within')) return;
     const hoveredShip = target.dataset.ship ? player().groups.find((g) => g.id === target.dataset.ship) : null;
@@ -2178,7 +2197,7 @@ function inspectHover(event) {
     classTip.style.left = left + "px";
     classTip.style.top =
       (resourceBar ? hoverTop : Math.max(8, Math.min(innerHeight - height - 8, box.top))) + "px";
-  }, 220);
+  });
 }
 app.addEventListener("focusin", inspectHover, true);
 app.addEventListener("focusout", (event) => {
@@ -2194,17 +2213,22 @@ app.addEventListener("pointerout", (event) => {
     !hoverTarget.contains(event.relatedTarget) &&
     !classTip.contains(event.relatedTarget)
   ) {
+    hoverTask.cancel();
+    sceneHoverKey = null;
+    hoverPending = null;
     clearTimeout(hoverHideTimer);
     hoverHideTimer = setTimeout(hideClassHover, 240);
   }
 });
 classTip.addEventListener("pointerenter", () => {
   clearTimeout(hoverHideTimer);
-  clearTimeout(hoverTimer);
+  hoverTask.cancel();
   hoverPending = null;
 });
 classTip.addEventListener("pointerleave", (event) => {
   if (!hoverTarget?.contains(event.relatedTarget)) {
+    hoverTask.cancel();
+    sceneHoverKey = null;
     clearTimeout(hoverHideTimer);
     hoverHideTimer = setTimeout(hideClassHover, 240);
   }

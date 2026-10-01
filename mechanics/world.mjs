@@ -33,7 +33,13 @@ const nodeVectors = Object.fromEntries(nodeIds.map(id => {
   const [lon,lat] = NODES[id].map(v => v * Math.PI / 180);
   return [id, [Math.cos(lat)*Math.cos(lon), Math.cos(lat)*Math.sin(lon), Math.sin(lat)]];
 }));
+const nearestNodeCache = new Map();
 export function nearestSeaNode(position, choices = nodeIds, preferLast = false) {
+  // Supply/port queries revisit the exact same force coordinates within a tick
+  // and docked coordinates across ticks. Cache only the fixed, complete graph;
+  // arbitrary ordered subsets still follow their original tie-breaking rules.
+  const cacheKey = choices === nodeIds ? `${position[0]}:${position[1]}:${+preferLast}` : null;
+  if (cacheKey !== null && nearestNodeCache.has(cacheKey)) return nearestNodeCache.get(cacheKey);
   const lon=position[0]*Math.PI/180, lat=position[1]*Math.PI/180,
     x=Math.cos(lat)*Math.cos(lon), y=Math.cos(lat)*Math.sin(lon), z=Math.sin(lat);
   let best = choices[0], score = -Infinity;
@@ -43,6 +49,10 @@ export function nearestSeaNode(position, choices = nodeIds, preferLast = false) 
       const a=distanceNm(NODES[id],position), b=distanceNm(NODES[best],position);
       if (a < b || (preferLast && a === b)) { best=id; score=next; }
     } else if (next > score) { best=id; score=next; }
+  }
+  if (cacheKey !== null) {
+    if (nearestNodeCache.size >= 2048) nearestNodeCache.delete(nearestNodeCache.keys().next().value);
+    nearestNodeCache.set(cacheKey, best);
   }
   return best;
 }

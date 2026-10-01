@@ -539,6 +539,21 @@
   "textureMetres": 2.5,
   "indexVertices": true,
   "materials": {
+    "upperdeck": {
+      "color": [
+        0.14,
+        0.155,
+        0.16,
+        1
+      ],
+      "metallic": 0,
+      "roughness": 1,
+      "normalScale": 0.6,
+      "baseColorTexture": "steel-deck-albedo",
+      "normalTexture": "steel-deck-normal",
+      "metallicRoughnessTexture": "steel-deck-orm",
+      "occlusionTexture": "steel-deck-orm"
+    },
     "paint": {
       "color": [
         0.33,
@@ -547,27 +562,27 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.65,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "deck": {
       "color": [
-        0.4,
-        0.34,
-        0.235,
+        0.42,
+        0.39,
+        0.33,
         1
       ],
       "metallic": 0,
-      "roughness": 0.9,
-      "baseColorTexture": "naval-albedo",
-      "normalTexture": "naval-normal",
-      "normalScale": 0.45,
-      "metallicRoughnessTexture": "naval-orm",
-      "occlusionTexture": "naval-orm"
+      "roughness": 1,
+      "normalScale": 0.8,
+      "baseColorTexture": "timber-albedo",
+      "normalTexture": "timber-normal",
+      "metallicRoughnessTexture": "timber-orm",
+      "occlusionTexture": "timber-orm"
     },
     "antifouling": {
       "color": [
@@ -577,7 +592,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.92
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "boot": {
       "color": [
@@ -587,7 +607,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.9
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "steel": {
       "color": [
@@ -597,7 +622,10 @@
         1
       ],
       "metallic": 0.78,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "glass": {
       "color": [
@@ -617,7 +645,10 @@
         1
       ],
       "metallic": 0.8,
-      "roughness": 0.45
+      "roughness": 0.45,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "canvas": {
       "color": [
@@ -627,7 +658,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.95
+      "roughness": 1,
+      "baseColorTexture": "canvas-albedo",
+      "normalTexture": "canvas-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "canvas-orm",
+      "occlusionTexture": "canvas-orm"
     },
     "white": {
       "color": [
@@ -637,7 +673,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.94
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "red": {
       "color": [
@@ -647,28 +688,42 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.5
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     }
   },
+  "curveToleranceMetres": 0.003,
   "materialSources": [
     {
-      "name": "Original naval surface maps",
+      "name": "Original fleet paint, timber, nonslip decking and canvas PBR maps",
       "author": "WNT1922",
       "license": "Original project artwork",
-      "manifest": "assets/models/textures/naval-paint/source.json",
-      "usage": "Embedded albedo, tangent normal and occlusion/roughness/metallic maps. Metre-scaled texture coordinates."
+      "manifest": "assets/models/textures/fleet-surfaces/source.json",
+      "usage": "Embedded physically scaled albedo, OpenGL normal and packed occlusion/roughness/metalness. Original inferred weathering, not an exact camouflage or refit claim."
     }
   ],
+  "surfaceProfile": {
+    "version": 1,
+    "tileMetres": 2.5,
+    "textureSize": 256,
+    "deckFinish": "timber",
+    "curveToleranceMetres": 0.003,
+    "geometryPolicy": "Preserve hull loft, fittings and weapon stations. Reduced cylinder and ring tessellation adds at most 3 mm radial error; already coarser original fittings are unchanged. Lossless Float32 vertex indexing preserves UV and hard-normal seams."
+  },
   "authoringFile": "assets/models/authoring/fleet-specifications.json",
   "exporter": "assets/models/authoring/build-detailed-fleet.mjs",
-  "sha256": "0a039da507bb13607d7a5210763a73b96ed32f5579b6e735169a17a32c1c5ec8",
+  "sha256": "b1a30492e482006538f74b1f06fb820f29dc3707d971b648f7ee6a71ddd24ac2",
   "statistics": {
     "id": "svetlana_1913",
-    "triangles": 107276,
-    "vertices": 135329,
-    "materials": 8,
-    "embeddedTextures": 3,
-    "bytes": 6205760,
+    "triangles": 99768,
+    "vertices": 128881,
+    "materials": 9,
+    "embeddedTextures": 12,
+    "bytes": 5830108,
     "bounds": {
       "min": [
         -79.19999694824219,
@@ -677,7 +732,7 @@
       ],
       "max": [
         79.19999694824219,
-        21.4991512298584,
+        21.499147415161133,
         7.743000030517578
       ]
     }
@@ -722,474 +777,479 @@
     },
     {
       "name": "Shaped bridge-base with glazing, doors, portholes and roof rails",
-      "triangles": 2352,
+      "triangles": 4456,
       "ranges": [
         {
           "material": "paint",
           "indexStart": 55992,
-          "indexCount": 240
+          "indexCount": 4368
         },
         {
-          "material": "deck",
-          "indexStart": 2112,
+          "material": "boot",
+          "indexStart": 612,
+          "indexCount": 432
+        },
+        {
+          "material": "upperdeck",
+          "indexStart": 0,
           "indexCount": 96
         },
         {
           "material": "brass",
           "indexStart": 0,
-          "indexCount": 3264
+          "indexCount": 3048
         },
         {
           "material": "glass",
           "indexStart": 0,
-          "indexCount": 3072
+          "indexCount": 2496
         },
         {
           "material": "steel",
           "indexStart": 0,
-          "indexCount": 384
+          "indexCount": 2928
         }
       ]
     },
     {
       "name": "Shaped bridge with glazing, doors, portholes and roof rails",
-      "triangles": 2968,
+      "triangles": 3328,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 56232,
-          "indexCount": 1200
+          "indexStart": 60360,
+          "indexCount": 1848
         },
         {
-          "material": "deck",
-          "indexStart": 2208,
-          "indexCount": 96
+          "material": "upperdeck",
+          "indexStart": 96,
+          "indexCount": 192
         },
         {
           "material": "brass",
-          "indexStart": 3264,
-          "indexCount": 2880
+          "indexStart": 3048,
+          "indexCount": 2976
         },
         {
           "material": "glass",
-          "indexStart": 3072,
-          "indexCount": 4344
+          "indexStart": 2496,
+          "indexCount": 3840
         },
         {
           "material": "steel",
-          "indexStart": 384,
-          "indexCount": 384
+          "indexStart": 2928,
+          "indexCount": 1128
         }
       ]
     },
     {
       "name": "Main battery mount 1 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 57432,
-          "indexCount": 1056
+          "indexStart": 62208,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 612,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6144,
+          "indexStart": 1044,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6024,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 768,
-          "indexCount": 2064
+          "indexStart": 4056,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 2 1 x 130 mm",
-      "triangles": 1336,
+      "triangles": 1180,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 58488,
-          "indexCount": 1632
+          "indexStart": 63036,
+          "indexCount": 1404
         },
         {
           "material": "boot",
-          "indexStart": 804,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6264,
+          "indexStart": 1164,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6096,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 2832,
-          "indexCount": 2064
+          "indexStart": 6000,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 3 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 60120,
-          "indexCount": 1056
+          "indexStart": 64440,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 996,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6384,
+          "indexStart": 1284,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6168,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 4896,
-          "indexCount": 2064
+          "indexStart": 7944,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 4 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 61176,
-          "indexCount": 1056
+          "indexStart": 65268,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 1188,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6504,
+          "indexStart": 1404,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6240,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 6960,
-          "indexCount": 2064
+          "indexStart": 9888,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 5 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 62232,
-          "indexCount": 1056
+          "indexStart": 66096,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 1380,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6624,
+          "indexStart": 1524,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6312,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 9024,
-          "indexCount": 2064
+          "indexStart": 11832,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 6 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 63288,
-          "indexCount": 1056
+          "indexStart": 66924,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 1572,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6744,
+          "indexStart": 1644,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6384,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 11088,
-          "indexCount": 2064
+          "indexStart": 13776,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 7 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 64344,
-          "indexCount": 1056
+          "indexStart": 67752,
+          "indexCount": 828
         },
         {
           "material": "boot",
           "indexStart": 1764,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6864,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6456,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 13152,
-          "indexCount": 2064
+          "indexStart": 15720,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 8 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 65400,
-          "indexCount": 1056
+          "indexStart": 68580,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 1956,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 6984,
+          "indexStart": 1884,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6528,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 15216,
-          "indexCount": 2064
+          "indexStart": 17664,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 9 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 66456,
-          "indexCount": 1056
+          "indexStart": 69408,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 2148,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7104,
+          "indexStart": 2004,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6600,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 17280,
-          "indexCount": 2064
+          "indexStart": 19608,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 10 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 67512,
-          "indexCount": 1056
+          "indexStart": 70236,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 2340,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7224,
+          "indexStart": 2124,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6672,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 19344,
-          "indexCount": 2064
+          "indexStart": 21552,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 11 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 68568,
-          "indexCount": 1056
+          "indexStart": 71064,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 2532,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7344,
+          "indexStart": 2244,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6744,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 21408,
-          "indexCount": 2064
+          "indexStart": 23496,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 12 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 69624,
-          "indexCount": 1056
+          "indexStart": 71892,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 2724,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7464,
+          "indexStart": 2364,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6816,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 23472,
-          "indexCount": 2064
+          "indexStart": 25440,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 13 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 70680,
-          "indexCount": 1056
+          "indexStart": 72720,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 2916,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7584,
+          "indexStart": 2484,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6888,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 25536,
-          "indexCount": 2064
+          "indexStart": 27384,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 14 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 71736,
-          "indexCount": 1056
+          "indexStart": 73548,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 3108,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7704,
+          "indexStart": 2604,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 6960,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 27600,
-          "indexCount": 2064
+          "indexStart": 29328,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Main battery mount 15 1 x 130 mm",
-      "triangles": 1144,
+      "triangles": 988,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 72792,
-          "indexCount": 1056
+          "indexStart": 74376,
+          "indexCount": 828
         },
         {
           "material": "boot",
-          "indexStart": 3300,
-          "indexCount": 192
-        },
-        {
-          "material": "brass",
-          "indexStart": 7824,
+          "indexStart": 2724,
           "indexCount": 120
         },
         {
+          "material": "brass",
+          "indexStart": 7032,
+          "indexCount": 72
+        },
+        {
           "material": "steel",
-          "indexStart": 29664,
-          "indexCount": 2064
+          "indexStart": 31272,
+          "indexCount": 1944
         }
       ]
     },
     {
       "name": "Torpedo bank at -22.176:3.942:0:trained:surface m: 4 individual tubes, gearing, rings and end caps",
-      "triangles": 7872,
+      "triangles": 7040,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 73848,
-          "indexCount": 2496
+          "indexStart": 75204,
+          "indexCount": 2352
         },
         {
           "material": "boot",
-          "indexStart": 3492,
-          "indexCount": 960
+          "indexStart": 2844,
+          "indexCount": 912
         },
         {
           "material": "steel",
-          "indexStart": 31728,
-          "indexCount": 20160
+          "indexStart": 33216,
+          "indexCount": 17856
         }
       ]
     },
@@ -1199,18 +1259,18 @@
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 76344,
-          "indexCount": 816
+          "indexStart": 77556,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 4452,
-          "indexCount": 840
+          "indexStart": 3756,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 51888,
-          "indexCount": 2688
+          "indexStart": 51072,
+          "indexCount": 2016
         }
       ]
     },
@@ -1220,18 +1280,18 @@
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 77160,
-          "indexCount": 816
+          "indexStart": 78804,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 5292,
-          "indexCount": 840
+          "indexStart": 4836,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 54576,
-          "indexCount": 2688
+          "indexStart": 53088,
+          "indexCount": 2016
         }
       ]
     },
@@ -1241,71 +1301,71 @@
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 77976,
-          "indexCount": 816
+          "indexStart": 80052,
+          "indexCount": 1248
         },
         {
           "material": "boot",
-          "indexStart": 6132,
-          "indexCount": 840
+          "indexStart": 5916,
+          "indexCount": 1080
         },
         {
           "material": "steel",
-          "indexStart": 57264,
-          "indexCount": 2688
+          "indexStart": 55104,
+          "indexCount": 2016
         }
       ]
     },
     {
       "name": "Mast 1 with taper, yards, rigging and access ladder",
-      "triangles": 1792,
+      "triangles": 1340,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 78792,
-          "indexCount": 1152
+          "indexStart": 81300,
+          "indexCount": 852
         },
         {
           "material": "steel",
-          "indexStart": 59952,
-          "indexCount": 4224
+          "indexStart": 57120,
+          "indexCount": 3168
         }
       ]
     },
     {
       "name": "Mast 2 with taper, yards, rigging and access ladder",
-      "triangles": 1632,
+      "triangles": 1220,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 79944,
-          "indexCount": 1152
+          "indexStart": 82152,
+          "indexCount": 852
         },
         {
           "material": "steel",
-          "indexStart": 64176,
-          "indexCount": 3744
+          "indexStart": 60288,
+          "indexCount": 2808
         }
       ]
     },
     {
       "name": "Open boat 1 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 81096,
-          "indexCount": 2688
+          "indexStart": 83004,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 2304,
+          "indexStart": 2112,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 67920,
-          "indexCount": 192
+          "indexStart": 63096,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1316,22 +1376,22 @@
     },
     {
       "name": "Open boat 2 with thwarts and working davit geometry",
-      "triangles": 3232,
+      "triangles": 3120,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 83784,
-          "indexCount": 2688
+          "indexStart": 85404,
+          "indexCount": 2400
         },
         {
           "material": "deck",
-          "indexStart": 2784,
+          "indexStart": 2592,
           "indexCount": 480
         },
         {
           "material": "steel",
-          "indexStart": 68112,
-          "indexCount": 192
+          "indexStart": 63240,
+          "indexCount": 144
         },
         {
           "material": "canvas",
@@ -1342,64 +1402,64 @@
     },
     {
       "name": "Mooring and deck fittings: windlass, anchors, fairleads, bitts, ventilation and hatches",
-      "triangles": 12144,
+      "triangles": 11888,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 86472,
-          "indexCount": 11712
+          "indexStart": 87804,
+          "indexCount": 11640
         },
         {
           "material": "boot",
-          "indexStart": 6972,
+          "indexStart": 6996,
           "indexCount": 1440
         },
         {
           "material": "steel",
-          "indexStart": 68304,
-          "indexCount": 23280
+          "indexStart": 63384,
+          "indexCount": 22584
         }
       ]
     },
     {
       "name": "Deck edge stanchions, lifelines and hull portholes",
-      "triangles": 25152,
+      "triangles": 19800,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 98184,
-          "indexCount": 41664
+          "indexStart": 99444,
+          "indexCount": 33000
         },
         {
           "material": "brass",
-          "indexStart": 7944,
-          "indexCount": 16896
+          "indexStart": 7104,
+          "indexCount": 13728
         },
         {
           "material": "glass",
-          "indexStart": 7416,
-          "indexCount": 16896
+          "indexStart": 6336,
+          "indexCount": 12672
         }
       ]
     },
     {
       "name": "Propeller shafts, closed pitched blades, stern rudder and bilge keels",
-      "triangles": 908,
+      "triangles": 804,
       "ranges": [
         {
           "material": "paint",
-          "indexStart": 139848,
-          "indexCount": 1308
+          "indexStart": 132444,
+          "indexCount": 1236
         },
         {
           "material": "brass",
-          "indexStart": 24840,
-          "indexCount": 936
+          "indexStart": 20832,
+          "indexCount": 864
         },
         {
           "material": "steel",
-          "indexStart": 91584,
-          "indexCount": 480
+          "indexStart": 85968,
+          "indexCount": 312
         }
       ]
     }

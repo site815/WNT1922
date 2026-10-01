@@ -7,7 +7,7 @@ import {validatePolygonShip,validateShipModels,validateDetailedShip} from '../to
 const read=async file=>JSON.parse(await fs.readFile('assets/models/ships/'+file,'utf8'));
 const volume=(model,part)=>{const p=model.mesh.positions,ix=model.mesh.indices;let sum=0;for(let i=part.indexStart;i<part.indexStart+part.indexCount;i+=3){const a=ix[i]*3,b=ix[i+1]*3,c=ix[i+2]*3;sum+=(p[a]*(p[b+1]*p[c+2]-p[b+2]*p[c+1])+p[a+1]*(p[b+2]*p[c]-p[b]*p[c+2])+p[a+2]*(p[b]*p[c+1]-p[b+1]*p[c]))/6;}return sum;};
 
-test('licensed detailed ships retain original embedded image bytes and attribution after scene normalization',async()=>{
+  test('licensed detailed ships retain attributed artist maps as budgeted derivatives after scene normalization',async()=>{
   for(const name of ['bismarck','samidare']){
     const file='historical/'+name+'-everlasting17th',metadata=await read(file+'.source.json'),buffer=await fs.readFile('assets/models/ships/'+file+'.glb');
     const stats=validateDetailedShip(buffer,{id:metadata.id,metadata});
@@ -17,7 +17,8 @@ test('licensed detailed ships retain original embedded image bytes and attributi
     const length=buffer.readUInt32LE(12),json=JSON.parse(buffer.subarray(20,20+length)),binary=buffer.subarray(28+length);
     assert.equal(json.nodes.length,1);assert.equal(json.nodes[0].mesh,0);assert(!json.nodes[0].matrix&&!json.nodes[0].rotation&&!json.nodes[0].scale,'All artist transforms baked');
     assert(json.asset.extras.author.includes('everlasting17th'));assert(json.asset.extras.license.includes('CC-BY-4.0'));
-    for(const image of metadata.embeddedImages){const view=json.bufferViews[json.images[image.index].bufferView],bytes=binary.subarray(view.byteOffset,view.byteOffset+view.byteLength);assert.equal(bytes.length,image.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),image.sha256,'Artist texture retained byte-for-byte');}
+      for(const image of metadata.embeddedImages){const view=json.bufferViews[json.images[image.index].bufferView],bytes=binary.subarray(view.byteOffset,view.byteOffset+view.byteLength);assert.equal(bytes.length,image.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),image.sha256,'Derivative revision matches recorded image');assert.equal(image.sourceSha256.length,64,'Original artist image revision is recorded');assert(image.width<=512&&image.height<=512);assert(image.sourceWidth>=image.width&&image.sourceHeight>=image.height,'No artificial upscaling');}
+      assert.equal(metadata.textureBudget.pixelCount,metadata.textureBudget.sourcePixelCount/4,'Image pixel memory reduced by 75%');
     assert.equal(json.images.length,metadata.embeddedImages.length);
     const {sourceHullBounds,uniformScale}=metadata.normalization;assert(Math.abs((sourceHullBounds.max[0]-sourceHullBounds.min[0])*uniformScale-metadata.length)<1e-8);
     assert(stats.bounds.min[1]<-2&&stats.bounds.max[1]>15,'Above-water equipment and underwater hull retained');

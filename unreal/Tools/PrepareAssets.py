@@ -1,6 +1,7 @@
 """Create missing native bootstrap assets inside Unreal's editor.
 
 Existing artist assets are preserved unless WNT_FORCE_ASSETS=1 is explicitly set.
+The generated terrain master also refreshes when its shader schema changes.
 """
 import json
 import os
@@ -114,24 +115,37 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
 
 def terrain_surface():
     asset_path = "/Game/Materials/M_TerrainSurface"
-    if assets.does_asset_exist(asset_path) and not force:
+    shader_schema = "3-full-precision-satellite-division"
+    existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
+    if existing and not force and assets.get_metadata_tag(existing, "WNTTerrainShaderSchema") == shader_schema:
         preserved.append(asset_path)
         return
-    mat = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else tools.create_asset(
+    mat = existing if existing else tools.create_asset(
         "M_TerrainSurface", "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
     editing.delete_all_material_expressions(mat)
     mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_DEFAULT_LIT)
     mat.set_editor_property("tangent_space_normal", False)
     mat.set_editor_property("two_sided", False)
     world = expression(mat, unreal.MaterialExpressionWorldPosition, -1600, 0)
-    xy = expression(mat, unreal.MaterialExpressionComponentMask, -1400, 0)
+    # Use full-precision local positions, not the procedural mesh's half-float
+    # UV buffer. The per-tile geographic phase survives world-origin rebases
+    # and is a common multiple of all three surface repeat distances.
+    local = expression(mat, unreal.MaterialExpressionLocalPosition, -2100, 0)
+    local.set_editor_property("local_origin", unreal.LocalPositionOrigin.PRIMITIVE)
+    local.set_editor_property("included_offsets", unreal.PositionIncludedOffsets.EXCLUDE_OFFSETS)
+    phase = expression(mat, unreal.MaterialExpressionVectorParameter, -2100, 200)
+    phase.set_editor_property("parameter_name", "GeographicTexturePhase")
+    phase.set_editor_property("use_custom_primitive_data", True)
+    phase.set_editor_property("primitive_data_index", 0)
+    stable = expression(mat, unreal.MaterialExpressionAdd, -1850, 0)
+    connect(local, stable, "A")
+    connect(phase, stable, "B", "RGB")
+    xy = expression(mat, unreal.MaterialExpressionComponentMask, -1600, 0)
     xy.set_editor_property("r", True)
     xy.set_editor_property("g", True)
-    xy.set_editor_property("b", False)
-    xy.set_editor_property("a", False)
-    connect(world, xy, "")
+    connect(stable, xy, "")
     uv = expression(mat, unreal.MaterialExpressionDivide, -1200, 0)
-    uv.set_editor_property("const_b", 5000.0)  # Source scan covers 50 metres.
+    uv.set_editor_property("const_b", 5000.0)
     connect(xy, uv, "A")
     linear_white_path = "/Game/Materials/T_LinearWhite"
     linear_white = assets.load_asset(linear_white_path)
@@ -168,11 +182,44 @@ def terrain_surface():
     bounded = expression(mat, unreal.MaterialExpressionSaturate, -1000, -400)
     connect(scaled, bounded, "")
     weight = expression(mat, unreal.MaterialExpressionMultiply, -800, -400)
-    weight.set_editor_property("const_b", .28)
+    weight.set_editor_property("const_b", .18)
     connect(bounded, weight, "A")
     nation = expression(mat, unreal.MaterialExpressionVertexColor, -800, -200)
-    global_uv = expression(mat, unreal.MaterialExpressionTextureCoordinate, -1600, -900)
-    global_uv.set_editor_property("coordinate_index", 0)
+    # The north-up world uses affine longitude/latitude positions. Reconstruct
+    # satellite UV in full float precision; mesh UV0 is half precision and
+    # loses coast-scale detail even though the original image is fully loaded.
+    # CPD comes from the original geographic tile, never its wrapped position.
+    global_origin = expression(mat, unreal.MaterialExpressionVectorParameter, -2300, -900)
+    global_origin.set_editor_property("parameter_name", "GlobalTextureOrigin")
+    global_origin.set_editor_property("use_custom_primitive_data", True)
+    global_origin.set_editor_property("primitive_data_index", 4)
+    uv_components = []
+    for channel, factor in [("g", 1.0), ("r", -2.0)]:
+        component = expression(mat, unreal.MaterialExpressionComponentMask, -2300, -1150-len(uv_components)*200)
+        for mask_channel in ["r", "g", "b", "a"]:
+            component.set_editor_property(mask_channel, mask_channel == channel)
+        connect(local, component, "")
+        # The legacy UE material translator prints scalar constants with only
+        # eight fractional digits. Multiplying by ~2.5e-10 therefore compiles
+        # to zero, leaving one satellite colour for an entire tile. Dividing
+        # by a large denominator preserves the spatial term in generated HLSL.
+        scale = expression(mat, unreal.MaterialExpressionDivide, -2100, -1150-len(uv_components)*200)
+        scale.set_editor_property("const_b", (2.0 * 3.141592653589793 * 6371000.0 * 100.0) / factor)
+        scale.set_editor_property("desc", "Satellite longitude UV" if channel == "g" else "Satellite latitude UV")
+        connect(component, scale, "A")
+        uv_components.append(scale)
+    global_delta = expression(mat, unreal.MaterialExpressionAppendVector, -1900, -1100)
+    connect(uv_components[0], global_delta, "A")
+    connect(uv_components[1], global_delta, "B")
+    origin_xy = expression(mat, unreal.MaterialExpressionComponentMask, -1900, -900)
+    origin_xy.set_editor_property("r", True)
+    origin_xy.set_editor_property("g", True)
+    origin_xy.set_editor_property("b", False)
+    origin_xy.set_editor_property("a", False)
+    connect(global_origin, origin_xy, "")
+    global_uv = expression(mat, unreal.MaterialExpressionAdd, -1600, -900)
+    connect(global_delta, global_uv, "A")
+    connect(origin_xy, global_uv, "B")
     satellite = expression(mat, unreal.MaterialExpressionTextureSampleParameter2D, -1350, -900)
     satellite.set_editor_property("parameter_name", "globalColorTexture")
     satellite.set_editor_property("texture", assets.load_asset("/Engine/EngineResources/WhiteSquareTexture"))
@@ -180,11 +227,30 @@ def terrain_surface():
     connect(global_uv, satellite, "UVs")
     # Satellite color preserves regional vegetation/desert/ice. The local scan
     # adds surface variation only on approach; it never replaces global color.
+    # Layer bounded local, landscape and regional detail. The regional imagery
+    # supplies geography/biome colour; approaching it reveals surface structure
+    # instead of enlarging a single satellite pixel or repeating one small scan.
+    blended_detail = maps["baseColorTexture"]
+    detail_output = "RGB"
+    for layer, repeat in enumerate([16.0, 96.0]):
+        scale = expression(mat, unreal.MaterialExpressionDivide, -1550, -1250-layer*300)
+        scale.set_editor_property("const_b", repeat)
+        connect(uv, scale, "A")
+        sample = expression(mat, unreal.MaterialExpressionTextureSampleParameter2D, -1300, -1250-layer*300)
+        sample.set_editor_property("parameter_name", "baseColorTexture")
+        sample.set_editor_property("texture", assets.load_asset("/Engine/EngineResources/DefaultTexture.DefaultTexture"))
+        sample.set_editor_property("sampler_type", unreal.MaterialSamplerType.SAMPLERTYPE_COLOR)
+        connect(scale, sample, "UVs")
+        mix = expression(mat, unreal.MaterialExpressionLinearInterpolate, -1050+layer*180, -1100-layer*300)
+        mix.set_editor_property("const_alpha", .5)
+        connect(blended_detail, mix, "A", detail_output)
+        connect(sample, mix, "B", "RGB")
+        blended_detail, detail_output = mix, ""
     texture_detail = expression(mat, unreal.MaterialExpressionMultiply, -900, -800)
-    texture_detail.set_editor_property("const_b", .7)
-    connect(maps["baseColorTexture"], texture_detail, "A", "RGB")
+    texture_detail.set_editor_property("const_b", 1.1)
+    connect(blended_detail, texture_detail, "A", detail_output)
     detail_bias = expression(mat, unreal.MaterialExpressionAdd, -700, -800)
-    detail_bias.set_editor_property("const_b", .65)
+    detail_bias.set_editor_property("const_b", .45)
     connect(texture_detail, detail_bias, "A")
     close_color = expression(mat, unreal.MaterialExpressionMultiply, -500, -800)
     connect(satellite, close_color, "A", "RGB")
@@ -217,6 +283,7 @@ def terrain_surface():
     errors = editing.recompile_material(mat)
     if errors:
         raise RuntimeError("Terrain surface compilation: " + str(errors))
+    assets.set_metadata_tag(mat, "WNTTerrainShaderSchema", shader_schema)
     if not assets.save_loaded_asset(mat, only_if_is_dirty=False):
         raise RuntimeError("Cannot save terrain surface material")
     changed.append(asset_path)

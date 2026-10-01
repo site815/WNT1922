@@ -8,7 +8,7 @@ The current working tree uses **Unreal Engine 5.8** for the world, water, ships,
 
 The voxel renderer, cuboid ship renderer and Three.js globe have been retired. Ships use detailed stored GLBs with curved full hulls, equipment, deck fittings, physical materials and embedded textures. Historical exteriors use referenced recognition drawings and photographs; undocumented hull sections and small fittings remain inferred artwork, as disclosed in each source file. Fictional classes and player-designed ship types use original designs. The earlier JSON recognition meshes remain reference data and are **not used as live 3D ship assets**. Missing or damaged external files remain visible as explicit status symbols. Ports use navigation symbols while their scenery is unfinished.
 
-The stable release remains [v0.38.0](https://github.com/site815/WNT1922/releases/tag/v0.38.0). The native development version is `0.40.0-dev`; build and verification evidence is recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md). Native previews are labeled prereleases and do not replace the stable download.
+The stable release remains [v0.38.0](https://github.com/site815/WNT1922/releases/tag/v0.38.0). The native development version is `0.41.0-dev`; verified native previews are available under [Releases](https://github.com/site815/WNT1922/releases). Build and verification evidence is recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md). Native previews are labeled prereleases and do not replace the stable download.
 
 ## Play and test locally
 
@@ -25,9 +25,11 @@ Single-player runs offline. Chromium device discovery and external requests, Unr
 
 The game opens in a decorated **1800×1000 window**. Resize or maximize it; the minimum client area is 1800×1000 and fullscreen is disabled. A display smaller than that client area plus its Windows frame cannot show the whole window.
 
-Scroll to zoom smoothly from the world to individual hulls and drag to pan. The strategic view stays overhead; right-drag or Shift-drag opens tilt gradually above 2048× zoom for ship inspection. Battles and the gallery allow orbiting. Home returns to the strategic view; Page Up / Page Down zoom. Fleets stay at authoritative campaign route positions with stable metre-based formation stations. The campaign does not record individual tactical tracks or exact harbor berths, so formation stations are representative. Own naval hulls and active merchant convoys are selectable; unseen enemy ships are not exposed.
+Scroll to zoom smoothly from the world to individual hulls and drag to pan. All map mouse drags pan, including right-drag and Shift-drag; there is no manual map tilt. The strategic view stays overhead through 16,384× zoom, then automatically tilts toward a 52° ship-inspection angle at 32,768×. Map zoom stops at 65,536×. Battles and the gallery retain orbiting. Home returns to the strategic view; Page Up / Page Down zoom. Fleets stay at authoritative campaign route positions with stable metre-based formation stations. The campaign does not record individual tactical tracks or exact harbor berths, so formation stations are representative. Own naval hulls and active merchant convoys are selectable; unseen enemy ships are not exposed.
 
-Decisive actions raise an optional **Watch battle** alert. Watching pauses the campaign. **Next tick** advances the entire simulation by 15 minutes and pauses again; earlier recorded frames replay without changing state. Minor encounters retain their effects in background attrition. The opening battle demonstrations are labelled scripted illustrations. [Battle rules](catalog/common/rules/battle-stages.md) define the thresholds.
+Decisive actions raise an optional **Watch battle** alert. Ongoing battles involving your navy also have animated, clickable map markers that open their battle viewer. Watching pauses the campaign. **Next tick** advances the entire simulation by 15 minutes and pauses again; earlier recorded frames replay without changing state. Minor encounters retain their effects in background attrition. The opening battle demonstrations are labelled scripted illustrations. [Battle rules](catalog/common/rules/battle-stages.md) define the thresholds.
+
+The optional **Tactical 60×** speed gives more time to watch fleet movement. Simulation ticks remain 15 minutes at every speed; no hourly-tick conversion or tick skipping is used. Paused and slow campaigns avoid repeated full-state copies and menu/scene refreshes when no simulation state changed. Small liveness messages keep the worker watchdog active, while adaptive scheduling avoids busy polling between slow ticks.
 
 ## Assets and authoring
 
@@ -37,6 +39,8 @@ Decisive actions raise an optional **Watch battle** alert. Watching pauses the c
 - [Recognition artwork](assets/recognition/README.md) remains available for the historical catalog, panels and hovers. These reference drawings are distinct from the full 3D game models.
 
 The native runtime makes no online asset requests. Models, textures, catalog data and the simulation ship with the game. The MIT-licensed glTFRuntime dependency is pinned under `unreal/Plugins/glTFRuntime`; it loads editable external model files. Attribution is available in the game and [asset notices](assets/licenses/third-party-notices.html).
+
+The 198-model surface pass gives original ships distinct weathered paint, timber or nonslip decks, and canvas textures at a shared physical scale. Bismarck and Samidare retain their artist geometry and UVs with 512-pixel texture derivatives, reducing their decoded texture pixels by 75%. Across the stored fleet, file size fell from 1,457,264,232 to 1,302,339,736 bytes (10.6%) and triangle count from 23,884,969 to 22,319,137 (6.6%), retaining recorded weapon muzzles, full hulls and equipment fits. These asset budgets do not establish runtime frame rate or exact historical reconstruction.
 
 ## Verification and distribution
 
@@ -50,7 +54,9 @@ node --test --test-isolation=none --test-skip-pattern="all selectable countries|
 
 Native GPU and interaction checks use `tools/verify-unreal-runtime.mjs` against an explicitly launched Unreal automation instance. The HUD-only smoke test does not verify Unreal rendering. Long campaign checks are available through `tools/playthrough.mjs` for both campaigns.
 
-Native portable archive filenames retain their version, for example `WNT1922-v0.40.0-dev-Unreal-Windows.zip`. A release requires cooking, package testing and visual verification. Building never pushes source or publishes a release. `.build/`, `test-output/`, Unreal binaries and caches are disposable local output excluded from Git.
+Native portable archive filenames retain their version, for example `WNT1922-v0.41.0-dev-Unreal-Windows.zip`. A release requires cooking, package testing and visual verification. Building never pushes source or publishes a release. `.build/`, `test-output/`, Unreal binaries and caches are disposable local output excluded from Git.
+
+**0.41.0-dev checkpoint:** implementation and stored-asset changes are present; final native build, extracted-package, on-screen interaction and visual verification remain pending. The recorded 0.40.0-dev results are historical evidence for that release and do not certify this working tree.
 
 ## Source layout
 

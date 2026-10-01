@@ -160,7 +160,7 @@ namespace
         if (Material) Component->SetMaterial(0, Material);
         Component->RegisterComponent(); return Component;
     }
-    UProceduralMeshComponent* PortSymbol(AActor* Owner, UMaterialInterface* Material)
+    UProceduralMeshComponent* PortSymbol(AActor* Owner, UMaterialInterface* Material, bool bBattle = false)
     {
         // Chart anchor inside a circle. This is a navigation symbol, not scenery.
         auto* Mesh = NewObject<UProceduralMeshComponent>(Owner);
@@ -179,6 +179,25 @@ namespace
             }
             Indices.Append({Base,Base+1,Base+2,Base,Base+2,Base+3});
         };
+        if (bBattle)
+        {
+            // A persistent chart badge with crossed gun barrels. Two small
+            // independently tinted muzzle rays animate without rebuilding mesh
+            // buffers, spawning effects, lights, audio or tactical combatants.
+            for (int32 I=0;I<32;++I)
+            {
+                const double A=I*UE_DOUBLE_PI/16.,B=(I+1)*UE_DOUBLE_PI/16.;
+                Stroke(FVector2D(FMath::Cos(A)*47,FMath::Sin(A)*47),FVector2D(FMath::Cos(B)*47,FMath::Sin(B)*47),2.4);
+            }
+            for (double Sign : {-1.,1.})
+            {
+                Stroke(FVector2D(-Sign*25,-23),FVector2D(Sign*21,23),8.);
+                Stroke(FVector2D(-Sign*31,-17),FVector2D(-Sign*19,-29),6.);
+                Stroke(FVector2D(Sign*16,27),FVector2D(Sign*25,18),4.);
+            }
+        }
+        else
+        {
         for(int32 I=0;I<48;++I)
         {
             const double A=I*UE_DOUBLE_PI/24.,B=(I+1)*UE_DOUBLE_PI/24.;
@@ -195,13 +214,39 @@ namespace
             Stroke(FVector2D(0,-29),FVector2D(Sign*21,-17),4.5); Stroke(FVector2D(Sign*21,-17),FVector2D(Sign*27,-4),4.5);
             Stroke(FVector2D(Sign*27,-4),FVector2D(Sign*15,-8),4.5);
         }
+        }
         Mesh->CreateMeshSection_LinearColor(0,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
+        if (bBattle) for (int32 Side=0;Side<2;++Side)
+        {
+            Vertices.Reset();Indices.Reset();Normals.Reset();UVs.Reset();Colors.Reset();Tangents.Reset();
+            const double Sign=Side==0?-1.:1.;
+            Stroke(FVector2D(Sign*27,29),FVector2D(Sign*34,36),4.);
+            Stroke(FVector2D(Sign*27,24),FVector2D(Sign*38,25),3.);
+            Stroke(FVector2D(Sign*22,29),FVector2D(Sign*23,40),3.);
+            Mesh->CreateMeshSection_LinearColor(Side+1,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
+            if(Material)Mesh->SetMaterial(Side+1,Material);
+        }
         if(Material)Mesh->SetMaterial(0,Material); Mesh->RegisterComponent();
         auto* HitBox=NewObject<UBoxComponent>(Owner); Owner->AddInstanceComponent(HitBox); HitBox->SetupAttachment(Owner->GetRootComponent());
         HitBox->SetMobility(EComponentMobility::Movable); HitBox->SetBoxExtent(FVector(40,50000,50000)); HitBox->SetHiddenInGame(true);
         HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly); HitBox->SetCollisionResponseToAllChannels(ECR_Ignore); HitBox->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
         HitBox->SetGenerateOverlapEvents(false); HitBox->RegisterComponent();
         return Mesh;
+    }
+    void AnimateBattleSymbol(AActor* Actor, double Time, bool bFiring)
+    {
+        auto* Mesh=Actor ? Actor->FindComponentByClass<UProceduralMeshComponent>() : nullptr;
+        if(!Mesh)return;
+        for(int32 Side=0;Side<2;++Side)
+        {
+            // Slow bounded highlights avoid the high-contrast flashing that can
+            // result from blinking the entire icon. Badge/hit target stay still.
+            if(auto* Material=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(Side+1)))
+            {
+                const float Amount=bFiring?static_cast<float>(.5+.5*FMath::Sin(Time*3.0+Side*UE_DOUBLE_PI)):.2f;
+                Material->SetVectorParameterValue(TEXT("Tint"),FMath::Lerp(FLinearColor(.42f,.19f,.07f),FLinearColor(1.f,.65f,.2f),Amount));
+            }
+        }
     }
     AActor* PlainActor(UWorld* World, AActor* Owner)
     {
@@ -235,7 +280,7 @@ struct FWNTWorldRuntime
     double ReceivedAt = 0, Duration = 0, BattleReceivedAt = 0, BattleDuration = 0;
     FBox BattleBounds = FBox(ForceInit);
     double LastWorldFraction = -1, LastBattleFraction = -1;
-    double NextModelRefresh = 0, RouteWidth = 10000;
+    double NextModelRefresh = 0, RouteWidth = 10000, BattleSymbolTime = 0;
     FVector LastMarkerCamera = FVector(TNumericLimits<double>::Max());
     FQuat LastMarkerCameraRotation = FQuat::Identity;
     FIntPoint LastMarkerViewport=FIntPoint::ZeroValue;
@@ -380,7 +425,9 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
 {
     if (!Packet.IsValid() || Number(Packet, TEXT("format")) != 1) return;
     const double Now = FPlatformTime::Seconds();
-    Runtime->Duration = Boolean(Packet, TEXT("paused")) || !Runtime->Packet.IsValid() ? 0.0 : FMath::Clamp(Now - Runtime->ReceivedAt, .05, 1.5);
+    // Tactical 60x emits one real 15-minute tick every 15 seconds. Interpolate
+    // its observed interval continuously too; never extrapolate future orders.
+    Runtime->Duration = Boolean(Packet, TEXT("paused")) || !Runtime->Packet.IsValid() ? 0.0 : FMath::Clamp(Now - Runtime->ReceivedAt, .05, 20.0);
     Runtime->ReceivedAt = Now; Runtime->Packet = Packet;
     const FString NextCampaign = String(Packet, TEXT("campaign"));
     if (Campaign != NextCampaign && Terrain)
@@ -403,10 +450,12 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
             if(!Actor)
             {
                 Actor=PlainActor(GetWorld(),this);if(!Actor)continue;
-                UMeshComponent* Mesh=Pick->GetStringField(TEXT("kind"))==TEXT("port")
-                    ?static_cast<UMeshComponent*>(PortSymbol(Actor,MarkerMaterial))
+                const FString Kind=Pick->GetStringField(TEXT("kind"));
+                UMeshComponent* Mesh=(Kind==TEXT("port")||Kind==TEXT("battle"))
+                    ?static_cast<UMeshComponent*>(PortSymbol(Actor,MarkerMaterial,Kind==TEXT("battle")))
                     :static_cast<UMeshComponent*>(Shape(Actor,Sphere,FVector::ZeroVector,FVector(1000),MarkerMaterial));
                 if(auto* Material=Mesh->CreateDynamicMaterialInstance(0))Material->SetVectorParameterValue(TEXT("Tint"),Tint);
+                if(Kind==TEXT("battle"))for(int32 Side=1;Side<=2;++Side)Mesh->CreateDynamicMaterialInstance(Side);
                 Runtime->Markers.Add(KeyCopy,Actor);
             }
             else
@@ -466,14 +515,16 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         Marker(TEXT("port:") + PortId, PortPick, PortColor);
     }
     Runtime->PublicPositions.Reset();
-    for (const auto* Field : { TEXT("countries"), TEXT("fronts") }) for (const auto& Value : Array(Packet, Field))
+    for (const auto* Field : { TEXT("countries"), TEXT("fronts"), TEXT("battles") }) for (const auto& Value : Array(Packet, Field))
     {
         const auto Entry = Value->AsObject(); FVector2D Geo; if (!Point(Entry, TEXT("position"), Geo)) continue;
-        const bool Country = FString(Field) == TEXT("countries");
-        const FString Kind = Country ? TEXT("country") : TEXT("front"), Identity = Id(Entry, TEXT("id")), Key = Kind + TEXT(":") + Identity;
+        const bool Country = FString(Field) == TEXT("countries"), Battle = FString(Field) == TEXT("battles");
+        const FString Kind = Country ? TEXT("country") : Battle ? TEXT("battle") : TEXT("front"), Identity = Id(Entry, TEXT("id")), Key = Kind + TEXT(":") + Identity;
         const FLinearColor Color = Country ? FLinearColor(FColor::FromHex(String(Entry, TEXT("color"), TEXT("#e5cf9d")))) : FLinearColor(.9f, .37f, .21f);
         Runtime->PublicPositions.Add(Key, Geo);
-        Marker(Key, Selection(Kind, Identity, String(Entry, TEXT("name"))), Color);
+        auto Pick=Selection(Kind, Identity, String(Entry, Battle?TEXT("label"):TEXT("name")));
+        if(Battle)Pick->SetNumberField(TEXT("stage"),Number(Entry,TEXT("stage")));
+        Marker(Key, Pick, Battle?FLinearColor(.94f,.62f,.26f):Color);
     }
     auto Prune = [&](auto& Actors, const TSet<FString>& Keep)
     {
@@ -697,14 +748,15 @@ void AWNTWorldActor::UpdateVisibility()
     for (const auto& Pair : Runtime->Markers) if (auto* Actor = Pair.Value.Get())
     {
         const double Distance = Camera ? FVector::Distance(Camera->GetCameraLocation(), Actor->GetActorLocation()) : 0;
-        const bool Visible = WorldVisible && (Pair.Key.StartsWith(TEXT("port:")) || Distance > (Pair.Key.StartsWith(TEXT("country:")) ? 400000000.0 : 2000000.0));
+        const bool Battle=Pair.Key.StartsWith(TEXT("battle:"));
+        const bool Visible = WorldVisible && (Battle || Pair.Key.StartsWith(TEXT("port:")) || Distance > (Pair.Key.StartsWith(TEXT("country:")) ? 400000000.0 : 2000000.0));
         // Apply immediately, not a frame later: a fresh simulation packet must
         // never briefly reactivate a large marker over a close-up ship's hull.
         Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
-        if(Camera&&Pair.Key.StartsWith(TEXT("port:")))
+        if(Camera&&(Battle||Pair.Key.StartsWith(TEXT("port:"))))
         {
             const auto Pick=Runtime->Selections.FindRef(Actor);
-            const FVector2D Geo=Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
+            const FVector2D Geo=Battle?Runtime->PublicPositions.FindRef(TEXT("battle:")+Id(Pick,TEXT("id"))):Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
             PositionPortSymbol(Actor,ChartPosition(Geo,CentralMeridian,static_cast<int32>(Number(Pick,TEXT("worldCopy"))),GroundHeight(Geo)),Camera->GetCameraLocation(),Camera->GetCameraRotation());
         }
     }
@@ -740,6 +792,12 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
     }
     else
     {
+        if(!Boolean(Runtime->Packet,TEXT("paused"))&&Boolean(Runtime->Packet,TEXT("animate"),true))Runtime->BattleSymbolTime+=DeltaSeconds;
+        for(const auto& Pair:Runtime->Markers)if(Pair.Key.StartsWith(TEXT("battle:")))if(auto* Actor=Pair.Value.Get())
+        {
+            const double Stage=Number(Runtime->Selections.FindRef(Actor),TEXT("stage"));
+            AnimateBattleSymbol(Actor,Runtime->BattleSymbolTime,Stage>=2&&Stage<=3);
+        }
         const double Fraction = Runtime->Duration > 0 ? FMath::Clamp((Now - Runtime->ReceivedAt) / Runtime->Duration, 0.0, 1.0) : 1.0;
         if (Fraction != Runtime->LastWorldFraction) UpdateWorld(Fraction);
         // Fleet/contact symbols yield to individual ships on approach. Ports
@@ -774,13 +832,13 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
             for (const auto& Pair : Runtime->Markers) if (auto* Actor = Pair.Value.Get())
             {
                 const double Distance = FVector::Distance(Camera->GetCameraLocation(), Actor->GetActorLocation());
-                const bool Country = Pair.Key.StartsWith(TEXT("country:")), Port = Pair.Key.StartsWith(TEXT("port:"));
-                const bool Visible = Port || Distance > (Country ? 400000000.0 : 2000000.0);
+                const bool Country = Pair.Key.StartsWith(TEXT("country:")), Port = Pair.Key.StartsWith(TEXT("port:")), Battle=Pair.Key.StartsWith(TEXT("battle:"));
+                const bool Visible = Port || Battle || Distance > (Country ? 400000000.0 : 2000000.0);
                 Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
-                if(Port)
+                if(Port||Battle)
                 {
                     const auto Pick=Runtime->Selections.FindRef(Actor);
-                    const FVector2D Geo=Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
+                    const FVector2D Geo=Battle?Runtime->PublicPositions.FindRef(TEXT("battle:")+Id(Pick,TEXT("id"))):Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
                     PositionPortSymbol(Actor,ChartPosition(Geo,CentralMeridian,static_cast<int32>(Number(Pick,TEXT("worldCopy"))),GroundHeight(Geo)),Camera->GetCameraLocation(),Camera->GetCameraRotation());
                 }
                 else Actor->SetActorScale3D(FVector(FMath::Max(.1, Distance * .006 / 100000.0)));
@@ -1167,6 +1225,63 @@ bool FWNTWrappedChartTest::RunTest(const FString& Parameters)
             }
         }
     }
+    World->DestroyWorld(false);return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTBattleChartTest,"WNT.World.LiveBattleChartMarkers",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTBattleChartTest::RunTest(const FString& Parameters)
+{
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Battle chart test world"),World))return false;
+    AWNTWorldActor* Scene=World->SpawnActor<AWNTWorldActor>();
+    if(!TestNotNull(TEXT("Battle chart scene"),Scene)){World->DestroyWorld(false);return false;}
+    TSharedPtr<FJsonObject> Packet;
+    const FString Json=TEXT(R"({"format":1,"campaign":"test","paused":false,"instanceId":"battle-map-test","battles":[{"id":"71","position":[179.8,25],"label":"Decisive battle","stage":3}]})");
+    if(!TestTrue(TEXT("Battle chart packet parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet)))
+    {World->DestroyWorld(false);return false;}
+    Scene->ApplyWorldPacket(Packet);
+    TArray<TWeakObjectPtr<AActor>> Markers;
+    for(TActorIterator<AActor> It(World);It;++It)if(const auto Pick=Scene->GetSelection(*It))
+        if(String(Pick,TEXT("kind"))==TEXT("battle"))Markers.Add(*It);
+    TestEqual(TEXT("Battle has selectable markers at every world copy"),Markers.Num(),3);
+    for(double Meridian:{0.,179.9,-179.9,147.})
+    {
+        Scene->SetCentralMeridian(Meridian);
+        for(const auto& Pointer:Markers)if(auto* Marker=Pointer.Get())
+        {
+            const auto Pick=Scene->GetSelection(Marker);
+            TestTrue(TEXT("Battle selection preserves report and viewport identity"),Id(Pick,TEXT("id"))==TEXT("71")
+                &&String(Pick,TEXT("instanceId"))==TEXT("battle-map-test"));
+            const int32 Copy=static_cast<int32>(Number(Pick,TEXT("worldCopy")));
+            TestTrue(TEXT("Battle remains at its actual wrapped geography"),Marker->GetActorLocation().Equals(ChartPosition(FVector2D(179.8,25),Meridian,Copy),.01));
+            auto* Mesh=Marker->FindComponentByClass<UProceduralMeshComponent>();
+            if(!TestNotNull(TEXT("Battle has one persistent mesh"),Mesh))continue;
+            TestEqual(TEXT("Base badge and two muzzle highlights"),Mesh->GetNumSections(),3);
+            const auto* Buffer=Mesh->GetProcMeshSection(0)->ProcVertexBuffer.GetData();
+            auto* First=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(1));
+            auto* Second=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(2));
+            if(TestNotNull(TEXT("First muzzle material"),First)&&TestNotNull(TEXT("Second muzzle material"),Second))
+            {
+                AnimateBattleSymbol(Marker,UE_DOUBLE_PI/6.,true);
+                TestTrue(TEXT("Muzzle highlights alternate"),First->K2_GetVectorParameterValue(TEXT("Tint")).R
+                    >Second->K2_GetVectorParameterValue(TEXT("Tint")).R);
+                const FLinearColor Before=First->K2_GetVectorParameterValue(TEXT("Tint"));
+                AnimateBattleSymbol(Marker,UE_DOUBLE_PI/2.,true);
+                TestTrue(TEXT("Animation changes highlight colour"),!Before.Equals(First->K2_GetVectorParameterValue(TEXT("Tint")),.01));
+                AnimateBattleSymbol(Marker,0.,false);const FLinearColor Quiet=First->K2_GetVectorParameterValue(TEXT("Tint"));
+                AnimateBattleSymbol(Marker,10.,false);
+                TestEqual(TEXT("Contact approach has no firing animation"),First->K2_GetVectorParameterValue(TEXT("Tint")),Quiet);
+            }
+            TestTrue(TEXT("Animation preserves mesh allocation"),Buffer==Mesh->GetProcMeshSection(0)->ProcVertexBuffer.GetData());
+            TestTrue(TEXT("Battle badge remains clickable"),Marker->GetActorEnableCollision());
+        }
+    }
+    Packet->SetArrayField(TEXT("battles"),{});Scene->ApplyWorldPacket(Packet);
+    for(const auto& Pointer:Markers)if(auto* Marker=Pointer.Get())
+        TestFalse(TEXT("Completed battle cannot retain a selectable marker"),Scene->GetSelection(Marker).IsValid());
     World->DestroyWorld(false);return true;
 }
 

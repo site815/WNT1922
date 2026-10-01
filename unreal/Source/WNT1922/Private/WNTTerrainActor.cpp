@@ -108,6 +108,39 @@ namespace
         static const FLinearColor Palette[]={FLinearColor(.37f,.52f,.41f),FLinearColor(.48f,.49f,.32f),FLinearColor(.35f,.46f,.49f),FLinearColor(.53f,.42f,.36f),FLinearColor(.46f,.44f,.53f),FLinearColor(.41f,.53f,.49f)};
         return Palette[GetTypeHash(Owner)%UE_ARRAY_COUNT(Palette)];
     }
+    FString BoundaryKey(const FVector2D& A,const FVector2D& B)
+    {
+        auto Key=[](const FVector2D& P){return FIntPoint(FMath::RoundToInt(WNTProjection::WrapLongitude(P.X)*1e6),FMath::RoundToInt(P.Y*1e6));};
+        FIntPoint First=Key(A),Last=Key(B);
+        if(First.X>Last.X||(First.X==Last.X&&First.Y>Last.Y))Swap(First,Last);
+        return FString::Printf(TEXT("%d,%d:%d,%d"),First.X,First.Y,Last.X,Last.Y);
+    }
+}
+
+TArray<FVector2D> WNTTerrainGeometry::SplitSurfaceEdge(const FVector2D& A,const FVector2D& B,double Step)
+{
+    Step=FMath::Clamp(Step,.25,2.0);
+    TArray<double> Cuts{0.0,1.0};
+    for(int32 Axis=0;Axis<2;++Axis)
+    {
+        const double Delta=B[Axis]-A[Axis];if(FMath::Abs(Delta)<1e-12)continue;
+        const int32 First=FMath::FloorToInt(FMath::Min(A[Axis],B[Axis])/Step)+1;
+        const int32 Last=FMath::CeilToInt(FMath::Max(A[Axis],B[Axis])/Step)-1;
+        for(int32 Grid=First;Grid<=Last;++Grid)
+        {
+            const double T=(Grid*Step-A[Axis])/Delta;
+            if(T>1e-10&&T<1-1e-10)Cuts.Add(T);
+        }
+    }
+    Cuts.Sort();TArray<FVector2D> Points;
+    double Previous=-1;
+    for(double T:Cuts)if(T-Previous>1e-10){Points.Add(FMath::Lerp(A,B,T));Previous=T;}
+    return Points;
+}
+
+TArray<FWNTGeographicTriangle> WNTTerrainGeometry::SubdivideSurface(const FWNTGeographicTriangle& Triangle,double Step)
+{
+    TArray<FWNTGeographicTriangle> Out;Tessellate(Triangle,Step,Out);return Out;
 }
 
 TArray<FVector2D> WNTTerrainGeometry::UnwrapRing(const TArray<FVector2D>& Source)
@@ -215,7 +248,7 @@ struct FWNTTerrainData
 {
     struct FPolygon{FString Id;FLinearColor Colour;TArray<FRing> Rings;FBox2D Bounds{ForceInit};};
     struct FTriangle{FWNTGeographicTriangle Geo;int32 Polygon=0;};
-    struct FEdge{FVector2D A,B;int32 Polygon=0;};
+    struct FEdge{FVector2D A,B;int32 Polygon=0;bool bCoast=true;};
     FWNTElevationGrid Elevation;
     TArray<FPolygon> Polygons;
     TArray<FTriangle> Triangles;
@@ -304,10 +337,24 @@ bool AWNTTerrainActor::Initialize(const FString& DataRoot)
             for(const FRing& Ring:Data->Polygons[PolygonIndex].Rings)for(int32 I=0;I<Ring.Num();++I)
             {
                 const FVector2D A=Ring[I],B=Ring[(I+1)%Ring.Num()];
-                const int32 Steps=FMath::Max(1,FMath::CeilToInt(FMath::Max(FMath::Abs(B.X-A.X),FMath::Abs(B.Y-A.Y))/.25));
-                for(int32 J=0;J<Steps;++J)Data->Edges.Add({FMath::Lerp(A,B,double(J)/Steps),FMath::Lerp(A,B,double(J+1)/Steps),PolygonIndex});
+                const TArray<FVector2D> Points=WNTTerrainGeometry::SplitSurfaceEdge(A,B,Step);
+                for(int32 J=0;J+1<Points.Num();++J)Data->Edges.Add({Points[J],Points[J+1],PolygonIndex});
             }
         }
+    }
+    // Political borders are internal terrain edges, not cliffs to sea level.
+    // Once both units use the same source chain, suppress both copies of its
+    // skirt. Real coast skirts use the land grid above, so their top boundary
+    // cannot interpolate above/below the adjacent tessellated land face.
+    TMap<FString,int32> FirstBoundary;
+    for(int32 I=0;I<Data->Edges.Num();++I)
+    {
+        auto& Edge=Data->Edges[I];const FString Key=BoundaryKey(Edge.A,Edge.B);
+        if(const int32* Previous=FirstBoundary.Find(Key))
+        {
+            if(Data->Edges[*Previous].Polygon!=Edge.Polygon){Edge.bCoast=false;Data->Edges[*Previous].bCoast=false;}
+        }
+        else FirstBoundary.Add(Key,I);
     }
     Data->Bins.SetNum(648);
     for(int32 I=0;I<Data->Polygons.Num();++I)
@@ -341,6 +388,11 @@ FVector WNTTerrainGeometry::WrappedTileOrigin(const FVector& GeographicOrigin, d
     return FVector(GeographicOrigin.X,
         WNTProjection::WrapLongitude(Longitude-Meridian)/360.0*WNTProjection::WorldWidth+Copy*WNTProjection::WorldWidth,
         GeographicOrigin.Z);
+}
+
+FVector2D WNTTerrainGeometry::GlobalTextureOrigin(const FVector& GeographicOrigin)
+{
+    return FVector2D(.5+GeographicOrigin.Y/WNTProjection::WorldWidth,.5-2.0*GeographicOrigin.X/WNTProjection::WorldWidth);
 }
 
 double WNTTerrainGeometry::GraticuleWidthForPixelSize(double CentimetresPerPixel)
@@ -483,6 +535,7 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
     }
     for(const FWNTTerrainData::FEdge& Edge:Data->Edges)
     {
+        if(!Edge.bCoast)continue;
         const double Centre=(Edge.A.X+Edge.B.X)*.5-MeshMeridian,Shift=-360.0*std::floor((Centre+180)/360.0);
         for(int32 Copy=-1;Copy<=1;++Copy)
         {
@@ -573,6 +626,16 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
             Mesh->bUseAsyncCooking=true;Mesh->RegisterComponent();TerrainTiles[Instance]=Mesh;AddInstanceComponent(Mesh);
         }
         if(!Mesh)continue;Mesh->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(TileOrigins[Instance],CentralMeridian,Copy));
+        // Local vertex positions retain float precision; procedural UV buffers
+        // default to half floats. Supply only the small geographic phase as
+        // primitive data, avoiding 400–800 m UV quantization at tile edges.
+        Mesh->SetCustomPrimitiveDataVector4(0,FVector4(
+            Tile.Origin.X-FMath::FloorToDouble(Tile.Origin.X/480000.0)*480000.0,
+            Tile.Origin.Y-FMath::FloorToDouble(Tile.Origin.Y/480000.0)*480000.0,0,0));
+        // Reconstruct the global satellite coordinates from full-precision
+        // local positions too: UV0 half floats otherwise quantize by ~20 km.
+        const FVector2D SatelliteOrigin=WNTTerrainGeometry::GlobalTextureOrigin(Tile.Origin);
+        Mesh->SetCustomPrimitiveDataVector4(4,FVector4(SatelliteOrigin.X,SatelliteOrigin.Y,0,0));
         auto Apply=[&](int32 Section,FTileSection& Build,UMaterialInterface* Material)
         {
             if(Build.Vertices.IsEmpty()){Mesh->ClearMeshSection(Section);return;}

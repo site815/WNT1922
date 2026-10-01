@@ -16,6 +16,9 @@ function tri(material,a,b,c,na,nb,nc,ua,ub,uc){
 function quad(mat,a,b,c,d,normal){tri(mat,a,b,c,normal,normal,normal);tri(mat,a,c,d,normal,normal,normal);}
 function part(name,fn){const before=new Map([...groups].map(([material,g])=>[material,g.indices.length]));fn();const ranges=[...groups].map(([material,g])=>({material,indexStart:before.get(material)||0,indexCount:g.indices.length-(before.get(material)||0)})).filter(r=>r.indexCount);parts.push({name,triangles:ranges.reduce((s,r)=>s+r.indexCount/3,0),ranges});}
 function cylinder(mat,a,b,r1,r2=r1,n=20,caps=true){
+  // Bound curved-fitting error in metres instead of spending dozens of sides on
+  // subpixel rails and barrels. Hull stations and equipment placements are kept.
+  if(spec.curveToleranceMetres){const radius=Math.max(r1,r2);n=Math.min(n,Math.max(6,Math.ceil(Math.PI/Math.acos(Math.max(-1,1-spec.curveToleranceMetres/radius)))));}
   const axis=unit(sub(b,a)),u=unit(cross(axis,Math.abs(axis[1])>.85?[1,0,0]:[0,1,0])),v=cross(axis,u),length=Math.hypot(...sub(b,a));
   for(let i=0;i<n;i++){
     const t=i/n*Math.PI*2,s=(i+1)/n*Math.PI*2,ra=add(mul(u,Math.cos(t)),mul(v,Math.sin(t))),rb=add(mul(u,Math.cos(s)),mul(v,Math.sin(s)));
@@ -27,6 +30,7 @@ function cylinder(mat,a,b,r1,r2=r1,n=20,caps=true){
   }
 }
 function ring(mat,center,major,minor,axis='y',segments=32){
+  if(spec.curveToleranceMetres)segments=Math.min(segments,Math.max(8,Math.ceil(Math.PI/Math.acos(Math.max(-1,1-spec.curveToleranceMetres/(major+minor))))));
   const point=(t,p)=>{const r=major+minor*Math.cos(p),v=[Math.cos(t)*r,minor*Math.sin(p),Math.sin(t)*r];return add(center,axis==='z'?[v[0],v[2],v[1]]:axis==='x'?[v[1],v[0],v[2]]:v);};
   for(let i=0;i<segments;i++)for(let j=0;j<8;j++){const a=i/segments*Math.PI*2,b=(i+1)/segments*Math.PI*2,c=j/8*Math.PI*2,d=(j+1)/8*Math.PI*2;axis==='y'?quad(mat,point(a,c),point(a,d),point(b,d),point(b,c)):quad(mat,point(a,c),point(b,c),point(b,d),point(a,d));}
 }
@@ -43,7 +47,7 @@ function rail(points,levels=[.48,.95],posts=true){
 }
 function ladder(a,b,width=.45){const side=[0,0,width/2],n=Math.ceil(Math.hypot(...sub(b,a))/.29);for(const sign of [-1,1])cylinder('paint',add(a,mul(side,sign)),add(b,mul(side,sign)),.023,.023,8);for(let i=0;i<=n;i++){const p=add(a,mul(sub(b,a),i/n));cylinder('steel',sub(p,side),add(p,side),.018,.018,8);}}
 function makeGlb(){
-  const json={asset:{version:'2.0',generator:'WNT1922 original detailed ship authoring',copyright:'Original WNT1922 geometry; independently licensed textures retain their terms; see LICENSE.md and companion source manifest'},scene:0,scenes:[{nodes:[0]}],nodes:[{name:spec.name,mesh:0}],meshes:[{name:spec.id,primitives:[]}],materials:[],accessors:[],bufferViews:[],buffers:[],extras:{id:spec.id,units:spec.units,axes:spec.axes,fit:spec.year,accuracy:spec.accuracy,geometrySource:spec.geometrySource,parts,sources:spec.sources,materialSources:spec.materialSources,textureMetres}};
+  const json={asset:{version:'2.0',generator:'WNT1922 original detailed ship authoring',copyright:'Original WNT1922 geometry; independently licensed textures retain their terms; see LICENSE.md and companion source manifest'},scene:0,scenes:[{nodes:[0]}],nodes:[{name:spec.name,mesh:0}],meshes:[{name:spec.id,primitives:[]}],materials:[],accessors:[],bufferViews:[],buffers:[],extras:{id:spec.id,units:spec.units,axes:spec.axes,fit:spec.year,accuracy:spec.accuracy,geometrySource:spec.geometrySource,parts,sources:spec.sources,materialSources:spec.materialSources,surfaceProfile:spec.surfaceProfile,textureMetres}};
   const chunks=[];let offset=0;const textureIndexes=new Map();
   if(textures.size){json.images=[];json.textures=[];json.samplers=[{magFilter:9729,minFilter:9987,wrapS:10497,wrapT:10497}];}
   for(const [name,{bytes,mimeType}]of textures){const view=json.bufferViews.length;json.bufferViews.push({buffer:0,byteOffset:offset,byteLength:bytes.length});chunks.push(bytes);offset+=bytes.length;const padding=(4-offset%4)%4;if(padding){chunks.push(Buffer.alloc(padding));offset+=padding;}const index=json.images.length;json.images.push({name,bufferView:view,mimeType});json.textures.push({source:index,sampler:0});textureIndexes.set(name,index);}

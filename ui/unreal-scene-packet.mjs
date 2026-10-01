@@ -3,6 +3,7 @@ import { fleetPosition, visibleContacts } from '../mechanics/task-forces.mjs';
 import { NODES, PORTS, PORT_LOCATIONS, MAP_CAPITALS, distanceNm, wrapLon } from '../mechanics/world.mjs';
 import { frontPosition, POWERS } from '../mechanics/land-war.mjs';
 import { fleetCourse, formationAt, ownFormationScene } from './fleet-formation.mjs';
+import { ongoingMapBattles } from './battle-map.mjs';
 
 const finitePoint = point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite);
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
@@ -116,7 +117,7 @@ export function buildUnrealScenePacket(state, content, previousRows = [], option
     .map(front => ({ id: front.id, name: front.name, position: frontPosition(front) }));
   const selected = rows.find(row => row.fleet.id === options.selectedForceId && !row.docked && !row.unlocated);
   const points = selected ? remainingOwnRoute(state, selected.fleet) : [];
-  return { format: 1, campaign: state.campaignId, player: state.player, at: campaignMinutes(state), paused: !!state.paused,
-    forces, contacts, ports, countries, fronts, route: points.length > 1 ? { forceId: selected.fleet.id, points } : null,
+  return { format: 1, campaign: state.campaignId, player: state.player, at: campaignMinutes(state), paused: !!state.paused, animate:options.animate !== false,
+    forces, contacts, ports, countries, fronts, battles:ongoingMapBattles(state), route: points.length > 1 ? { forceId: selected.fleet.id, points } : null,
     control: { ...(state.world?.control || {}) } };
 }

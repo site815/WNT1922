@@ -24,6 +24,7 @@ export function startScreen({bundle, content, selectedCampaign, selected, saved,
     <header class="start-screen-header"><div><span class="start-brand">WNT<span>1922</span></span><span class="start-subtitle">Naval command · global strategy</span></div><span class="start-version">v${esc(version)} · single player · local save</span></header>
     <div class="start-screen-layout">
       <section class="start-setup" aria-label="Choose a campaign and navy">
+        <div class="start-setup-scroll" data-scroll-key="start-setup">
         <div class="start-section-label"><span>01 / Campaign</span><span>${esc(content.scenario.start)}</span></div>
         <div class="start-campaigns">${campaignList(bundle).map(c => `<button data-action="select-campaign" data-id="${esc(c.id)}" aria-pressed="${c.id === selectedCampaign}" class="${c.id === selectedCampaign ? 'selected' : ''}"><strong>${esc(c.title)}</strong><span>${esc(c.start.slice(0,4))} start</span></button>`).join('')}</div>
         <details class="start-campaign-description"><summary>About this campaign</summary><p>${esc(content.scenario.description)}</p></details>
@@ -36,6 +37,7 @@ export function startScreen({bundle, content, selectedCampaign, selected, saved,
           <h1>${esc(nation.name)}</h1><h2>${esc(nation.title)}</h2><p>${esc(nation.description)}</p>
           <div class="start-nation-stats"><span><strong>${number(fleet.active)}</strong>active warships</span><span><strong>${number(fleet.building)}</strong>warships building</span><span><strong>${number(nation.merchants.hulls)}</strong>merchant hulls</span><span><strong>${number(nation.support.reduce((sum,g) => sum + g.count, 0))}</strong>support hulls cataloged</span></div>
         </section>
+        </div>
         <button class="primary start-command" data-action="new">Take command of ${esc(PROFILES[selected]?.name || nation.name)} <span aria-hidden="true">→</span></button>
         ${saved ? `<div class="start-resume"><div><strong>${esc(PROFILES[saved.player]?.name || saved.player)} · ${esc(date)}</strong><span>Saved campaign · resumes paused</span></div><button data-action="continue">Continue</button></div>` : '<p class="start-save-note">Your campaign saves automatically on this computer.</p>'}
       </section>

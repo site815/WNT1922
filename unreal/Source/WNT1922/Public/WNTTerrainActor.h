@@ -20,6 +20,11 @@ namespace WNTTerrainGeometry
     WNT1922_API TArray<FWNTGeographicTriangle> ClipAtMeridian(const FWNTGeographicTriangle& Triangle, double CentralMeridian);
     /** Translate a fixed geographic tile to its nearest repeat, then the requested adjacent copy. */
     WNT1922_API FVector WrappedTileOrigin(const FVector& GeographicOrigin, double CentralMeridian, int32 Copy);
+    /** Normalized satellite UV at a fixed geographic tile origin; independent of visible wrap/rebase. */
+    WNT1922_API FVector2D GlobalTextureOrigin(const FVector& GeographicOrigin);
+    /** Split a boundary on the same global grid used to tessellate land faces. */
+    WNT1922_API TArray<FVector2D> SplitSurfaceEdge(const FVector2D& A, const FVector2D& B, double Step);
+    WNT1922_API TArray<FWNTGeographicTriangle> SubdivideSurface(const FWNTGeographicTriangle& Triangle, double Step);
     /** Quantized world width keeps chart lines at least one physical pixel wide. */
     WNT1922_API double GraticuleWidthForPixelSize(double CentimetresPerPixel);
 }

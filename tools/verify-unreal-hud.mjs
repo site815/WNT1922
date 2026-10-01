@@ -38,21 +38,38 @@ try {
   await page.waitForFunction(()=>window.__nativeCalls.some(c=>c.method==='battle'));
   assert.equal(await page.evaluate(()=>window.__webglCalls),0);
   assert.equal(await page.locator('.unreal-scene-mask').count(),1);
-  // Short windows scroll the opening battle without changing canvas size.
-  // Its native viewport must follow that movement before a pointer-down occurs.
-  await page.setViewportSize({width:888,height:500});
-  await page.locator('.start-demo [data-demo-action="fit"]').scrollIntoViewIfNeeded();
+  // Native pixels can be twice CEF's logical CSS size under Windows DPI scaling.
+  // Fit the title to the viewport; only the optional information areas scroll.
+  for(const [width,height] of [[900,500],[1280,540],[1920,730],[1800,1000],[1920,1080],[2560,1080],[3440,1440]]){
+    await page.setViewportSize({width,height});
+    const layout=await page.evaluate(()=>{
+      const root=document.querySelector('.start-screen'),button=root.querySelector('[data-action="new"]'),footer=root.querySelector('.start-screen-footer'),stage=root.querySelector('.start-demo-stage');
+      return {viewport:{width:innerWidth,height:innerHeight},root:{clientHeight:root.clientHeight,scrollHeight:root.scrollHeight,clientWidth:root.clientWidth,scrollWidth:root.scrollWidth},button:button.getBoundingClientRect().toJSON(),footer:footer.getBoundingClientRect().toJSON(),stage:stage.getBoundingClientRect().toJSON(),document:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}};
+    });
+    assert(layout.root.scrollHeight<=layout.root.clientHeight+1&&layout.root.scrollWidth<=layout.root.clientWidth+1,'No outer title scrollbar at '+width+'×'+height);
+    assert(layout.document.width<=width&&layout.document.height<=height,'No document scrollbar at '+width+'×'+height);
+    assert(layout.button.top>=0&&layout.button.bottom<=layout.footer.top,'Take command remains above the fixed footer');
+    assert(layout.footer.bottom<=height+1&&layout.stage.height>=100,'Footer and battle viewer remain usable');
+  }
+  await page.setViewportSize({width:900,height:500});
+  await page.locator('.start-campaign-description summary').click();
+  await page.locator('.start-demo-disclaimer summary').click();
+  assert(await page.locator('.start-screen').evaluate(n=>n.scrollHeight<=n.clientHeight+1),'Expanded optional information stays inside its own scroll region');
   await page.waitForFunction(()=>{
     const rect=document.querySelector('.battle-canvas').getBoundingClientRect();
     const p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
     return p&&Math.abs(p.y-rect.top/innerHeight)<1e-6;
   });
-  await page.locator('.start-screen').evaluate(n=>{n.scrollTop=0;});
+  await page.locator('.start-setup-scroll').evaluate(n=>{n.scrollTop=n.scrollHeight;});
+  await page.locator('.start-demo-information').evaluate(n=>{n.scrollTop=n.scrollHeight;});
   await page.waitForFunction(()=>{
     const rect=document.querySelector('.battle-canvas').getBoundingClientRect();
     const p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
     return p&&Math.abs(p.y-rect.top/innerHeight)<1e-6;
   });
+  await page.locator('.start-campaign-description').evaluate(n=>n.open=false);
+  await page.locator('.start-demo-disclaimer details').evaluate(n=>n.open=false);
+  await page.locator('.start-setup-scroll,.start-demo-information').evaluateAll(nodes=>nodes.forEach(n=>n.scrollTop=0));
   await page.setViewportSize({width:1440,height:1000});
   const battle = await page.evaluate(()=>window.__nativeCalls.find(c=>c.method==='battle').packet);
   assert(battle.units.length>1); assert.equal(battle.animate,false);
@@ -65,7 +82,19 @@ try {
   await page.waitForFunction(()=>window.__nativeCalls.some(c=>c.method==='world'));
   await page.waitForSelector('.native-world-surface .unreal-input');
   const dispatch=page.locator('.diplomatic-dispatch [data-action="defer-decision"]').first();
-  if(await dispatch.count()) await dispatch.click();
+  if(await dispatch.count()) {await dispatch.click();await page.locator('.diplomatic-dispatch').waitFor({state:'detached'});}
+  // Deferring a choice leaves its popup marker in the save until the deadline.
+  // Only an actively displayed dispatch may block ministry shortcuts.
+  await page.locator('.native-world-input').focus();
+  await page.keyboard.press('4');await page.locator('.workspace.view-yards').waitFor();
+  await page.keyboard.press('5');await page.locator('.workspace.view-aircraft').waitFor();
+  for(const empty of await page.locator('.production-lines select:disabled').all())
+    assert.equal(await empty.locator('option:checked').innerText(),'No eligible aircraft');
+  await page.keyboard.press('6');await page.locator('.workspace.view-fleet').waitFor();
+  await page.locator('#fleet-search').fill('4');
+  assert.equal(await page.locator('.workspace.view-fleet').count(),1,'Typing in search does not invoke shortcuts');
+  await page.locator('#fleet-search').fill('');
+  await page.locator('.sidebar [data-view="command"]').click();
   const before = await page.evaluate(()=>window.__nativeCalls.filter(c=>c.method==='viewport').length);
   await page.waitForTimeout(650);
   const after = await page.evaluate(()=>window.__nativeCalls.filter(c=>c.method==='viewport').length);

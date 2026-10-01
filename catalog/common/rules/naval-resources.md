@@ -16,6 +16,10 @@ Each naval production line starts on automatic modernization. Automatic lines se
   "SYSTEMS_REVISION": 2,
   "SPEEDS": [
     [
+      0.006,
+      "Tactical · 60×"
+    ],
+    [
       0.25,
       "Very slow · 2,500×"
     ],

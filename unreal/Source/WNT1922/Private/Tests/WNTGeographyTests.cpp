@@ -6,6 +6,16 @@
 #include "WNTProjection.h"
 #include "WNTTerrainActor.h"
 #include "WNTMapTileComponent.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
+#include "Misc/FileHelper.h"
+#if WITH_EDITOR
+#include "Materials/Material.h"
+#include "Materials/MaterialExpressionDivide.h"
+#include "MaterialShared.h"
+#include "RHI.h"
+#endif
 
 namespace
 {
@@ -154,6 +164,157 @@ bool FWNTConservativeChartBoundsTest::RunTest(const FString& Parameters)
         const double Width=WNTTerrainGeometry::GraticuleWidthForPixelSize(PixelMetres*100.0);
         TestTrue(TEXT("Strategic grid quantization stays between one and sqrt(2) pixels"),Width>=PixelMetres&&Width<=PixelMetres*FMath::Sqrt(2.0)+1e-7);
     }
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTSatellitePrecisionTest,"WNT.Geography.SatelliteTexturePrecision",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTSatellitePrecisionTest::RunTest(const FString& Parameters)
+{
+    // Match the shader's float arithmetic, including its CPD and local vertex
+    // positions. Quantization must stay below one percent of a NASA texel.
+    auto ShaderUV=[](const FVector2D& Point,const FVector2D& TileCentre)
+    {
+        const FVector Origin=WNTProjection::ForwardUnwrapped(TileCentre);
+        const FVector Local=WNTProjection::ForwardUnwrapped(Point)-Origin;
+        const FVector2D UV=WNTTerrainGeometry::GlobalTextureOrigin(Origin);
+        const float U=float(UV.X)+float(Local.Y)/float(WNTProjection::WorldWidth);
+        const float V=float(UV.Y)+float(Local.X)/float(-WNTProjection::WorldWidth/2.0);
+        return FVector2D(U,V);
+    };
+    for(double Lon:{-179.999,-15.001,-15.0,-.001,0.0,14.999,15.0,179.999})for(double Lat:{-89.999,-.001,0.0,37.5,89.999})
+    {
+        const FVector2D Point(Lon,Lat);
+        const FVector2D Centre(-172.5+FMath::FloorToDouble((Lon+180)/15.0)*15.0,-82.5+FMath::FloorToDouble((Lat+90)/15.0)*15.0);
+        const FVector2D UV=ShaderUV(Point,Centre),Expected((Lon+180)/360.0,(90-Lat)/180.0);
+        TestTrue(TEXT("Global float UV tracks geographic coordinates to subpixel precision"),UV.Equals(Expected,2e-7));
+        const FVector2D Adjacent=ShaderUV(Point,Centre+FVector2D(15,0));
+        TestTrue(TEXT("Satellite sampling is continuous across adjacent tile origins"),UV.Equals(Adjacent,2e-7));
+    }
+    const FVector2D A=ShaderUV(FVector2D(12.0,38.0),FVector2D(7.5,37.5));
+    const FVector2D B=ShaderUV(FVector2D(12.001,38.001),FVector2D(7.5,37.5));
+    TestTrue(TEXT("Subkilometre movement changes UV instead of sticking to half-float steps"),B.X-A.X>2.6e-6&&A.Y-B.Y>5.3e-6);
+    const FVector2D West=ShaderUV(FVector2D(-180,37.0),FVector2D(-172.5,37.5));
+    const FVector2D East=ShaderUV(FVector2D(180,37.0),FVector2D(172.5,37.5));
+    TestTrue(TEXT("Dateline differs only by exactly one repeating texture turn"),FMath::Abs(East.X-West.X-1.0)<2e-7&&FMath::Abs(East.Y-West.Y)<2e-7);
+    return true;
+}
+
+#if WITH_EDITOR
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTSatelliteCompiledCoordinatesTest,"WNT.Geography.CompiledSatelliteCoordinates",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTSatelliteCompiledCoordinatesTest::RunTest(const FString& Parameters)
+{
+    UMaterial* Material=LoadObject<UMaterial>(nullptr,TEXT("/Game/Materials/M_TerrainSurface.M_TerrainSurface"));
+    if(!TestNotNull(TEXT("Actual prepared terrain surface material"),Material))return false;
+    int32 CoordinateDivisions=0;
+    for(UMaterialExpression* Expression:Material->GetExpressions())
+    {
+        auto* Division=Cast<UMaterialExpressionDivide>(Expression);
+        if(!Division||!Division->Desc.StartsWith(TEXT("Satellite ")))continue;
+        ++CoordinateDivisions;
+        TestNotNull(TEXT("Satellite coordinate retains a spatial input"),Division->A.Expression);
+        const double Expected=Division->Desc.Contains(TEXT("longitude"))?WNTProjection::WorldWidth:-WNTProjection::WorldWidth/2.0;
+        TestTrue(TEXT("Satellite denominator is a representable world span, not a rounded-zero reciprocal"),FMath::Abs(Division->ConstB/Expected-1.0)<1e-6);
+    }
+    TestEqual(TEXT("Prepared satellite material contains both coordinate divisions"),CoordinateDivisions,2);
+    // NullRHI does not allocate the material's runtime rendering resources.
+    // Bind a translation-only resource to the real loaded graph and the same
+    // Windows SM6 target used by the package; shader translation needs no GPU.
+    FMaterialResource Resource;
+    Resource.SetMaterial(Material,nullptr,SP_PCD3D_SM6,EMaterialQualityLevel::High);
+    FString HLSL;
+    if(!TestTrue(TEXT("Translate the actual prepared material to shader source"),Resource.GetMaterialExpressionSource(HLSL)))return false;
+    // The earlier CPU UV test could pass while UE emitted *0.00000000f.
+    // Inspect real material translation as well as the numerical projection.
+    for(float Denominator:{float(WNTProjection::WorldWidth),float(-WNTProjection::WorldWidth/2.0)})
+    {
+        const FString Literal=FString::Printf(TEXT("%0.8f"),Denominator);
+        TestTrue(TEXT("Generated shader preserves a nonzero satellite coordinate denominator: ")+Literal,HLSL.Contains(Literal));
+    }
+    FFileHelper::SaveStringToFile(HLSL,*FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("WNTTerrainSurface.ush")));
+    return true;
+}
+#endif
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTSharedBorderContinuityTest,"WNT.Geography.SharedBorderTerrainContinuity",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTSharedBorderContinuityTest::RunTest(const FString& Parameters)
+{
+    const FString Root=DataRoot();FString Text,Error;TSharedPtr<FJsonObject> Document;
+    if(!TestTrue(TEXT("Read actual display geometry"),FFileHelper::LoadFileToString(Text,*FPaths::Combine(Root,TEXT("assets/maps/geometry.json")))&&FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text),Document)))return false;
+    FWNTElevationGrid Grid;
+    if(!TestTrue(TEXT("Read actual elevation for boundary continuity"),Grid.Load(FPaths::Combine(Root,TEXT("assets/terrain/elevation.bin")),FPaths::Combine(Root,TEXT("assets/terrain/elevation.json")),Error)))return false;
+    const auto Height=[&](const FVector2D& P){return AWNTTerrainActor::LandBaseMetres+FMath::Max(0.0,Grid.SampleMetres(P));};
+    struct FBoundary{FVector2D A,B;TArray<int32> Owners;};
+    TMap<FString,FBoundary> Boundaries;TArray<TArray<FWNTGeographicTriangle>> Surfaces;Surfaces.SetNum(3);
+    const TArray<FString> Ids{TEXT("c220"),TEXT("c325"),TEXT("ne_CHE")};
+    const auto Geometries=Document->GetObjectField(TEXT("geometry"));
+    for(int32 Owner=0;Owner<Ids.Num();++Owner)
+    {
+        const auto Geometry=Geometries->GetObjectField(Ids[Owner]);
+        const auto& Coordinates=Geometry->GetArrayField(TEXT("coordinates"));TArray<TArray<TSharedPtr<FJsonValue>>> Polygons;
+        if(Geometry->GetStringField(TEXT("type"))==TEXT("Polygon"))Polygons.Add(Coordinates);
+        else for(const auto& P:Coordinates)Polygons.Add(P->AsArray());
+        for(const auto& Polygon:Polygons)
+        {
+            TArray<TArray<FVector2D>> Rings;FBox2D Bounds(ForceInit);
+            for(const auto& RingValue:Polygon)
+            {
+                TArray<FVector2D> Ring;
+                for(const auto& Value:RingValue->AsArray()){const auto& XY=Value->AsArray();Ring.Add(FVector2D(XY[0]->AsNumber(),XY[1]->AsNumber()));}
+                if(Rings.IsEmpty())for(const auto& P:Ring)Bounds+=P;Rings.Add(MoveTemp(Ring));
+            }
+            if(Bounds.Max.X<6.6||Bounds.Min.X>8.4||Bounds.Max.Y<45.5||Bounds.Min.Y>46.5)continue;
+            TArray<FWNTGeographicTriangle> Coarse;
+            if(!TestTrue(TEXT("Triangulate actual Alpine country ")+Ids[Owner],WNTTerrainGeometry::TriangulatePolygon(Rings,Coarse,Error)))return false;
+            for(const auto& T:Coarse)
+            {
+                if(FMath::Max3(T.A.X,T.B.X,T.C.X)<6.6||FMath::Min3(T.A.X,T.B.X,T.C.X)>8.4||FMath::Max3(T.A.Y,T.B.Y,T.C.Y)<45.5||FMath::Min3(T.A.Y,T.B.Y,T.C.Y)>46.5)continue;
+                Surfaces[Owner].Append(WNTTerrainGeometry::SubdivideSurface(T,.5));
+            }
+            for(const auto& Ring:Rings)for(int32 I=0;I+1<Ring.Num();++I)
+            {
+                const FVector2D A=Ring[I],B=Ring[I+1],Mid=(A+B)*.5;
+                if(Mid.X<=6.6||Mid.X>=8.4||Mid.Y<=45.5||Mid.Y>=46.5)continue;
+                const FString KA=FString::Printf(TEXT("%.9f,%.9f"),A.X,A.Y),KB=FString::Printf(TEXT("%.9f,%.9f"),B.X,B.Y);
+                const FString Key=KA<KB?KA+TEXT(":")+KB:KB+TEXT(":")+KA;
+                auto& Edge=Boundaries.FindOrAdd(Key);Edge.A=A;Edge.B=B;Edge.Owners.AddUnique(Owner);
+            }
+        }
+    }
+    auto SurfaceHeight=[&](const FVector2D& P,int32 Owner,double& Out)
+    {
+        for(const auto& T:Surfaces[Owner])
+        {
+            const FVector2D U=T.B-T.A,V=T.C-T.A,W=P-T.A;const double D=U.X*V.Y-U.Y*V.X;
+            if(FMath::Abs(D)<1e-14)continue;
+            const double B=(W.X*V.Y-W.Y*V.X)/D,C=(U.X*W.Y-U.Y*W.X)/D;
+            if(B>=-1e-8&&C>=-1e-8&&B+C<=1+1e-8){Out=(1-B-C)*Height(T.A)+B*Height(T.B)+C*Height(T.C);return true;}
+        }
+        return false;
+    };
+    TestTrue(TEXT("Fixture includes many exact shared Alpine boundary edges"),Boundaries.Num()>20);
+    int32 Checked=0;double MaximumDifference=0;
+    for(const auto& Pair:Boundaries)
+    {
+        const auto& Edge=Pair.Value;
+        if(!TestEqual(TEXT("Every Alpine boundary has two exactly matching country owners"),Edge.Owners.Num(),2))return false;
+        const auto Points=WNTTerrainGeometry::SplitSurfaceEdge(Edge.A,Edge.B,.5);
+        const auto Reverse=WNTTerrainGeometry::SplitSurfaceEdge(Edge.B,Edge.A,.5);
+        TestEqual(TEXT("Reversing a shared edge keeps its split count"),Points.Num(),Reverse.Num());
+        for(int32 I=0;I<Points.Num();++I)TestTrue(TEXT("Shared edge split positions coincide in either orientation"),Points[I].Equals(Reverse[Reverse.Num()-1-I],1e-10));
+        for(int32 I=0;I+1<Points.Num();++I)for(double Fraction:{.2,.5,.8})
+        {
+            const FVector2D P=FMath::Lerp(Points[I],Points[I+1],Fraction);
+            const double Expected=FMath::Lerp(Height(Points[I]),Height(Points[I+1]),Fraction);
+            for(int32 Owner:Edge.Owners)
+            {
+                double Actual=0;
+                if(!TestTrue(TEXT("Both actual tessellated country surfaces cover their shared border"),SurfaceHeight(P,Owner,Actual)))return false;
+                MaximumDifference=FMath::Max(MaximumDifference,FMath::Abs(Expected-Actual));++Checked;
+            }
+        }
+    }
+    TestTrue(TEXT("Real source elevation agrees across both tessellated sides within one millimetre"),Checked>100&&MaximumDifference<.001);
+    AddInfo(FString::Printf(TEXT("Checked %d real shared-edge samples; maximum vertical mismatch %.9f metres"),Checked,MaximumDifference));
     return true;
 }
 

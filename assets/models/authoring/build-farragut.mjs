@@ -1,17 +1,15 @@
 // Optional original-geometry authoring. The game opens the GLB directly.
 // No voxel data, catalog geometry, external modelling library or network.
 import fs from 'node:fs/promises';
+import {writeStoredAsset} from './write-stored-asset.mjs';
 import {validateDetailedShip} from '../../../tools/check-models.mjs';
-import {createAuthoredMesh} from './authored-mesh.mjs';
+import {createNavalMesh} from './fleet-materials.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const spec=JSON.parse(await fs.readFile(path.join(here,'farragut-1934.json'),'utf8'));
 const L=spec.dimensions.length,B=spec.dimensions.beam,D=spec.dimensions.draft;
-const {groups,parts,add,sub,mul,cross,unit,mix,mesh,tri,quad,part,cylinder,ring,prism,roundedOutline,house,rail,ladder,addTexture,makeGlb}=createAuthoredMesh(spec);
-addTexture('naval-paint-albedo',await fs.readFile(path.join(here,'../textures/naval-paint/albedo.png')));
-addTexture('naval-paint-normal',await fs.readFile(path.join(here,'../textures/blue_metal_plate/blue_metal_plate_nor_gl_1k.png')));
-addTexture('naval-paint-orm',await fs.readFile(path.join(here,'../textures/blue_metal_plate/blue_metal_plate_arm_1k.jpg')),'image/jpeg');
+const {groups,parts,add,sub,mul,cross,unit,mix,mesh,tri,quad,part,cylinder,ring,prism,roundedOutline,house,rail,ladder,addTexture,makeGlb}=await createNavalMesh(spec);
 function curveValue(t,column){const ss=spec.hullStations;let i=0;while(i<ss.length-2&&ss[i+1][0]<t)i++;const p=ss[i],q=ss[i+1],u=(t-p[0])/(q[0]-p[0]);const pp=ss[Math.max(0,i-1)],qq=ss[Math.min(ss.length-1,i+2)];const m0=(q[column]-pp[column])/(q[0]-pp[0]),m1=(qq[column]-p[column])/(qq[0]-p[0]);return (2*u*u*u-3*u*u+1)*p[column]+(u*u*u-2*u*u+u)*m0*(q[0]-p[0])+(-2*u*u*u+3*u*u)*q[column]+(u*u*u-u*u)*m1*(q[0]-p[0]);}
 const beam=x=>Math.max(.005,curveValue(x/(L/2),1))*B/2;
 const sheer=x=>curveValue(x/(L/2),3);
@@ -126,7 +124,7 @@ if(!process.argv.includes('--write'))throw Error('Use --write to export; normal 
 const output=path.join(here,'../ships/usa/farragut_dd34.glb');
 const completedGlb=makeGlb();
 const statistics=validateDetailedShip(completedGlb,{id:spec.id,metadata:spec});
-await fs.writeFile(output,completedGlb);
-const summary={id:spec.id,file:'assets/models/ships/usa/farragut_dd34.glb',triangles:[...groups.values()].reduce((s,g)=>s+g.indices.length/3,0),vertices:[...groups.values()].reduce((s,g)=>s+g.positions.length/3,0),materials:groups.size,bytes:(await fs.stat(output)).size};
-await fs.writeFile(path.join(here,'../ships/usa/farragut_dd34.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/authoring/farragut-1934.json',exporter:'assets/models/authoring/build-farragut.mjs',summary,statistics},null,2)+'\n');
+await writeStoredAsset(output,completedGlb);
+const summary={id:spec.id,file:'assets/models/ships/usa/farragut_dd34.glb',triangles:[...groups.values()].reduce((s,g)=>s+g.indices.length/3,0),vertices:statistics.vertices,materials:groups.size,bytes:(await fs.stat(output)).size};
+await writeStoredAsset(path.join(here,'../ships/usa/farragut_dd34.source.json'),JSON.stringify({...spec,authoringFile:'assets/models/authoring/farragut-1934.json',exporter:'assets/models/authoring/build-farragut.mjs',summary,statistics},null,2)+'\n');
 console.log(JSON.stringify(summary));

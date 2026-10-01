@@ -52,9 +52,10 @@ test('time-step receipts report elapsed time and high speeds stay within a bound
     let clock=0;const runner=new SimulationRunner(CATALOG,{now:()=>++clock,budgetMs:3});runner.replace(s);
     clock+=1000;const before=campaignMinutes(s),ticks=s.minuteTicks||0;
     let done=runner.advance();clock+=1000;done+=runner.advance();
+    for(let wait=0;!done&&wait<200;wait++){clock+=100;done+=runner.advance();}
     assert.ok(done>0&&done<=90);assert.equal(campaignMinutes(s)-before,done);
     assert.equal((s.minuteTicks||0)-ticks,done/15);
-    assert.ok(runner.credit<=s.speed*10000/60*.3);
+    assert.ok(runner.credit<=Math.max(30,s.speed*10000/60*.3));
     validateSave(s,CATALOG);
   }
 });

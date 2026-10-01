@@ -42,7 +42,7 @@ if (UNREAL_MODE) {
       const scene = scenes.get(event.instanceId);
       if (!scene || scene !== activeScene) return;
       if (event.type === 'select' && event.selection) scene.onSelect({...event.selection,zoom:!!event.zoom});
-      if (event.type === 'hover') scene.onHover?.(event.selection, {clientX:event.x * innerWidth, clientY:event.y * innerHeight});
+      if (event.type === 'hover') scene.receiveHover(event);
       if (event.type === 'camera') scene.cameraChanged?.(event);
     },
   };
@@ -55,9 +55,20 @@ class NativeScene {
     Object.assign(this, {root, onSelect, onHover});
     this.instanceId = 'native-' + ++nextId; scenes.set(this.instanceId, this);
     this.hits = []; this.zoom = 1; this.pan = [0, 0]; this.raf = null;
+    this.hoverSequence = 0; this.hoverRequestId = null;
   }
-  input(action, values = {}) { return send('sceneinput', {instanceId:this.instanceId, action, ...values}); }
-  cancelHover() { clearTimeout(this.hoverTimer); this.hoverTimer = null; this.pendingHover = null; }
+  input(action, values = {}) {
+    if (['zoom','pan','tilt','home','focus'].includes(action) && this.hoverRequestId != null) this.dismissHover();
+    return send('sceneinput', {instanceId:this.instanceId, action, ...values});
+  }
+  cancelHover() { clearTimeout(this.hoverTimer); this.hoverTimer = null; this.pendingHover = null; this.hoverRequestId = null; }
+  dismissHover() { this.cancelHover(); this.onHover(null, {immediate:true}); }
+  receiveHover(event) {
+    // Native picking crosses the CEF bridge asynchronously. Camera movement or
+    // a newer pointer location invalidates the old request before its reply.
+    if (this.hoverRequestId == null || event.requestId !== this.hoverRequestId) return;
+    this.onHover(event.selection, {clientX:event.x * innerWidth, clientY:event.y * innerHeight});
+  }
   attach(canvas) {
     if (this.canvas === canvas) return;
     this.cancelHover();
@@ -69,14 +80,16 @@ class NativeScene {
     const point = event => ({x:clamp(event.clientX / innerWidth, 0, 1), y:clamp(event.clientY / innerHeight, 0, 1)});
     canvas.addEventListener('contextmenu', event => event.preventDefault(), options);
     canvas.addEventListener('wheel', event => {
-      event.preventDefault(); this.activate();
+      event.preventDefault(); this.activate(); canvas.focus({preventScroll:true});
+      this.dismissHover();
       this.input('zoom', {delta:event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1), ...point(event)});
     }, {...options, passive:false});
     canvas.addEventListener('pointerdown', event => {
-      if (![0,2].includes(event.button)) return;
-      this.cancelHover();
+      if (![0,1,2].includes(event.button)) return;
+      this.dismissHover();
       this.activate(); canvas.focus({preventScroll:true}); canvas.setPointerCapture(event.pointerId);
-      this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false, tilt:event.button === 2 || event.shiftKey};
+      this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false,
+        pick:event.button === 0, tilt:this.mode === 'battle' && (event.button === 2 || event.shiftKey)};
     }, options);
     canvas.addEventListener('pointermove', event => {
       if (this.drag) {
@@ -88,7 +101,8 @@ class NativeScene {
       } else {
         // Keep the last pointer position even when movement stops within the
         // rate limit; dropping that event leaves the hovered ship stale.
-        this.pendingHover = point(event);
+        this.hoverRequestId = ++this.hoverSequence;
+        this.pendingHover = {...point(event),requestId:this.hoverRequestId};
         if (this.hoverTimer == null) this.hoverTimer = setTimeout(() => {
           this.hoverTimer = null; this.lastHover = performance.now();
           const position = this.pendingHover; this.pendingHover = null;
@@ -97,14 +111,17 @@ class NativeScene {
       }
     }, options);
     canvas.addEventListener('pointerup', event => {
-      if (this.drag && !this.drag.moved && !this.drag.tilt) this.input('pick', point(event));
+      if (this.drag?.pick && !this.drag.moved && !this.drag.tilt) this.input('pick', point(event));
       this.drag = null;
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     }, options);
-    canvas.addEventListener('pointercancel', () => { this.drag = null; }, options);
+    canvas.addEventListener('pointercancel', () => { this.drag = null; this.dismissHover(); }, options);
     canvas.addEventListener('dblclick', event => this.input('pick', {...point(event),zoom:true}), options);
     canvas.addEventListener('pointerleave', () => {this.cancelHover(); if (!this.drag) this.onHover(null);}, options);
     canvas.addEventListener('keydown', event => {
+      if (['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
+        this.dismissHover();
+      }
       if (event.key === 'Home') { event.preventDefault(); this.input('home'); }
       if (['PageUp','PageDown'].includes(event.key)) { event.preventDefault(); this.input('zoom', {delta:event.key === 'PageUp' ? -300 : 300}); }
       const delta = {ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]}[event.key];
@@ -124,6 +141,7 @@ class NativeScene {
   activate() {
     if (!this.canvas?.isConnected || document.hidden) return;
     const wasActive = activeScene === this;
+    if (!wasActive) {activeScene?.dismissHover(); this.cancelHover();}
     activeScene = this;
     const rect = this.viewportRect();
     const packet = {instanceId:this.instanceId, mode:this.mode, x:rect.left / innerWidth, y:rect.top / innerHeight,
@@ -143,6 +161,7 @@ class NativeScene {
   }
   suspend() {
     if (activeScene !== this) return;
+    this.dismissHover();
     activeScene = null;
     if (this.mask) this.mask.hidden = true;
     send('viewport', {instanceId:this.instanceId,mode:'hidden',x:0,y:0,width:1,height:1});
@@ -156,7 +175,10 @@ class NativeScene {
     this.canvas = null; this.report = null; this.frame = null; this.hits = [];
   }
   destroy() { this.clear(); scenes.delete(this.instanceId); }
-  cameraChanged(event) { this.zoom = event.zoom; }
+  cameraChanged(event) {
+    if (this.zoom !== event.zoom) this.dismissHover();
+    this.zoom = event.zoom;
+  }
 }
 
 export class UnrealWorldScene extends NativeScene {
@@ -170,7 +192,8 @@ export class UnrealWorldScene extends NativeScene {
       if (state.campaignId !== this.state?.campaignId || state.player !== this.state?.player) this.rows = [];
       const rows = ownFormationScene(state, content, this.rows);
       this.routeSelection = this.chart().convoyId || this.chart().fleetId || null;
-      this.packet = buildUnrealScenePacket(state, content, this.rows, {rows, selectedForceId:this.routeSelection});
+      this.packet = buildUnrealScenePacket(state, content, this.rows, {rows, selectedForceId:this.routeSelection,
+        animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
       send('world', this.packet); this.rows = rows;
     }
     Object.assign(this, {state, content, political}); this.refresh();
@@ -179,7 +202,8 @@ export class UnrealWorldScene extends NativeScene {
     const selectedForceId = this.chart().convoyId || this.chart().fleetId || null;
     if (this.state && selectedForceId !== this.routeSelection) {
       this.routeSelection = selectedForceId;
-      this.packet = buildUnrealScenePacket(this.state, this.content, this.rows, {rows:this.rows, selectedForceId});
+      this.packet = buildUnrealScenePacket(this.state, this.content, this.rows, {rows:this.rows, selectedForceId,
+        animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
       send('world', this.packet);
     }
     const surface = this.root.querySelector('.native-world-surface');
@@ -188,7 +212,7 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Scroll to zoom, drag to pan. Right drag tilts at ship-inspection zoom above 2048 times. Home restores the overhead strategic view.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Scroll to zoom; left, middle or right drag to pan. The camera tilts automatically only at close ship inspection. Home restores the overhead strategic view.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
@@ -203,6 +227,7 @@ export class UnrealWorldScene extends NativeScene {
   cameraChanged(event) {
     const key = JSON.stringify([event.zoom,event.longitude,event.latitude,event.tilt]);
     if (key === this.cameraKey) return; this.cameraKey = key;
+    this.dismissHover();
     this.zoom = event.zoom; const chart = this.chart(); chart.zoom = event.zoom;
     chart.rotation = event.longitude; chart.nativeLatitude = event.latitude;
     // Camera movement is independent from DOM/simulation redraw rate.

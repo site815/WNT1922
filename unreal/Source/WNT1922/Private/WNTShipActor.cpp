@@ -268,10 +268,11 @@ void AWNTShipActor::RefreshModelForCamera(const FVector& CameraLocation,bool bRe
         ? ReadRevision(SourcePath) : *Known;
     const auto* Cached=DetailedCache.Find(SourcePath);
     const bool NeedsParse=!Cached||!Cached->Mesh.IsValid()||Cached->Timestamp!=Revision.Timestamp||Cached->Size!=Revision.Size;
-    if(NeedsParse&&DistanceSquared>VisibleRange*VisibleRange)
+    if(NeedsParse&&Revision.Size>=20&&Revision.Size<=268435456)
     {
-        // Limit speculative cold parses to one per frame. Visible ships load
-        // immediately, so this budget never omits a hull inside the draw range.
+        // A jump into a large fleet must not import every distinct class in one
+        // frame. Share sister-ship geometry immediately and admit one new GLB
+        // per frame, including visible hulls, until the entire fleet is ready.
         if(PrefetchFrame!=GFrameCounter){PrefetchFrame=GFrameCounter;PrefetchParses=0;}
         if(PrefetchParses>=1)return;
         ++PrefetchParses;

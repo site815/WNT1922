@@ -7,6 +7,7 @@ import { campaignMinutes, setCampaignMinutes } from '../mechanics/campaign-clock
 import { routeLength, distanceNm, interpolate, PORTS, NODES, PORT_LOCATIONS, MAP_CAPITALS } from '../mechanics/world.mjs';
 import { fleetCourse, ownFormationScene, geographicOffset, formationAt } from '../ui/fleet-formation.mjs';
 import { buildUnrealScenePacket, sampleObservedNavigation } from '../ui/unreal-scene-packet.mjs';
+import { battleMapHover } from '../ui/battle-map.mjs';
 
 const classes = { bb: { type: 'BB', dimensions: { length_m: 200, beam_m: 30 } },
   dd: { type: 'DD', dimensions: { length_m: 100, beam_m: 12 } } };
@@ -24,6 +25,27 @@ const nearPoint = (a, b, epsilon = 1e-8) => {
   assert(Math.abs(((a[0] - b[0] + 540) % 360) - 180) < epsilon, `Longitude ${a[0]} != ${b[0]}`);
   assert(Math.abs(a[1] - b[1]) < epsilon, `Latitude ${a[1]} != ${b[1]}`);
 };
+
+test('ongoing battle markers expose only player reports and disappear on completion without changing combat state', () => {
+  const state = fixture(force([[0,0],[4,0]]),100);
+  const report = {id:71,a:'USA',b:'JPN',status:'ongoing',stage:3,round:2,mainRounds:3,region:'pacific',position:[179.8,25],startedAt:40,
+    resultA:{sunk:1,planesLost:2,conditions:[{count:4,sunk:1}]},resultB:{sunk:2,conditions:[{count:8,sunk:2}]}};
+  state.reports = [report,{...report,id:72,a:'GBR',b:'DEU'}, {...report,id:73,status:'completed'},
+    {...report,id:74,background:true},{...report,id:75,position:[Infinity,10]}];
+  const before = JSON.stringify(state), packet = buildUnrealScenePacket(state,{classes});
+  assert.deepEqual(packet.battles.map(row => row.id),['71']);
+  assert.deepEqual(packet.battles[0].position,[179.8,25]);
+  assert.match(packet.battles[0].label,/round 2 \/ 3/);
+  const hover = battleMapHover(state,71);
+  assert.match(hover,/3 ships afloat/); assert.match(hover,/6 ships afloat/);
+  assert.match(hover,/60 minutes elapsed/); assert.match(hover,/Click to pause and watch/);
+  assert.equal(battleMapHover(state,72),'');
+  assert.equal(JSON.stringify(state),before);
+  packet.battles[0].position[0] = 0; assert.equal(report.position[0],179.8);
+  report.status = 'completed';
+  assert.equal(buildUnrealScenePacket(state,{classes}).battles.length,0);
+  assert.equal(battleMapHover(state,71),'');
+});
 
 test('native scene packet exposes compact own hulls, public ports and observed contacts without foreign truth or save mutation', () => {
   const s = fixture(force([[0, 0], [4, 0]]), 100);

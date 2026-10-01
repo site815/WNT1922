@@ -1,19 +1,17 @@
 // Optional original Clemson authoring. The game reads the stored GLB directly.
 // Independent source stations and shape; no legacy mesh or Farragut geometry.
 import fs from 'node:fs/promises';
+import {writeStoredAsset} from './write-stored-asset.mjs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
-import {createAuthoredMesh} from './authored-mesh.mjs';
+import {createNavalMesh} from './fleet-materials.mjs';
 import {validateDetailedShip} from '../../../tools/check-models.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const spec=JSON.parse(await fs.readFile(path.join(here,'clemson-1919.json'),'utf8'));
 const {length:L,beam:B,draft:D}=spec.dimensions;
-const {groups,parts,add,sub,mul,cross,unit,mix,tri,quad,part,cylinder,ring,prism,house,rail,ladder,addTexture,makeGlb}=createAuthoredMesh(spec);
-addTexture('naval-paint-albedo',await fs.readFile(path.join(here,'../textures/naval-paint/albedo.png')));
-addTexture('naval-paint-normal',await fs.readFile(path.join(here,'../textures/blue_metal_plate/blue_metal_plate_nor_gl_1k.png')));
-addTexture('naval-paint-orm',await fs.readFile(path.join(here,'../textures/blue_metal_plate/blue_metal_plate_arm_1k.jpg')),'image/jpeg');
+const {groups,parts,add,sub,mul,cross,unit,mix,tri,quad,part,cylinder,ring,prism,house,rail,ladder,addTexture,makeGlb}=await createNavalMesh(spec);
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
 function station(t,k){const s=spec.hullStations;let i=0;while(i<s.length-2&&s[i+1][0]<t)i++;const p=s[i],q=s[i+1],a=s[Math.max(0,i-1)],b=s[Math.min(s.length-1,i+2)],u=(t-p[0])/(q[0]-p[0]),d=q[0]-p[0];return (2*u**3-3*u*u+1)*p[k]+(u**3-2*u*u+u)*(q[k]-a[k])/(q[0]-a[0])*d+(-2*u**3+3*u*u)*q[k]+(u**3-u*u)*(b[k]-p[k])/(b[0]-p[0])*d;}
 const half=x=>Math.max(.006,station(clamp(x/(L/2),-1,1),1))*B/2;
@@ -249,9 +247,9 @@ part('Twin propeller shafts, struts, three-blade screws, bilge keels and rudder'
 assert.equal(spec.mainGuns.length,4);assert.equal(spec.funnels.length,4);assert.equal(spec.torpedoMounts.reduce((n,b)=>n+b.tubes,0),12);
 const buffer=makeGlb();const statistics=validateDetailedShip(buffer,{id:spec.id,metadata:spec});
 assert(statistics.bounds.min[1]<-2.9&&statistics.bounds.max[1]>28,'Clemson full hull and mast scale');
-assert(statistics.triangles>50000&&statistics.embeddedTextures===3,'Detailed stored geometry and photographic surface maps');
+assert(statistics.triangles>50000&&statistics.embeddedTextures>=6,'Detailed stored geometry and photographic surface maps');
 if(!process.argv.includes('--write'))throw Error('Use --write to export this optional authoring source. The game never invokes it.');
-const target=path.join(here,'../ships/usa/clemson.glb');await fs.writeFile(target,buffer);
+const target=path.join(here,'../ships/usa/clemson.glb');await writeStoredAsset(target,buffer);
 const metadata={...spec,authoringFile:'assets/models/authoring/clemson-1919.json',exporter:'assets/models/authoring/build-clemson.mjs',sha256:crypto.createHash('sha256').update(buffer).digest('hex'),statistics,parts};
-await fs.writeFile(target.replace(/\.glb$/,'.source.json'),JSON.stringify(metadata,null,2)+'\n');
+await writeStoredAsset(target.replace(/\.glb$/,'.source.json'),JSON.stringify(metadata,null,2)+'\n');
 console.log(JSON.stringify(statistics));

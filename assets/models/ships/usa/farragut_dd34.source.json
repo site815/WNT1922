@@ -13,18 +13,11 @@
   "textureMetres": 2.5,
   "materialSources": [
     {
-      "name": "Blue Metal Plate",
-      "author": "Rob Tuytel",
-      "license": "CC0-1.0",
-      "url": "https://polyhaven.com/a/blue_metal_plate",
-      "manifest": "assets/models/textures/blue_metal_plate/source.json",
-      "usage": "Unmodified OpenGL normal and packed AO/roughness/metalness maps; gray paint base color is original, painted surfaces use metalness zero."
-    },
-    {
-      "name": "Neutral naval paint albedo",
+      "name": "Original fleet paint, timber, nonslip decking and canvas PBR maps",
       "author": "WNT1922",
       "license": "Original project artwork",
-      "manifest": "assets/models/textures/naval-paint/source.json"
+      "manifest": "assets/models/textures/fleet-surfaces/source.json",
+      "usage": "Embedded physically scaled albedo, OpenGL normal and packed occlusion/roughness/metalness. Original inferred weathering, not an exact camouflage or refit claim."
     }
   ],
   "geometrySource": "Original reconstruction from the United States War Department recognition plan/profile and NHHC dimensions; no legacy voxel or recognition-model geometry is imported.",
@@ -199,12 +192,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.95,
-      "baseColorTexture": "naval-paint-albedo",
-      "normalTexture": "naval-paint-normal",
+      "roughness": 1,
       "normalScale": 0.65,
-      "metallicRoughnessTexture": "naval-paint-orm",
-      "occlusionTexture": "naval-paint-orm"
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "deck": {
       "color": [
@@ -215,11 +208,11 @@
       ],
       "metallic": 0,
       "roughness": 1,
-      "baseColorTexture": "naval-paint-albedo",
-      "normalTexture": "naval-paint-normal",
       "normalScale": 0.6,
-      "metallicRoughnessTexture": "naval-paint-orm",
-      "occlusionTexture": "naval-paint-orm"
+      "baseColorTexture": "steel-deck-albedo",
+      "normalTexture": "steel-deck-normal",
+      "metallicRoughnessTexture": "steel-deck-orm",
+      "occlusionTexture": "steel-deck-orm"
     },
     "antifouling": {
       "color": [
@@ -229,7 +222,12 @@
         1
       ],
       "metallic": 0.05,
-      "roughness": 0.8
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "boot": {
       "color": [
@@ -239,7 +237,12 @@
         1
       ],
       "metallic": 0.05,
-      "roughness": 0.82
+      "roughness": 1,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "paint-orm",
+      "occlusionTexture": "paint-orm"
     },
     "steel": {
       "color": [
@@ -249,7 +252,10 @@
         1
       ],
       "metallic": 0.82,
-      "roughness": 0.43
+      "roughness": 0.43,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     },
     "canvas": {
       "color": [
@@ -259,7 +265,12 @@
         1
       ],
       "metallic": 0,
-      "roughness": 0.94
+      "roughness": 1,
+      "baseColorTexture": "canvas-albedo",
+      "normalTexture": "canvas-normal",
+      "normalScale": 0.65,
+      "metallicRoughnessTexture": "canvas-orm",
+      "occlusionTexture": "canvas-orm"
     },
     "glass": {
       "color": [
@@ -279,26 +290,39 @@
         1
       ],
       "metallic": 0.9,
-      "roughness": 0.4
+      "roughness": 0.4,
+      "baseColorTexture": "paint-albedo",
+      "normalTexture": "paint-normal",
+      "normalScale": 0.65
     }
+  },
+  "indexVertices": true,
+  "curveToleranceMetres": 0.003,
+  "surfaceProfile": {
+    "version": 1,
+    "tileMetres": 2.5,
+    "textureSize": 256,
+    "deckFinish": "steel-deck",
+    "curveToleranceMetres": 0.003,
+    "geometryPolicy": "Preserve hull loft, fittings and weapon stations. Reduced cylinder and ring tessellation adds at most 3 mm radial error; already coarser original fittings are unchanged. Lossless Float32 vertex indexing preserves UV and hard-normal seams."
   },
   "authoringFile": "assets/models/authoring/farragut-1934.json",
   "exporter": "assets/models/authoring/build-farragut.mjs",
   "summary": {
     "id": "farragut_dd34",
     "file": "assets/models/ships/usa/farragut_dd34.glb",
-    "triangles": 93280,
-    "vertices": 279840,
+    "triangles": 81520,
+    "vertices": 109629,
     "materials": 8,
-    "bytes": 14815460
+    "bytes": 4882812
   },
   "statistics": {
     "id": "farragut_dd34",
-    "triangles": 93280,
-    "vertices": 279840,
+    "triangles": 81520,
+    "vertices": 109629,
     "materials": 8,
-    "embeddedTextures": 3,
-    "bytes": 14815460,
+    "embeddedTextures": 9,
+    "bytes": 4882812,
     "bounds": {
       "min": [
         -52.006500244140625,
@@ -307,7 +331,7 @@
       ],
       "max": [
         52.006500244140625,
-        25.40278434753418,
+        25.402742385864258,
         5.2776103019714355
       ]
     }
