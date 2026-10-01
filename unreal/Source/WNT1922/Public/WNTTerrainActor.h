@@ -20,12 +20,12 @@ namespace WNTTerrainGeometry
     WNT1922_API TArray<FWNTGeographicTriangle> ClipAtMeridian(const FWNTGeographicTriangle& Triangle, double CentralMeridian);
     /** Translate a fixed geographic tile to its nearest repeat, then the requested adjacent copy. */
     WNT1922_API FVector WrappedTileOrigin(const FVector& GeographicOrigin, double CentralMeridian, int32 Copy);
-    /** Normalized satellite UV at a fixed geographic tile origin; independent of visible wrap/rebase. */
-    WNT1922_API FVector2D GlobalTextureOrigin(const FVector& GeographicOrigin);
+    /** Stable illustrative elevation/climate colors; no satellite or image sampling. */
+    WNT1922_API FLinearColor TerrainColour(const FVector2D& LongitudeLatitude, double HeightMetres, const FLinearColor& PoliticalTint);
     /** Split a boundary on the same global grid used to tessellate land faces. */
     WNT1922_API TArray<FVector2D> SplitSurfaceEdge(const FVector2D& A, const FVector2D& B, double Step);
     WNT1922_API TArray<FWNTGeographicTriangle> SubdivideSurface(const FWNTGeographicTriangle& Triangle, double Step);
-    /** Quantized world width keeps chart lines at least one physical pixel wide. */
+    /** Padded support ribbon for the material's antialiased, constant-pixel chart line. */
     WNT1922_API double GraticuleWidthForPixelSize(double CentimetresPerPixel);
 }
 
@@ -57,7 +57,7 @@ public:
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridSpacingDegrees = 30.0;
     // A readable strategic default; runtime adjusts only the grid ribbons as
     // zoom changes. Land, coast, indices and geographic centerlines stay fixed.
-    UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridWidthMetres = 24000.0;
+    UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridWidthMetres = 96000.0;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> TerrainMaterial;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> LineMaterial;
 

@@ -28,7 +28,7 @@ const nearPoint = (a, b, epsilon = 1e-8) => {
 
 test('ongoing battle markers expose only player reports and disappear on completion without changing combat state', () => {
   const state = fixture(force([[0,0],[4,0]]),100);
-  const report = {id:71,a:'USA',b:'JPN',status:'ongoing',stage:3,round:2,mainRounds:3,region:'pacific',position:[179.8,25],startedAt:40,
+  const report = {id:71,a:'USA',b:'JPN',status:'ongoing',stage:3,round:2,mainRounds:3,region:'pacific',position:[179.8,25],startedAt:40,durations:[15,15,30,60,15],nextStageAt:130,
     resultA:{sunk:1,planesLost:2,conditions:[{count:4,sunk:1}]},resultB:{sunk:2,conditions:[{count:8,sunk:2}]}};
   state.reports = [report,{...report,id:72,a:'GBR',b:'DEU'}, {...report,id:73,status:'completed'},
     {...report,id:74,background:true},{...report,id:75,position:[Infinity,10]}];
@@ -36,9 +36,12 @@ test('ongoing battle markers expose only player reports and disappear on complet
   assert.deepEqual(packet.battles.map(row => row.id),['71']);
   assert.deepEqual(packet.battles[0].position,[179.8,25]);
   assert.match(packet.battles[0].label,/round 2 \/ 3/);
+  assert.match(packet.battles[0].label,/60 min/);
+  assert.equal(packet.battles[0].elapsedMinutes,60); assert.equal(packet.battles[0].stageProgress,.5);
   const hover = battleMapHover(state,71);
   assert.match(hover,/3 ships afloat/); assert.match(hover,/6 ships afloat/);
   assert.match(hover,/60 minutes elapsed/); assert.match(hover,/Click to pause and watch/);
+  assert.match(hover,/50% of current stage/);
   assert.equal(battleMapHover(state,72),'');
   assert.equal(JSON.stringify(state),before);
   packet.battles[0].position[0] = 0; assert.equal(report.position[0],179.8);

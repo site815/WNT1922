@@ -11,6 +11,7 @@ import { finishIncident, opposingProvocations } from "./provocation.mjs";
 import { recordWarBattle } from "./war-balance.mjs";
 import { applyBattleMorale } from './campaign-impact.mjs';
 import { decisiveAssessment, recordBattleFrame, recordBackgroundAttrition, pruneAttritionLedger } from './battle-records.mjs';
+import { pauseForNewBattle } from './battle-pacing.mjs';
 const rules = await readDocument("common/rules/battle-stages.md");
 export const BATTLE_STAGES = rules.STAGES;
 const zeroPower = () => ({surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:0,supply:1});
@@ -91,6 +92,7 @@ export function beginEngagement(s,c,order) {
     recordBattleFrame(s,r,battleStageLabel(r));
     s.reports.unshift(r);
     s.reports=s.reports.filter((x,i)=>x.status==="ongoing"||i<80);
+    pauseForNewBattle(s,r);
     if([a,b].includes(s.player)) addAlert(s,"Decisive battle underway · "+REGIONS[region].name,
       PROFILES[a].name+" and "+PROFILES[b].name+" have made contact. "+r.decisive.reason,"battle",{reportId:r.id,a,b,ongoing:true});
   } else {
@@ -151,7 +153,7 @@ function applyExchange(s,c,r,weight) {
   if(part.merchantGRT) { r.merchantGRT=(r.merchantGRT||0)+part.merchantGRT; r.merchantHulls=(r.merchantHulls||0)+part.merchantHulls; }
   if(part.industryRaid) r.industryRaid={...part.industryRaid,damage:(r.industryRaid?.damage||0)+part.industryRaid.damage};
   if(part.upset) { r.upset=true; r.upsetSide=part.upsetSide; }
-  return true;
+  return {kind:o.kind,sides:o.kind==='air' ? ['A'] : ['A','B'].filter(side => part['power'+side]?.total > 0)};
 }
 function finish(s,c,r) {
   if(r.status!=="ongoing") return;
@@ -190,18 +192,20 @@ export function progressEngagements(s,c) {
   for(const r of [...s.reports,...(s.backgroundEngagements||[])].filter(r=>r.status==="ongoing")) {
     if(now<r.nextStageAt) {recordBattleFrame(s,r,battleStageLabel(r));continue;}
     const fighting=r.stage===2 || r.stage===3;
+    let exchange;
     if(fighting) {
       const weight=r.stage===2?rules.OPENING_WEIGHT:r.round===1?rules.MAIN_WEIGHT:rules.EXTRA_ROUND_WEIGHT;
-      if(!applyExchange(s,c,r,weight)) r.round=r.mainRounds;
+      exchange=applyExchange(s,c,r,weight);
+      if(!exchange) r.round=r.mainRounds;
     }
     if(r.stage===3 && r.round<r.mainRounds) r.round++;
     else r.stage++;
-    if(r.stage===5) {finish(s,c,r);recordBattleFrame(s,r,battleStageLabel(r));continue;}
+    if(r.stage===5) {finish(s,c,r);recordBattleFrame(s,r,battleStageLabel(r),exchange);continue;}
     r.nextStageAt=now+r.durations[r.stage];
     r.timeline.push({at:now,stage:r.stage,round:r.round,label:battleStageLabel(r)});
     const alert=s.alerts.find(a=>a.reportId===r.id);
     if(alert) {alert.title="Battle underway · "+battleStageLabel(r);alert.body="Fighting in the "+REGIONS[r.region].name+". Open the report for current losses.";}
-    recordBattleFrame(s,r,battleStageLabel(r));
+    recordBattleFrame(s,r,battleStageLabel(r),exchange);
   }
   s.backgroundEngagements=(s.backgroundEngagements||[]).filter(r=>r.status==="ongoing");
 }

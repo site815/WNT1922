@@ -95,7 +95,9 @@ try {
         $nodeLicense=Get-Content -Raw -LiteralPath $licenseSource
         if ($nodeLicense.Length -lt 1000 -or $nodeLicense -notmatch 'Node\.js is licensed') { throw 'Node license file is not the complete official distribution license.' }
         $archive=Join-Path $report 'archive'
-        & $engine.UAT BuildCookRun "-project=$project" -noP4 -platform=Win64 "-clientconfig=$Configuration" -build -cook -map=/Game/Maps/WNTWorld -stage -pak -archive "-archivedirectory=$archive" -utf8output -unattended
+        # UAT must forward this to UBT. In UE 5.8, -NoUBA disables detouring
+        # and remote execution, so the build accelerator opens no LAN listener.
+        & $engine.UAT BuildCookRun "-project=$project" -noP4 -platform=Win64 "-clientconfig=$Configuration" '-UbtArgs=-NoUBA' -build -cook -map=/Game/Maps/WNTWorld -stage -pak -archive "-archivedirectory=$archive" -utf8output -unattended
         if ($LASTEXITCODE -ne 0) { throw 'Native Unreal cooking/packaging failed.' }
         $binaries=@(Get-ChildItem -LiteralPath $archive -Filter 'WNT1922*.exe' -Recurse -File | Where-Object { $_.Directory.Name -eq 'Win64' -and $_.Directory.Parent.Name -eq 'Binaries' -and $_.Directory.Parent.Parent.Name -eq 'WNT1922' })
         if ($binaries.Count -ne 1) { throw 'Cannot identify one native packaged WNT1922 binary.' }

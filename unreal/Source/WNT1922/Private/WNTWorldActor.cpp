@@ -5,6 +5,7 @@
 #include "WNTMapTileComponent.h"
 #include "WNTVisualAssets.h"
 #include "WNTOceanDetailActor.h"
+#include "WNTBattleEffects.h"
 
 #include "Camera/PlayerCameraManager.h"
 #include "Components/DirectionalLightComponent.h"
@@ -276,11 +277,16 @@ struct FWNTWorldRuntime
     TMap<FString, FVector2D> PublicPositions;
     struct FBattlePose { FVector From, To; double FromYaw = 0, ToYaw = 0; bool bSunk = false; };
     TMap<FString, FBattlePose> BattlePoses;
+    TMap<FString, FTransform> BattleSurfaceTransforms;
+    FWNTBattleEffects BattleEffects;
     FString BattleId;
+    double BattleAt = 0;
+    bool bBattleEffectsWereAnimating = false;
     double ReceivedAt = 0, Duration = 0, BattleReceivedAt = 0, BattleDuration = 0;
     FBox BattleBounds = FBox(ForceInit);
     double LastWorldFraction = -1, LastBattleFraction = -1;
     double NextModelRefresh = 0, RouteWidth = 10000, BattleSymbolTime = 0;
+    bool bGridVisible = true;
     FVector LastMarkerCamera = FVector(TNumericLimits<double>::Max());
     FQuat LastMarkerCameraRotation = FQuat::Identity;
     FIntPoint LastMarkerViewport=FIntPoint::ZeroValue;
@@ -680,7 +686,17 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
 {
     if (!Packet.IsValid()) return;
     const FString Report = Id(Packet, TEXT("id")); const bool SameBattle = Runtime->BattleId == Report;
-    Runtime->BattleId = Report; Runtime->BattleReceivedAt = FPlatformTime::Seconds(); Runtime->BattleDuration = SameBattle && Boolean(Packet, TEXT("animate")) ? .95 : 0;
+    const double Now=FPlatformTime::Seconds(),At=Number(Packet,TEXT("at"));
+    const bool NewFrame=Runtime->BattleEffects.SetPacket(Packet,Now);
+    const bool Forward=SameBattle&&At>Runtime->BattleAt;
+    if(NewFrame)
+    {
+        Runtime->BattleReceivedAt=Now;
+        Runtime->BattleDuration=Forward&&Boolean(Packet,TEXT("animate"))?FMath::Clamp(Number(Packet,TEXT("durationSeconds"),15),.1,30.):0;
+        Runtime->BattleAt=At;
+    }
+    Runtime->BattleId = Report;
+    if(!Boolean(Packet,TEXT("animate"),true))Runtime->BattleDuration=0;
     if (!SameBattle) Runtime->BattleBounds = FBox(ForceInit);
     TSet<FString> Keep;
     for (const auto& Value : Array(Packet, TEXT("units")))
@@ -697,8 +713,8 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
         }
         Ship->SelectionKey = Key;
         const FVector Target = PositionMetres(Unit); const double Heading = Number(Unit, TEXT("headingDegrees"));
-        Runtime->BattlePoses.Add(Key, { SameBattle && Existing ? Ship->GetActorLocation() : Target, Target,
-            SameBattle && Existing ? Ship->GetActorRotation().Yaw : Heading, Heading, Boolean(Unit, TEXT("sunk")) });
+        if(NewFrame||!Runtime->BattlePoses.Contains(Key))Runtime->BattlePoses.Add(Key, { Forward && Existing ? Ship->GetActorLocation() : Target, Target,
+            Forward && Existing ? Ship->GetActorRotation().Yaw : Heading, Heading, Boolean(Unit, TEXT("sunk")) });
         auto Pick = Selection(TEXT("battle-ship"), Id(Unit, TEXT("id")), String(Unit, TEXT("label")));
         Pick->SetStringField(TEXT("key"), Key); Pick->SetStringField(TEXT("side"), String(Unit, TEXT("side"))); Pick->SetStringField(TEXT("classId"), String(Unit, TEXT("classId")));
         Pick->SetBoolField(TEXT("representativeDesign"), !Path.IsEmpty() && String(Unit, TEXT("classId")).StartsWith(TEXT("draft-")));
@@ -710,21 +726,29 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
     { if (auto* Actor = It.Value().Get()) { Runtime->Selections.Remove(Actor); Actor->Destroy(); } Runtime->BattlePoses.Remove(It.Key()); Runtime->LoadedBattleModels.Remove(It.Key()); It.RemoveCurrent(); }
     // Viewport messages own scene activation. A delayed demo packet must not
     // reactivate a hidden/title scene after the user has entered the campaign.
-    UpdateBattle(Runtime->BattleDuration > 0 ? 0 : 1); UpdateVisibility();
+    const double Fraction=Runtime->BattleDuration>0?FMath::Clamp((Now-Runtime->BattleReceivedAt)/Runtime->BattleDuration,0.,1.):1.;
+    UpdateBattle(Fraction); UpdateVisibility();
 }
 
 void AWNTWorldActor::UpdateBattle(double Fraction)
 {
     Runtime->LastBattleFraction = Fraction;
+    const double Now=FPlatformTime::Seconds();
+    Runtime->BattleSurfaceTransforms.Reset();
     for (const auto& Pair : Runtime->BattlePoses) if (auto* Ship = Runtime->BattleShips.FindRef(Pair.Key).Get())
     {
         const auto& Pose = Pair.Value;
         const FVector Position = FMath::Lerp(Pose.From, Pose.To, Fraction);
-        Ship->SetShipTransform(Position, Pose.FromYaw + FMath::FindDeltaAngleDegrees(Pose.FromYaw, Pose.ToYaw) * Fraction);
-        // The recorded loss determines visibility. No native combat rolls,
-        // damage decisions, shell-hit claims or extrapolated tactical paths.
-        Ship->SetActorHiddenInGame(bSceneHidden || !bBattleMode || Pose.bSunk);
-        Ship->SetActorEnableCollision(!bSceneHidden && bBattleMode && !Pose.bSunk);
+        const double Heading=Pose.FromYaw + FMath::FindDeltaAngleDegrees(Pose.FromYaw, Pose.ToYaw) * Fraction;
+        const FTransform Surface(FRotator(0,Heading,0),Position);
+        Runtime->BattleSurfaceTransforms.Add(Pair.Key,Surface);
+        const double Sinking=Pose.bSunk?Runtime->BattleEffects.SinkProgress(Pair.Key,Now):0.;
+        Ship->SetActorTransform(Pose.bSunk?FWNTBattleEffects::SinkingTransform(Surface,Sinking):Surface);
+        // Only recorded new losses get a transition. Historical wrecks and
+        // reduced-motion losses are hidden immediately, without combat rolls.
+        const bool Visible=!bSceneHidden&&bBattleMode&&(!Pose.bSunk||Sinking<1.);
+        Ship->SetActorHiddenInGame(!Visible);Ship->SetActorEnableCollision(Visible);
+        if(Pose.bSunk&&Sinking>=1.&&Ship->HasRenderableModel())Ship->ReleaseResidentModel();
     }
 }
 
@@ -762,9 +786,11 @@ void AWNTWorldActor::UpdateVisibility()
     }
     for (const auto& Pair : Runtime->BattleShips) if (auto* Actor = Pair.Value.Get())
     {
-        const bool Visible = !bSceneHidden && bBattleMode && !Runtime->BattlePoses.FindRef(Pair.Key).bSunk;
+        const bool Visible = !bSceneHidden && bBattleMode && (!Runtime->BattlePoses.FindRef(Pair.Key).bSunk
+            ||Runtime->BattleEffects.SinkProgress(Pair.Key,FPlatformTime::Seconds())<1.);
         Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
     }
+    Runtime->BattleEffects.SetVisible(!bSceneHidden&&bBattleMode);
 }
 
 void AWNTWorldActor::Tick(float DeltaSeconds)
@@ -780,10 +806,14 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
     if (bBattleMode)
     {
         const double Fraction = Runtime->BattleDuration > 0 ? FMath::Clamp((Now - Runtime->BattleReceivedAt) / Runtime->BattleDuration, 0.0, 1.0) : 1.0;
-        if (Fraction != Runtime->LastBattleFraction) UpdateBattle(Fraction);
+        const bool Animating=Runtime->BattleEffects.IsAnimating(Now);
+        if (Fraction != Runtime->LastBattleFraction||Animating||Runtime->bBattleEffectsWereAnimating) UpdateBattle(Fraction);
+        Runtime->bBattleEffectsWereAnimating=Animating;
+        Runtime->BattleEffects.Update(this,Runtime->BattleSurfaceTransforms,Now,true,&Runtime->BattleShips);
         if(const auto* Player=GetWorld()->GetFirstPlayerController())if(const auto* Camera=Player->PlayerCameraManager.Get())
             for(const auto& Pair:Runtime->BattleShips)if(auto* Ship=Pair.Value.Get())
             {
+                if(Runtime->BattlePoses.FindRef(Pair.Key).bSunk&&Runtime->BattleEffects.SinkProgress(Pair.Key,Now)>=1.)continue;
                 // The watchable battle contains a bounded set of observed
                 // combatants; keep them available throughout its fitted view.
                 Ship->RefreshModelForCamera(Ship->GetActorLocation(),RefreshModels);
@@ -819,7 +849,9 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
             const double DistanceToMap = FMath::Max(1.0, FMath::Abs(Camera->GetCameraLocation().Z));
             if(Terrain)
             {
-                const bool ShowGrid=DistanceToMap>15000000.0;
+                if(DistanceToMap<14000000.0)Runtime->bGridVisible=false;
+                else if(DistanceToMap>16000000.0)Runtime->bGridVisible=true;
+                const bool ShowGrid=Runtime->bGridVisible;
                 Terrain->SetGraticuleVisible(ShowGrid);
                 if(ShowGrid)
                 {
@@ -879,6 +911,21 @@ void AWNTWorldActor::SetSceneMode(const FString& Mode)
     Runtime->LastMarkerCamera = FVector(TNumericLimits<double>::Max()); UpdateVisibility();
 }
 double AWNTWorldActor::GroundHeight(const FVector2D& LongitudeLatitude) const { return Terrain ? Terrain->RenderHeightAt(LongitudeLatitude) : 0; }
+FBox AWNTWorldActor::GetForceBounds(const FString& ForceId) const
+{
+    FBox Bounds(ForceInit);
+    for(const auto& Pair:Runtime->Ships)if(auto* Ship=Pair.Value.Get())
+    {
+        const auto Pick=Runtime->Selections.FindRef(Ship);
+        if(!Pick.IsValid()||String(Pick,TEXT("fleetId"))!=ForceId)continue;
+        // Deferred models retain their observed formation positions. Include a
+        // conservative hull envelope before the detailed GLBs stream in.
+        const FVector Position=Ship->GetActorLocation();
+        Bounds+=Position-FVector(18000,18000,0);Bounds+=Position+FVector(18000,18000,5000);
+    }
+    return Bounds;
+}
+
 FBox AWNTWorldActor::GetSceneBounds() const { return bBattleMode ? Runtime->BattleBounds : FBox(FVector(-850000000, -1750000000, 0), FVector(850000000, 1750000000, 1000000)); }
 
 TSharedPtr<FJsonObject> AWNTWorldActor::GetSelection(AActor* Actor) const
@@ -1009,7 +1056,7 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
             for(const auto* Light:SkyLights)
                 TestTrue(TEXT("HDR sky is loaded as a dynamic cubemap"),Light->IsRegistered()&&Light->Mobility==EComponentMobility::Movable&&Light->SourceType==SLS_SpecifiedCubemap&&Light->Cubemap&&Light->Cubemap->GetSizeX()>0);
             AWNTTerrainActor* Terrain = Scene->GetTerrain();
-            TestNotNull(TEXT("Terrain uses the loaded photographic surface material"),Terrain->TerrainMaterial.Get());
+            TestNotNull(TEXT("Terrain uses the lit geometric palette material"),Terrain->TerrainMaterial.Get());
             TArray<FVector> ReferenceVertices,ReferenceNormals;TArray<int32> ReferenceIndices;TArray<FVector2D> ReferenceUVs;TArray<FProcMeshTangent> ReferenceTangents;
             UKismetProceduralMeshLibrary::GenerateBoxMesh(FVector(1),ReferenceVertices,ReferenceIndices,ReferenceNormals,ReferenceUVs,ReferenceTangents);
             const FVector ReferenceA=ReferenceVertices[ReferenceIndices[0]],ReferenceB=ReferenceVertices[ReferenceIndices[1]],ReferenceC=ReferenceVertices[ReferenceIndices[2]];
@@ -1031,7 +1078,8 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
             }
             TestEqual(TEXT("Ocean covers the central world and both seamless copies"),SeaTiles,864);
             TestTrue(TEXT("Sea has unit-scale clockwise geometry, upward normals and a lit material"),SeaGeometryValid);
-            bool TerrainFacesMatchEngine=true,ElevationMatchesMetres=true,GeographicUVsMatch=true;int64 CheckedFaces=0,CheckedHeights=0;
+            bool TerrainFacesMatchEngine=true,ElevationMatchesMetres=true,PaletteValid=true;int64 CheckedFaces=0,CheckedHeights=0;
+            TSet<uint32> LandColours;
             TArray<UProceduralMeshComponent*> Tiles;Terrain->GetComponents(Tiles);
             for(auto* Tile:Tiles)for(int32 SectionIndex=0;SectionIndex<Tile->GetNumSections();++SectionIndex)
             {
@@ -1043,9 +1091,9 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
                     {
                         const double Expected=Terrain->LandBaseMetres+FMath::Max(0.,Terrain->HeightAt(Geo.GetValue()));
                         if(FMath::Abs(P.Z*.01-Expected)>.1)ElevationMatchesMetres=false;
-                        const FVector2D UV=Section->ProcVertexBuffer[VertexIndex].UV0;
-                        if(FMath::Abs(90.-UV.Y*180.-Geo->Y)>.0001
-                            || FMath::Abs(WNTProjection::WrapLongitude(UV.X*360.-180.-Geo->X))>.0001)GeographicUVsMatch=false;
+                        const auto& Vertex=Section->ProcVertexBuffer[VertexIndex];
+                        LandColours.Add(Vertex.Color.DWColor());
+                        if(Vertex.Color.A!=255||Vertex.Color==FColor::Black||Vertex.Normal.ContainsNaN()||Vertex.Normal.IsNearlyZero())PaletteValid=false;
                         ++CheckedHeights;
                     }
                 }
@@ -1061,7 +1109,7 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
             }
             TestTrue(TEXT("Actual land, coast and grid faces follow Epic's clockwise convention"),CheckedFaces>0&&TerrainFacesMatchEngine);
             TestTrue(TEXT("Rendered terrain uses source metres without a raised plateau or height multiplier"),CheckedHeights>0&&ElevationMatchesMetres);
-            TestTrue(TEXT("Photographic surface UVs retain absolute geographic longitude and latitude, including wrapped U"),CheckedHeights>0&&GeographicUVsMatch);
+            TestTrue(TEXT("Real terrain carries varied opaque biome colors and valid relief normals"),CheckedHeights>0&&PaletteValid&&LandColours.Num()>8);
             UProceduralMeshComponent* GridSample=nullptr;
             for(auto* Tile:Tiles)if(const auto* Grid=Tile->GetProcMeshSection(2))if(Grid->ProcVertexBuffer.Num()>=6){GridSample=Tile;break;}
             if(TestNotNull(TEXT("A real geographic grid section exists"),GridSample))
@@ -1077,7 +1125,7 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
                 TestTrue(TEXT("Grid width changes preserve geographic endpoints and vertex allocation"),
                     VertexAllocation==Grid->ProcVertexBuffer.GetData()&&BeforeP.Equals(AfterP,.001)&&BeforeQ.Equals(AfterQ,.001));
                 const double RibbonWidth=FVector::Distance(Grid->ProcVertexBuffer[0].Position,Grid->ProcVertexBuffer[1].Position);
-                TestTrue(TEXT("Grid ribbon becomes at least one physical pixel wide"),RibbonWidth>=3200000.0&&RibbonWidth<=3200000.0*FMath::Sqrt(2.0)+.01);
+                TestTrue(TEXT("Grid support ribbon spans four pixels for derivative antialiasing"),RibbonWidth>=3200000.0*4&&RibbonWidth<=3200000.0*4*FMath::Sqrt(2.0)+.01);
             }
             TArray<const FProcMeshSection*> Sections;
             TArray<FVector> BeforeLocations;

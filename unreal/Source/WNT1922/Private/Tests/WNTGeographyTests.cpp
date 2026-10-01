@@ -12,7 +12,10 @@
 #include "Misc/FileHelper.h"
 #if WITH_EDITOR
 #include "Materials/Material.h"
-#include "Materials/MaterialExpressionDivide.h"
+#include "Materials/MaterialExpressionTextureBase.h"
+#include "Materials/MaterialExpressionDDX.h"
+#include "Materials/MaterialExpressionDDY.h"
+#include "WNTVisualAssets.h"
 #include "MaterialShared.h"
 #include "RHI.h"
 #endif
@@ -162,75 +165,59 @@ bool FWNTConservativeChartBoundsTest::RunTest(const FString& Parameters)
     for(double PixelMetres:{120.0,500.0,4000.0,18000.0,32000.0,44000.0})
     {
         const double Width=WNTTerrainGeometry::GraticuleWidthForPixelSize(PixelMetres*100.0);
-        TestTrue(TEXT("Strategic grid quantization stays between one and sqrt(2) pixels"),Width>=PixelMetres&&Width<=PixelMetres*FMath::Sqrt(2.0)+1e-7);
+        TestTrue(TEXT("Filtered grid has four to four sqrt(2) support pixels"),Width>=PixelMetres*4.0&&Width<=PixelMetres*4.0*FMath::Sqrt(2.0)+1e-7);
     }
     return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTSatellitePrecisionTest,"WNT.Geography.SatelliteTexturePrecision",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
-bool FWNTSatellitePrecisionTest::RunTest(const FString& Parameters)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTTerrainPaletteTest,"WNT.Geography.GeometricTerrainPalette",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTTerrainPaletteTest::RunTest(const FString& Parameters)
 {
-    // Match the shader's float arithmetic, including its CPD and local vertex
-    // positions. Quantization must stay below one percent of a NASA texel.
-    auto ShaderUV=[](const FVector2D& Point,const FVector2D& TileCentre)
+    const FLinearColor Neutral(.4f,.4f,.4f);
+    for(double Lon:{-180.0,-112.0,-20.0,0.0,134.0,179.999})for(double Lat:{-85.0,-26.0,0.0,25.0,46.0,80.0})for(double Height:{0.0,1500.0,4500.0,6500.0})
     {
-        const FVector Origin=WNTProjection::ForwardUnwrapped(TileCentre);
-        const FVector Local=WNTProjection::ForwardUnwrapped(Point)-Origin;
-        const FVector2D UV=WNTTerrainGeometry::GlobalTextureOrigin(Origin);
-        const float U=float(UV.X)+float(Local.Y)/float(WNTProjection::WorldWidth);
-        const float V=float(UV.Y)+float(Local.X)/float(-WNTProjection::WorldWidth/2.0);
-        return FVector2D(U,V);
-    };
-    for(double Lon:{-179.999,-15.001,-15.0,-.001,0.0,14.999,15.0,179.999})for(double Lat:{-89.999,-.001,0.0,37.5,89.999})
-    {
-        const FVector2D Point(Lon,Lat);
-        const FVector2D Centre(-172.5+FMath::FloorToDouble((Lon+180)/15.0)*15.0,-82.5+FMath::FloorToDouble((Lat+90)/15.0)*15.0);
-        const FVector2D UV=ShaderUV(Point,Centre),Expected((Lon+180)/360.0,(90-Lat)/180.0);
-        TestTrue(TEXT("Global float UV tracks geographic coordinates to subpixel precision"),UV.Equals(Expected,2e-7));
-        const FVector2D Adjacent=ShaderUV(Point,Centre+FVector2D(15,0));
-        TestTrue(TEXT("Satellite sampling is continuous across adjacent tile origins"),UV.Equals(Adjacent,2e-7));
+        const FLinearColor A=WNTTerrainGeometry::TerrainColour(FVector2D(Lon,Lat),Height,Neutral);
+        const FLinearColor Wrapped=WNTTerrainGeometry::TerrainColour(FVector2D(Lon+720.0,Lat),Height,Neutral);
+        TestTrue(TEXT("Biome/elevation colors are finite and remain in the display range"),FMath::IsFinite(A.R)&&FMath::IsFinite(A.G)&&FMath::IsFinite(A.B)&&A.R>=0&&A.R<=1&&A.G>=0&&A.G<=1&&A.B>=0&&A.B<=1&&A.A==1);
+        TestTrue(TEXT("World wrapping never changes the terrain palette"),A.Equals(Wrapped,1e-6));
     }
-    const FVector2D A=ShaderUV(FVector2D(12.0,38.0),FVector2D(7.5,37.5));
-    const FVector2D B=ShaderUV(FVector2D(12.001,38.001),FVector2D(7.5,37.5));
-    TestTrue(TEXT("Subkilometre movement changes UV instead of sticking to half-float steps"),B.X-A.X>2.6e-6&&A.Y-B.Y>5.3e-6);
-    const FVector2D West=ShaderUV(FVector2D(-180,37.0),FVector2D(-172.5,37.5));
-    const FVector2D East=ShaderUV(FVector2D(180,37.0),FVector2D(172.5,37.5));
-    TestTrue(TEXT("Dateline differs only by exactly one repeating texture turn"),FMath::Abs(East.X-West.X-1.0)<2e-7&&FMath::Abs(East.Y-West.Y)<2e-7);
+    const FVector2D Alps(7.5,46);
+    const FLinearColor Low=WNTTerrainGeometry::TerrainColour(Alps,100,Neutral),High=WNTTerrainGeometry::TerrainColour(Alps,5000,Neutral);
+    TestTrue(TEXT("Actual elevation distinguishes low vegetation from pale mountain snow"),High.GetLuminance()>Low.GetLuminance()+.2);
+    const FLinearColor Desert=WNTTerrainGeometry::TerrainColour(FVector2D(22,25),100,Neutral);
+    const FLinearColor Forest=WNTTerrainGeometry::TerrainColour(FVector2D(-65,-5),100,Neutral);
+    TestTrue(TEXT("Illustrative dry and forest regions have visibly different colors"),Desert.R>Forest.R+.10&&Forest.G>Forest.R);
+    const FLinearColor Dark=WNTTerrainGeometry::TerrainColour(Alps,1500,FLinearColor::Black),Bright=WNTTerrainGeometry::TerrainColour(Alps,1500,FLinearColor::White);
+    TestTrue(TEXT("Political ownership contributes only a restrained ten percent tint"),FMath::Abs(Bright.R-Dark.R-.10f)<1e-6f&&FMath::Abs(Bright.G-Dark.G-.10f)<1e-6f&&FMath::Abs(Bright.B-Dark.B-.10f)<1e-6f);
     return true;
 }
 
 #if WITH_EDITOR
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTSatelliteCompiledCoordinatesTest,"WNT.Geography.CompiledSatelliteCoordinates",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
-bool FWNTSatelliteCompiledCoordinatesTest::RunTest(const FString& Parameters)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTGeometricMaterialTest,"WNT.Geography.GeometricTerrainAndFilteredGridMaterials",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTGeometricMaterialTest::RunTest(const FString& Parameters)
 {
-    UMaterial* Material=LoadObject<UMaterial>(nullptr,TEXT("/Game/Materials/M_TerrainSurface.M_TerrainSurface"));
-    if(!TestNotNull(TEXT("Actual prepared terrain surface material"),Material))return false;
-    int32 CoordinateDivisions=0;
-    for(UMaterialExpression* Expression:Material->GetExpressions())
+    auto* Terrain=LoadObject<UMaterial>(nullptr,TEXT("/Game/Materials/M_TerrainSurface.M_TerrainSurface"));
+    auto* Grid=LoadObject<UMaterial>(nullptr,TEXT("/Game/Materials/M_Graticule.M_Graticule"));
+    if(!TestNotNull(TEXT("Prepared geometric land material"),Terrain)||!TestNotNull(TEXT("Prepared filtered geographic grid"),Grid))return false;
+    TestTrue(TEXT("Land remains opaque lit geometry"),Terrain->BlendMode==BLEND_Opaque&&Terrain->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestEqual(TEXT("Terrain loads without any external photograph directory"),WNTVisualAssets::LoadTerrainMaterial(TEXT("nonexistent-terrain-photograph-root")),static_cast<UMaterialInterface*>(Terrain));
+    TestEqual(TEXT("Replacement terrain graph has only vertex color and three scalar parameters"),Terrain->GetExpressions().Num(),4);
+    for(UMaterialExpression* Expression:Terrain->GetExpressions())
+        TestFalse(TEXT("Geometric terrain has no texture sampling dependency"),Expression->IsA<UMaterialExpressionTextureBase>());
+    TestTrue(TEXT("Grid is an unlit translucent chart overlay with no terrain depth fighting"),Grid->BlendMode==BLEND_Translucent&&Grid->bDisableDepthTest&&Grid->GetShadingModels().HasShadingModel(MSM_Unlit));
+    TestTrue(TEXT("Grid overlay runs after temporal reconstruction and motion blur"),Grid->TranslucencyPass==MTP_AfterMotionBlur);
+    bool HasDX=false,HasDY=false;
+    for(UMaterialExpression* Expression:Grid->GetExpressions())
     {
-        auto* Division=Cast<UMaterialExpressionDivide>(Expression);
-        if(!Division||!Division->Desc.StartsWith(TEXT("Satellite ")))continue;
-        ++CoordinateDivisions;
-        TestNotNull(TEXT("Satellite coordinate retains a spatial input"),Division->A.Expression);
-        const double Expected=Division->Desc.Contains(TEXT("longitude"))?WNTProjection::WorldWidth:-WNTProjection::WorldWidth/2.0;
-        TestTrue(TEXT("Satellite denominator is a representable world span, not a rounded-zero reciprocal"),FMath::Abs(Division->ConstB/Expected-1.0)<1e-6);
+        HasDX|=Expression->IsA<UMaterialExpressionDDX>();HasDY|=Expression->IsA<UMaterialExpressionDDY>();
+        TestFalse(TEXT("Grid filtering does not load an image"),Expression->IsA<UMaterialExpressionTextureBase>());
     }
-    TestEqual(TEXT("Prepared satellite material contains both coordinate divisions"),CoordinateDivisions,2);
-    // NullRHI does not allocate the material's runtime rendering resources.
-    // Bind a translation-only resource to the real loaded graph and the same
-    // Windows SM6 target used by the package; shader translation needs no GPU.
-    FMaterialResource Resource;
-    Resource.SetMaterial(Material,nullptr,SP_PCD3D_SM6,EMaterialQualityLevel::High);
+    TestTrue(TEXT("Both screen derivatives support constant-pixel line coverage"),HasDX&&HasDY);
+    FMaterialResource Resource;Resource.SetMaterial(Grid,nullptr,SP_PCD3D_SM6,EMaterialQualityLevel::High);
     FString HLSL;
-    if(!TestTrue(TEXT("Translate the actual prepared material to shader source"),Resource.GetMaterialExpressionSource(HLSL)))return false;
-    // The earlier CPU UV test could pass while UE emitted *0.00000000f.
-    // Inspect real material translation as well as the numerical projection.
-    for(float Denominator:{float(WNTProjection::WorldWidth),float(-WNTProjection::WorldWidth/2.0)})
-    {
-        const FString Literal=FString::Printf(TEXT("%0.8f"),Denominator);
-        TestTrue(TEXT("Generated shader preserves a nonzero satellite coordinate denominator: ")+Literal,HLSL.Contains(Literal));
-    }
-    FFileHelper::SaveStringToFile(HLSL,*FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("WNTTerrainSurface.ush")));
+    if(!TestTrue(TEXT("Translate the actual filtered overlay graph"),Resource.GetMaterialExpressionSource(HLSL)))return false;
+    TestTrue(TEXT("Generated grid shader retains screen-space filtering"),HLSL.Contains(TEXT("ddx"),ESearchCase::IgnoreCase)&&HLSL.Contains(TEXT("ddy"),ESearchCase::IgnoreCase));
+    FFileHelper::SaveStringToFile(HLSL,*FPaths::Combine(FPaths::ProjectSavedDir(),TEXT("WNTGraticule.ush")));
     return true;
 }
 #endif

@@ -15,6 +15,20 @@ editing = unreal.MaterialEditingLibrary
 changed, preserved = [], []
 
 
+def clear_expressions(material):
+    # UE 5.8's DeleteAllMaterialExpressions iterates the expression array while
+    # DeleteMaterialExpression removes entries from it. A single call can skip
+    # old nodes (and retain their texture dependencies). Require actual emptiness
+    # before constructing a replacement graph, with bounded progress each pass.
+    remaining = editing.get_num_material_expressions(material)
+    while remaining:
+        editing.delete_all_material_expressions(material)
+        current = editing.get_num_material_expressions(material)
+        if current >= remaining:
+            raise RuntimeError("Cannot clear material graph: " + material.get_path_name())
+        remaining = current
+
+
 def expression(material, cls, x, y):
     node = editing.create_material_expression(material, cls, x, y)
     if not node:
@@ -75,19 +89,37 @@ def ocean_normal(material):
         raise RuntimeError("Cannot connect ocean ripple normal")
 
 
-def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint"):
+def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint", instanced=False):
     asset_path = "/Game/Materials/" + name
     exists = assets.does_asset_exist(asset_path)
     if exists and not force:
+        if instanced:
+            mat = assets.load_asset(asset_path)
+            if not isinstance(mat, unreal.Material):
+                raise RuntimeError("Material path has an incompatible asset: " + asset_path)
+            # Cook the instanced vertex-factory permutation explicitly. Runtime
+            # usage discovery cannot compile it in Shipping and falls back to
+            # the gray default material. Preserve the existing authored graph.
+            if not mat.get_editor_property("used_with_instanced_static_meshes"):
+                mat.set_editor_property("used_with_instanced_static_meshes", True)
+                errors = editing.recompile_material(mat)
+                if errors:
+                    raise RuntimeError("Instanced material compilation failed for " + name + ": " + str(errors))
+                if not assets.save_loaded_asset(mat, only_if_is_dirty=False):
+                    raise RuntimeError("Cannot save instanced material: " + asset_path)
+                changed.append(asset_path)
+                return
         preserved.append(asset_path)
         return
     mat = assets.load_asset(asset_path) if exists else tools.create_asset(name, "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
     if not isinstance(mat, unreal.Material):
         raise RuntimeError("Material path has an incompatible asset: " + asset_path)
     if exists:
-        editing.delete_all_material_expressions(mat)
+        clear_expressions(mat)
     mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_OPAQUE)
     mat.set_editor_property("two_sided", False)
+    if instanced:
+        mat.set_editor_property("used_with_instanced_static_meshes", True)
     mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT if unlit else unreal.MaterialShadingModel.MSM_DEFAULT_LIT)
     if color is None:
         node = expression(mat, unreal.MaterialExpressionVertexColor, -450, 0)
@@ -114,187 +146,120 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
 
 
 def terrain_surface():
+    """Lit geometric relief with CPU-authored elevation/climate vertex colors."""
     asset_path = "/Game/Materials/M_TerrainSurface"
-    shader_schema = "3-full-precision-satellite-division"
+    shader_schema = "5-geometric-biome-clean-graph"
     existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
     if existing and not force and assets.get_metadata_tag(existing, "WNTTerrainShaderSchema") == shader_schema:
         preserved.append(asset_path)
         return
     mat = existing if existing else tools.create_asset(
         "M_TerrainSurface", "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
-    editing.delete_all_material_expressions(mat)
+    clear_expressions(mat)
+    mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_OPAQUE)
     mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_DEFAULT_LIT)
     mat.set_editor_property("tangent_space_normal", False)
     mat.set_editor_property("two_sided", False)
-    world = expression(mat, unreal.MaterialExpressionWorldPosition, -1600, 0)
-    # Use full-precision local positions, not the procedural mesh's half-float
-    # UV buffer. The per-tile geographic phase survives world-origin rebases
-    # and is a common multiple of all three surface repeat distances.
-    local = expression(mat, unreal.MaterialExpressionLocalPosition, -2100, 0)
-    local.set_editor_property("local_origin", unreal.LocalPositionOrigin.PRIMITIVE)
-    local.set_editor_property("included_offsets", unreal.PositionIncludedOffsets.EXCLUDE_OFFSETS)
-    phase = expression(mat, unreal.MaterialExpressionVectorParameter, -2100, 200)
-    phase.set_editor_property("parameter_name", "GeographicTexturePhase")
-    phase.set_editor_property("use_custom_primitive_data", True)
-    phase.set_editor_property("primitive_data_index", 0)
-    stable = expression(mat, unreal.MaterialExpressionAdd, -1850, 0)
-    connect(local, stable, "A")
-    connect(phase, stable, "B", "RGB")
-    xy = expression(mat, unreal.MaterialExpressionComponentMask, -1600, 0)
-    xy.set_editor_property("r", True)
-    xy.set_editor_property("g", True)
-    connect(stable, xy, "")
-    uv = expression(mat, unreal.MaterialExpressionDivide, -1200, 0)
-    uv.set_editor_property("const_b", 5000.0)
-    connect(xy, uv, "A")
-    linear_white_path = "/Game/Materials/T_LinearWhite"
-    linear_white = assets.load_asset(linear_white_path)
-    if not linear_white:
-        linear_white = assets.duplicate_asset("/Engine/EngineResources/WhiteSquareTexture", linear_white_path)
-    if not linear_white:
-        raise RuntimeError("Cannot create linear roughness default")
-    linear_white.set_editor_property("srgb", False)
-    if not assets.save_loaded_asset(linear_white, only_if_is_dirty=False):
-        raise RuntimeError("Cannot save linear roughness default")
-    maps = {}
-    for row, (name, sampler, default) in enumerate([
-        ("baseColorTexture", unreal.MaterialSamplerType.SAMPLERTYPE_COLOR, "/Engine/EngineResources/DefaultTexture.DefaultTexture"),
-        ("normalTexture", unreal.MaterialSamplerType.SAMPLERTYPE_NORMAL, "/Engine/EngineMaterials/DefaultNormal.DefaultNormal"),
-        ("metallicRoughnessTexture", unreal.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR, linear_white_path)
-    ]):
-        sample = expression(mat, unreal.MaterialExpressionTextureSampleParameter2D, -950, row * 250)
-        sample.set_editor_property("parameter_name", name)
-        texture = assets.load_asset(default)
-        if not texture:
-            raise RuntimeError("Missing engine default texture: " + default)
-        sample.set_editor_property("texture", texture)
-        sample.set_editor_property("sampler_type", sampler)
-        connect(uv, sample, "UVs")
-        maps[name] = sample
-    # Geography remains shaded terrain. Political tint grows only at strategic distance.
-    camera = expression(mat, unreal.MaterialExpressionCameraPositionWS, -1600, -450)
-    distance = expression(mat, unreal.MaterialExpressionDistance, -1400, -400)
-    connect(camera, distance, "A")
-    connect(world, distance, "B")
-    scaled = expression(mat, unreal.MaterialExpressionDivide, -1200, -400)
-    scaled.set_editor_property("const_b", 50000000.0)
-    connect(distance, scaled, "A")
-    bounded = expression(mat, unreal.MaterialExpressionSaturate, -1000, -400)
-    connect(scaled, bounded, "")
-    weight = expression(mat, unreal.MaterialExpressionMultiply, -800, -400)
-    weight.set_editor_property("const_b", .18)
-    connect(bounded, weight, "A")
-    nation = expression(mat, unreal.MaterialExpressionVertexColor, -800, -200)
-    # The north-up world uses affine longitude/latitude positions. Reconstruct
-    # satellite UV in full float precision; mesh UV0 is half precision and
-    # loses coast-scale detail even though the original image is fully loaded.
-    # CPD comes from the original geographic tile, never its wrapped position.
-    global_origin = expression(mat, unreal.MaterialExpressionVectorParameter, -2300, -900)
-    global_origin.set_editor_property("parameter_name", "GlobalTextureOrigin")
-    global_origin.set_editor_property("use_custom_primitive_data", True)
-    global_origin.set_editor_property("primitive_data_index", 4)
-    uv_components = []
-    for channel, factor in [("g", 1.0), ("r", -2.0)]:
-        component = expression(mat, unreal.MaterialExpressionComponentMask, -2300, -1150-len(uv_components)*200)
-        for mask_channel in ["r", "g", "b", "a"]:
-            component.set_editor_property(mask_channel, mask_channel == channel)
-        connect(local, component, "")
-        # The legacy UE material translator prints scalar constants with only
-        # eight fractional digits. Multiplying by ~2.5e-10 therefore compiles
-        # to zero, leaving one satellite colour for an entire tile. Dividing
-        # by a large denominator preserves the spatial term in generated HLSL.
-        scale = expression(mat, unreal.MaterialExpressionDivide, -2100, -1150-len(uv_components)*200)
-        scale.set_editor_property("const_b", (2.0 * 3.141592653589793 * 6371000.0 * 100.0) / factor)
-        scale.set_editor_property("desc", "Satellite longitude UV" if channel == "g" else "Satellite latitude UV")
-        connect(component, scale, "A")
-        uv_components.append(scale)
-    global_delta = expression(mat, unreal.MaterialExpressionAppendVector, -1900, -1100)
-    connect(uv_components[0], global_delta, "A")
-    connect(uv_components[1], global_delta, "B")
-    origin_xy = expression(mat, unreal.MaterialExpressionComponentMask, -1900, -900)
-    origin_xy.set_editor_property("r", True)
-    origin_xy.set_editor_property("g", True)
-    origin_xy.set_editor_property("b", False)
-    origin_xy.set_editor_property("a", False)
-    connect(global_origin, origin_xy, "")
-    global_uv = expression(mat, unreal.MaterialExpressionAdd, -1600, -900)
-    connect(global_delta, global_uv, "A")
-    connect(origin_xy, global_uv, "B")
-    satellite = expression(mat, unreal.MaterialExpressionTextureSampleParameter2D, -1350, -900)
-    satellite.set_editor_property("parameter_name", "globalColorTexture")
-    satellite.set_editor_property("texture", assets.load_asset("/Engine/EngineResources/WhiteSquareTexture"))
-    satellite.set_editor_property("sampler_type", unreal.MaterialSamplerType.SAMPLERTYPE_COLOR)
-    connect(global_uv, satellite, "UVs")
-    # Satellite color preserves regional vegetation/desert/ice. The local scan
-    # adds surface variation only on approach; it never replaces global color.
-    # Layer bounded local, landscape and regional detail. The regional imagery
-    # supplies geography/biome colour; approaching it reveals surface structure
-    # instead of enlarging a single satellite pixel or repeating one small scan.
-    blended_detail = maps["baseColorTexture"]
-    detail_output = "RGB"
-    for layer, repeat in enumerate([16.0, 96.0]):
-        scale = expression(mat, unreal.MaterialExpressionDivide, -1550, -1250-layer*300)
-        scale.set_editor_property("const_b", repeat)
-        connect(uv, scale, "A")
-        sample = expression(mat, unreal.MaterialExpressionTextureSampleParameter2D, -1300, -1250-layer*300)
-        sample.set_editor_property("parameter_name", "baseColorTexture")
-        sample.set_editor_property("texture", assets.load_asset("/Engine/EngineResources/DefaultTexture.DefaultTexture"))
-        sample.set_editor_property("sampler_type", unreal.MaterialSamplerType.SAMPLERTYPE_COLOR)
-        connect(scale, sample, "UVs")
-        mix = expression(mat, unreal.MaterialExpressionLinearInterpolate, -1050+layer*180, -1100-layer*300)
-        mix.set_editor_property("const_alpha", .5)
-        connect(blended_detail, mix, "A", detail_output)
-        connect(sample, mix, "B", "RGB")
-        blended_detail, detail_output = mix, ""
-    texture_detail = expression(mat, unreal.MaterialExpressionMultiply, -900, -800)
-    texture_detail.set_editor_property("const_b", 1.1)
-    connect(blended_detail, texture_detail, "A", detail_output)
-    detail_bias = expression(mat, unreal.MaterialExpressionAdd, -700, -800)
-    detail_bias.set_editor_property("const_b", .45)
-    connect(texture_detail, detail_bias, "A")
-    close_color = expression(mat, unreal.MaterialExpressionMultiply, -500, -800)
-    connect(satellite, close_color, "A", "RGB")
-    connect(detail_bias, close_color, "B")
-    surface_color = expression(mat, unreal.MaterialExpressionLinearInterpolate, -250, -600)
-    connect(close_color, surface_color, "A")
-    connect(satellite, surface_color, "B", "RGB")
-    connect(bounded, surface_color, "Alpha")
-    color = expression(mat, unreal.MaterialExpressionLinearInterpolate, 0, 0)
-    connect(surface_color, color, "A")
-    connect(nation, color, "B")
-    connect(weight, color, "Alpha")
-    editing.connect_material_property(color, "", unreal.MaterialProperty.MP_BASE_COLOR)
-    editing.connect_material_property(maps["metallicRoughnessTexture"], "G", unreal.MaterialProperty.MP_ROUGHNESS)
-    normal_delta = expression(mat, unreal.MaterialExpressionSubtract, -700, 350)
-    connect(maps["normalTexture"], normal_delta, "A", "RGB")
-    flat = expression(mat, unreal.MaterialExpressionConstant3Vector, -950, 800)
-    flat.set_editor_property("constant", unreal.LinearColor(0, 0, 1, 1))
-    connect(flat, normal_delta, "B")
-    detail = expression(mat, unreal.MaterialExpressionMultiply, -500, 350)
-    detail.set_editor_property("const_b", .35)
-    connect(normal_delta, detail, "A")
-    geometry_normal = expression(mat, unreal.MaterialExpressionVertexNormalWS, -700, 700)
-    combined = expression(mat, unreal.MaterialExpressionAdd, -300, 400)
-    connect(geometry_normal, combined, "A")
-    connect(detail, combined, "B")
-    normalized = expression(mat, unreal.MaterialExpressionNormalize, -100, 400)
-    connect(combined, normalized, "VectorInput")
-    editing.connect_material_property(normalized, "", unreal.MaterialProperty.MP_NORMAL)
+    color = expression(mat, unreal.MaterialExpressionVertexColor, -450, 0)
+    if not editing.connect_material_property(color, "", unreal.MaterialProperty.MP_BASE_COLOR):
+        raise RuntimeError("Cannot connect geometric terrain color")
+    # No texture, noise normal or displacement: actual sampled elevation and
+    # triangle normals supply relief at every zoom. All inputs remain local.
+    scalar(mat, "Roughness", 1.0, unreal.MaterialProperty.MP_ROUGHNESS, 150)
+    scalar(mat, "Metallic", 0.0, unreal.MaterialProperty.MP_METALLIC, 300)
+    scalar(mat, "Specular", .12, unreal.MaterialProperty.MP_SPECULAR, 450)
+    if editing.get_num_material_expressions(mat) != 4:
+        raise RuntimeError("Geometric terrain must contain only vertex color and three scalar parameters")
     errors = editing.recompile_material(mat)
     if errors:
-        raise RuntimeError("Terrain surface compilation: " + str(errors))
+        raise RuntimeError("Geometric terrain compilation: " + str(errors))
     assets.set_metadata_tag(mat, "WNTTerrainShaderSchema", shader_schema)
     if not assets.save_loaded_asset(mat, only_if_is_dirty=False):
-        raise RuntimeError("Cannot save terrain surface material")
+        raise RuntimeError("Cannot save geometric terrain material")
+    changed.append(asset_path)
+
+
+def graticule_material():
+    """A screen-filtered overlay on the existing fixed geographic ribbons."""
+    asset_path = "/Game/Materials/M_Graticule"
+    shader_schema = "2-pixel-filtered-clean-graph"
+    existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
+    if existing and not force and assets.get_metadata_tag(existing, "WNTGraticuleShaderSchema") == shader_schema:
+        preserved.append(asset_path)
+        return
+    mat = existing if existing else tools.create_asset(
+        "M_Graticule", "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
+    clear_expressions(mat)
+    mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_TRANSLUCENT)
+    mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
+    mat.set_editor_property("two_sided", True)
+    # The graticule is a chart overlay, visible only at strategic distances.
+    # It must not alternate against terrain/water depth as the camera moves.
+    mat.set_editor_property("disable_depth_test", True)
+    # This overlay needs no temporal reconstruction. UE's after-motion-blur
+    # pass avoids reprojecting a thin chart line through jittered scene depth.
+    mat.set_editor_property("translucency_pass", unreal.MaterialTranslucencyPass.MTP_AFTER_MOTION_BLUR)
+    color = expression(mat, unreal.MaterialExpressionVertexColor, -700, -350)
+    if not editing.connect_material_property(color, "", unreal.MaterialProperty.MP_EMISSIVE_COLOR):
+        raise RuntimeError("Cannot connect graticule color")
+    uv = expression(mat, unreal.MaterialExpressionTextureCoordinate, -1600, 0)
+    uv.set_editor_property("coordinate_index", 0)
+    across = expression(mat, unreal.MaterialExpressionComponentMask, -1400, 0)
+    for channel in ["r", "g", "b", "a"]:
+        across.set_editor_property(channel, channel == "r")
+    connect(uv, across, "")
+    derivatives = []
+    for row, cls in enumerate([unreal.MaterialExpressionDDX, unreal.MaterialExpressionDDY]):
+        derivative = expression(mat, cls, -1200, 250 + row * 200)
+        connect(across, derivative, "")
+        absolute = expression(mat, unreal.MaterialExpressionAbs, -1000, 250 + row * 200)
+        connect(derivative, absolute, "")
+        derivatives.append(absolute)
+    footprint = expression(mat, unreal.MaterialExpressionAdd, -800, 300)
+    connect(derivatives[0], footprint, "A")
+    connect(derivatives[1], footprint, "B")
+    bounded = expression(mat, unreal.MaterialExpressionMax, -600, 300)
+    bounded.set_editor_property("const_b", .000001)
+    connect(footprint, bounded, "A")
+    centered = expression(mat, unreal.MaterialExpressionSubtract, -1200, 0)
+    centered.set_editor_property("const_b", .5)
+    connect(across, centered, "A")
+    absolute = expression(mat, unreal.MaterialExpressionAbs, -1000, 0)
+    connect(centered, absolute, "")
+    pixels = expression(mat, unreal.MaterialExpressionDivide, -400, 0)
+    connect(absolute, pixels, "A")
+    connect(bounded, pixels, "B")
+    core = expression(mat, unreal.MaterialExpressionSubtract, -200, 0)
+    core.set_editor_property("const_b", .25)
+    connect(pixels, core, "A")
+    transition = expression(mat, unreal.MaterialExpressionDivide, 0, 0)
+    transition.set_editor_property("const_b", .75)
+    connect(core, transition, "A")
+    coverage = expression(mat, unreal.MaterialExpressionSaturate, 200, 0)
+    connect(transition, coverage, "")
+    inverse = expression(mat, unreal.MaterialExpressionOneMinus, 400, 0)
+    connect(coverage, inverse, "")
+    opacity = expression(mat, unreal.MaterialExpressionMultiply, 600, 0)
+    opacity.set_editor_property("const_b", .42)
+    connect(inverse, opacity, "A")
+    if not editing.connect_material_property(opacity, "", unreal.MaterialProperty.MP_OPACITY):
+        raise RuntimeError("Cannot connect filtered graticule opacity")
+    errors = editing.recompile_material(mat)
+    if errors:
+        raise RuntimeError("Graticule compilation: " + str(errors))
+    assets.set_metadata_tag(mat, "WNTGraticuleShaderSchema", shader_schema)
+    if not assets.save_loaded_asset(mat, only_if_is_dirty=False):
+        raise RuntimeError("Cannot save graticule material")
     changed.append(asset_path)
 
 
 material("M_Ship", .85, .12)
 material("M_Terrain", 1.0, 0.0)
 terrain_surface()
+graticule_material()
 material("M_Ocean", .26, .15, color=(.018, .065, .10), parameter="BaseColor")
 material("M_Line", 1.0, 0.0, unlit=True)
-material("M_Marker", 1.0, 0.0, unlit=True, color=(.5, .65, .8))
+material("M_Marker", 1.0, 0.0, unlit=True, color=(.5, .65, .8), instanced=True)
 material("M_Port", .9, 0.0, color=(.35, .38, .4))
 
 map_path = "/Game/Maps/WNTWorld"

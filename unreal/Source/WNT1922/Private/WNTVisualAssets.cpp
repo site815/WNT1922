@@ -27,25 +27,7 @@ UTextureCube* WNTVisualAssets::LoadSkyCube(const FString& DataRoot)
 
 UMaterialInterface* WNTVisualAssets::LoadTerrainMaterial(const FString& DataRoot)
 {
-    auto* Master = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_TerrainSurface.M_TerrainSurface"));
-    if (!Master) return nullptr;
-    FglTFRuntimeConfig Loader;
-    Loader.bNoArchive = true;
-    // This document references only local, attributed photographic sources.
-    Loader.OverrideBaseDirectory = FPaths::Combine(DataRoot, TEXT("assets/materials"));
-    auto* Asset = UglTFRuntimeFunctionLibrary::glTFLoadAssetFromFilename(
-        FPaths::Combine(DataRoot, TEXT("assets/materials/terrain.gltf")), false, Loader);
-    if (!Asset) return nullptr;
-    FglTFRuntimeMaterialsConfig Materials;
-    Materials.bGeneratesMipMaps = true;
-    // External image mip chains are resident runtime data, not cooked bulk files.
-    Materials.ImagesConfig.bStreaming = false;
-    Materials.ForceMaterial = Master;
-    auto* Material = Cast<UMaterialInstanceDynamic>(Asset->LoadMaterial(0, Materials, false));
-    if (!Material) return nullptr;
-    Materials.ImagesConfig.bSRGB = true;
-    UTexture2D* GlobalColour = Asset->LoadTexture(3, Materials);
-    if (!GlobalColour) return nullptr;
-    Material->SetTextureParameterValue(TEXT("globalColorTexture"), GlobalColour);
-    return Material;
+    // Terrain uses the cooked geometric material and existing elevation mesh.
+    // No runtime NASA image, photographic glTF or normal-map import is needed.
+    return LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_TerrainSurface.M_TerrainSurface"));
 }

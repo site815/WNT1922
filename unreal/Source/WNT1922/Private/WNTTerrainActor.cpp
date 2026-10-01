@@ -377,8 +377,9 @@ bool AWNTTerrainActor::Initialize(const FString& DataRoot)
     }
     if(Data->Triangles.IsEmpty()){LoadError=TEXT("No terrain triangles were generated");return false;}
     if(!TerrainMaterial)TerrainMaterial=WNTVisualAssets::LoadTerrainMaterial(DataRoot);
-    if(!TerrainMaterial){LoadError=TEXT("Cannot load the native photographic terrain material and local texture set.");return false;}
-    if(!LineMaterial)LineMaterial=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/Materials/M_Line.M_Line"));
+    if(!TerrainMaterial){LoadError=TEXT("Cannot load the native geometric terrain material.");return false;}
+    if(!LineMaterial)LineMaterial=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/Materials/M_Graticule.M_Graticule"));
+    if(!LineMaterial){LoadError=TEXT("Cannot load the filtered geographic grid material.");return false;}
     RebuildProjectedMeshes();return true;
 }
 
@@ -390,17 +391,39 @@ FVector WNTTerrainGeometry::WrappedTileOrigin(const FVector& GeographicOrigin, d
         GeographicOrigin.Z);
 }
 
-FVector2D WNTTerrainGeometry::GlobalTextureOrigin(const FVector& GeographicOrigin)
+FLinearColor WNTTerrainGeometry::TerrainColour(const FVector2D& LongitudeLatitude,double HeightMetres,const FLinearColor& PoliticalTint)
 {
-    return FVector2D(.5+GeographicOrigin.Y/WNTProjection::WorldWidth,.5-2.0*GeographicOrigin.X/WNTProjection::WorldWidth);
+    const double Latitude=FMath::Clamp(LongitudeLatitude.Y,-90.0,90.0),AbsoluteLatitude=FMath::Abs(Latitude);
+    const double Longitude=WNTProjection::WrapLongitude(LongitudeLatitude.X),Height=FMath::Max(0.0,HeightMetres);
+    auto Blend=[](const FLinearColor& A,const FLinearColor& B,double T){return FMath::Lerp(A,B,float(FMath::Clamp(T,0.0,1.0)));};
+    // These are intentionally broad illustrative climate regions, not claimed
+    // land-cover data. Elevation is the unchanged actual local NOAA sample.
+    const FLinearColor Meadow(.235f,.295f,.165f),Forest(.125f,.205f,.135f),Dry(.43f,.355f,.22f);
+    const FLinearColor Rock(.32f,.315f,.285f),Snow(.69f,.735f,.74f);
+    FLinearColor Base=Blend(Forest,Meadow,FMath::Clamp(AbsoluteLatitude/42.0,0.0,1.0));
+    auto Region=[&](double Lon,double Lat,double LonRadius,double LatRadius)
+    {
+        const double X=WNTProjection::WrapLongitude(Longitude-Lon)/LonRadius,Y=(Latitude-Lat)/LatRadius;
+        return FMath::Exp(-(X*X+Y*Y)*2.0);
+    };
+    const double Dryness=FMath::Max(FMath::Max(Region(22,25,55,16),Region(48,26,24,16)),FMath::Max(Region(134,-26,32,20),Region(-112,30,25,17)));
+    Base=Blend(Base,Dry,Dryness*.88);
+    Base=Blend(Base,Forest,FMath::Clamp((AbsoluteLatitude-48.0)/12.0,0.0,1.0)*.55);
+    Base=Blend(Base,Rock,FMath::Clamp((Height-850.0)/2300.0,0.0,1.0)*.8);
+    const double SnowLine=FMath::Clamp(4700.0-AbsoluteLatitude*48.0,700.0,4700.0);
+    const double SnowAmount=FMath::Max(FMath::Clamp((Height-SnowLine)/900.0,0.0,1.0),FMath::Clamp((AbsoluteLatitude-68.0)/13.0,0.0,1.0));
+    Base=Blend(Base,Snow,SnowAmount);
+    Base=Blend(Base,PoliticalTint.GetClamped(),.10);
+    Base.A=1.0f;return Base;
 }
 
 double WNTTerrainGeometry::GraticuleWidthForPixelSize(double CentimetresPerPixel)
 {
-    if(!FMath::IsFinite(CentimetresPerPixel)||CentimetresPerPixel<=0)return 24000.0;
-    const double Metres=FMath::Clamp(CentimetresPerPixel*.01,100.0,64000.0);
-    // Half-octave steps avoid uploading ribbon vertices for every zoom frame.
-    return FMath::Clamp(FMath::Pow(2.0,FMath::CeilToDouble(FMath::Log2(Metres)*2.0)*.5),100.0,64000.0);
+    if(!FMath::IsFinite(CentimetresPerPixel)||CentimetresPerPixel<=0)return 96000.0;
+    const double Metres=FMath::Clamp(CentimetresPerPixel*.04,400.0,256000.0);
+    // Four-pixel support leaves room for derivative-based edge filtering.
+    // Half-octave geometry changes do not change the visible shader line width.
+    return FMath::Clamp(FMath::Pow(2.0,FMath::CeilToDouble(FMath::Log2(Metres)*2.0)*.5),400.0,256000.0);
 }
 
 void AWNTTerrainActor::SetCentralMeridian(double Degrees)
@@ -491,13 +514,16 @@ namespace
         TArray<FLinearColor> Colours;
         void Triangle(FVector A,FVector B,FVector C,const FLinearColor& Colour,const FVector& Origin,bool Up=true,
             FVector2D UVA=FVector2D(0,0),FVector2D UVB=FVector2D(1,0),FVector2D UVC=FVector2D(0,1))
+        {TriangleWithColours(A,B,C,Colour,Colour,Colour,Origin,Up,UVA,UVB,UVC);}
+        void TriangleWithColours(FVector A,FVector B,FVector C,FLinearColor CA,FLinearColor CB,FLinearColor CC,const FVector& Origin,bool Up=true,
+            FVector2D UVA=FVector2D(0,0),FVector2D UVB=FVector2D(1,0),FVector2D UVC=FVector2D(0,1))
         {
             FVector N=FVector::CrossProduct(B-A,C-A).GetSafeNormal();
-            if(N.IsNearlyZero())return;if(Up&&N.Z<0){Swap(B,C);Swap(UVB,UVC);N=-N;}
+            if(N.IsNearlyZero())return;if(Up&&N.Z<0){Swap(B,C);Swap(UVB,UVC);Swap(CB,CC);N=-N;}
             const int32 Base=Vertices.Num();
             Vertices.Append({A-Origin,B-Origin,C-Origin});Normals.Append({N,N,N});
             // Unreal front faces are clockwise; shading normals stay outward.
-            Indices.Append({Base,Base+2,Base+1});UV.Append({UVA,UVB,UVC});Colours.Append({Colour,Colour,Colour});
+            Indices.Append({Base,Base+2,Base+1});UV.Append({UVA,UVB,UVC});Colours.Append({CA,CB,CC});
         }
     };
     struct FTileBuild{FVector Origin;FTileSection Land,Coast,Grid;};
@@ -525,12 +551,11 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
         {
             const FVector2D Centre=(T.A+T.B+T.C)/3.0;FTileBuild& Tile=Tiles[TileAt(Centre.X,Centre.Y)];
             const double HA=Height(T.A),HB=Height(T.B),HC=Height(T.C);
-            // Vertex colours remain political; normals and geometry provide the geographic relief.
-            // Keep longitudes unwrapped within each triangle. The texture's U
-            // sampler repeats at 180 degrees without interpolating across the
-            // entire image when the map's central meridian moves.
-            auto GlobalUV=[&](const FVector2D& P){return FVector2D((P.X+MeshMeridian+180.0)/360.0,(90.0-P.Y)/180.0);};
-            Tile.Land.Triangle(WNTProjection::ForwardUnwrapped(T.A,HA),WNTProjection::ForwardUnwrapped(T.B,HB),WNTProjection::ForwardUnwrapped(T.C,HC),Colour,Tile.Origin,true,GlobalUV(T.A),GlobalUV(T.B),GlobalUV(T.C));
+            // Actual height and face normals provide relief; stable geographic
+            // vertex colors supply restrained biomes and political ownership.
+            // No photographic texture is enlarged as the camera approaches.
+            Tile.Land.TriangleWithColours(WNTProjection::ForwardUnwrapped(T.A,HA),WNTProjection::ForwardUnwrapped(T.B,HB),WNTProjection::ForwardUnwrapped(T.C,HC),
+                WNTTerrainGeometry::TerrainColour(T.A,HA,Colour),WNTTerrainGeometry::TerrainColour(T.B,HB,Colour),WNTTerrainGeometry::TerrainColour(T.C,HC,Colour),Tile.Origin);
         }
     }
     for(const FWNTTerrainData::FEdge& Edge:Data->Edges)
@@ -574,13 +599,16 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
             Land.Add({Start,End,W0.X*TA.Z+W0.Y*TB.Z+W0.Z*TC.Z,W1.X*TA.Z+W1.Y*TB.Z+W1.Z*TC.Z});
         }
         Land.Sort([](const FInterval& L,const FInterval& R){return L.Start<R.Start;});
-        const FLinearColor Grid(.34f,.56f,.59f);
+        const FLinearColor Grid(.31f,.40f,.39f);
         auto DrawInterval=[&](double Start,double End,double H0,double H1)
         {
             if(End-Start<1e-9)return;
             FVector P=FMath::Lerp(PA,PB,Start),Q=FMath::Lerp(PA,PB,End);P.Z=H0+10000;Q.Z=H1+10000;
             const FVector Side=FVector::CrossProduct((Q-P).GetSafeNormal(),FVector::UpVector).GetSafeNormal()*GridWidthMetres*50.0;
-            Tile.Grid.Triangle(P-Side,P+Side,Q+Side,Grid,Tile.Origin);Tile.Grid.Triangle(P-Side,Q+Side,Q-Side,Grid,Tile.Origin);
+            // U runs across the padded ribbon. The shader measures its screen
+            // derivative to retain the same softly filtered pixel width.
+            Tile.Grid.Triangle(P-Side,P+Side,Q+Side,Grid,Tile.Origin,true,FVector2D(0,0),FVector2D(1,0),FVector2D(1,1));
+            Tile.Grid.Triangle(P-Side,Q+Side,Q-Side,Grid,Tile.Origin,true,FVector2D(0,0),FVector2D(1,1),FVector2D(0,1));
         };
         double Cursor=0;
         for(const auto& Interval:Land)
@@ -626,16 +654,6 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
             Mesh->bUseAsyncCooking=true;Mesh->RegisterComponent();TerrainTiles[Instance]=Mesh;AddInstanceComponent(Mesh);
         }
         if(!Mesh)continue;Mesh->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(TileOrigins[Instance],CentralMeridian,Copy));
-        // Local vertex positions retain float precision; procedural UV buffers
-        // default to half floats. Supply only the small geographic phase as
-        // primitive data, avoiding 400–800 m UV quantization at tile edges.
-        Mesh->SetCustomPrimitiveDataVector4(0,FVector4(
-            Tile.Origin.X-FMath::FloorToDouble(Tile.Origin.X/480000.0)*480000.0,
-            Tile.Origin.Y-FMath::FloorToDouble(Tile.Origin.Y/480000.0)*480000.0,0,0));
-        // Reconstruct the global satellite coordinates from full-precision
-        // local positions too: UV0 half floats otherwise quantize by ~20 km.
-        const FVector2D SatelliteOrigin=WNTTerrainGeometry::GlobalTextureOrigin(Tile.Origin);
-        Mesh->SetCustomPrimitiveDataVector4(4,FVector4(SatelliteOrigin.X,SatelliteOrigin.Y,0,0));
         auto Apply=[&](int32 Section,FTileSection& Build,UMaterialInterface* Material)
         {
             if(Build.Vertices.IsEmpty()){Mesh->ClearMeshSection(Section);return;}

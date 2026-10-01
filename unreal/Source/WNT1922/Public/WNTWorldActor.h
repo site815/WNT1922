@@ -35,6 +35,7 @@ public:
     TSharedPtr<FJsonObject> GetSelection(const FHitResult& Hit) const;
     TOptional<FVector> GetSelectedPosition(const FString& Kind, const FString& Id, int32 HullIndex = -1, const FString& Side = TEXT("")) const;
     FBox GetSceneBounds() const;
+    FBox GetForceBounds(const FString& ForceId) const;
     AWNTTerrainActor* GetTerrain() const { return Terrain; }
     double GroundHeight(const FVector2D& LongitudeLatitude) const;
     const FString& GetLoadError() const { return LoadError; }

@@ -11,6 +11,8 @@
 #include "WNTProjection.h"
 #include "WNTWindowPolicy.h"
 #include "Components/PrimitiveComponent.h"
+#include "Components/MeshComponent.h"
+#include "WNTSelectionGeometry.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
@@ -569,6 +571,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     const FString Action = String(Packet, TEXT("action"));
     const bool Battle = Mode == TEXT("battle");
     if (Action == TEXT("pick") || Action == TEXT("hover")) { Pick(Packet, Action == TEXT("hover")); return; }
+    if (Action == TEXT("selectBox")) { if (!Battle) SelectBox(Packet); return; }
     if(bCameraDirty)UpdateCamera(false);
     const FVector2D Pointer(FMath::Clamp(Number(Packet,TEXT("x"),ViewRect.X+ViewRect.Z*.5),0.0,1.0),FMath::Clamp(Number(Packet,TEXT("y"),ViewRect.Y+ViewRect.W*.5),0.0,1.0));
     const FVector2D Previous(Number(Packet,TEXT("previousX"),Pointer.X-Number(Packet,TEXT("dx"))/FMath::Max(1,LastViewport.X)),Number(Packet,TEXT("previousY"),Pointer.Y-Number(Packet,TEXT("dy"))/FMath::Max(1,LastViewport.Y)));
@@ -600,7 +603,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         if (Battle) FitBattle();
         else { Zoom = 1; FocusGeo = FVector2D::ZeroVector; Meridian = 0; WorldScene->SetCentralMeridian(0); }
     }
-    else if (Action == TEXT("focus"))
+    else if (Action == TEXT("focus") || Action == TEXT("fit-force"))
     {
         if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
         if (Battle)
@@ -613,6 +616,22 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
             FocusGeo = FVector2D(WNTProjection::WrapLongitude(Number(Packet, TEXT("longitude"))), FMath::Clamp(Number(Packet, TEXT("latitude")), -89.9, 89.9));
             Meridian = FocusGeo.X; WorldScene->SetCentralMeridian(Meridian);
             Zoom = FMath::Clamp(Number(Packet, TEXT("zoom"), 6000), 1., WNTCameraMath::MaxWorldZoom);
+            if(Action==TEXT("fit-force"))
+            {
+                const FBox Bounds=WorldScene->GetForceBounds(String(Packet,TEXT("id")));
+                if(Bounds.IsValid)
+                {
+                    FocusGeo=WNTCameraMath::WrappedFocus(Bounds.GetCenter(),Meridian);
+                    const double Aspect=FMath::Max(.1,double(LastViewport.X)*ViewRect.Z/(FMath::Max(1,LastViewport.Y)*ViewRect.W));
+                    const FVector Extent=Bounds.GetExtent();
+                    // North-up: X is north/south, Y east/west. Include actual
+                    // formation extents and a margin for small ship silhouettes.
+                    const double HalfHeight=FMath::Max(Extent.X,Extent.Y/Aspect);
+                    const double Distance=FMath::Max(90000.0,HalfHeight*1.35/FMath::Tan(FMath::DegreesToRadians(22.5)));
+                    const double Base=WNTProjection::WorldWidth*.5*ViewRect.W/(2*FMath::Tan(FMath::DegreesToRadians(22.5)))*.99;
+                    Zoom=FMath::Clamp(Base/Distance,1.,WNTCameraMath::MaxWorldZoom);
+                }
+            }
         }
     }
     if(Anchor.IsSet())AnchorPoint(Anchor.GetValue(),Pointer);
@@ -666,6 +685,10 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetNumberField(TEXT("zoom"), Zoom);
     int32 NativeWidth,NativeHeight;GetViewportSize(NativeWidth,NativeHeight);
     Event->SetNumberField(TEXT("viewportWidth"),NativeWidth);Event->SetNumberField(TEXT("viewportHeight"),NativeHeight);
+    auto CameraRect=MakeShared<FJsonObject>();
+    CameraRect->SetNumberField(TEXT("x"),ViewRect.X);CameraRect->SetNumberField(TEXT("y"),ViewRect.Y);
+    CameraRect->SetNumberField(TEXT("width"),ViewRect.Z);CameraRect->SetNumberField(TEXT("height"),ViewRect.W);
+    Event->SetObjectField(TEXT("viewRect"),CameraRect);
     Event->SetNumberField(TEXT("windowMode"),Window.IsValid()?int32(Window.Pin()->GetWindowMode()):-1);
     Event->SetBoolField(TEXT("renderingOffscreen"),FSlateApplication::Get().IsRenderingOffScreen());
     Event->SetNumberField(TEXT("configuredWindowMode"),GEngine&&GEngine->GetGameUserSettings()?int32(GEngine->GetGameUserSettings()->GetFullscreenMode()):-1);
@@ -742,6 +765,51 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Send(Event);
 }
 
+FBox2D AWNTPlayerController::PickBounds(AActor* Actor) const
+{
+    FBox2D Result(ForceInit);
+    if(!Actor||Actor->IsHidden()||!Actor->GetActorEnableCollision())return Result;
+    TArray<UMeshComponent*> Meshes;Actor->GetComponents(Meshes);
+    for(auto* Mesh:Meshes)
+    {
+        if(!Mesh->IsVisible()||Mesh->bHiddenInGame)continue;
+        const FBox Bounds=Mesh->Bounds.GetBox();
+        for(int32 I=0;I<8;++I)
+        {
+            const FVector P((I&1)?Bounds.Max.X:Bounds.Min.X,(I&2)?Bounds.Max.Y:Bounds.Min.Y,(I&4)?Bounds.Max.Z:Bounds.Min.Z);
+            const auto Screen=WNTCameraMath::Project(SceneCamera->View,P);
+            if(Screen.IsSet())Result+=Screen.GetValue();
+        }
+    }
+    return Result;
+}
+
+void AWNTPlayerController::SelectBox(const TSharedPtr<FJsonObject>& Packet)
+{
+    if(!SceneCamera||!WorldScene||Mode!=TEXT("world"))return;
+    if(bCameraDirty)UpdateCamera(false);
+    const FVector2D A(Number(Packet,TEXT("x0")),Number(Packet,TEXT("y0"))),B(Number(Packet,TEXT("x")),Number(Packet,TEXT("y")));
+    FBox2D Rectangle(ForceInit);Rectangle+=A;Rectangle+=B;
+    Rectangle.Min.X=FMath::Max(Rectangle.Min.X,ViewRect.X);Rectangle.Min.Y=FMath::Max(Rectangle.Min.Y,ViewRect.Y);
+    Rectangle.Max.X=FMath::Min(Rectangle.Max.X,ViewRect.X+ViewRect.Z);Rectangle.Max.Y=FMath::Min(Rectangle.Max.Y,ViewRect.Y+ViewRect.W);
+    TSet<FString> Unique;
+    if(Rectangle.Min.X<=Rectangle.Max.X&&Rectangle.Min.Y<=Rectangle.Max.Y)
+        for(TActorIterator<AActor> It(GetWorld());It;++It)
+        {
+            const auto Pick=WorldScene->GetSelection(*It);if(!Pick.IsValid())continue;
+            const FString Kind=String(Pick,TEXT("kind"));
+            const FString Fleet=Kind==TEXT("fleet")?String(Pick,TEXT("id")):Kind==TEXT("ship")?String(Pick,TEXT("fleetId")):FString();
+            // World packets expose hulls only for the player's own fleets;
+            // contacts, merchants and country/port markers cannot leak into orders.
+            if(!Fleet.IsEmpty()&&WNTSelectionGeometry::Overlaps(Rectangle,PickBounds(*It)))Unique.Add(Fleet);
+        }
+    TArray<FString> Ids=Unique.Array();Ids.Sort();TArray<TSharedPtr<FJsonValue>> Values;
+    for(const FString& Id:Ids)Values.Add(MakeShared<FJsonValueString>(Id));
+    auto Selection=MakeShared<FJsonObject>();Selection->SetStringField(TEXT("kind"),TEXT("fleet-group"));
+    Selection->SetStringField(TEXT("id"),Ids.IsEmpty()?TEXT(""):Ids[0]);Selection->SetArrayField(TEXT("ids"),Values);
+    auto Event=MakeShared<FJsonObject>();Event->SetStringField(TEXT("type"),TEXT("select"));Event->SetObjectField(TEXT("selection"),Selection);Send(Event);
+}
+
 void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHover)
 {
     if(!SceneCamera||Mode==TEXT("hidden"))return;if(bCameraDirty)UpdateCamera(false);
@@ -756,6 +824,24 @@ void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHov
         const double Limit=Surface.IsSet()?FVector::Distance(Surface.GetValue(),OriginPoint)+10:1e11;
         if (GetWorld()->LineTraceSingleByChannel(Hit, OriginPoint, OriginPoint + Direction * Limit, ECC_Visibility, Params))
             Selection = WorldScene->GetSelection(Hit.GetActor());
+    }
+    if(!Selection.IsValid()||String(Selection,TEXT("kind"))==TEXT("country")||String(Selection,TEXT("kind"))==TEXT("port"))
+    {
+        const FVector2D Padding(FMath::Clamp(Number(Packet,TEXT("radiusX"),10.0/FMath::Max(1,LastViewport.X)),.00001,.025),
+            FMath::Clamp(Number(Packet,TEXT("radiusY"),10.0/FMath::Max(1,LastViewport.Y)),.00001,.05));
+        double Best=1.000001,BestCenter=TNumericLimits<double>::Max();FString BestKey;
+        for(TActorIterator<AActor> It(GetWorld());It;++It)
+        {
+            const auto Candidate=WorldScene->GetSelection(*It);if(!Candidate.IsValid())continue;
+            const FString Kind=String(Candidate,TEXT("kind"));
+            if(Kind==TEXT("country")||Kind==TEXT("territory"))continue;
+            const FBox2D Bounds=PickBounds(*It);if(!Bounds.bIsValid)continue;
+            const double Distance=WNTSelectionGeometry::Distance(Bounds,Pointer,Padding);
+            const double Center=(Bounds.GetCenter()-Pointer).SizeSquared();
+            const FString Key=Kind+TEXT(":")+String(Candidate,TEXT("id"))+TEXT(":")+String(Candidate,TEXT("key"));
+            if(Distance<=1 && (Distance<Best || (FMath::IsNearlyEqual(Distance,Best,1e-9) && (Center<BestCenter || (Center==BestCenter && Key<BestKey)))))
+            {Selection=Candidate;Best=Distance;BestCenter=Center;BestKey=Key;}
+        }
     }
     if(!Selection.IsValid()&&Surface.IsSet()&&Mode==TEXT("world")&&WorldScene->GetTerrain())
     {
@@ -773,6 +859,11 @@ void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHov
     if (bHover) Event->SetNumberField(TEXT("requestId"), Number(Packet, TEXT("requestId")));
     Event->SetNumberField(TEXT("x"), Number(Packet, TEXT("x"))); Event->SetNumberField(TEXT("y"), Number(Packet, TEXT("y")));
     bool bZoom=false;Packet->TryGetBoolField(TEXT("zoom"),bZoom);Event->SetBoolField(TEXT("zoom"),bZoom);
+    if(!Selection.IsValid()&&!bHover&&Mode==TEXT("world"))
+    {
+        Selection=MakeShared<FJsonObject>();Selection->SetStringField(TEXT("kind"),TEXT("fleet-group"));
+        Selection->SetStringField(TEXT("id"),TEXT(""));Selection->SetArrayField(TEXT("ids"),TArray<TSharedPtr<FJsonValue>>());
+    }
     if (Selection.IsValid()) Event->SetObjectField(TEXT("selection"), Selection);
     else Event->SetField(TEXT("selection"), MakeShared<FJsonValueNull>());
     Send(Event);

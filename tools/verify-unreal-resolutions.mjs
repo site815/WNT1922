@@ -86,13 +86,35 @@ async function save(){
  const state=await page.evaluate(async()=>{const r=await fetch('/api/save');if(!r.ok)throw Error('Save read failed');return r.json();});validateSave(state,CATALOG);assert.equal(state.paused,true);return state;
 }
 async function worldReady(){await page.locator('.native-world-input').waitFor();return until(()=>diagnostics(),d=>d.mode==='world'&&d.shipActorCount>0,'world ready',60000);}
-async function clearPoint(){return page.evaluate(()=>{const sidebar=document.querySelector('.sidebar').getBoundingClientRect(),panel=document.querySelector('.command-side-panel').getBoundingClientRect(),work=document.querySelector('.workspace').getBoundingClientRect();const p={x:(sidebar.right+panel.left)/2,y:(work.top+innerHeight-70)/2};if(!document.elementFromPoint(p.x,p.y)?.matches('.native-world-input'))throw Error('Map input point is covered');return p;});}
+async function clearPoint(){return page.evaluate(()=>{const sidebar=document.querySelector('.sidebar').getBoundingClientRect(),panel=document.querySelector('.command-side-panel').getBoundingClientRect(),work=document.querySelector('.command-workspace').getBoundingClientRect();const p={x:(sidebar.right+panel.left)/2,y:(work.top+innerHeight-70)/2};if(!document.elementFromPoint(p.x,p.y)?.matches('.native-world-input'))throw Error('Map input point is covered');return p;});}
+async function ministryMenus(size){
+ const before=await diagnostics('world'),camera=d=>({instanceId:d.instanceId,zoom:d.zoom,longitude:d.longitude,latitude:d.latitude,tilt:d.tilt});
+ await page.evaluate(()=>{globalThis.__resolutionMap=document.querySelector('.native-world-input');globalThis.__resolutionOutliner=document.querySelector('.command-side-panel');});
+ const outliner=await page.locator('.command-side-panel').boundingBox();
+ for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports','review']){
+  await page.locator('.nav-item[data-view="'+menu+'"]').click();await page.locator('.menu-popup.view-'+menu).waitFor();
+  const layout=await page.evaluate(()=>{
+   const popup=document.querySelector('.menu-popup'),body=popup.querySelector('.workspace-inner'),panel=document.querySelector('.command-side-panel');
+   const r=popup.getBoundingClientRect(),p=panel.getBoundingClientRect(),close=popup.querySelector('.workspace-close').getBoundingClientRect();
+   return{popup:r.toJSON(),panel:p.toJSON(),close:close.toJSON(),width:innerWidth,height:innerHeight,sameMap:__resolutionMap===document.querySelector('.native-world-input'),sameOutliner:__resolutionOutliner===panel,panelReachable:!!document.elementFromPoint(p.left+10,p.top+10)?.closest('.command-side-panel'),contentFits:body.scrollWidth<=body.clientWidth+1};
+  });
+  assert(layout.sameMap&&layout.sameOutliner,'Menus retain their native map canvas and naval outliner');
+  assert(layout.panelReachable&&layout.popup.right<layout.panel.left,'Ministry panel leaves naval commands available');
+  assert(layout.close.top>=layout.popup.top&&layout.close.bottom<=layout.popup.bottom,'Menu close remains visible');
+  assert(layout.contentFits,'Popup content fits; wide tables use their local scroll area');
+  assert.deepEqual(await page.locator('.command-side-panel').boundingBox(),outliner);
+  assert.deepEqual(camera(await diagnostics('world')),camera(before),'Ministry menu preserves native camera');
+  result.metrics.push({kind:'persistent-ministry-popup',menu,...size,layout});
+  if(menu==='yards')await capture('menu-catalog-'+size.width+'x'+size.height,size,true);
+ }
+ await page.keyboard.press('Escape');assert.equal(await page.locator('.menu-popup').count(),0);
+}
 async function gestureCycle(){
  const surface=page.locator('.native-world-input');await surface.focus();await page.keyboard.press('Home');await until(()=>diagnostics(),d=>d.zoom===1,'Home');
  const p=await clearPoint(),before=await cursor();await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-450);await until(()=>diagnostics(),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.00001,'smooth wheel zoom reaches its target');
  const zoomFrames=(await events(before)).filter(e=>e.event.type==='camera').map(e=>e.event.zoom);
  assert(zoomFrames.some(z=>z>1&&z<Math.exp(.675)-.001),'Wheel zoom renders intermediate camera positions');
- await page.mouse.down();await page.mouse.move(p.x+160,p.y+30,{steps:6});await page.mouse.up();
+ await page.mouse.down({button:'middle'});await page.mouse.move(p.x+160,p.y+30,{steps:6});await page.mouse.up({button:'middle'});
  await page.mouse.down({button:'right'});await page.mouse.move(p.x+205,p.y+85,{steps:6});await page.mouse.up({button:'right'});
  assert(Math.abs((await diagnostics()).tilt)<.001,'Strategic right-drag remains overhead');
  await surface.focus();await page.keyboard.press('Home');await until(()=>diagnostics(),d=>d.zoom===1,'Home after pan');await delay(150);return diagnostics('world');
@@ -125,7 +147,7 @@ try{
  const initial=await save(),packet=buildUnrealScenePacket(initial,contentFor(CATALOG,initial));
  const force=packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.length);assert(force,'An own fleet is needed for pointer alignment checks');
  for(const size of resolutions){
-  await resize(size,'world');const samples=[];for(let cycle=0;cycle<3;cycle++)samples.push(counts(await gestureCycle()));
+  await resize(size,'world');await ministryMenus(size);const samples=[];for(let cycle=0;cycle<3;cycle++)samples.push(counts(await gestureCycle()));
   for(const key of ['primitiveComponentCount','terrainTileCount','shipActorCount']){assert(Number.isFinite(samples[2][key]),'Native diagnostics must expose '+key);assert.equal(samples[2][key],samples[1][key],key+' remains stable after repeated pan/zoom/return');}
   result.metrics.push({kind:'component-count-stability',...size,samples});
   await temporalSample('world-'+size.width+'x'+size.height,size);
@@ -142,13 +164,15 @@ try{
   await capture('fleet-tilted-'+size.width+'x'+size.height,size,true);
  }
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');
+ for(const a of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'))for(const b of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'&&row.width>a.width&&row.height===a.height))assert(Math.abs(a.layout.popup.width-b.layout.popup.width)<2,'At the same height, ultrawide retains the 16:9 menu width');
+ result.checks.push('All ten ministry menus retain the native map and naval outliner at every size; wider screens preserve their 16:9-derived popup width and expose the world beside it.');
  phase='continuous map wrapping';
  const widest=resolutions.reduce((a,b)=>b.width/b.height>a.width/a.height?b:a);await resize(widest,'world');
  for(const direction of [-1,1]){
   await input('home');let previous=(await diagnostics()).longitude,total=0;
   const samples=[];
   for(let i=0;i<16;i++){
-   const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(p.x+direction*widest.width*.2,p.y,{steps:8});await page.mouse.up();
+   const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+direction*widest.width*.2,p.y,{steps:8});await page.mouse.up({button:'right'});
    const d=await diagnostics('world'),delta=((d.longitude-previous+540)%360)-180;total+=delta;previous=d.longitude;samples.push({longitude:d.longitude,latitude:d.latitude,...counts(d)});
    assert(Math.abs(d.tilt)<.001,'World wrapping never tilts the strategic camera');
   }

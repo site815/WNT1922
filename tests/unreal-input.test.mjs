@@ -50,7 +50,7 @@ function fixture(t, mode = 'world') {
   return {scene, canvas, inputs};
 }
 
-for (const [label, button, shiftKey] of [['left',0,false],['middle',1,false],['right',2,false],['Shift-left',0,true]]) {
+for (const [label, button, shiftKey] of [['middle',1,false],['right',2,false],['Shift-right',2,true]]) {
   test('world '+label+' drag pans and never picks or manually tilts', t => {
     const {canvas, inputs} = fixture(t);
     canvas.emit('pointerdown',{button,shiftKey});
@@ -63,6 +63,17 @@ for (const [label, button, shiftKey] of [['left',0,false],['middle',1,false],['r
   });
 }
 
+for(const shiftKey of [false,true])test('left drag selects a rectangle without moving the map or issuing orders'+(shiftKey?' with Shift':''), t=>{
+  const {scene,canvas,inputs}=fixture(t);
+  canvas.emit('pointerdown',{shiftKey});
+  canvas.emit('pointermove',{shiftKey,clientX:300,clientY:240});
+  assert.equal(scene.selectionBox.style.width,'200px');
+  assert.deepEqual(inputs,[],'Drawing the box sends no navigation or movement orders');
+  canvas.emit('pointerup',{shiftKey,clientX:300,clientY:240});
+  assert.deepEqual(inputs,[{action:'selectBox',x0:.1,y0:.2,x:.3,y:.48}]);
+  assert.equal(scene.selectionBox,null);
+});
+
 for (const [label, button, expected] of [['left',0,['pick']],['middle',1,[]],['right',2,[]]]) {
   test('world '+label+' click has the correct selection policy', t => {
     const {canvas, inputs} = fixture(t);
@@ -70,11 +81,11 @@ for (const [label, button, expected] of [['left',0,['pick']],['middle',1,[]],['r
     canvas.emit('pointermove',{button,clientX:102,clientY:101});
     canvas.emit('pointerup',{button,clientX:102,clientY:101});
     assert.deepEqual(inputs.map(input => input.action),expected);
-    if (expected.length) assert.deepEqual(inputs[0],{action:'pick',x:.102,y:.202});
+    if (expected.length) assert.deepEqual(inputs[0],{action:'pick',x:.102,y:.202,radiusX:.01,radiusY:.02});
   });
 }
 
-for (const [label, button, shiftKey, action] of [['left',0,false,'pan'],['middle',1,false,'pan'],['right',2,false,'tilt'],['Shift-left',0,true,'tilt']]) {
+for (const [label, button, shiftKey, action] of [['middle',1,false,'tilt'],['right',2,false,'pan'],['Shift-right',2,true,'tilt']]) {
   test('battle '+label+' drag retains '+action+' inspection control without selecting', t => {
     const {canvas, inputs} = fixture(t,'battle');
     canvas.emit('pointerdown',{button,shiftKey});
@@ -92,7 +103,14 @@ test('cancelled gestures and detached surfaces cannot select or move the camera'
   canvas.emit('pointerdown'); canvas.emit('pointermove',{clientX:150}); canvas.emit('pointerup');
   assert.deepEqual(inputs,[]);
   replacement.emit('pointerdown'); replacement.emit('pointerup');
-  assert.deepEqual(inputs,[{action:'pick',x:.1,y:.2}]);
+  assert.deepEqual(inputs,[{action:'pick',x:.1,y:.2,radiusX:.01,radiusY:.02}]);
+});
+
+test('battle left drag does not pan or issue a fleet order; only left double-click focuses',t=>{
+  const {canvas,inputs}=fixture(t,'battle');
+  canvas.emit('pointerdown');canvas.emit('pointermove',{clientX:300});canvas.emit('pointerup',{clientX:300});
+  canvas.emit('dblclick',{button:2});assert.deepEqual(inputs,[]);
+  canvas.emit('dblclick');assert.deepEqual(inputs,[{action:'pick',x:.1,y:.2,radiusX:.01,radiusY:.02,zoom:true}]);
 });
 
 test('world wheel and keyboard controls keep zoom units and cardinal pan direction', t => {

@@ -57,7 +57,7 @@ export function landView(s, c, ui = {}, data = {}) {
     (!fronts.length
       ? "<p>No active fronts. Historical campaigns and wartime island assaults will appear here.</p>"
       : "");
-  return commandView(s, c, { ...ui, mode: "land", sidePanel: panel }, data);
+  return ui.panelOnly ? panel : commandView(s, c, { ...ui, mode: "land", sidePanel: panel }, data);
 }
 export function strategicAirView(s, c, ui = {}, data = {}) {
   const n = s.nations[s.player],
@@ -94,5 +94,5 @@ export function strategicAirView(s, c, ui = {}, data = {}) {
       (!n.strategicLog?.length
         ? "<p>No completed raids involving your country.</p>"
         : "");
-  return commandView(s, c, { ...ui, mode: "airwar", sidePanel: panel }, data);
+  return ui.panelOnly ? panel : commandView(s, c, { ...ui, mode: "airwar", sidePanel: panel }, data);
 }

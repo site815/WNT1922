@@ -4,6 +4,16 @@
 
 The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
 
+## Native preview — 0.42.0-dev
+
+- The command map and naval outliner remain loaded under menus 02–11. Ministry menus use centered panels with a consistent width at equal-height standard and ultrawide resolutions; X or Escape returns to the map.
+- Left click selects or inspects a unit. Left drag draws an owned-fleet selection box without issuing movement orders. Right drag pans; a double-click in the fleet outliner fits that formation. Nearby clicks have a small screen-space tolerance around visible units.
+- Terrain uses actual elevation, lit geometric relief and a restrained climate palette. Geographic lines use a filtered overlay and a stable zoom cutoff to avoid depth fighting and threshold chatter.
+- A new decisive battle involving the player pauses the campaign and selects Tactical 60×. Watch remains optional. Resume/Play battle runs complete 15-minute ticks; Next tick advances one. The map/outliner shows elapsed time and current-stage progress.
+- Battle presentation includes bounded salvo, splash, smoke and sinking effects derived from recorded exchanges and losses. Effects retain readable sizes at fleet zoom; sinking ships visibly list before descending. Trajectories illustrate aggregate exchanges; they do not claim a shell-by-shell combat simulation.
+
+The window remains resizable and maximizable, with a default/minimum 1800×1000 client area. The offline policy and external editable ship models remain in place. See [current verification evidence](SYSTEMS-CHECK.md).
+
 ## Native migration — 0.39.0-dev
 
 This development version replaces the voxel/WebGL renderer with Unreal terrain, water, lighting, camera and ship rendering. **The realistic asset conversion is unfinished:** only five detailed GLB models are registered. Most campaign classes and all port scenery still await detailed artwork and appear as explicitly labeled navigation symbols. The 179 old JSON recognition meshes remain reference files and are not used as live ship graphics. This version must not be presented as a completed realistic fleet or a World of Warships-quality conversion.

@@ -6,6 +6,7 @@ import { campaignMinutes } from "./campaign-clock.mjs";
 import { contentFor } from "./campaign-content.mjs";
 import { noticeReceipt, activeDispatch } from "./alert-lifecycle.mjs";
 import { contactAlerts } from "./contact-alerts.mjs";
+import { constrainBattleSpeed } from './battle-pacing.mjs';
 import { commissionDraft } from "./designer.mjs";
 import { commissionAircraft } from "./aircraft-designer.mjs";
 import {
@@ -44,6 +45,7 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
       )
         throw Error("Acknowledge or return to ministry from the dispatch before resuming.");
       s.paused = args.value ?? !s.paused;
+      constrainBattleSpeed(s);
       delete s.pauseReason;
       delete s.resumeAfterDecision;
       break;
@@ -51,6 +53,8 @@ export function applyCommand(s, bundle, { type, args = {} }, actor = s.player) {
       if (!SPEEDS.some(([v]) => v === args.value))
         throw Error("Unknown simulation speed.");
       s.speed = args.value;
+      constrainBattleSpeed(s);
+      if (s.speed !== args.value) return {receipt:'An ongoing decisive battle keeps time at Tactical 60×. Pause or watch it from its alert.'};
       break;
     case "battle-next":
     case "step": {

@@ -57,7 +57,7 @@ function sideLedger(frame, side, recorded) {
   return `<span>Total losses: ${lossText(total)}</span><small>${num(total.tons)} naval tons sunk · surviving damaged ships: ${num(total.damaged)} hulls · ${num(total.damagedTons)} equivalent tons</small>${recorded ? `<small>Net loss change this tick: ${lossChangeText(delta)}</small><small>Surviving damage change: ${signed(delta.damaged)} hulls · ${signed(delta.damagedTons)} equivalent tons. This can fall when damaged ships sink.</small>` : ''}<small>${num(total.sailorsRescued)} sailors / ${num(total.aviatorsRescued)} aviators rescued · ${num(total.planesRescued)} aircraft salvaged</small>`;
 }
 
-export function battleWatchView(report, campaign, { frameIndex = null, selected = null, busy = false } = {}) {
+export function battleWatchView(report, campaign, { frameIndex = null, selected = null, busy = false, paused = true } = {}) {
   const { frame, index, count, recorded } = watchFrame(report, frameIndex);
   const atEdge = index >= count - 1;
   const canAdvance = recorded && (index < count - 1 || report.status === 'ongoing');
@@ -67,8 +67,9 @@ export function battleWatchView(report, campaign, { frameIndex = null, selected 
   const sunk = selectedGroup && hull >= selectedGroup.count - (selectedGroup.sunk || 0);
   return `<section class="battle-watch" data-report="${report.id}">
     <div class="battle-watch-scene">
-    <div class="battle-watch-heading"><div><span class="eyebrow">${atEdge && report.status === 'ongoing' ? 'LIVE · CAMPAIGN PAUSED' : recorded ? 'RECORDED BATTLE' : 'SUMMARY ONLY'}</span><h3>${esc(frame.label)}${frame.stage === 3 && !/\bround\s+\d/i.test(frame.label || '') ? ' · round ' + num(frame.round) : ''}</h3></div><strong>+${num(Math.max(0, frame.at - report.startedAt))} min${count ? ` · ${index + 1} / ${count}` : ''}</strong></div>
+    <div class="battle-watch-heading"><div><span class="eyebrow">${atEdge && report.status === 'ongoing' ? paused ? 'LIVE · CAMPAIGN PAUSED' : 'LIVE · TACTICAL 60×' : recorded ? 'RECORDED BATTLE' : 'SUMMARY ONLY'}</span><h3>${esc(frame.label)}${frame.stage === 3 && !/\bround\s+\d/i.test(frame.label || '') ? ' · round ' + num(frame.round) : ''}</h3></div><strong>+${num(Math.max(0, frame.at - report.startedAt))} min${count ? ` · ${index + 1} / ${count}` : ''}</strong></div>
     <div class="battle-watch-controls">
+      ${recorded && atEdge && report.status === 'ongoing' ? `<button class="primary" data-action="battle-play" ${busy ? 'disabled' : ''}>${paused ? 'Play battle · 60×' : 'Pause battle'}</button>` : ''}
       <button data-action="battle-first" ${!recorded || index === 0 || busy ? 'disabled' : ''}>↤ Start</button>
       <button data-action="battle-previous" ${!recorded || index === 0 || busy ? 'disabled' : ''}>Previous</button>
       <button class="primary" data-action="battle-next" ${!canAdvance || busy ? 'disabled' : ''}>${busy ? 'Advancing…' : atEdge && report.status === 'ongoing' ? 'Next tick · 15 min' : 'Next recorded tick →'}</button>
@@ -76,12 +77,12 @@ export function battleWatchView(report, campaign, { frameIndex = null, selected 
       <button data-action="battle-fit">Fit fleets</button>
       <button data-action="battle-report" data-id="${report.id}">Full report</button>
     </div>
-    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Click a ship to inspect its recorded condition; scroll to zoom, drag to pan, right-drag or Shift-drag to orbit."></canvas></div>
-    <div class="battle-watch-legend"><span>Wheel: zoom · Drag: pan · Right / Shift-drag: orbit · Click: inspect</span><span>Illustrated formations · recorded losses</span></div>
+    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Left-click a ship to inspect its recorded condition; wheel to zoom, right-drag to pan, middle-drag or Shift plus right-drag to orbit."></canvas></div>
+    <div class="battle-watch-legend"><span>Wheel: zoom · Right-drag: pan · Middle / Shift+right-drag: orbit · Left-click: inspect</span><span>Illustrated formations and salvos · recorded damage and losses</span></div>
     </div>
     <aside class="battle-watch-information" data-scroll-key="battle-information" aria-label="Battle details, losses and ship roster">
     <p class="battle-qualification">${esc(report.decisive?.reason || 'Recorded naval action.')}</p>
-    <p class="battle-watch-note">${recorded ? 'Next tick at the live edge advances the whole campaign by 15 minutes. Closing leaves the campaign paused.' : 'This older action has no retained tick recording; only its confirmed outcome is shown.'} ${report.replay?.truncated ? 'Some intermediate frames are no longer retained.' : ''}</p>
+    <p class="battle-watch-note">${recorded ? 'Play battle advances the whole campaign at Tactical 60×: one complete 15-minute tick every 15 real seconds. Next tick advances once and pauses. Closing leaves the campaign paused. Salvo paths illustrate aggregate exchanges; hits and sinking follow recorded condition changes.' : 'This older action has no retained tick recording; only its confirmed outcome is shown.'} ${report.replay?.truncated ? 'Some intermediate frames are no longer retained; effects are omitted across those gaps.' : ''}</p>
     <p class="panel-note battle-art-legend">${NATIVE_ART_LEGEND}</p>
     <div class="battle-side-ledger">${['A','B'].map(side => `<div><strong style="color:${PROFILES[report[side === 'A' ? 'a' : 'b']]?.color}">${esc(PROFILES[report[side === 'A' ? 'a' : 'b']]?.name)}</strong>${sideLedger(frame,side,recorded)}</div>`).join('')}</div>
     ${selectedGroup ? `<section class="battle-ship-inspection"><div><span class="eyebrow">${esc(TYPES[selectedGroup.type] || selectedGroup.type)} · ${selected.side === 'A' ? esc(PROFILES[report.a]?.name) : esc(PROFILES[report.b]?.name)}</span><h3>${esc(selectedGroup.name)}${selectedGroup.count > 1 ? ' · hull ' + (hull + 1) + ' / ' + selectedGroup.count : ''}</h3></div><strong class="${sunk ? 'sunk' : ''}">${sunk ? 'SUNK' : num((1 - selectedGroup.health) * 100) + '% damage'}</strong>${nativeArtNotice(selected)}${selectedGroup.count > 1 ? `<p>Condition is shared by this ship group. ${num(selectedGroup.count - selectedGroup.sunk)} hulls remain afloat.</p><div><button data-action="battle-hull-previous" ${hull === 0 ? 'disabled' : ''}>Previous hull</button><button data-action="battle-hull-next" ${hull >= selectedGroup.count - 1 ? 'disabled' : ''}>Next hull</button></div>` : ''}</section>` : '<p class="panel-note">Select a ship or navigation symbol in the scene, or a name in the roster, to inspect its condition at this recorded tick.</p>'}

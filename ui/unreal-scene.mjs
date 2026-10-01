@@ -2,6 +2,7 @@ import { ownFormationScene } from './fleet-formation.mjs';
 import { buildUnrealScenePacket } from './unreal-scene-packet.mjs';
 import { chartPosition } from './map-focus.mjs';
 import { watchFrame, battleInstances } from './battle-watch.mjs';
+import { battleVisualEvents } from './battle-events.mjs';
 
 export const UNREAL_MODE = globalThis.location?.search != null && new URLSearchParams(globalThis.location.search).get('unreal') === '1';
 const scenes = new Map();
@@ -58,11 +59,23 @@ class NativeScene {
     this.hoverSequence = 0; this.hoverRequestId = null;
   }
   input(action, values = {}) {
-    if (['zoom','pan','tilt','home','focus'].includes(action) && this.hoverRequestId != null) this.dismissHover();
+    if (['zoom','pan','tilt','home','focus','fit-force'].includes(action) && this.hoverRequestId != null) this.dismissHover();
     return send('sceneinput', {instanceId:this.instanceId, action, ...values});
   }
   cancelHover() { clearTimeout(this.hoverTimer); this.hoverTimer = null; this.pendingHover = null; this.hoverRequestId = null; }
   dismissHover() { this.cancelHover(); this.onHover(null, {immediate:true}); }
+  clearSelectionBox() { this.selectionBox?.remove(); this.selectionBox = null; }
+  drawSelectionBox(d) {
+    if (!this.selectionBox) {
+      this.selectionBox = document.createElement('div');
+      this.selectionBox.className = 'native-selection-box';
+      Object.assign(this.selectionBox.style, {position:'fixed',pointerEvents:'none',zIndex:45,
+        border:'1px solid #c1dfdc',background:'rgba(113,182,174,.16)',boxSizing:'border-box'});
+      document.body.prepend(this.selectionBox);
+    }
+    Object.assign(this.selectionBox.style, {left:Math.min(d.startX,d.x)+'px',top:Math.min(d.startY,d.y)+'px',
+      width:Math.abs(d.x-d.startX)+'px',height:Math.abs(d.y-d.startY)+'px'});
+  }
   receiveHover(event) {
     // Native picking crosses the CEF bridge asynchronously. Camera movement or
     // a newer pointer location invalidates the old request before its reply.
@@ -72,12 +85,13 @@ class NativeScene {
   attach(canvas) {
     if (this.canvas === canvas) return;
     this.cancelHover();
-    this.drag = null;
+    this.drag = null; this.clearSelectionBox();
     this.events?.abort(); this.resize?.disconnect();
     this.canvas = canvas; this.events = new AbortController();
     const options = {signal:this.events.signal};
     canvas.classList.add('unreal-input');
     const point = event => ({x:clamp(event.clientX / innerWidth, 0, 1), y:clamp(event.clientY / innerHeight, 0, 1)});
+    const pickPoint = event => ({...point(event),radiusX:10 / innerWidth,radiusY:10 / innerHeight});
     canvas.addEventListener('contextmenu', event => event.preventDefault(), options);
     canvas.addEventListener('wheel', event => {
       event.preventDefault(); this.activate(); canvas.focus({preventScroll:true});
@@ -89,7 +103,7 @@ class NativeScene {
       this.dismissHover();
       this.activate(); canvas.focus({preventScroll:true}); canvas.setPointerCapture(event.pointerId);
       this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false,
-        pick:event.button === 0, tilt:this.mode === 'battle' && (event.button === 2 || event.shiftKey)};
+        pick:event.button === 0, tilt:this.mode === 'battle' && (event.button === 1 || (event.button === 2 && event.shiftKey))};
     }, options);
     canvas.addEventListener('pointermove', event => {
       if (this.drag) {
@@ -97,12 +111,13 @@ class NativeScene {
         const previousX = d.x / innerWidth, previousY = d.y / innerHeight;
         d.moved ||= Math.hypot(event.clientX - d.startX, event.clientY - d.startY) > 4;
         d.x = event.clientX; d.y = event.clientY;
-        if (d.moved) this.input(d.tilt ? 'tilt' : 'pan', {dx, dy, previousX, previousY, ...point(event)});
+        if (d.moved && d.pick) { if (this.mode === 'world') this.drawSelectionBox(d); }
+        else if (d.moved) this.input(d.tilt ? 'tilt' : 'pan', {dx, dy, previousX, previousY, ...point(event)});
       } else {
         // Keep the last pointer position even when movement stops within the
         // rate limit; dropping that event leaves the hovered ship stale.
         this.hoverRequestId = ++this.hoverSequence;
-        this.pendingHover = {...point(event),requestId:this.hoverRequestId};
+        this.pendingHover = {...pickPoint(event),requestId:this.hoverRequestId};
         if (this.hoverTimer == null) this.hoverTimer = setTimeout(() => {
           this.hoverTimer = null; this.lastHover = performance.now();
           const position = this.pendingHover; this.pendingHover = null;
@@ -111,12 +126,15 @@ class NativeScene {
       }
     }, options);
     canvas.addEventListener('pointerup', event => {
-      if (this.drag?.pick && !this.drag.moved && !this.drag.tilt) this.input('pick', point(event));
-      this.drag = null;
+      const d = this.drag;
+      if (d?.pick && !d.moved) this.input('pick', pickPoint(event));
+      else if (d?.pick && this.mode === 'world') this.input('selectBox', {
+        x0:clamp(d.startX/innerWidth,0,1),y0:clamp(d.startY/innerHeight,0,1),...point(event)});
+      this.drag = null; this.clearSelectionBox();
       if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     }, options);
-    canvas.addEventListener('pointercancel', () => { this.drag = null; this.dismissHover(); }, options);
-    canvas.addEventListener('dblclick', event => this.input('pick', {...point(event),zoom:true}), options);
+    canvas.addEventListener('pointercancel', () => { this.drag = null; this.clearSelectionBox(); this.dismissHover(); }, options);
+    canvas.addEventListener('dblclick', event => {if (event.button === 0) this.input('pick', {...pickPoint(event),zoom:true});}, options);
     canvas.addEventListener('pointerleave', () => {this.cancelHover(); if (!this.drag) this.onHover(null);}, options);
     canvas.addEventListener('keydown', event => {
       if (['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
@@ -161,7 +179,7 @@ class NativeScene {
   }
   suspend() {
     if (activeScene !== this) return;
-    this.dismissHover();
+    this.dismissHover(); this.drag = null; this.clearSelectionBox();
     activeScene = null;
     if (this.mask) this.mask.hidden = true;
     send('viewport', {instanceId:this.instanceId,mode:'hidden',x:0,y:0,width:1,height:1});
@@ -169,7 +187,7 @@ class NativeScene {
   }
   clear() {
     this.cancelHover();
-    this.drag = null;
+    this.drag = null; this.clearSelectionBox();
     this.suspend(); this.events?.abort(); this.resize?.disconnect();
     this.mask?.remove(); this.mask = null;
     this.canvas = null; this.report = null; this.frame = null; this.hits = [];
@@ -212,14 +230,14 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Scroll to zoom; left, middle or right drag to pan. The camera tilts automatically only at close ship inspection. Home restores the overhead strategic view.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Scroll to zoom. The camera tilts automatically only at close ship inspection. Home restores the overhead strategic view.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
   }
   viewportRect() {
     const bounds = this.canvas.getBoundingClientRect(), sidebar = this.root.querySelector('.sidebar')?.getBoundingClientRect();
-    const panel = this.root.querySelector('.command-side-panel')?.getBoundingClientRect(), workspace = this.root.querySelector('.workspace')?.getBoundingClientRect();
+    const panel = this.root.querySelector('.command-side-panel')?.getBoundingClientRect(), workspace = this.root.querySelector('.command-workspace')?.getBoundingClientRect();
     const left = Math.max(bounds.left + 12, (sidebar?.right || 0) + 12), top = Math.max(bounds.top + 12, (workspace?.top || 0) + 8);
     const right = panel && panel.width < bounds.width * .5 ? panel.left - 12 : bounds.right - 12;
     return {left, top, width:Math.max(120, right - left), height:Math.max(120, bounds.bottom - top - 48)};
@@ -235,14 +253,18 @@ export class UnrealWorldScene extends NativeScene {
   }
   focus(kind, id, {zoom = false} = {}) {
     const point = chartPosition(this.state, this.political, kind, id); if (!point) return;
-    this.activate(); this.input('focus', {kind,id,longitude:point[0],latitude:point[1],zoom:zoom ? 12000 : Math.max(4, this.zoom)});
+    this.activate(); this.input(zoom && kind === 'fleet' ? 'fit-force' : 'focus', {kind,id,longitude:point[0],latitude:point[1],zoom:Math.max(4, this.zoom)});
   }
   reloadModels() { /* Native meshes reload from external files on subsequent scene packets. */ }
 }
 
 export function unrealBattlePacket(report, campaign, frameIndex, selected, animate = true) {
   const {frame, index} = watchFrame(report, frameIndex);
+  const durationSeconds = String(report.id).startsWith('title-demo-') ? 3.6 : 15;
+  const timeScale = durationSeconds / 15;
   return {format:1,campaign,id:String(report.id),at:frame.at,index,animate,
+    eventKey:`${report.id}:${frame.at}:${index}`,durationSeconds,
+    events:battleVisualEvents(report,frame,index).map(event => ({...event,time:event.time*timeScale,duration:event.duration*timeScale})),
     units:battleInstances(frame, report.startedAt).map(unit => ({key:unit.key,id:unit.id,side:unit.side,hullIndex:unit.hullIndex,
       classId:unit.classId,type:unit.type,label:unit.name,
       positionMetres:unit.positionMetres,
@@ -252,16 +274,17 @@ export function unrealBattlePacket(report, campaign, frameIndex, selected, anima
 
 export class UnrealBattleScene extends NativeScene {
   constructor(options) {super(options); this.mode = 'battle';}
-  refresh(report, campaign, frameIndex = null, selected = null) {
+  refresh(report, campaign, frameIndex = null, selected = null, animationEnabled = true) {
     const canvas = this.root.querySelector('.battle-canvas');
     if (!canvas || !report) {this.clear(); return;}
     const current = watchFrame(report, frameIndex);
-    const changed = this.report?.id !== report.id || this.frameIndex !== current.index || this.frame?.at !== current.frame.at || this.selected !== selected;
-    Object.assign(this, {report,campaign,frame:current.frame,frameIndex:current.index,selected});
+    const animate = animationEnabled && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const changed = this.report?.id !== report.id || this.frameIndex !== current.index || this.frame?.at !== current.frame.at || this.selected !== selected || this.animate !== animate;
+    Object.assign(this, {report,campaign,frame:current.frame,frameIndex:current.index,selected,animate});
     this.attach(canvas); this.activate();
     if (changed) {
       this.started = performance.now();
-      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,!matchMedia('(prefers-reduced-motion: reduce)').matches));
+      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,animate));
     }
     this.view = {native:true};
     // Callers that fit a newly selected model must wait for the native packet:

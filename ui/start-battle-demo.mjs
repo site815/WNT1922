@@ -64,6 +64,11 @@ export class StartBattleDemo {
     if (!this.active) return;
     const playing = this.canPlay(), changed = playing !== this.playing;
     this.playing = playing;
+    // Native effects have their own clock; cancelling the JS stage timer alone
+    // cannot pause them. Paused/hidden/reduced-motion frames settle immediately.
+    // Their stable frame key prevents old effects replaying when play resumes.
+    if (changed && this.scene?.frame)
+      this.scene.refresh(this.report, CAMPAIGN, this.frameIndex, this.selected, playing);
     const el = this.host.querySelector('.start-demo');
     if (el) el.dataset.demoPlaying = String(playing);
     const toggle = this.host.querySelector('[data-demo-action="toggle"]');
@@ -123,7 +128,7 @@ export class StartBattleDemo {
     const chosen = this.selected && frame['groups' + this.selected.side].find(s => s.id === this.selected.id);
     updateDOM(this.host, `<div class="start-demo" data-demo-battle="${battle.id}" data-demo-frame="${this.frameIndex}" data-demo-frames="${battle.stages.length}" data-demo-playing="${this.canPlay()}" data-demo-ready="${this.ready}">
       <header class="start-demo-heading"><div><span class="start-demo-eyebrow">Famous naval battles · ${this.battleIndex + 1} / ${DEMO_BATTLES.length}</span><h2>${esc(battle.title)}</h2><p>${esc(battle.date)} <span>· ${esc(battle.subtitle)}</span></p></div><div class="start-demo-navigation"><button data-demo-action="previous-battle" aria-label="Previous battle">←</button><button data-demo-action="next-battle" aria-label="Next battle">→</button></div></header>
-      <div class="start-demo-stage" data-key="demo-stage" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="Interactive 3D naval battle. Click a ship to inspect it; scroll to zoom, drag to pan, right-drag or Shift-drag to orbit."></canvas><span class="start-demo-canvas-label">3D battle viewer · right-drag to orbit</span></div>
+      <div class="start-demo-stage" data-key="demo-stage" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="Interactive 3D naval battle. Click a ship to inspect it; scroll to zoom, right-drag to pan, middle or Shift-right-drag to orbit."></canvas><span class="start-demo-canvas-label">3D battle viewer · right-drag to pan · middle-drag to orbit</span></div>
       <div class="start-demo-toolbar"><div><button data-demo-action="toggle">${this.paused ? 'Play demo' : 'Pause demo'}</button><button data-demo-action="next">Next stage →</button><button data-demo-action="fit">Fit ships</button></div><span>Stage ${this.frameIndex + 1} / ${battle.stages.length}</span></div>
       <div class="start-demo-information" data-scroll-key="start-demo-information" aria-label="Battle stage, ships and historical information">
       <div class="start-demo-phase"><strong>${esc(stage.label)}</strong><p>${esc(stage.note)}</p></div>
@@ -134,7 +139,7 @@ export class StartBattleDemo {
       </div>
     </div>`);
     const changedBattle = this.scene.report?.id !== this.report.id;
-    this.scene.refresh(this.report, CAMPAIGN, this.frameIndex, this.selected);
+    this.scene.refresh(this.report, CAMPAIGN, this.frameIndex, this.selected, this.canPlay());
     if (changedBattle) {this.scene.zoom = 1.25; this.scene.draw(performance.now());}
     this.syncPlayback();
   }

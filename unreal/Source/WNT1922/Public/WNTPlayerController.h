@@ -78,6 +78,8 @@ private:
     void AnchorPoint(const FVector& Point, const FVector2D& Pointer);
     void Input(const TSharedPtr<FJsonObject>& Packet);
     void Pick(const TSharedPtr<FJsonObject>& Packet, bool bHover);
+    FBox2D PickBounds(AActor* Actor) const;
+    void SelectBox(const TSharedPtr<FJsonObject>& Packet);
     void FitBattle();
     void AutomationRequest(const TSharedPtr<FJsonObject>& Packet);
     void RequestClose(const TSharedRef<SWindow>& RequestedWindow);

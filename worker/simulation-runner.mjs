@@ -1,5 +1,6 @@
 import { advanceMinutes, BASE_SPEED } from "../mechanics/engine.mjs";
 import { campaignMinutes, TICK_MINUTES } from "../mechanics/campaign-clock.mjs";
+import { constrainBattleSpeed } from '../mechanics/battle-pacing.mjs';
 // Simulation work runs off the rendering thread. Requested wall time is a speed
 // ceiling, not an unbounded catch-up queue. Every fifteen-minute simulation step runs.
 export class SimulationRunner {
@@ -17,6 +18,9 @@ export class SimulationRunner {
     this.observedSpeed = null;
   }
   replace(state) {
+    // Loading a running test session or replacing state after a command may
+    // clamp the rate, but never creates a second contact pause.
+    if (state) constrainBattleSpeed(state);
     this.state = state;
     this.credit = 0;
     this.last = this.now();

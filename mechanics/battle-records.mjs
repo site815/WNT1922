@@ -47,7 +47,7 @@ export const shipInEngagement = (s, nation, group) => !!group.battleId ||
   [...(s.reports || []), ...(s.backgroundEngagements || [])].some(r => r.status === 'ongoing' &&
     [[r.a, r.resultA], [r.b, r.resultB]].some(([id, result]) => id === nation && result.conditions.some(row => row.id === group.id)));
 
-export function recordBattleFrame(s, r, label) {
+export function recordBattleFrame(s, r, label, exchange = null) {
   if (!r.replay || r.replay.archived) return; // Missing chronology is never reconstructed.
   const at = campaignMinutes(s), frames = r.replay.frames, previous = frames.at(-1);
   if (previous?.at === at && previous.status === r.status && previous.stage === r.stage && previous.round === r.round) return;
@@ -55,6 +55,10 @@ export function recordBattleFrame(s, r, label) {
   const frame = { at, stage: r.stage, round: r.round, label, status: r.status,
     merchantHulls: r.merchantHulls || r.airOperation?.merchantHulls || 0,
     merchantGRT: r.merchantGRT || r.airOperation?.merchantGRT || 0, portDamage: r.portDamage || 0 };
+  // This records a resolved exchange, not an inferred attack on every combat
+  // stage tick. Exact shell trajectories and individual attackers are not
+  // simulated; the viewer illustrates this aggregate event explicitly.
+  if (exchange) frame.exchange = {kind:exchange.kind,sides:[...exchange.sides]};
   for (const [side, nation] of [['A', r.a], ['B', r.b]]) {
     const current = new Map(s.nations[nation].groups.map(g => [g.id, g]));
     frame['groups' + side] = r['result' + side].conditions.map(row => {

@@ -5,6 +5,7 @@ import { fleetPosition, convoyCoverage, fleetStatus, MISSIONS } from '../mechani
 import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { mapHover } from './inspection-view.mjs';
 import { linePath } from './projection.mjs';
+import { ongoingMapBattles } from './battle-map.mjs';
 const esc = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -70,18 +71,22 @@ export function commandView(s, content, ui = {}) {
   const coverage = uiModel(s)?.escortCoverage || convoyCoverage(s, content);
   const selectedKey = ui.mode || "commands",
     columns = 1;
+  const selectedFleets = new Set(ui.fleetIds || (ui.fleetId ? [ui.fleetId] : []));
+  const battles = ongoingMapBattles(s);
+  const battleList = battles.length ? '<div class="command-battles" aria-label="Your ongoing battles">' + battles.map(battle =>
+    `<button data-action="watch-battle" data-id="${esc(battle.id)}" data-map-hover="battle:${esc(battle.id)}"><strong>Watch battle</strong><span>${esc(battle.label)}</span><progress max="1" value="${battle.stageProgress || 0}" aria-label="Current battle stage progress"></progress><small>${Math.round((battle.stageProgress || 0) * 100)}% of current stage</small></button>`).join('') + '</div>' : '';
   const fleetList =
     '<div class="panel-title"><h2>Naval commands</h2><span>' +
     fleets.length +
-    ' forces</span></div><div class="fleet-command-list" data-scroll-key="naval-commands">' +
+    ' forces' + (selectedFleets.size > 1 ? ' · ' + selectedFleets.size + ' selected' : '') + '</span></div>' + battleList + '<div class="fleet-command-list" data-scroll-key="naval-commands">' +
     fleets
       .map(({ f: ship, stats: st }) => {
         return (
           '<article class="fleet-command-row ' +
-          (ship.id === ui.fleetId ? "selected" : "") +
+          (selectedFleets.has(ship.id) ? "selected" : "") +
           '" data-action="focus-fleet" data-id="' +
           ship.id +
-          '" aria-current="'+(ship.id === ui.fleetId ? "true" : "false")+'" tabindex="0" role="button"><div data-fleet-hover="' +
+          '" aria-current="'+(selectedFleets.has(ship.id) ? "true" : "false")+'" tabindex="0" role="button" title="Select this fleet; double-click or press Enter to center and fit its ships"><div data-fleet-hover="' +
           ship.id +
           '" data-hover-mode="readiness"><strong>' +
           esc(ship.name) +
@@ -96,9 +101,9 @@ export function commandView(s, content, ui = {}) {
       .join("") +
     "</div>";
   const merchantPanel = convoy ? `<section class="merchant-inspection" data-convoy-id="${esc(convoy.id)}" data-hull-index="${ui.merchantHullIndex ?? ''}"><button data-action="map-overview">Naval commands</button>${Number.isInteger(ui.merchantHullIndex) ? `<p>Merchant hull ${Math.min(convoy.count,ui.merchantHullIndex + 1)} of ${convoy.count}</p>` : ''}${mapHover(s,content,'convoy:'+convoy.id)}<p class="panel-note">Representative freighter geometry. Hull identities and spacing are for inspection; the simulation records the convoy's shared voyage and surviving count.</p></section>` : '';
-  const panel = ui.sidePanel || merchantPanel || fleetList;
+  const panel = ui.sidePanel || merchantPanel + fleetList;
   const legend =
-    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · drag to pan · the camera tilts automatically only when inspecting individual ships · double-click a force for ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
+    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · right/middle drag to pan · left drag to select fleets · the camera tilts automatically only when inspecting individual ships · double-click a force for ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
     PROFILES[s.player].color +
     '">▲ Fleet</span><span style="color:' +
     PROFILES[s.player].color +
@@ -121,7 +126,7 @@ export function commandView(s, content, ui = {}) {
     "</span>" +
     '<a href="/third-party-notices.html" target="_blank" rel="noreferrer">Map credits</a>' +
     "</div>";
-  const map = '<section class="world-board panel" ' +
+  const map = '<section class="world-board panel" data-key="command-world" ' +
     (ui.backgroundOnly ? 'aria-hidden="true" inert' : 'aria-label="Native 3D world naval chart"') +
     '><div class="map-stage"><div class="native-world-surface" data-key="native-world-surface" data-preserve="true"></div></div>' + legend + '</section>';
   const panelLayer = '<section class="panel command-side-panel" data-key="command-selection-' +

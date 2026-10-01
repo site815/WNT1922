@@ -129,7 +129,7 @@ test('minor combat preserves real staged losses, repairs and war accounting with
 
 test('watch records observed 15-minute conditions and exact loss deltas through completion and survives save/load', () => {
   const [s, c] = start(), r = engage(s, c), before = campaignMinutes(s);
-  assert.equal(r.decisive.qualifies, true); assert.equal(s.paused, false, 'Contact does not auto-pause');
+  assert.equal(r.decisive.qualifies, true); assert.equal(s.paused, true, 'Own decisive contact pauses for the optional Watch alert');
   assert.equal(r.replay.frames.length, 1);
   const initial = structuredClone(r.replay.frames[0]);
   finish(s, c, r);

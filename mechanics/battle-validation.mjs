@@ -36,6 +36,9 @@ export function validateBattleRecords(s, c) {
         || !Number.isInteger(f.round) || !number(f.round, 1, 5) || !text(f.label, 200)
         || !['ongoing', 'completed'].includes(f.status) || !['merchantHulls', 'merchantGRT', 'portDamage'].every(k => number(f[k]))) fail();
       previousAt = f.at;
+      if (f.exchange !== undefined && (!plain(f.exchange) || !['surface','port','air','convoy'].includes(f.exchange.kind)
+        || !Array.isArray(f.exchange.sides) || f.exchange.sides.length > 2
+        || new Set(f.exchange.sides).size !== f.exchange.sides.length || f.exchange.sides.some(side => !['A','B'].includes(side)))) fail();
       for (const [side, nation] of [['A', r.a], ['B', r.b]]) {
         const groups = f['groups' + side];
         if (!Array.isArray(groups) || groups.length > 10000) fail();

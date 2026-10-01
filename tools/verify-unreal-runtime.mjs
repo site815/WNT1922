@@ -141,7 +141,7 @@ async function worldReady() {
 }
 async function clearPoint() {
  return page.evaluate(()=>{
-  const side=document.querySelector('.sidebar').getBoundingClientRect(),panel=document.querySelector('.command-side-panel').getBoundingClientRect(),work=document.querySelector('.workspace').getBoundingClientRect();
+  const side=document.querySelector('.sidebar').getBoundingClientRect(),panel=document.querySelector('.command-side-panel').getBoundingClientRect(),work=document.querySelector('.command-workspace').getBoundingClientRect();
   const x=(side.right+panel.left)/2,y=(work.top+innerHeight-70)/2;
   if(!document.elementFromPoint(x,y)?.matches('.native-world-input'))throw Error('Clear native input surface unavailable');
   return{x,y};
@@ -239,8 +239,51 @@ try {
  assert.equal(d.pendingModelCount,0,'Every starting campaign ship and opening-demo combatant must have a registered detailed model');
  result.checks.push('USA1936 starts paused; every own hull retains its identity and position, with pending artwork counted separately from detailed models and loading errors.');
 
+ phase='persistent command map and ministry menus';
+ await page.evaluate(()=>{globalThis.__runtimeWorldCanvas=document.querySelector('.native-world-input');globalThis.__runtimeOutliner=document.querySelector('.command-side-panel');});
+ const cameraFields=d=>({instanceId:d.instanceId,zoom:d.zoom,longitude:d.longitude,latitude:d.latitude,tilt:d.tilt});
+ const menuBaseline=await diagnostics('world'),menuGeometry=await page.locator('.command-side-panel').boundingBox();
+ for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports','review']) {
+  await page.locator('.nav-item[data-view="'+menu+'"]').click();await page.locator('.menu-popup.view-'+menu).waitFor();
+  const menuNative=await diagnostics('world');
+  assert.deepEqual(cameraFields(menuNative),cameraFields(menuBaseline),'Opening '+menu+' preserves native scene and camera');
+  assert.equal(menuNative.shipActorCount,menuBaseline.shipActorCount,'Opening menus preserves loaded ship actors');
+  assert.equal(menuNative.terrainTileCount,menuBaseline.terrainTileCount,'Opening menus preserves loaded terrain');
+  assert.deepEqual(await page.locator('.command-side-panel').boundingBox(),menuGeometry,'Naval outliner stays fixed');
+  assert(await page.evaluate(()=>__runtimeWorldCanvas===document.querySelector('.native-world-input')&&__runtimeOutliner===document.querySelector('.command-side-panel')),'Map and outliner DOM nodes persist');
+ }
+ await nativeCapture('native-ministry-popup',true);
+ await page.keyboard.press('Escape');assert.equal(await page.locator('.menu-popup').count(),0);
+ result.checks.push('Menus 02–11 preserve the native world instance, camera, loaded terrain/ship actors and naval outliner; Escape restores the unobstructed command map.');
+
  phase='world camera and hull picking';
+ const selectedBefore=await diagnostics('world');
  await page.locator('.fleet-command-row').first().click();
+ assert.deepEqual(cameraFields(await diagnostics('world')),cameraFields(selectedBefore),'Single outliner click selects without moving the camera');
+ const fittedRow=page.locator('.fleet-command-row').first(),fittedId=await fittedRow.getAttribute('data-id');
+ assert(packet.forces.some(force=>force.id===fittedId&&!force.merchant));
+ await fittedRow.dblclick();
+ const fitted=await until(()=>diagnostics('world'),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.001&&d.visibleShipCount>0,{label:'real double-click fleet fit'});
+ assert.equal(fitted.tilt,0,'Fleet fit remains overhead');
+ assert(fitted.detailedModelCount>0,'Fleet fit has resident detailed ship geometry');
+ assert.equal(await fittedRow.getAttribute('aria-current'),'true');
+ assert((await targets('ship')).length>0,'A fitted own ship is visible and pickable');
+ const boxTarget=await until(async()=>{
+  const rows=await targets('ship');
+  return page.evaluate(rows=>rows.find(t=>[-9,9].every(dx=>[-9,9].every(dy=>document.elementFromPoint(t.x+dx,t.y+dy)?.matches('.native-world-input')))),rows);
+ },Boolean,{label:'visible own hull with room for a selection box'});
+ const boxForce=packet.forces.find(force=>!force.merchant&&force.hulls.some(h=>h.id===boxTarget.id));assert(boxForce);
+ const boxState=await save(),boxCamera=await diagnostics('world'),boxCursor=await cursor();
+ await page.mouse.move(boxTarget.x-9,boxTarget.y-9);await page.mouse.down({button:'left'});await page.mouse.move(boxTarget.x+9,boxTarget.y+9,{steps:5});await page.mouse.up({button:'left'});
+ const boxEvents=await until(()=>eventsSince(boxCursor),rows=>rows.some(row=>row.event.type==='select'&&row.event.selection?.kind==='fleet-group'),{label:'real left-drag group selection'});
+ const boxSelection=boxEvents.find(row=>row.event.type==='select'&&row.event.selection?.kind==='fleet-group').event.selection;
+ assert(boxSelection.ids.includes(boxForce.id),'Box selects the fleet containing the enclosed own hull');
+ assert(boxSelection.ids.every(id=>packet.forces.some(force=>!force.merchant&&force.id===id)),'Box selection exposes only own fleets');
+ assert.deepEqual(cameraFields(await diagnostics('world')),cameraFields(boxCamera),'Left box selection does not move the camera');
+ const boxAfter=await save();assert.equal(campaignMinutes(boxAfter),campaignMinutes(boxState));assert.equal(boxAfter.minuteTicks,boxState.minuteTicks);
+ assert.deepEqual(boxAfter.nations.USA.fleets,boxState.nations.USA.fleets,'Selecting a box issues no movement or mission orders');
+ result.checks.push('Real outliner single click selects without centering, double click fits a visible detailed overhead fleet, and left-drag selects only enclosed own fleets without camera movement, orders or campaign time.');
+ await surface().focus();await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'Home after selection checks'});
  let before=await diagnostics('world');
  const point=await clearPoint();await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-300);
  await until(()=>diagnostics(),after=>after.zoom>before.zoom,{label:'real wheel zoom'});
