@@ -3,6 +3,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HAL/PlatformProcess.h"
 #include "Camera/CameraTypes.h"
+#include "WNTBattleCameraDirector.h"
 #include "WNTPlayerController.generated.h"
 class AWNTCameraActor;
 class AWNTWorldActor;
@@ -23,10 +24,22 @@ namespace WNTCameraMath
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
     WNT1922_API double MaxWorldTilt(double Zoom);
     WNT1922_API double WorldViewDistance();
+    constexpr double BattleOverviewTilt = 25.0;
+    constexpr double BattleOverviewYaw = 0.0;
+    constexpr double BattleFocusZoom = 3.0;
+    WNT1922_API double BattleFocusDistance(double Aspect);
+    WNT1922_API double BattleFitDistance(const FBox& Bounds, const FIntPoint& Pixels, const FVector4& ClearRect);
+    WNT1922_API double BattleMarkerPixels(double HullLength, double CameraDepth, double HorizontalFOV, const FIntPoint& Pixels);
     WNT1922_API double ConstrainWorldNorthing(const FMinimalViewInfo& View, const FVector4& ClearRect, double Northing);
     constexpr double MaxWorldZoom = 65536.0;
     constexpr double WorldOrbitZoom = 32768.0;
     constexpr double WorldEdgeMargin = .03;
+    // A physical wheel notch is normally 120 CSS pixels in CEF. Sixteen
+    // notches traverse the complete 2^16 strategic-to-hull range.
+    constexpr double WorldZoomPerPixel = 0.005776226504666211;
+    constexpr double BattleZoomPerPixel = .0015;
+    WNT1922_API double WheelZoom(double CurrentTarget, double Delta, bool bBattle);
+    WNT1922_API double SmoothZoom(double Current, double Target, double DeltaSeconds);
     WNT1922_API bool CanOrbitWorld(double Zoom);
     struct WNT1922_API FWorldOrbit
     {
@@ -64,6 +77,10 @@ public:
     void Receive(const FString& Kind, const FString& Json);
     void CompleteClose(bool Saved);
 private:
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FWNTCameraNotificationTest;
+    TFunction<void(const TSharedPtr<FJsonObject>&)> AutomationEventObserver;
+#endif
     UPROPERTY() TObjectPtr<AWNTCameraActor> SceneCamera;
     UPROPERTY() TObjectPtr<AWNTWorldActor> WorldScene;
     UPROPERTY() TObjectPtr<UWNTBrowserBridge> Bridge;
@@ -89,9 +106,13 @@ private:
     double BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
     WNTCameraMath::FWorldOrbit WorldOrbit;
     WNTCameraMath::FFrameRateSampler FrameRate;
+    FWNTBattleCameraDirector BattleDirector;
+    double LastDirectorNotification = 0;
+    int32 CinematicCutCount = 0;
     TArray<double> FrameSamples;
     int32 FrameSampleCursor = 0;
     int32 LastAnchorIterations = 0;
+    int32 LastAnchorRebases = 0;
     bool bLastAnchorConstrained = false;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;
     bool bClosing = false, bHostFailed = false, bCameraDirty = true;

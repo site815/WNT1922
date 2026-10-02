@@ -17,6 +17,14 @@ namespace
     { FString Result; if(Object)Object->TryGetStringField(Field,Result);return Result; }
     double Number(const TSharedPtr<FJsonObject>& Object,const TCHAR* Field,double Fallback)
     { double Result;return Object&&Object->TryGetNumberField(Field,Result)&&FMath::IsFinite(Result)?Result:Fallback; }
+    TOptional<FVector> RecordedPosition(const TSharedPtr<FJsonObject>& Object,const TCHAR* Field)
+    {
+        const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
+        if(!Object||!Object->TryGetArrayField(Field,Values)||Values->Num()!=3)return {};
+        FVector Position;
+        for(int32 I=0;I<3;++I){double Coordinate;if(!(*Values)[I]->TryGetNumber(Coordinate)||!FMath::IsFinite(Coordinate)||FMath::Abs(Coordinate)>1e7)return {};Position[I]=Coordinate*100.;}
+        return Position;
+    }
     constexpr int32 Flash=0,Tracer=1,Smoke=2,Splash=3;
 }
 
@@ -45,6 +53,9 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
     StartedAt=Now-PausedElapsed;
     if(!bAnimate){StartedAt=Now-Duration;PausedElapsed=Duration;}
     Events.Reset();SinkTimes.Reset();TSet<FString> Identities;
+    bool Tactical=false;Packet->TryGetBoolField(TEXT("tactical"),Tactical);
+    TSet<FString> ShoreKeys;const TArray<TSharedPtr<FJsonValue>>* Batteries=nullptr;
+    if(Packet->TryGetArrayField(TEXT("shoreBatteries"),Batteries))for(const auto& Value:*Batteries)if(const auto Battery=Value->AsObject())ShoreKeys.Add(Text(Battery,TEXT("key")));
     const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
     if(Packet->TryGetArrayField(TEXT("events"),Values))for(const auto& Value:*Values)
     {
@@ -52,8 +63,15 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
         const auto Object=Value->AsObject();if(!Object)continue;
         FEvent Event{Text(Object,TEXT("key")),Text(Object,TEXT("type")),Text(Object,TEXT("sourceKey")),Text(Object,TEXT("targetKey")),Text(Object,TEXT("weapon")),
             Number(Object,TEXT("time"),-1),Number(Object,TEXT("duration"),-1)};
-        if(Event.Key.IsEmpty()||Event.Target.IsEmpty()||Identities.Contains(Event.Key)||Event.At<0||Event.Duration<=0
-            ||Event.At+Event.Duration>Duration+.001||(Event.Type!=TEXT("salvo")&&Event.Type!=TEXT("hit")&&Event.Type!=TEXT("sink")))continue;
+        const bool ContinuingProjectile=Tactical&&Event.Type==TEXT("salvo")&&Event.Duration<=21600&&Event.At>=-21600&&Event.At+Event.Duration>=0;
+        if(Event.Key.IsEmpty()||Event.Target.IsEmpty()||Identities.Contains(Event.Key)||(!ContinuingProjectile&&Event.At<0)||Event.At>Duration||Event.Duration<=0
+            ||(!ContinuingProjectile&&Event.At+Event.Duration>Duration+.001)||(Event.Type!=TEXT("salvo")&&Event.Type!=TEXT("hit")&&Event.Type!=TEXT("sink")))continue;
+        // A tactical miss is a salvo arriving in the sea, never a fabricated
+        // damage flash. The simulation alone supplies positive impact damage.
+        if(Tactical&&Event.Type==TEXT("hit")&&Number(Object,TEXT("damage"),0)<=0)continue;
+        if(Event.Type==TEXT("sink")&&ShoreKeys.Contains(Event.Target))continue;
+        Event.SourcePosition=RecordedPosition(Object,TEXT("sourcePositionMetres"));
+        Event.TargetPosition=RecordedPosition(Object,TEXT("targetPositionMetres"));
         Identities.Add(Event.Key);Events.Add(Event);
         if(Event.Type==TEXT("sink"))SinkTimes.Add(Event.Target,FVector2D(Event.At,Event.Duration));
     }
@@ -159,21 +177,21 @@ void FWNTBattleEffects::Update(AActor* Owner,const TMap<FString,FTransform>& Shi
     for(const auto& Event:Events)
     {
         const double Age=Elapsed-Event.At;if(Age<0||Age>Event.Duration)continue;
-        const auto* Target=Ships.Find(Event.Target);if(!Target)continue;
+        const auto* Target=Ships.Find(Event.Target);if(!Target&&!Event.TargetPosition.IsSet())continue;
         const double Alpha=FMath::Clamp(Age/Event.Duration,0.,1.);
-        const FVector Impact=Target->TransformPosition(Anchor(Event.Target,false));
+        const FVector Impact=Event.TargetPosition.IsSet()?Event.TargetPosition.GetValue():Target->TransformPosition(Anchor(Event.Target,false));
         if(Event.Type==TEXT("salvo"))
         {
             const auto* Source=Ships.Find(Event.Source);
-            const FVector Start=Source?Source->TransformPosition(Anchor(Event.Source,true)):Impact+FVector(-18000,0,Event.Weapon==TEXT("air")?24000:1000);
+            const FVector Start=Event.SourcePosition.IsSet()?Event.SourcePosition.GetValue():Source?Source->TransformPosition(Anchor(Event.Source,true)):Impact+FVector(-18000,0,Event.Weapon==TEXT("air")?24000:1000);
             const double Arc=Event.Weapon==TEXT("submarine")?0.:FMath::Min(12000.,FVector::Distance(Start,Impact)*.12);
             const FVector Projectile=FMath::Lerp(Start,Impact,Alpha)+FVector(0,0,4.*Arc*Alpha*(1.-Alpha));
             const FVector Direction=(Impact-Start+FVector(0,0,4.*Arc*(1.-2.*Alpha))).GetSafeNormal();
             Draw(Tracer,Projectile,FVector(5,.32,.32),FRotationMatrix::MakeFromX(Direction).ToQuat());
-            if(Source&&Age<.24&&Event.Weapon!=TEXT("submarine"))Draw(Flash,Start,FVector(6.*(1.-Age/.24)));
+            if(Source&&Age<.24&&Event.Weapon==TEXT("surface"))Draw(Flash,Start,FVector(6.*(1.-Age/.24)));
             // A broad water burst marks aggregate salvo arrival. It is not a
             // claim that a particular shell hit a particular simulated hull.
-            if(Alpha>.72)Draw(Splash,Target->GetLocation()+FVector(0,2400,900*(Alpha-.72)/.28),FVector(4,4,18)*(1.-Alpha));
+            if(Alpha>.72)Draw(Splash,FVector(Impact.X,Impact.Y,900*(Alpha-.72)/.28),FVector(4,4,18)*(1.-Alpha));
         }
         else if(Event.Type==TEXT("hit"))
         {
@@ -186,7 +204,7 @@ void FWNTBattleEffects::Update(AActor* Owner,const TMap<FString,FTransform>& Shi
         }
         else if(Event.Type==TEXT("sink"))
         {
-            const FVector Water(Target->GetLocation().X,Target->GetLocation().Y,60);
+            const FVector Water(Impact.X,Impact.Y,60);
             Draw(Splash,Water,FVector(25.+Alpha*90,10.+Alpha*32,.3)*(1.-Alpha*.6));
         }
     }
@@ -285,6 +303,45 @@ bool FWNTRecordedBattleEffectsTest::RunTest(const FString& Parameters)
     Unit->GetArrayField(TEXT("trajectory"))[1]->AsObject()->SetBoolField(TEXT("cut"),true);Track.Read(Unit,60);
     TestEqual(TEXT("An archive gap does not invent travel through missing observations"),Track.Sample(19).GetLocation(),FVector::ZeroVector);
     TestEqual(TEXT("The next retained observation is reached exactly at the cut"),Track.Sample(20).GetLocation(),FVector(20000,40000,0));
+    World->DestroyWorld(false);return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTTacticalEndpointsTest,"WNT.World.TacticalProjectileEndpoints",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTTacticalEndpointsTest::RunTest(const FString& Parameters)
+{
+    TSharedPtr<FJsonObject> Packet;
+    const FString Json=TEXT(R"({"id":"tactical","eventKey":"slice-1","tactical":true,"animate":true,"durationSeconds":15,"events":[
+      {"key":"torpedo","type":"salvo","weapon":"submarine","sourceKey":"a","targetKey":"b","time":0,"duration":30,"hits":0,"sourcePositionMetres":[100,200,0],"targetPositionMetres":[1100,200,0]},
+      {"key":"false-hit","type":"hit","targetKey":"b","time":2,"duration":2,"damage":0},
+      {"key":"hit","type":"hit","targetKey":"b","time":6,"duration":2,"damage":0.1,"targetPositionMetres":[1200,300,15]}]})");
+    if(!TestTrue(TEXT("Tactical effects packet parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet)))return false;
+    auto Battery=MakeShared<FJsonObject>();Battery->SetStringField(TEXT("key"),TEXT("fort"));Packet->SetArrayField(TEXT("shoreBatteries"),{MakeShared<FJsonValueObject>(Battery)});
+    auto Loss=MakeShared<FJsonObject>();Loss->SetStringField(TEXT("key"),TEXT("fort-loss"));Loss->SetStringField(TEXT("type"),TEXT("sink"));Loss->SetStringField(TEXT("targetKey"),TEXT("fort"));Loss->SetNumberField(TEXT("time"),1);Loss->SetNumberField(TEXT("duration"),5);
+    auto Events=Packet->GetArrayField(TEXT("events"));Events.Add(MakeShared<FJsonValueObject>(Loss));Packet->SetArrayField(TEXT("events"),Events);
+    FWNTBattleEffects Effects;Effects.SetPacket(Packet,100);
+    TestEqual(TEXT("Only the positive hit and in-flight torpedo are accepted; zero-damage flashes and shore-battery watersinking are rejected"),Effects.EventCount(),2);
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false).CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Tactical effects world"),World))return false;
+    AActor* Owner=World->SpawnActor<AActor>();auto* Root=NewObject<USceneComponent>(Owner);Owner->AddInstanceComponent(Root);Owner->SetRootComponent(Root);Root->RegisterComponent();
+    TMap<FString,FTransform> Ships{{TEXT("a"),FTransform(FVector(-9000000,0,0))},{TEXT("b"),FTransform(FVector(9000000,0,0))}};
+    Effects.Update(Owner,Ships,105,true);
+    TArray<UInstancedStaticMeshComponent*> Pools;Owner->GetComponents(Pools);
+    UInstancedStaticMeshComponent* TracerPool=nullptr;UInstancedStaticMeshComponent* FlashPool=nullptr;
+    for(auto* Pool:Pools){if(Pool->GetName()==TEXT("RecordedBattleEffects1"))TracerPool=Pool;if(Pool->GetName()==TEXT("RecordedBattleEffects0"))FlashPool=Pool;}
+    if(!TestTrue(TEXT("Fixed tactical effects pools exist"),TracerPool&&FlashPool)){World->DestroyWorld(false);return false;}
+    FTransform Before;TracerPool->GetInstanceTransform(0,Before,true);
+    TestTrue(TEXT("A long torpedo is only one sixth through its actual30-second visual flight, not forced to arrive at the packet deadline"),Before.GetLocation().Equals(FVector(10000+100000/6.,20000,0),.01));
+    TestFalse(TEXT("A torpedo miss creates no invented hull-impact flash"),FlashPool->IsVisible());
+    Ships[TEXT("b")]=FTransform(FVector(-8000000,1000000,0));Effects.Update(Owner,Ships,105,true);
+    FTransform After;TracerPool->GetInstanceTransform(0,After,true);
+    TestTrue(TEXT("Recorded launch and aim points do not home onto the target's later position"),Before.Equals(After,.001));
+    Effects.Update(Owner,Ships,106.1,true);FTransform Hit;FlashPool->GetInstanceTransform(0,Hit,true);
+    TestTrue(TEXT("The damage flash uses the actual recorded impact coordinate"),Hit.GetLocation().Equals(FVector(120000,30000,1500),.01));
+    TestEqual(TEXT("Tactical effects retain the same four bounded pools"),Effects.ComponentCount(),4);
+    Packet->SetStringField(TEXT("eventKey"),TEXT("slice-2"));Packet->SetNumberField(TEXT("elapsedSeconds"),6);
+    Packet->GetArrayField(TEXT("events"))[0]->AsObject()->SetNumberField(TEXT("time"),-10);
+    Effects.SetPacket(Packet,200);Effects.Update(Owner,Ships,200,true);FTransform Continuing;TracerPool->GetInstanceTransform(0,Continuing,true);
+    TestTrue(TEXT("A long torpedo remains at its true sixteen-second flight age after its launch leaves the rolling history window"),Continuing.GetLocation().Equals(FVector(10000+100000*16./30.,20000,0),.01));
     World->DestroyWorld(false);return true;
 }
 #endif

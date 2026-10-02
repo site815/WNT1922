@@ -41,6 +41,7 @@ public:
     double GetChartPixelSize(const AActor* Actor, double ViewportHeight) const;
     AActor* HitChart(const FVector2D& NormalizedPointer, const FVector2D& NormalizedPadding) const;
     FBox GetSceneBounds() const;
+    FBox GetBattleBounds() const;
     FBox GetForceBounds(const FString& ForceId) const;
     AWNTTerrainActor* GetTerrain() const { return Terrain; }
     double GroundHeight(const FVector2D& LongitudeLatitude) const;
@@ -49,6 +50,7 @@ public:
 private:
 #if WITH_DEV_AUTOMATION_TESTS
     friend class FWNTWorldSelectionUpdateTest;
+    friend class FWNTTacticalPresentationTest;
 #endif
     void UpdateWorld(double Fraction);
     void UpdateBattle(double Fraction);

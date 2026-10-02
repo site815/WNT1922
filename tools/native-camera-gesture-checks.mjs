@@ -20,6 +20,30 @@ export function verifyWorldExtentFit(d) {
   assert(Math.abs(d.northPoleScreenY-north)<.001&&Math.abs(d.southPoleScreenY-south)<.001,'Home fits both poles inside the unobscured map with small top/bottom margins');
 }
 
+// Start from Home in a paused isolated campaign. Exercise CEF's actual wheel
+// events and the native interpolation/reprojection path, then restore Home.
+export async function verifyWorldWheelResponse({page,diagnostics,clearPoint,waitFor,metrics}) {
+  const before=await diagnostics('world');
+  assert.equal(before.zoom,1,'Wheel traversal starts from the full chart');
+  const p=await clearPoint();await page.mouse.move(p.x,p.y);
+  const started=performance.now();await page.mouse.wheel(0,-120);
+  const first=await waitFor('one wheel notch reaches twice the world zoom',d=>Math.abs(d.zoom-2)<.001&&Math.abs(d.targetZoom-2)<.001);
+  const firstResponseMs=performance.now()-started;
+  assert(first.lastAnchorRebases<=1,'An anchor solution commits the expensive map reprojection at most once');
+  // A burst is allowed to coalesce before crossing the native bridge. Its sum
+  // must retain all fifteen remaining ordinary notches.
+  for(let i=0;i<15;i++)await page.mouse.wheel(0,-120);
+  const close=await waitFor('sixteen wheel notches reach ship inspection',d=>Math.abs(d.zoom-d.maxWorldZoom)<.1&&Math.abs(d.targetZoom-d.maxWorldZoom)<.1);
+  assert.equal(close.requestedTilt,0,'Wheel traversal never tilts automatically');
+  assert.equal(close.requestedYaw,0,'Wheel traversal stays north-up');
+  assert(close.lastAnchorRebases<=1,'The large zoom burst still commits at most one map rebase per solution');
+  await page.keyboard.press('Home');
+  const restored=await waitFor('Home restores the chart after wheel traversal',d=>d.zoom===1&&d.targetZoom===1);
+  verifyWorldExtentFit(restored);
+  metrics.push({kind:'real-wheel-traversal',notches:16,firstResponseMs,wheelZoomPerPixel:first.wheelZoomPerPixel,
+    firstZoom:first.zoom,finalZoom:close.zoom,lastAnchorIterations:close.lastAnchorIterations,lastAnchorRebases:close.lastAnchorRebases});
+}
+
 async function drag(page, clearPoint, button, dx, dy) {
   const p=await clearPoint();
   await page.mouse.move(p.x,p.y);await page.mouse.down({button});
@@ -61,11 +85,12 @@ export async function verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor
   assert(smallReset.zoom>=smallReset.worldOrbitZoom&&smallReset.orbitEnabled,'The small outward step stays at ship zoom');
   assert(Math.abs(smallReset.tilt)<.001&&Math.abs(smallReset.yaw)<.001,'Outward input immediately resets both rendered axes');
   const lowZoom=before.worldOrbitZoom*.75;
-  await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,Math.log(smallReset.targetZoom/lowZoom)/.0015);
+  assert(smallReset.wheelZoomPerPixel>0,'The native wheel sensitivity is reported');
+  await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,Math.log(smallReset.targetZoom/lowZoom)/smallReset.wheelZoomPerPixel);
   const reset=await waitFor('wheel zoom out restores overhead north-up',d=>d.zoom<d.worldOrbitZoom&&Math.abs(d.zoom-d.targetZoom)<.01);
   assert.equal(reset.orbitEnabled,false);assert(Math.abs(reset.yaw)<.001&&Math.abs(reset.tilt)<.001,'Zoom out resets both rendered axes');
   await verifyStrategicMiddleNoop({page,diagnostics,clearPoint,metrics});
-  await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-Math.log(before.zoom/reset.zoom)/.0015);
+  await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-Math.log(before.zoom/reset.zoom)/reset.wheelZoomPerPixel);
   const returned=await waitFor('wheel returns to close inspection after orientation reset',d=>d.orbitEnabled&&Math.abs(d.zoom-d.targetZoom)<.01);
   assert(Math.abs(returned.yaw)<.001&&Math.abs(returned.requestedYaw)<.001,'Old manual yaw cannot return after strategic zoom');
   assert(Math.abs(returned.requestedTilt)<.001&&Math.abs(returned.tilt)<.001,'No automatic or old manual pitch returns after zooming in');

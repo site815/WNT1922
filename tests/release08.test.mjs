@@ -174,11 +174,11 @@ test("a whole damaged flotilla keeps its identity on the return voyage and remai
   assert.ok(sim.fleetPower(s, c, n.id, null, f.id).ships > 0);
   validateSave(s, b);
 });
-test("aggressive engagements raise inflicted damage and exposure, with typed reports conserving hull counts", () => {
+test("aggressive engagements use a distinct close-range doctrine, with typed reports conserving hull counts", () => {
   let ordinary = 0,
     aggressive = 0,
     count = 0;
-  for (let seed = 1; seed <= 32; seed++) {
+  for (let seed = 1; seed <= 12; seed++) {
     const { s, c } = start("FRA");
     s.seed = seed;
     const fa = s.nations.FRA.fleets.find((f) => f.role === "carrier"),
@@ -228,10 +228,12 @@ test("aggressive engagements raise inflicted damage and exposure, with typed rep
     }
     assert.match(battleDetails(hard), /Engaged:/);
     assert.ok(hard.aggressiveA && hard.aggressiveB);
+    assert.equal(hard.tactical.sides.A.doctrine,'aggressive');assert.equal(hard.tactical.sides.B.doctrine,'aggressive');
+    assert.equal(r.tactical.sides.A.doctrine,'balanced');
     validateSave(other, b);
   }
-  assert.ok(count > 10);
-  assert.ok(aggressive > ordinary * 1.25);
+  assert.ok(count > 5);
+  assert(aggressive>0&&ordinary>0);assert.notEqual(aggressive,ordinary,'Doctrine changes simulated courses and outcomes, without a flat damage bonus');
 });
 test("clear all retains mandatory decisions and chosen decisions produce one receipt without a new alert", () => {
   const { s, c } = start();

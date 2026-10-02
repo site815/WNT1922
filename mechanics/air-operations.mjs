@@ -1,5 +1,6 @@
 import { strategicFactor } from "./strategic-materials.mjs";
 import { engagementReport, recordAttritionRecovery } from './battle-records.mjs';
+import { tacticalAirPool } from '../combatmechanics/campaign-air-wings.mjs';
 import { readDocument } from "../worker/documents.mjs";
 const ENGAGEMENTS = await readDocument("common/rules/engagements.md");
 const rules = (await readDocument('common/rules/air-warfare.md')).sorties;
@@ -157,7 +158,7 @@ export function queueAirStrike(s, c, id, request) {
     && !["anchorage", "siege"].includes(source.fleet.mission)) return false;
   if (
     source.fleet &&
-    (["port", "refuel", "repair", "returning"].includes(source.fleet.phase) ||
+    (source.fleet.battleId || ["port", "refuel", "repair", "returning"].includes(source.fleet.phase) ||
       ["support", "repair", "reinforcement"].includes(source.fleet.role) ||
       now < (source.fleet.airReadyAt ?? -1e9))
   )
@@ -212,6 +213,9 @@ export function combatAirPatrol(
 ) {
   const source = airSource(s, id, { fleetId, sourcePort: port });
   if (!source) return { count: 0, power: 0, wings: [] };
+  const battle=source.fleet?.battleId?engagementReport(s,source.fleet.battleId):null,side=battle?.a===id?'A':'B',pool=battle?.tactical?tacticalAirPool(s,battle.tactical,side):null;
+  if(pool)source.rows=[pool];
+  let tacticalAvailable=pool?battle.tactical.ships.filter(ship=>ship.side===side&&ship.status!=='sunk').reduce((n,ship)=>n+ship.aircraft.fighter,0):Infinity;
   const cond = airConditions(s, source.position),
     models = new Map(operationalAircraftModels(c, id).map((a) => [a.id, a]));
   let count = 0,
@@ -220,10 +224,11 @@ export function combatAirPatrol(
   for (const g of source.rows)
     for (const w of g.airWing || [])
       if (w.role === "fighter") {
-        const take = Math.floor(
+        const take = Math.min(tacticalAvailable,Math.floor(
           (w.crewed || 0) * rules.capFraction * cond.launch * (g.health ?? 1) * strategicFactor(s.nations[id]),
-        );
+        ));
         if (!take) continue;
+        tacticalAvailable-=take;
         const a = models.get(w.model);
         count += take;
         power += take * aircraftQuality(a, "fighter");
@@ -233,7 +238,7 @@ export function combatAirPatrol(
 }
 export function loseCAP(s, c, id, cap, fraction) {
   const lost = { planes: 0, aviators: 0, planesRescued: 0, aviatorsRescued: 0 };
-  for (const { w, count } of cap.wings) {
+  for (const { g, w, count } of cap.wings) {
     const take = Math.min(w.crewed || 0, count),
       wing = { ...w, count: take, crewed: take };
     w.count -= take;
@@ -244,6 +249,15 @@ export function loseCAP(s, c, id, cap, fraction) {
     });
     w.count += wing.count;
     w.crewed += wing.crewed;
+    if(g?.tacticalCombat) {
+      const battle=engagementReport(s,g.tacticalCombat),side=battle?.a===id?'A':'B',combat=battle?.tactical;
+      let remaining=take-wing.count;
+      if(combat?.airPools?.[side]) {
+        combat.airPools[side].lossesApplied+=remaining;
+        const ships=combat.ships.filter(ship=>ship.side===side&&ship.status!=='sunk').sort((a,b)=>Number(b.groupId===w.homeGroup)-Number(a.groupId===w.homeGroup));
+        for(const ship of ships){const loss=Math.min(remaining,ship.aircraft.fighter);ship.aircraft.fighter-=loss;ship.aircraftLost+=loss;remaining-=loss;}
+      }
+    }
     for (const k of Object.keys(lost)) lost[k] += part[k] || 0;
   }
   return lost;
@@ -253,6 +267,7 @@ function launch(s, c, id, op) {
     source = airSource(s, id, op),
     now = campaignMinutes(s);
   if (!source) return false;
+  if (source.fleet?.battleId) return false;
   if (op.targetKind !== "port") {
     const contact = n.contacts.find((x) => x.id === op.targetId);
     if (!contact || now - contact.seenAt > rules.contactMaxAgeMinutes) return false;

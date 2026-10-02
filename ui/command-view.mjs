@@ -1,11 +1,11 @@
 import { uiModel, displayedFleet } from '../mechanics/queries.mjs';
 import { PROFILES, NATION_ORDER } from '../mechanics/catalog.mjs';
-import { distanceNm } from '../mechanics/world.mjs';
+import { distanceNm, PORTS } from '../mechanics/world.mjs';
 import { fleetPosition, convoyCoverage, fleetStatus, MISSIONS } from '../mechanics/task-forces.mjs';
 import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
-import { mapHover } from './inspection-view.mjs';
+import { mapHover, portPopup } from './inspection-view.mjs';
 import { linePath } from './projection.mjs';
-import { ongoingMapBattles } from './battle-map.mjs';
+import { ongoingMapBattles, battleMapProgress } from './battle-map.mjs';
 import { mapSymbolLegend } from './map-symbols.mjs';
 const esc = (v) =>
   String(v ?? "").replace(
@@ -75,7 +75,7 @@ export function commandView(s, content, ui = {}) {
   const selectedFleets = new Set(ui.fleetIds || (ui.fleetId ? [ui.fleetId] : []));
   const battles = ongoingMapBattles(s);
   const battleList = battles.length ? '<div class="command-battles" aria-label="Your ongoing battles">' + battles.map(battle =>
-    `<button data-action="watch-battle" data-id="${esc(battle.id)}" data-map-hover="battle:${esc(battle.id)}"><strong>Watch battle</strong><span>${esc(battle.label)}</span><progress max="1" value="${battle.stageProgress || 0}" aria-label="Current battle stage progress"></progress><small>${Math.round((battle.stageProgress || 0) * 100)}% of current stage</small></button>`).join('') + '</div>' : '';
+    `<button data-action="watch-battle" data-id="${esc(battle.id)}" data-map-hover="battle:${esc(battle.id)}"><strong>Watch battle</strong><span>${esc(battle.label)}</span>${battleMapProgress(battle)}</button>`).join('') + '</div>' : '';
   const fleetList =
     '<div class="panel-title"><h2>Naval commands</h2><span>' +
     fleets.length +
@@ -102,7 +102,8 @@ export function commandView(s, content, ui = {}) {
       .join("") +
     "</div>";
   const merchantPanel = convoy ? `<section class="merchant-inspection" data-convoy-id="${esc(convoy.id)}" data-hull-index="${ui.merchantHullIndex ?? ''}"><button data-action="map-overview">Naval commands</button>${Number.isInteger(ui.merchantHullIndex) ? `<p>Merchant hull ${Math.min(convoy.count,ui.merchantHullIndex + 1)} of ${convoy.count}</p>` : ''}${mapHover(s,content,'convoy:'+convoy.id)}<p class="panel-note">Representative freighter geometry. Hull identities and spacing are for inspection; the simulation records the convoy's shared voyage and surviving count.</p></section>` : '';
-  const panel = ui.sidePanel || merchantPanel + fleetList;
+  const portPanel=PORTS[ui.portId]?`<section class="merchant-inspection port-inspection" data-port-id="${esc(ui.portId)}"><div class="panel-title"><h2>${esc(PORTS[ui.portId].name)}</h2><button data-action="map-overview" aria-label="Close port information">×</button></div>${portPopup(s,content,ui.portId)}</section>`:'';
+  const panel = ui.sidePanel || portPanel + merchantPanel + fleetList;
   const legend =
     '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · right drag pans · left drag selects fleets · middle drag orbits at close ship zoom (32768× and above) · any zoom out immediately restores overhead north-up · double-click a force to fit its ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span>' + mapSymbolLegend() + '<span class="legend-powers" title="Country ownership colors">' +
     NATION_ORDER.map(

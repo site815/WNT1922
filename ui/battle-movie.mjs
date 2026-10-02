@@ -1,15 +1,17 @@
 import {battleInstances} from './battle-watch.mjs';
 import {battleVisualEvents} from './battle-events.mjs';
 import {TICK_MINUTES} from '../mechanics/campaign-clock.mjs';
+import {buildTacticalMovie} from './tactical-scene-packet.mjs';
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 export const MAX_MOVIE_EVENTS=4096;
 export const MAX_MOVIE_FRAMES=128;
 
 // A movie is a frozen copy of retained observations. It has no simulation
-// client, combat rolls or campaign clock. Tracks are explicitly illustrative
-// formations, not a claim that individual shell/hull trajectories were logged.
+// client, combat rolls or campaign clock. Tactical tracks use recorded physics;
+// older aggregate reports retain their explicitly labelled illustrations.
 export function buildBattleMovie(report) {
+  if(report.tactical?.ships?.length)return buildTacticalMovie(report);
   const source=report.replay?.frames || [];
   if(source.length<2)return null;
   const snapshot=structuredClone(report);

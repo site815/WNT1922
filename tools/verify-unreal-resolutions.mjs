@@ -33,6 +33,7 @@ const result={format:1,passed:false,endpoint,startedAt:new Date().toISOString(),
  'Unreal offscreen FNullWindow hardcodes fullscreen; window policy is checked through configured mode here. Physical Windows frame/maximize behavior is tested separately.',
  'Temporal image differences are review evidence, not an automatic flicker verdict; ocean animation and temporal lighting can change pixels.',
  'Draw counters, when supplied by native diagnostics, are samples rather than GPU profiling or performance certification.',
+ 'Offscreen Slate UI-inclusive captures can be black. Native scene PNGs and separately labelled CEF-only UI images are recorded instead; composed output is reviewed in a normal visible window.',
 ]};
 let browser,page,phase='connect',logOffset=0;
 await fs.mkdir(output,{recursive:true});
@@ -63,11 +64,16 @@ async function resize(size,mode){
 }
 async function capture(name,size,includeUI=false){
  const source=path.join(captureDir,name+'.png'),old=await fs.stat(source).catch(()=>null);
- await input('capture',{name,includeUI});
+ await input('capture',{name,includeUI:false});
  await until(()=>fs.stat(source).catch(()=>null),s=>s&&s.size>1000&&(!old||s.mtimeMs>old.mtimeMs),'native PNG '+name,45000);
  const png=await until(()=>fs.readFile(source),b=>b.subarray(-8,-4).toString()==='IEND','complete PNG '+name);
  const width=png.readUInt32BE(16),height=png.readUInt32BE(20);assert.equal(width,size.width,'Native capture width');assert.equal(height,size.height,'Native capture height');
- const file=path.join(output,name+'.png');await fs.writeFile(file,png);result.captures.push({name,file,width,height,includeUI,kind:'native-Unreal-GPU'});return png;
+ const file=path.join(output,name+'.png');await fs.writeFile(file,png);result.captures.push({name,file,width,height,includeUI:false,kind:'native-Unreal-GPU'});
+ if(includeUI){
+  const uiFile=path.join(output,name+'-cef-html-only.png');await page.screenshot({path:uiFile});
+  result.captures.push({name:name+'-cef-html-only',file:uiFile,kind:'CEF-HTML-only-not-native-render'});
+ }
+ return png;
 }
 async function temporalSample(name,size){
  const first=await capture(name+'-a',size);await delay(600);const second=await capture(name+'-b',size);
@@ -120,9 +126,12 @@ async function gestureCycle(){
  await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'right'});await page.mouse.move(limitPoint.x+100,limitPoint.y);await page.mouse.up({button:'right'});
  const horizontal=await diagnostics();assert(Math.abs(horizontal.longitude-constrained.longitude)>.01,'Horizontal right-drag still moves the map at full-world fit');
  result.metrics.push({kind:'constrained-pan',verticalIterations:constrained.lastAnchorIterations,longitudeBefore:constrained.longitude,longitudeAfter:horizontal.longitude});
- const p=await clearPoint(),before=await cursor();await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-450);await until(()=>diagnostics(),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.00001,'smooth wheel zoom reaches its target');
+ const expectedZoom=Math.exp(horizontal.wheelZoomPerPixel*450);
+ const p=await clearPoint(),before=await cursor();await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-450);const zoomed=await until(()=>diagnostics(),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.00001,'smooth wheel zoom reaches its target');
+ assert(Math.abs(zoomed.targetZoom-expectedZoom)<.00001,'Wheel target uses the reported native sensitivity');
  const zoomFrames=(await events(before)).filter(e=>e.event.type==='camera').map(e=>e.event.zoom);
- assert(zoomFrames.some(z=>z>1&&z<Math.exp(.675)-.001),'Wheel zoom renders intermediate camera positions');
+ assert(zoomFrames.some(z=>z>1&&z<expectedZoom-.001),'Wheel zoom renders intermediate camera positions');
+ result.metrics.push({kind:'smooth-wheel',target:expectedZoom,intermediate:zoomFrames.filter(z=>z>1&&z<expectedZoom-.001)});
  await verifyStrategicMiddleNoop({page,diagnostics,clearPoint,metrics:result.metrics});
  await page.mouse.move(p.x,p.y);
  await page.mouse.down({button:'right'});await page.mouse.move(p.x+205,p.y+85,{steps:6});await page.mouse.up({button:'right'});
@@ -148,7 +157,7 @@ try{
  result.checks.push('A native 1280x720 resize request is clamped to a true 1800x1000 windowed render target.');
  phase='title battle resolutions';
  for(const size of resolutions){await resize(size,'battle');await page.locator('.start-screen').evaluate(n=>n.scrollTop=0);await pick('battle-ship');await capture('title-'+size.width+'x'+size.height,size,true);}
- result.checks.push('Title battle geometry is clickable with exact identities at every actual native resolution; full GPU/UI captures match requested dimensions.');
+ result.checks.push('Title battle geometry is clickable with exact identities at every actual native resolution; native scene PNGs match requested dimensions and CEF-only UI images are recorded separately.');
  phase='campaign resolutions';
  if(existing===200){await page.locator('[data-action="continue"]').click();}
  else{await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();await page.locator('[data-action="select-nation"][data-id="USA"]').click();await page.locator('[data-action="new"]').click();if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();}
@@ -169,8 +178,8 @@ try{
   const inspection=await until(()=>diagnostics(),d=>Math.abs(d.zoom-40000)<.01,'close ship zoom');
   assert.equal(inspection.tilt,0,'Close ship zoom does not tilt automatically');
   await verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,label),metrics:result.metrics});
-  await input('zoom',{delta:-100000});await until(()=>diagnostics(),d=>d.zoom===d.maxWorldZoom,'zoom clamps at useful ship scale');
-  assert.equal((await diagnostics()).zoom,65536);
+  await input('zoom',{delta:-100000});await until(()=>diagnostics(),d=>Math.abs(d.zoom-d.maxWorldZoom)<1e-6&&Math.abs(d.targetZoom-d.maxWorldZoom)<1e-6,'zoom clamps at useful ship scale');
+  assert(Math.abs((await diagnostics()).zoom-65536)<1e-6,'World zoom clamps to65,536 within floating-point precision');
   await capture('fleet-tilted-'+size.width+'x'+size.height,size,true);
  }
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');

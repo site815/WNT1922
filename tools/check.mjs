@@ -100,7 +100,7 @@ for (const file of (await projectFiles()).filter((f) => f.endsWith(".mjs"))) {
     !/content\.json|\.build\/game|game\/src/.test(source),
     `Retired build input in ${file}`,
   );
-  if (file.startsWith("mechanics/"))
+  if (file.startsWith("mechanics/") || file.startsWith("combatmechanics/"))
     assert(
       !/\b(?:document|window|localStorage)\s*\.|from\s+['"][^'"]*\/ui\//.test(
         source,

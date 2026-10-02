@@ -4,6 +4,8 @@ import { chartPosition } from './map-focus.mjs';
 import { watchFrame, battleInstances } from './battle-watch.mjs';
 import { battleVisualEvents } from './battle-events.mjs';
 import { receiveNativePerformance } from './native-performance.mjs';
+import { unrealTacticalPacket, tacticalSceneSnapshot } from './tactical-scene-packet.mjs';
+export { unrealTacticalPacket } from './tactical-scene-packet.mjs';
 
 export const UNREAL_MODE = globalThis.location?.search != null && new URLSearchParams(globalThis.location.search).get('unreal') === '1';
 const scenes = new Map();
@@ -65,6 +67,14 @@ class NativeScene {
     return send('sceneinput', {instanceId:this.instanceId, action, ...values});
   }
   cancelHover() { clearTimeout(this.hoverTimer); this.hoverTimer = null; this.pendingHover = null; this.hoverRequestId = null; }
+  cancelWheel() { if(this.wheelFrame!=null)cancelAnimationFrame(this.wheelFrame);this.wheelFrame=null;this.pendingWheel=null; }
+  queueWheel(values) {
+    this.pendingWheel={...values,delta:values.delta+(this.pendingWheel?.delta||0)};
+    if(this.wheelFrame==null)this.wheelFrame=requestAnimationFrame(()=>{
+      this.wheelFrame=null;const packet=this.pendingWheel;this.pendingWheel=null;
+      if(packet&&activeScene===this&&this.canvas?.isConnected)this.input('zoom',packet);
+    });
+  }
   dismissHover() { this.cancelHover(); this.onHover(null, {immediate:true}); }
   clearSelectionBox() { this.selectionBox?.remove(); this.selectionBox = null; }
   drawSelectionBox(d) {
@@ -86,6 +96,7 @@ class NativeScene {
   }
   attach(canvas) {
     if (this.canvas === canvas) return;
+    this.cancelWheel();
     this.cancelHover();
     this.drag = null; this.clearSelectionBox();
     this.events?.abort(); this.resize?.disconnect();
@@ -98,11 +109,12 @@ class NativeScene {
     canvas.addEventListener('wheel', event => {
       event.preventDefault(); this.activate(); canvas.focus({preventScroll:true});
       this.dismissHover();
-      this.input('zoom', {delta:event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1), ...point(event)});
+      this.queueWheel({delta:event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1), ...point(event)});
     }, {...options, passive:false});
     canvas.addEventListener('pointerdown', event => {
       if (![0,1,2].includes(event.button)) return;
       event.preventDefault(); // Middle dragging must not start browser autoscroll.
+      this.cancelWheel();
       this.dismissHover();
       this.activate(); canvas.focus({preventScroll:true}); canvas.setPointerCapture(event.pointerId);
       this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false,
@@ -140,6 +152,7 @@ class NativeScene {
     canvas.addEventListener('dblclick', event => {if (event.button === 0) this.input('pick', {...pickPoint(event),zoom:true});}, options);
     canvas.addEventListener('pointerleave', () => {this.cancelHover(); if (!this.drag) this.onHover(null);}, options);
     canvas.addEventListener('keydown', event => {
+      if(['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))this.cancelWheel();
       if (['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
         this.dismissHover();
       }
@@ -181,6 +194,7 @@ class NativeScene {
     document.documentElement.dataset.unrealScene = this.mode;
   }
   suspend() {
+    this.cancelWheel();
     if (activeScene !== this) return;
     this.dismissHover(); this.drag = null; this.clearSelectionBox();
     activeScene = null;
@@ -189,6 +203,7 @@ class NativeScene {
     document.documentElement.dataset.unrealScene = 'hidden';
   }
   clear() {
+    this.cancelWheel();
     this.cancelHover();
     this.drag = null; this.clearSelectionBox();
     this.suspend(); this.events?.abort(); this.resize?.disconnect();
@@ -262,7 +277,7 @@ export class UnrealWorldScene extends NativeScene {
   }
   focus(kind, id, {zoom = false} = {}) {
     const point = chartPosition(this.state, this.political, kind, id); if (!point) return;
-    this.activate(); this.input(zoom && kind === 'fleet' ? 'fit-force' : 'focus', {kind,id,longitude:point[0],latitude:point[1],zoom:Math.max(4, this.zoom)});
+    this.activate(); this.input(zoom && kind === 'fleet' ? 'fit-force' : 'focus', {kind,id,longitude:point[0],latitude:point[1],zoom:Math.max(zoom&&kind==='port'?16:4, this.zoom)});
   }
   reloadModels() { /* Native meshes reload from external files on subsequent scene packets. */ }
 }
@@ -271,13 +286,21 @@ export function unrealBattlePacket(report, campaign, frameIndex, selected, anima
   if(playback?.plan){
     const {plan,key,elapsedSeconds,paused}=playback;
     return {format:1,campaign,id:plan.reportId,at:plan.recordedUntil,index:0,animate,movie:true,
+      cameraDirector:!!plan.tactical,tactical:!!plan.tactical,airstrikes:plan.airstrikes||[],shoreBatteries:plan.shoreBatteries||[],
       eventKey:key,durationSeconds:plan.durationSeconds,elapsedSeconds,playbackPaused:paused,
       events:plan.events,units:plan.units.map(unit=>({key:unit.key,id:unit.id,side:unit.side,hullIndex:unit.hullIndex,
-        classId:unit.classId,type:unit.type,label:unit.name,positionMetres:unit.positionMetres,headingDegrees:unit.headingDegrees,
-        health:unit.health,sunk:unit.sunkHull,trajectory:unit.trajectory,appearsAt:unit.appearsAt,lostAtSeconds:unit.lostAtSeconds,
+        classId:unit.classId,campaign:unit.campaign||campaign,type:unit.type,label:unit.name,positionMetres:unit.positionMetres,headingDegrees:unit.headingDegrees,
+        health:unit.health,sunk:unit.sunkHull,trajectory:unit.trajectory,appearsAt:unit.appearsAt,lostAtSeconds:unit.lostAtSeconds,disappearsAt:unit.disappearsAt,
         selected:selected?.side===unit.side&&selected.id===unit.id&&(selected.hullIndex||0)===unit.hullIndex}))};
   }
   const {frame, index} = watchFrame(report, frameIndex);
+  if(report.tactical?.ships?.length){
+    const seconds=report.tactical.history?.frames?.length
+      ? frame.tacticalSeconds??Math.min(report.tactical.seconds,Math.max(0,(frame.at-report.startedAt)*60))
+      : report.tactical.seconds;
+    return {...unrealTacticalPacket(report.tactical,{sessionId:String(report.id),campaign,replaySeconds:seconds,fromSeconds:seconds,
+      selected,paused:true,animate,cinematic:false}),at:frame.at,index};
+  }
   const durationSeconds = String(report.id).startsWith('title-demo-') ? 3.6 : 15;
   const timeScale = durationSeconds / 15;
   return {format:1,campaign,id:String(report.id),at:frame.at,index,animate,
@@ -313,4 +336,36 @@ export class UnrealBattleScene extends NativeScene {
   draw() {if (this.canvas?.isConnected && this.frame) this.activate();}
   fit() {this.zoom = 1; this.input('home');}
   focus(side, id, hullIndex = 0) {this.input('focus', {side,id,hullIndex});}
+}
+
+export class UnrealTacticalScene extends NativeScene {
+  constructor(options){super(options);this.mode='battle';this.onCameraChange=options.onCameraChange;this.sessionSerial=0;}
+  refresh(state,options={}){
+    const canvas=this.root.querySelector('.battle-canvas');if(!canvas||!state){this.clear();return Promise.resolve();}
+    if(this.combat!==state){this.combat=state;this.sessionId=`${this.instanceId}:tactical:${++this.sessionSerial}`;this.previous=null;this.current=null;this.packet=null;}
+    if(this.current?.seconds!==state.seconds){this.previous=this.current;this.current=tacticalSceneSnapshot(state);}
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let candidate=unrealTacticalPacket(state,{...options,previous:this.previous,sessionId:this.sessionId,animate:!reduced});
+    // Selection/pause/camera toggles must not reset the active interpolation.
+    // Keep its key and clock origin until the simulation/replay position moves.
+    if(this.packet&&this.packet.at===candidate.at&&this.replay===options.replaySeconds){
+      const {playbackPaused,cameraDirector,units}=candidate;
+      candidate={...this.packet,playbackPaused,cameraDirector,units:this.packet.units.map((unit,index)=>({...unit,selected:units[index]?.selected||false}))};
+      candidate.elapsedSeconds=Math.min(this.packet.durationSeconds,this.clockElapsed+(this.packet.playbackPaused?0:(performance.now()-this.clockStartedAt)/1000));
+    }
+    const changed=!this.packet||candidate.eventKey!==this.packet.eventKey||candidate.playbackPaused!==this.packet.playbackPaused||
+      JSON.stringify(options.selected)!==this.selectionKey||candidate.cameraDirector!==this.packet.cameraDirector;
+    this.attach(canvas);this.activate();
+    if(changed){
+      if(!this.packet||candidate.eventKey!==this.packet.eventKey||candidate.playbackPaused!==this.packet.playbackPaused){this.clockStartedAt=performance.now();this.clockElapsed=candidate.elapsedSeconds;}
+      this.packet=candidate;this.replay=options.replaySeconds;this.selectionKey=JSON.stringify(options.selected);this.battleReady=send('battle',candidate);
+    }
+    return this.battleReady||Promise.resolve();
+  }
+  cameraChanged(event){super.cameraChanged(event);this.onCameraChange?.(event);}
+  fit(){this.input('home');}
+  focus(side,id,hullIndex=0){this.input('focus',{side,id,hullIndex});}
+  setCinematic(enabled){this.input('cinematic',{enabled});}
+  draw(){if(this.canvas?.isConnected)this.activate();}
+  clear(){super.clear();this.combat=null;this.previous=null;this.current=null;this.packet=null;}
 }

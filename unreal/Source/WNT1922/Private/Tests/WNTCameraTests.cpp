@@ -3,9 +3,15 @@
 #include "WNTPlayerController.h"
 #include "WNTProjection.h"
 #include "WNTWorldActor.h"
+#include "WNTCameraActor.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Dom/JsonObject.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Misc/ScopeExit.h"
+#include "Slate/SceneViewport.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRebaseHistoryTest,"WNT.Camera.RebaseResetsTemporalHistory",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTRebaseHistoryTest::RunTest(const FString& Parameters)
@@ -261,4 +267,120 @@ bool FWNTAnchorConstraintTest::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWheelResponseTest,"WNT.Camera.ResponsiveWheelTraversal",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTWheelResponseTest::RunTest(const FString& Parameters)
+{
+    double Target=1;
+    for(int32 I=0;I<16;++I)Target=WNTCameraMath::WheelZoom(Target,-120,false);
+    TestTrue(TEXT("Sixteen ordinary wheel notches traverse the full strategic-to-hull range"),FMath::IsNearlyEqual(Target,WNTCameraMath::MaxWorldZoom,1e-6));
+    TestTrue(TEXT("A single strategic wheel notch doubles the zoom"),FMath::IsNearlyEqual(WNTCameraMath::WheelZoom(1,-120,false),2.,1e-12));
+    TestTrue(TEXT("Coalescing a wheel burst preserves its exact total movement"),FMath::IsNearlyEqual(WNTCameraMath::WheelZoom(1,-120*8,false),256.,1e-8));
+    TestTrue(TEXT("Battle inspection retains its finer wheel sensitivity"),FMath::IsNearlyEqual(WNTCameraMath::WheelZoom(1,-120,true),FMath::Exp(.18),1e-12));
+    TestTrue(TEXT("Continuous touchpad motion is proportional rather than rounded to notches"),FMath::IsNearlyEqual(WNTCameraMath::WheelZoom(1,-30,false),FMath::Pow(2.,.25),1e-12));
+    TestTrue(TEXT("Huge wheel inputs cannot overflow the world limit"),FMath::IsNearlyEqual(WNTCameraMath::WheelZoom(1,-1e300,false),WNTCameraMath::MaxWorldZoom,1e-6));
+    TestEqual(TEXT("Huge outward inputs remain at the full-world floor"),WNTCameraMath::WheelZoom(400,1e300,false),1.);
+    for(double FPS:{30.,60.,120.})
+    {
+        double Current=1;
+        for(int32 I=0;I<FMath::CeilToInt(FPS*.35);++I)Current=WNTCameraMath::SmoothZoom(Current,2.,1/FPS);
+        TestEqual(TEXT("An ordinary wheel step settles inside350ms independently of frame rate"),Current,2.);
+    }
+    TestEqual(TEXT("A zero-time sample cannot jump the camera"),WNTCameraMath::SmoothZoom(1,2,0),1.);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTBattleOverviewFitTest,"WNT.Camera.TacticalOverviewFit",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTBattleOverviewFitTest::RunTest(const FString& Parameters)
+{
+    for(const FIntPoint Pixels:{FIntPoint(1800,1000),FIntPoint(1920,1080),FIntPoint(3440,1440),FIntPoint(5120,2160)})
+    for(const FVector4 Rect:{FVector4(.04,.19,.72,.74),FVector4(.1,.2,.38,.65),FVector4(0,0,1,1)})
+    for(double SeparationMetres:{23000.,220000.})for(double Bearing:{0.,45.,90.})
+    {
+        const FVector Axis=FRotator(0,Bearing,0).Vector()*SeparationMetres*50.;
+        FBox Bounds(ForceInit);for(double Side:{-1.,1.}){Bounds+=Axis*Side+FVector(40000);Bounds+=Axis*Side-FVector(40000);}
+        FMinimalViewInfo View;WNTCameraMath::ConfigureProjection(View,Pixels,Rect);
+        const double Distance=WNTCameraMath::BattleFitDistance(Bounds,Pixels,Rect);
+        WNTCameraMath::Orbit(View,Bounds.GetCenter(),Distance,WNTCameraMath::BattleOverviewTilt,WNTCameraMath::BattleOverviewYaw);
+        for(int32 I=0;I<8;++I)
+        {
+            const FVector Corner((I&1)?Bounds.Max.X:Bounds.Min.X,(I&2)?Bounds.Max.Y:Bounds.Min.Y,(I&4)?Bounds.Max.Z:Bounds.Min.Z);
+            const auto Screen=WNTCameraMath::Project(View,Corner);
+            TestTrue(TEXT("Denmark Strait and Midway extents fit the actual HUD opening at16:9and21:9 with8%margin"),Screen.IsSet()&&Screen->X>=Rect.X+Rect.Z*.0799&&Screen->X<=Rect.X+Rect.Z*.9201&&Screen->Y>=Rect.Y+Rect.W*.0799&&Screen->Y<=Rect.Y+Rect.W*.9201);
+        }
+        for(double Side:{-1.,1.})
+        {
+            const double Depth=FVector::DotProduct(Axis*Side-View.Location,View.Rotation.Vector());
+            const double Marker=WNTCameraMath::BattleMarkerPixels(25000.,Depth,View.FOV,Pixels);
+            const double HullSpan=25000.*Pixels.X/(2*Depth*FMath::Tan(FMath::DegreesToRadians(View.FOV)*.5));
+            TestTrue(TEXT("Both sides remain readable as a hull or screen glyph at realistic battle separation"),Marker>=28.||HullSpan>=12*FMath::Clamp(Pixels.Y/1000.,1.,2.));
+            if(SeparationMetres==220000.)TestTrue(TEXT("Midway-scale carrier groups cannot disappear into subpixel models"),Marker>=28.);
+        }
+    }
+    TestEqual(TEXT("At800m ship inspection the actual hull is visible without an overview glyph"),WNTCameraMath::BattleMarkerPixels(20000.,80000.,90.,FIntPoint(1800,1000)),0.);
+    TestEqual(TEXT("A hull behind the camera has no marker or pick rectangle"),WNTCameraMath::BattleMarkerPixels(20000.,-1.,90.,FIntPoint(1800,1000)),0.);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTBattleFocusContractTest,"WNT.Camera.TacticalAndGalleryFocusContract",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTBattleFocusContractTest::RunTest(const FString& Parameters)
+{
+    for(double Aspect:{.4,1.,2.4})
+    {
+        const double Distance=WNTCameraMath::BattleFocusDistance(Aspect);
+        TestEqual(TEXT("Focus preserves the gallery's documented3x zoom baseline"),WNTCameraMath::BattleFocusZoom,3.);
+        TestTrue(TEXT("Tactical focus is1050m/aspect regardless of a previous220km fit"),FMath::IsNearlyEqual(Distance/WNTCameraMath::BattleFocusZoom,105000./FMath::Min(1.,Aspect),.001));
+        for(double LengthMetres:{25.,160.,251.,330.})
+        {
+            const double GalleryZoom=1550./LengthMetres;
+            const double Target=WNTCameraMath::WheelZoom(WNTCameraMath::BattleFocusZoom,-FMath::Loge(GalleryZoom/3.)/WNTCameraMath::BattleZoomPerPixel,true);
+            TestTrue(TEXT("The gallery's relative dimensional input reaches its announced zoom for every hull scale"),FMath::IsNearlyEqual(Target,GalleryZoom,1e-8));
+            const double RangeMetres=Distance/Target/100.;
+            TestTrue(TEXT("Gallery framing remains dimensionally proportional and outside the hull"),RangeMetres>LengthMetres*2.&&RangeMetres<LengthMetres*5.1);
+        }
+    }
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTCameraNotificationTest,"WNT.Camera.SilentPickRefreshPreservesNotification",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTCameraNotificationTest::RunTest(const FString& Parameters)
+{
+    // A sized headless viewport exercises the actual focus/matrix/Tick path;
+    // no browser, game window or campaign service is started in this fixture.
+    class FTestViewport final:public FSceneViewport
+    {
+    public:
+        FTestViewport():FSceneViewport(TSharedPtr<SViewport>()){}
+        FIntPoint GetSizeXY() const override{return FIntPoint(1800,1000);}
+    } Viewport;
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,MakeUniqueObjectName(GetTransientPackage(),UWorld::StaticClass(),TEXT("WNTCameraNotificationTest")),GetTransientPackage(),true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Headless camera notification world"),World))return false;
+    auto* Controller=World->SpawnActor<AWNTPlayerController>();
+    auto* LocalPlayer=NewObject<ULocalPlayer>(GEngine);auto* Client=NewObject<UGameViewportClient>(GEngine);
+    ON_SCOPE_EXIT{Client->Viewport=nullptr;LocalPlayer->ViewportClient=nullptr;LocalPlayer->PlayerController=nullptr;if(Controller)Controller->Player=nullptr;World->DestroyWorld(false);};
+    if(!TestNotNull(TEXT("Real native controller"),Controller))return false;
+    Client->Viewport=&Viewport;LocalPlayer->ViewportClient=Client;LocalPlayer->PlayerController=Controller;Controller->Player=LocalPlayer;
+    Controller->WorldScene=World->SpawnActor<AWNTWorldActor>();Controller->SceneCamera=World->SpawnActor<AWNTCameraActor>();
+    Controller->Mode=TEXT("world");Controller->InstanceId=TEXT("notification-fixture");
+    TArray<double> CameraZooms;
+    Controller->AutomationEventObserver=[&](const TSharedPtr<FJsonObject>& Event)
+    {if(Event->GetStringField(TEXT("type"))==TEXT("camera"))CameraZooms.Add(Event->GetNumberField(TEXT("zoom")));};
+    Controller->UpdateCamera();CameraZooms.Reset();
+    auto Focus=MakeShared<FJsonObject>();Focus->SetStringField(TEXT("action"),TEXT("focus"));Focus->SetStringField(TEXT("instanceId"),Controller->InstanceId);
+    Focus->SetNumberField(TEXT("longitude"),18.4);Focus->SetNumberField(TEXT("latitude"),-34.18);Focus->SetNumberField(TEXT("zoom"),16);
+    Controller->Input(Focus);
+    TestTrue(TEXT("Programmatic port focus schedules a HUD camera notification"),Controller->bCameraDirty);
+    Controller->UpdateCamera(false);Controller->UpdateCamera(false);
+    TestEqual(TEXT("Silent picking refreshes do not emit intermediate notifications"),CameraZooms.Num(),0);
+    TestTrue(TEXT("Fresh picking matrices preserve the existing pending HUD notification"),Controller->bCameraDirty);
+    TestEqual(TEXT("The physical camera has already reached the port focus"),Controller->Zoom,16.);
+    Controller->Tick(1.f/60);
+    TestEqual(TEXT("The next controller tick emits the focused zoom exactly once"),CameraZooms.Num(),1);
+    if(CameraZooms.Num())TestEqual(TEXT("The legend receives16x rather than retaining1x"),CameraZooms[0],16.);
+    TestFalse(TEXT("A notified view clears the pending state"),Controller->bCameraDirty);
+    Controller->UpdateCamera(false);Controller->Tick(1.f/60);
+    TestFalse(TEXT("A no-op silent hover never creates a new pending update"),Controller->bCameraDirty);
+    TestEqual(TEXT("Settled hover traffic cannot produce redundant camera events"),CameraZooms.Num(),1);
+    Controller->AutomationEventObserver=nullptr;
+    return true;
+}
 #endif

@@ -16,7 +16,7 @@ import {campaignMinutes} from '../mechanics/campaign-clock.mjs';
 import {newGame} from '../mechanics/engine.mjs';
 import {beginEngagement} from '../mechanics/engagements.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
-import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS} from './native-camera-gesture-checks.mjs';
+import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldWheelResponse} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2);
@@ -295,6 +295,36 @@ try {
  assert.deepEqual(boxAfter.nations.USA.fleets,boxState.nations.USA.fleets,'Selecting a box issues no movement or mission orders');
  result.checks.push('Real outliner single click visibly highlights only its native fleet without centering or issuing orders. Double click fits a detailed overhead fleet. Left-drag selects only enclosed own fleets and updates native selection without camera movement, orders or campaign time.');
  await surface().focus();await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'Home after selection checks'});
+ await verifyWorldWheelResponse({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,{label}),metrics:result.metrics});
+ // Global diagnostics intentionally return only 24 ray-tested targets. Focus a
+ // public, lightly crowded port so fleets/contacts cannot fill that bounded list.
+ const inspectPort=packet.ports.find(p=>p.id==='cape')||packet.ports[0];assert(inspectPort);
+ await input('focus',{kind:'port',id:inspectPort.id,longitude:inspectPort.position[0],latitude:inspectPort.position[1],zoom:4});
+ await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-4)<.001,{label:'regional port inspection framing'});
+ const zoomLegend=page.locator('.map-zoom-level');
+ await until(()=>zoomLegend.textContent(),text=>text==='Zoom 4.0×',{label:'regional native camera reflected in zoom legend'});
+ const portCamera=await diagnostics('world'),selectedPort=await pick('port');
+ await page.waitForFunction(id=>document.querySelector('.port-inspection')?.dataset.portId===id,selectedPort.id);
+ assert((await page.locator('.port-inspection').innerText()).includes(selectedPort.label),'A real port click opens the matching information panel');
+ assert.deepEqual(cameraFields(await diagnostics('world')),cameraFields(portCamera),'Single-click port inspection does not drag or recenter the map');
+ const portDoubleTarget=await until(async()=>(await targets('port')).find(target=>target.id===selectedPort.id),Boolean,{label:'same inspected port remains directly pickable'});
+ const portDoubleCursor=await cursor();
+ await page.mouse.dblclick(portDoubleTarget.x,portDoubleTarget.y);
+ // A real pointer move may queue hover while programmatic port focus updates
+ // the camera. That hit-test update must not swallow its camera notification.
+ await page.mouse.move(portDoubleTarget.x+2,portDoubleTarget.y+1);
+ const portDoubleEvents=await until(()=>eventsSince(portDoubleCursor),rows=>rows.some(row=>row.event.type==='select'&&row.event.selection?.kind==='port'&&row.event.selection.id===selectedPort.id&&row.event.zoom===true),{label:'real port double-click focus request'});
+ const portFocused=await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-16)<.001&&Math.abs(d.targetZoom-16)<.001,{label:'real port double-click reaches 16×'});
+ // Check before captures, menu clicks, or unrelated UI actions could conceal a
+ // stale legend by incidentally causing a later full render.
+ const focusedLegend=await until(()=>zoomLegend.textContent(),text=>text===`Zoom ${portFocused.zoom.toFixed(1)}×`,{label:'port double-click updates visible zoom legend without another UI action'});
+ const portCameraEvents=await until(()=>eventsSince(portDoubleCursor),rows=>rows.some(row=>row.event.type==='camera'&&Math.abs(row.event.zoom-16)<.001),{label:'port focus emits its native camera notification'});
+ assert.equal(await page.locator('.port-inspection').getAttribute('data-port-id'),selectedPort.id,'Double-click retains the same port inspector');
+ result.metrics.push({kind:'native-port-double-click-camera-legend',portId:selectedPort.id,before:cameraFields(portCamera),after:cameraFields(portFocused),legend:focusedLegend,selectionEvent:portDoubleEvents.find(row=>row.event.type==='select'&&row.event.zoom===true)?.event,cameraNotifications:portCameraEvents.filter(row=>row.event.type==='camera').map(row=>row.event)});
+ await nativeCapture('native-port-inspection',true);
+ await page.locator('.port-inspection [data-action="map-overview"]').click();
+ await surface().focus();await page.keyboard.press('Home');await until(()=>diagnostics('world'),d=>d.zoom===1,{label:'Home after port inspection'});
+ result.checks.push('Sixteen actual wheel notches reach ship zoom with at most one map rebase per anchor solve. A native port single-click opens its matching information without moving the map; a real double-click from 4× focuses that same port at 16× and updates the visible zoom legend through its native camera notification without an unrelated UI redraw.');
  let before=await diagnostics('world');
  const point=await clearPoint();await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-300);
  await until(()=>diagnostics(),after=>after.zoom>before.zoom,{label:'real wheel zoom'});
@@ -367,12 +397,46 @@ try {
  await page.reload({waitUntil:'domcontentloaded'});eventCursor=0;
  await page.locator('[data-action="continue"]').click();await dismissDispatches();await worldReady();
  assert.equal(await page.locator('[data-dialog-type="battle-watch"]').count(),0,'A decisive action alerts without opening the viewer automatically');
+ // Read the real shared-engine clock independently of UI formatting. A
+ // tactical battle's scenario budget is not a staged completion estimate.
+ assert(engagement.tactical,'The campaign fixture uses the shared tactical engine');
+ const elapsedSeconds=engagement.tactical.seconds,scenarioLimitSeconds=engagement.tactical.maxDurationSeconds;
+ assert(Number.isFinite(elapsedSeconds)&&elapsedSeconds>=0);
+ assert(Number.isFinite(scenarioLimitSeconds)&&scenarioLimitSeconds>0);
+ const combatDuration=seconds=>`${Math.floor(seconds/60)} min ${Math.floor(seconds%60)} s`;
+ const elapsedLabel=`Tactical engagement · ${combatDuration(elapsedSeconds)} elapsed`;
+ const scenarioProgress=Math.min(1,elapsedSeconds/scenarioLimitSeconds);
+ const limitLabel=`${Math.round(scenarioProgress*100)}% of scenario time limit (${combatDuration(scenarioLimitSeconds)})`;
+ const checkTacticalTiming=async(locator,label)=>{
+  const text=await locator.innerText();
+  assert(text.includes(elapsedLabel),`${label} shows the actual elapsed combat seconds`);
+  assert(text.includes(limitLabel),`${label} names the actual scenario time limit`);
+  assert(text.includes('not a completion estimate; battles may end earlier.'),`${label} explains the time-limit ratio`);
+  assert.doesNotMatch(text,/current stage|until the next stage/i,`${label} does not present legacy stage progress`);
+  const progress=locator.locator('progress');assert.equal(await progress.count(),1);
+  assert.equal(await progress.getAttribute('aria-label'),'Elapsed combat time compared with the scenario time limit');
+  assert.equal(Number(await progress.getAttribute('max')),1);
+  assert(Math.abs(Number(await progress.getAttribute('value'))-scenarioProgress)<1e-12,`${label} uses elapsed combat divided by its scenario limit`);
+  return text;
+ };
+ const battleCard=page.locator('.command-battles [data-action="watch-battle"]');
+ assert.equal(await battleCard.count(),1);
+ assert.equal(await battleCard.getAttribute('data-id'),String(engagement.id));
+ const battleCardText=await checkTacticalTiming(battleCard,'Compact command battle card');
  // Diagnostics exposes a bounded set of ray-tested targets. Bring the actual
  // engagement into view before picking; Home can put it beyond a narrow
  // viewport or behind the first 24 strategic port/convoy targets.
  await input('focus',{longitude:engagement.position[0],latitude:engagement.position[1],zoom:12});
  await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-12)<.001,{label:'regional battle location'});
  await until(()=>diagnostics('world'),d=>d.targets.some(t=>t.kind==='battle'&&String(t.id)===String(engagement.id)),{label:'ongoing decisive map marker'});
+ const battleHover=await pick('battle',{hover:true});
+ assert.equal(String(battleHover.id),String(engagement.id),'The actual native map hover identifies its own live engagement');
+ const battleTooltip=page.locator('.class-hover:not([hidden])');await battleTooltip.waitFor();
+ await until(()=>battleTooltip.innerText(),text=>text.includes(elapsedLabel),{label:'live tactical battle hover timing'});
+ const battleHoverText=await checkTacticalTiming(battleTooltip,'Native map battle hover');
+ result.metrics.push({kind:'campaign-tactical-progress-labels',reportId:engagement.id,elapsedSeconds,scenarioLimitSeconds,scenarioProgress,cardText:battleCardText,hoverText:battleHoverText});
+ result.checks.push('Before opening a real shared-engine decisive battle, its compact command card and actual native map hover show the exact elapsed combat seconds and scenario time-limit ratio, explicitly deny a completion estimate, and contain no legacy current-stage wording.');
+ await page.mouse.move(1,1);
  await nativeCapture('native-campaign-battle-marker');
  const battlePick=await pick('battle');
  assert.equal(String(battlePick.id),String(engagement.id),'Map marker selects its own live engagement');

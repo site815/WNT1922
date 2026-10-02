@@ -19,7 +19,7 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 | All nine research-level explanations | [common/rules/research-tree.md](common/rules/research-tree.md) |
 | Economic growth and historical series | `common/rules/economy.md` and `common/rules/historical-gdp-data.md` |
 | Monthly shipping demand, 2% moving pool and automatic round-trip routes | `common/rules/merchant-routes.md` |
-| Naval battle stages, durations and repeated main engagements | `common/rules/battle-stages.md` |
+| Shared tactical combat, ship AI and decisive thresholds | [`../combatmechanics/README.md`](../combatmechanics/README.md) |
 | Significant actions, morale changes and tonnage-based war score | `common/rules/campaign-impact.md` |
 | Civilian hull rebuilding, logistics multipliers and average merchant GRT | `common/rules/merchant-economy.md`; `economy.md` defines GTP and home-region output access |
 | Ports, lanes, capitals and island campaigns | `common/rules/world.md`, `port-catalog.md`, `land-war.md`; national documents specify opening ports; `task-forces.md` supplies theater allocation and fallback basing |

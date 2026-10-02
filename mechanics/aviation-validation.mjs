@@ -26,7 +26,7 @@ export function validateAviation(s, c) {
       !Array.isArray(n.airTransfers) ||
       n.airTransfers.length > 1000 ||
       !Array.isArray(n.airSorties) ||
-      n.airSorties.length > 32 ||
+      n.airSorties.length > 64 ||
       !Array.isArray(n.airLog) ||
       n.airLog.length > 20
     )
@@ -139,6 +139,8 @@ export function validateAviation(s, c) {
         fail();
     }
     for (const op of n.airSorties) {
+      if (op.tacticalCombat !== undefined && (!Number.isInteger(op.tacticalCombat) ||
+        op.phase !== 'engaging' || ![...s.reports,...(s.backgroundEngagements||[])].some(r=>r.id===op.tacticalCombat && r.status==='ongoing' && r.tactical?.airPools && Object.values(r.tactical.airPools).some(p=>p.id===op.id)))) fail();
       if (
         !op ||
         typeof op.id !== "string" ||

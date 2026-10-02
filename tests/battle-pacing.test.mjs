@@ -68,8 +68,11 @@ test('explicit resume uses real 15-second tactical ticks and command/load replac
 test('completion never resumes a manual pause or silently accelerates, and later speed choices are allowed', () => {
   const f = fixture(), report = f.begin();
   applyCommand(f.state,CATALOG,{type:'pause',args:{value:true}});
+  let recordedDamage=0;
   for (let i = 0; i < 128 && report.status === 'ongoing'; i++) {
     setCampaignMinutes(f.state,campaignMinutes(f.state) + 15); progressEngagements(f.state,f.content);
+    const current=Object.values(f.state.relations['JPN-USA'].record?.sides||{}).reduce((n,side)=>n+side.damage,0);
+    assert(current>=recordedDamage,'Sinking a damaged hull must not subtract previously inflicted damage from the war ledger');recordedDamage=current;
   }
   assert.equal(report.status,'completed'); assert.equal(f.state.paused,true); assert.equal(f.state.speed,BATTLE_SPEED);
   applyCommand(f.state,CATALOG,{type:'speed',args:{value:1}});
@@ -78,7 +81,8 @@ test('completion never resumes a manual pause or silently accelerates, and later
   const resolved = frames.filter(frame => frame.exchange);
   assert(resolved.length > 0);
   assert(resolved.every(frame => frame.exchange.kind === 'surface' && frame.exchange.sides.join() === 'A,B'));
-  assert(frames.some(frame => frame.stage === 3 && !frame.exchange),'Waiting combat-stage ticks are not recorded as attacks');
+  assert(frames.every(frame => Number.isFinite(frame.tacticalSeconds)),'Each observed campaign frame identifies its actual tactical time');
+  assert(report.tactical.history.events.some(event => event.kind === 'salvo'),'Attacks come from individual timed weapon events');
   const loaded = validateSave(JSON.parse(exportSave(f.state)),CATALOG);
   assert.deepEqual(loaded.reports[0].replay,report.replay);
   const bad = structuredClone(f.state); bad.reports[0].replay.frames.find(frame => frame.exchange).exchange.sides = ['A','A'];

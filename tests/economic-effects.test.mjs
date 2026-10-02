@@ -141,7 +141,8 @@ test('completed skirmishes do not change morale, significant battles apply once 
     const r=beginEngagement(s,c,{a:'JPN',b:'USA',kind:'surface',region:'pacific',
       fleetA:a.fleets.find(f=>f.role==='carrier').id,fleetB:b.fleets.find(f=>f.role==='carrier').id});
     const ma=a.morale,mb=b.morale;
-    r.resultB.tons=tons;r.stage=4;r.nextStageAt=campaignMinutes(s);
+    r.resultB.tons=tons;r.tactical.status='completed';r.tactical.winner='A';
+    setCampaignMinutes(s,campaignMinutes(s)+15);
     progressEngagements(s,c);
     assert.equal(r.status,'completed');assert.equal(r.significantAction,significant);
     near(a.morale,ma+(significant?3:0));near(b.morale,mb-(significant?5:0));

@@ -55,6 +55,7 @@ export function recordBattleFrame(s, r, label, exchange = null) {
   const frame = { at, stage: r.stage, round: r.round, label, status: r.status,
     merchantHulls: r.merchantHulls || r.airOperation?.merchantHulls || 0,
     merchantGRT: r.merchantGRT || r.airOperation?.merchantGRT || 0, portDamage: r.portDamage || 0 };
+  if (r.tactical) frame.tacticalSeconds = r.tactical.seconds;
   // This records a resolved exchange, not an inferred attack on every combat
   // stage tick. Exact shell trajectories and individual attackers are not
   // simulated; the viewer illustrates this aggregate event explicitly.
@@ -75,6 +76,19 @@ export function recordBattleFrame(s, r, label, exchange = null) {
   if (frames.length >= REPLAY_FRAME_LIMIT) { frames.splice(1, 1); r.replay.truncated = true; }
   frames.push(frame);
   boundReplayArchive(s, r);
+  boundTacticalArchive(s);
+}
+
+// Tactical state shares the save budget across reports. Older complete records
+// become explicitly unavailable; campaign outcomes and aggregate frames remain.
+export function boundTacticalArchive(s) {
+  const reports = s.reports.filter(r => r.tactical), complete = reports.filter(r => r.status !== 'ongoing');
+  let characters = reports.reduce((n, r) => n + JSON.stringify(r.tactical).length, 0);
+  for (const report of [...complete].reverse()) {
+    if (characters <= 1000000 && complete.indexOf(report) < REPLAY_REPORT_LIMIT) continue;
+    characters -= JSON.stringify(report.tactical).length;
+    delete report.tactical; report.tacticalArchived = true;
+  }
 }
 
 function boundReplayArchive(s, current) {

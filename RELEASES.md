@@ -4,6 +4,21 @@
 
 The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
 
+## Native preview — 0.45.0-dev
+
+- **Tactical Engagements** opens from the title screen or menu 12. Choose Denmark Strait, Midway or North Cape, or create opposing fleets from both campaign catalogs. Set formations, doctrine, weather and a reproducible seed, then watch the AI, advance one step, or resolve quickly. Custom fleets support up to 120 hulls per side. The campaign stays paused and unchanged while this separate mode is open.
+- Campaign battles and the standalone simulator now share the rules in **combatmechanics/**. Combat uses fixed **10-second steps** inside each complete **15-minute campaign tick**. Watched and quick outcomes use the same positions, reloads, weapon travel, damage, sinking and withdrawal rules. Carrier strikes move as aggregate air groups; aircraft are physically reserved and returned rather than counted twice.
+- Native ships follow observed individual courses. The cinematic camera follows actual attacks and losses; manual camera input takes control. Recorded campaign movies compress retained tactical observations into 30–90 seconds without changing campaign time or outcomes. Old aggregate recordings retain their labelled illustrations; missing detailed history is disclosed.
+- Fit fleets frames the current participants, with clickable symbols at their true positions when hulls are too distant to see. Focus approaches the selected ship at a consistent distance. Replay and restart reset the camera and preserve the cinematic preference.
+- Distant cinematic subjects use direct camera cuts instead of flying across empty ocean. Fleet-wide views stay near overhead; close attack and sinking shots retain cinematic angles.
+- World-map wheel input is coalesced per rendered frame, zoom responds more strongly, and one cursor-anchor solve performs at most one geographic rebase. Sixteen standard wheel notches span world-to-ship zoom. Close orbit remains manual; zooming out restores north-up immediately.
+- Single-click a port to open its inspector beside the command map without moving the camera. Double-click centers and zooms. Foreign stores and forces remain subject to intelligence visibility.
+- Compact battle cards and map hovers show actual combat time against the scenario limit; the bar is a time budget, not a prediction of when the battle will end.
+
+Validation passed: **519 selected JavaScript tests**, **48 native tests**, all **198 gallery loads/picks**, **seven native window sizes and 70 ministry layouts**, and a **90-day / 8,640-tick campaign run**. The final extracted archive also passed tactical interactions, scoped native-image review, normal on-screen input and offline network observation.
+
+Presets model selected principal ships and disclose omitted forces and scenario assumptions. Combat coefficients are editable game approximations, not calibrated historical probabilities; outcomes are never forced to match history. The game remains offline, windowed, resizable and maximizable, with a default/minimum 1800×1000 client area. Ship assets remain external and directly editable. See [verification evidence and limits](SYSTEMS-CHECK.md).
+
 ## Native preview — 0.44.0-dev
 
 - The map stays overhead at every zoom until you deliberately orbit at close ship range with a middle-button drag. Any zoom-out input immediately restores overhead and north-up viewing. Right drag pans; left click selects and left drag boxes your fleets. Strategic framing includes margins around the polar limits.

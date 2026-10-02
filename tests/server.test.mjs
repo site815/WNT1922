@@ -50,6 +50,7 @@ test("local server serves the game, saves atomically, retains a backup and rejec
     "ui/app.mjs",
     "ui/styles.css",
     "mechanics/engine.mjs",
+    "combatmechanics/index.mjs",
     "worker/simulation-worker.mjs",
     "worker/catalog-loader.mjs",
     "catalog/manifest.md",

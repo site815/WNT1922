@@ -53,7 +53,7 @@ export function mapHover(s, c, key, data = {}) {
       esc(PORTS[id].name) +
       "</h3>" +
       portPopup(s, c, id) +
-      "<small>Click to center · double-click to zoom.</small>"
+      "<small>Click to inspect this port · double-click to center and zoom.</small>"
     );
   if (kind === "front") {
     const f = s.world?.fronts.find((f) => f.id === id);

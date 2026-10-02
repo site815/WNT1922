@@ -105,7 +105,7 @@ try {
         $packageDirectory=Split-Path -Parent $projectDirectory
         $data=Join-Path $projectDirectory 'GameData'
         New-Item -ItemType Directory -Path $data | Out-Null
-        foreach ($folder in @('ui','mechanics','catalog','worker','assets')) {
+        foreach ($folder in @('ui','mechanics','combatmechanics','catalog','worker','assets')) {
             Copy-Item -LiteralPath (Join-Path $repo $folder) -Destination (Join-Path $data $folder) -Recurse
         }
         foreach ($file in @('LICENSE.md','README.md','package.json')) {

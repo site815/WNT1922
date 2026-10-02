@@ -3,10 +3,11 @@
 
 void FWNTBattleTrack::Read(const TSharedPtr<FJsonObject>& Unit,double Duration)
 {
-    Points.Reset();AppearsAt=0;LostAt=-1;if(!Unit)return;
+    Points.Reset();AppearsAt=0;LostAt=DisappearsAt=-1;if(!Unit)return;
     double Number;
     if(Unit->TryGetNumberField(TEXT("appearsAt"),Number)&&FMath::IsFinite(Number))AppearsAt=FMath::Clamp(Number,0.,Duration);
     if(Unit->TryGetNumberField(TEXT("lostAtSeconds"),Number)&&FMath::IsFinite(Number)&&Number>=0)LostAt=FMath::Clamp(Number,AppearsAt,Duration);
+    if(Unit->TryGetNumberField(TEXT("disappearsAt"),Number)&&FMath::IsFinite(Number)&&Number>=0)DisappearsAt=FMath::Clamp(Number,AppearsAt,Duration);
     const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
     if(!Unit->TryGetArrayField(TEXT("trajectory"),Values))return;
     for(const auto& Value:*Values)

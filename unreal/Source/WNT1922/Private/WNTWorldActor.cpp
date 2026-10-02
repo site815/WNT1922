@@ -7,6 +7,7 @@
 #include "WNTOceanDetailActor.h"
 #include "WNTBattleEffects.h"
 #include "WNTBattleTimeline.h"
+#include "WNTPlayerController.h"
 
 #include "Camera/PlayerCameraManager.h"
 #include "Components/DirectionalLightComponent.h"
@@ -20,6 +21,7 @@
 #include "Engine/TextureCube.h"
 #include "Engine/World.h"
 #include "Engine/Canvas.h"
+#include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/GameViewportClient.h"
 #include "CanvasItem.h"
@@ -325,13 +327,50 @@ struct FWNTWorldRuntime
     struct FBattlePose { FVector From, To; double FromYaw = 0, ToYaw = 0; bool bSunk = false; FWNTBattleTrack Track; };
     TMap<FString, FBattlePose> BattlePoses;
     TMap<FString, FTransform> BattleSurfaceTransforms;
+    struct FAirWing
+    {
+        struct FCount { double At=0; int32 Planes=0,Fighters=0; };
+        FString Key,Side,Phase;
+        int32 Planes=0,Fighters=0;
+        FVector Position=FVector::ZeroVector;
+        double Yaw=0;
+        FWNTBattleTrack Track;
+        TArray<FCount> Counts;
+        FIntPoint CountAt(double At) const
+        {
+            FIntPoint Result(Planes,Fighters);
+            if(!Counts.IsEmpty())Result=FIntPoint(Counts[0].Planes,Counts[0].Fighters);
+            for(const auto& Count:Counts){if(Count.At>At)break;Result=FIntPoint(Count.Planes,Count.Fighters);}
+            return Result;
+        }
+    };
+    TArray<FAirWing> BattleAirWings;
+    int32 VisibleAirWings=0;
+    struct FShoreBattery
+    {
+        struct FHealth { double At=0,Health=1; };
+        FString Key,Side,Label;
+        FVector Position=FVector::ZeroVector;
+        double Health=1;
+        FWNTBattleTrack Track;
+        TArray<FHealth> Conditions;
+        double HealthAt(double At) const
+        {
+            if(Track.IsLost(At))return 0.;
+            double Result=Conditions.IsEmpty()?Health:Conditions[0].Health;
+            for(const auto& Condition:Conditions){if(Condition.At>At)break;Result=Condition.Health;}
+            return Result;
+        }
+    };
+    TArray<FShoreBattery> ShoreBatteries;
+    int32 VisibleShoreBatteries=0;
+    int32 VisibleBattleShipMarkers=0;
     FWNTBattleEffects BattleEffects;
     FString BattleId;
     double BattleAt = 0;
     bool bBattleEffectsWereAnimating = false;
     bool bBattleMovie = false;
     double ReceivedAt = 0, Duration = 0, BattleReceivedAt = 0, BattleDuration = 0;
-    FBox BattleBounds = FBox(ForceInit);
     double LastWorldFraction = -1, LastBattleFraction = -1;
     double NextModelRefresh = 0, RouteWidth = 10000, BattleSymbolTime = 0;
     bool bGridVisible = true;
@@ -827,14 +866,20 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
     }
     Runtime->BattleId = Report;
     if(!Boolean(Packet,TEXT("animate"),true))Runtime->BattleDuration=0;
-    if (!SameBattle||NewFrame) Runtime->BattleBounds = FBox(ForceInit);
     TSet<FString> Keep;
     for (const auto& Value : Array(Packet, TEXT("units")))
     {
-        const auto Unit = Value->AsObject(); const FString Key = String(Unit, TEXT("key")); Keep.Add(Key);
+        const auto Unit = Value->AsObject();
+        // Coastal defenses have their own chart representation. Never let a
+        // logical installation request or inherit a ship mesh.
+        if(!Unit||Boolean(Unit,TEXT("hiddenFromScene"))||String(Unit,TEXT("type"))==TEXT("FORT"))continue;
+        const FString Key = String(Unit, TEXT("key"));if(Key.IsEmpty())continue;Keep.Add(Key);
         AWNTShipActor* Ship = Runtime->BattleShips.FindRef(Key).Get(); const bool Existing = Ship != nullptr;
         if (!Ship) { Ship = GetWorld()->SpawnActor<AWNTShipActor>(); if (!Ship) continue; Ship->SetOwner(this); Runtime->BattleShips.Add(Key, Ship); }
-        const FString Path = ModelPath(String(Unit, TEXT("classId")), String(Packet, TEXT("campaign"), Campaign), String(Unit, TEXT("type")));
+        // Custom engagements can deliberately mix catalog vintages. Preserve
+        // each chosen class's explicit catalog identity; never search another
+        // campaign for a conveniently available but different hull variant.
+        const FString Path = ModelPath(String(Unit, TEXT("classId")), String(Unit,TEXT("campaign"),String(Packet,TEXT("campaign"),Campaign)), String(Unit, TEXT("type")));
         if (Path.IsEmpty()) { Ship->SetPendingModel(); Runtime->LoadedBattleModels.Remove(Key); }
         else
         {
@@ -853,13 +898,44 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
         auto Pick = Selection(TEXT("battle-ship"), Id(Unit, TEXT("id")), String(Unit, TEXT("label")));
         Pick->SetStringField(TEXT("key"), Key); Pick->SetStringField(TEXT("side"), String(Unit, TEXT("side"))); Pick->SetStringField(TEXT("classId"), String(Unit, TEXT("classId")));
         Pick->SetBoolField(TEXT("representativeDesign"), !Path.IsEmpty() && String(Unit, TEXT("classId")).StartsWith(TEXT("draft-")));
+        Pick->SetBoolField(TEXT("selected"),Boolean(Unit,TEXT("selected")));
         Pick->SetNumberField(TEXT("hullIndex"), Number(Unit, TEXT("hullIndex"))); Runtime->Selections.Add(Ship, Pick);
         if (Packet->HasField(TEXT("instanceId"))) Pick->SetField(TEXT("instanceId"), Packet->TryGetField(TEXT("instanceId")));
-        Runtime->BattleBounds += Target + FVector(40000); Runtime->BattleBounds += Target - FVector(40000);
-        for(const auto& Point:Runtime->BattlePoses.FindChecked(Key).Track.Points){Runtime->BattleBounds+=Point.Position+FVector(40000);Runtime->BattleBounds+=Point.Position-FVector(40000);}
     }
     for (auto It = Runtime->BattleShips.CreateIterator(); It; ++It) if (!Keep.Contains(It.Key()))
     { if (auto* Actor = It.Value().Get()) { Runtime->Selections.Remove(Actor); Actor->Destroy(); } Runtime->BattlePoses.Remove(It.Key()); Runtime->LoadedBattleModels.Remove(It.Key()); It.RemoveCurrent(); }
+    Runtime->BattleAirWings.Reset();
+    for(const auto& Value:Array(Packet,TEXT("airstrikes")))
+    {
+        if(Runtime->BattleAirWings.Num()>=256)break;
+        const auto Wing=Value->AsObject();if(!Wing)continue;
+        FWNTWorldRuntime::FAirWing Entry;Entry.Key=String(Wing,TEXT("key"));Entry.Side=String(Wing,TEXT("side"));Entry.Phase=String(Wing,TEXT("phase"));
+        Entry.Planes=int32(FMath::Clamp(Number(Wing,TEXT("planes")),0.,10000.));Entry.Fighters=int32(FMath::Clamp(Number(Wing,TEXT("fighters")),0.,10000.));
+        if(Entry.Key.IsEmpty())continue;
+        Entry.Position=PositionMetres(Wing);Entry.Yaw=Number(Wing,TEXT("headingDegrees"));Entry.Track.Read(Wing,Number(Packet,TEXT("durationSeconds"),15));
+        for(const auto& CountValue:Array(Wing,TEXT("trajectory")))
+        {
+            if(Entry.Counts.Num()>=128)break;const auto Count=CountValue->AsObject();if(!Count||!Count->HasField(TEXT("planes")))continue;
+            const double Time=Number(Count,TEXT("time"),-1);if(Time<0||(!Entry.Counts.IsEmpty()&&Time<=Entry.Counts.Last().At))continue;
+            Entry.Counts.Add({Time,int32(FMath::Clamp(Number(Count,TEXT("planes")),0.,10000.)),int32(FMath::Clamp(Number(Count,TEXT("fighters")),0.,10000.))});
+        }
+        Runtime->BattleAirWings.Add(MoveTemp(Entry));
+    }
+    Runtime->ShoreBatteries.Reset();
+    for(const auto& Value:Array(Packet,TEXT("shoreBatteries")))
+    {
+        if(Runtime->ShoreBatteries.Num()>=128)break;const auto Battery=Value->AsObject();if(!Battery)continue;
+        FWNTWorldRuntime::FShoreBattery Entry;Entry.Key=String(Battery,TEXT("key"));if(Entry.Key.IsEmpty())continue;
+        Entry.Side=String(Battery,TEXT("side"));Entry.Label=String(Battery,TEXT("label"));Entry.Position=PositionMetres(Battery);Entry.Health=FMath::Clamp(Number(Battery,TEXT("health"),1),0.,1.);
+        Entry.Track.Read(Battery,Number(Packet,TEXT("durationSeconds"),15));
+        for(const auto& HealthValue:Array(Battery,TEXT("trajectory")))
+        {
+            if(Entry.Conditions.Num()>=128)break;const auto Point=HealthValue->AsObject();if(!Point||!Point->HasField(TEXT("health")))continue;
+            const double ConditionTime=Number(Point,TEXT("time"),-1);if(ConditionTime<0||(!Entry.Conditions.IsEmpty()&&ConditionTime<=Entry.Conditions.Last().At))continue;
+            Entry.Conditions.Add({ConditionTime,FMath::Clamp(Number(Point,TEXT("health"),1),0.,1.)});
+        }
+        Runtime->ShoreBatteries.Add(MoveTemp(Entry));
+    }
     // Viewport messages own scene activation. A delayed demo packet must not
     // reactivate a hidden/title scene after the user has entered the campaign.
     const double Fraction=Runtime->BattleDuration>0?FMath::Clamp(Runtime->BattleEffects.Elapsed(Now)/Runtime->BattleDuration,0.,1.):1.;
@@ -885,9 +961,14 @@ void AWNTWorldActor::UpdateBattle(double Fraction)
         Ship->SetActorTransform(Lost?FWNTBattleEffects::SinkingTransform(Surface,Sinking):Surface);
         // Only recorded new losses get a transition. Historical wrecks and
         // reduced-motion losses are hidden immediately, without combat rolls.
-        const bool Visible=!bSceneHidden&&bBattleMode&&(!Tracked||Pose.Track.HasAppeared(Elapsed))&&(!Lost||Sinking<1.);
+        const bool Visible=!bSceneHidden&&bBattleMode&&(!Tracked||Pose.Track.HasAppeared(Elapsed))&&!Pose.Track.HasDeparted(Elapsed)&&(!Lost||Sinking<1.);
         Ship->SetActorHiddenInGame(!Visible);Ship->SetActorEnableCollision(Visible);
-        if(Lost&&Sinking>=1.&&Ship->HasRenderableModel())Ship->ReleaseResidentModel();
+        if(((Lost&&Sinking>=1.)||Pose.Track.HasDeparted(Elapsed))&&Ship->HasRenderableModel())Ship->ReleaseResidentModel();
+    }
+    for(const auto& Battery:Runtime->ShoreBatteries)
+    {
+        const double Elapsed=Runtime->BattleEffects.Elapsed(Now);
+        Runtime->BattleSurfaceTransforms.Add(Battery.Key,Battery.Track.Points.IsEmpty()?FTransform(Battery.Position):Battery.Track.Sample(Elapsed));
     }
 }
 
@@ -915,7 +996,7 @@ void AWNTWorldActor::UpdateVisibility()
         const auto& Pose=Runtime->BattlePoses.FindChecked(Pair.Key);
         const double Now=FPlatformTime::Seconds(),Elapsed=Runtime->BattleEffects.Elapsed(Now);
         const bool Tracked=!Pose.Track.Points.IsEmpty(),Lost=Tracked?Pose.Track.IsLost(Elapsed):Pose.bSunk;
-        const bool Visible = !bSceneHidden && bBattleMode && (!Tracked||Pose.Track.HasAppeared(Elapsed))
+        const bool Visible = !bSceneHidden && bBattleMode && (!Tracked||Pose.Track.HasAppeared(Elapsed))&&!Pose.Track.HasDeparted(Elapsed)
             &&(!Lost||Runtime->BattleEffects.SinkProgress(Pair.Key,Now)<1.);
         Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
     }
@@ -959,12 +1040,125 @@ void AWNTWorldActor::DrawChart(UCanvas* Canvas)
     const int32 PreviousVertices=Runtime->ChartVertices;
     Runtime->DrawnChartMarkers=Runtime->ChartVertices=Runtime->ChartTriangles=0;
     Runtime->ChartDrawMilliseconds=Runtime->ChartProjectionMilliseconds=Runtime->ChartBatchMilliseconds=0;
-    if(!Canvas||!Canvas->Canvas||bSceneHidden||bBattleMode)return;
+    Runtime->VisibleAirWings=Runtime->VisibleShoreBatteries=Runtime->VisibleBattleShipMarkers=0;
+    if(!Canvas||!Canvas->Canvas||bSceneHidden)return;
     const double Started=FPlatformTime::Seconds();
     auto* Player=GetWorld()->GetFirstPlayerController();if(!Player)return;
     const FChartScreenProjection Projection(Player);
     Runtime->ChartProjectionMilliseconds=(FPlatformTime::Seconds()-Started)*1000.;
     const double UIScale=FMath::Clamp(Canvas->SizeY/1000.,1.,2.);
+    if(bBattleMode)
+    {
+        // A real 200m hull becomes subpixel in a 220km carrier engagement.
+        // Keep the exact models/positions and add crisp navigation ink only
+        // while the hull itself is too small to recognize or select.
+        TArray<FBox2D> Labels;
+        for(const auto& Pair:Runtime->BattleShips)
+        {
+            auto* Ship=Pair.Value.Get();const double Pixels=GetChartPixelSize(Ship,Canvas->SizeY);
+            if(Pixels<=0)continue;
+            FVector2D At,Ahead;if(!Projection.Project(Ship->GetActorLocation(),At)||At.X< -Pixels||At.Y< -Pixels||At.X>Canvas->SizeX+Pixels||At.Y>Canvas->SizeY+Pixels)continue;
+            const auto Pick=Runtime->Selections.FindRef(Ship);const bool Selected=Boolean(Pick,TEXT("selected"));
+            const FString Side=String(Pick,TEXT("side"));
+            const FLinearColor Colour=Side==TEXT("B")?FLinearColor(.98f,.55f,.36f):FLinearColor(.46f,.86f,1.f);
+            const bool HasHeading=Projection.Project(Ship->GetActorLocation()+Ship->GetActorForwardVector()*10000.,Ahead);
+            const double Angle=HasHeading?FMath::Atan2(Ahead.Y-At.Y,Ahead.X-At.X)+UE_DOUBLE_PI*.5:0.;
+            At=FVector2D(FMath::RoundToDouble(At.X),FMath::RoundToDouble(At.Y));
+            static const FVector2D Hull[]={{0,-.5},{.25,-.15},{.25,.4},{-.25,.4},{-.25,-.15}};
+            auto DrawHull=[&](FCanvas* InCanvas)
+            {
+                auto* Batch=InCanvas->GetBatchedElements(FCanvas::ET_Triangle,nullptr,GWhiteTexture,SE_BLEND_Translucent);
+                const auto Proxy=InCanvas->GetHitProxyId();
+                for(int32 Layer=0;Layer<2;++Layer)
+                {
+                    const FLinearColor Ink=Layer==1?Colour:Selected?FLinearColor(1.f,.9f,.35f):FLinearColor(.01f,.025f,.04f);
+                    const double Size=Pixels*(Layer==0?1.2:1.);
+                    const int32 Centre=Batch->AddVertexf(FVector4f(float(At.X),float(At.Y),0,1),FVector2f::ZeroVector,Ink,Proxy);
+                    for(const auto& Point:Hull)
+                    {
+                        const FVector2D P=At+FVector2D(Point.X*FMath::Cos(Angle)-Point.Y*FMath::Sin(Angle),Point.X*FMath::Sin(Angle)+Point.Y*FMath::Cos(Angle))*Size;
+                        Batch->AddVertexf(FVector4f(float(P.X),float(P.Y),0,1),FVector2f::ZeroVector,Ink,Proxy);
+                    }
+                    for(int32 I=0;I<UE_ARRAY_COUNT(Hull);++I)Batch->AddTriangle(Centre,Centre+1+I,Centre+1+(I+1)%UE_ARRAY_COUNT(Hull),GWhiteTexture,SE_BLEND_Translucent);
+                }
+            };
+            FChartCanvasItem HullInk(DrawHull);Canvas->DrawItem(HullInk);
+            const FVector2D LabelAt=At+FVector2D(Pixels*.65,-7*UIScale);
+            const FString Label=Side+TEXT(" ")+String(Pick,TEXT("label")).Left(24);
+            const FBox2D LabelBounds(LabelAt,LabelAt+FVector2D(FMath::Max(40,Label.Len()*8),16)*UIScale);
+            bool Overlap=false;for(const auto& Bounds:Labels)if(Bounds.Intersect(LabelBounds)){Overlap=true;break;}
+            if((Selected||!Overlap)&&GEngine&&GEngine->GetSmallFont())
+            {
+                FCanvasTextItem Text(LabelAt,FText::FromString(Label),GEngine->GetSmallFont(),Colour);
+                Text.Scale=FVector2D(UIScale,UIScale);Text.bOutlined=true;Text.OutlineColor=FLinearColor(.01f,.025f,.04f);Canvas->DrawItem(Text);Labels.Add(LabelBounds);
+            }
+            ++Runtime->VisibleBattleShipMarkers;Runtime->ChartVertices+=12;Runtime->ChartTriangles+=10;
+        }
+        // One clearly labelled aggregate wing per real air operation. These
+        // are crisp chart symbols in the tactical view, not substitute 3D
+        // aircraft models or one actor per aircraft.
+        const double Elapsed=Runtime->BattleEffects.Elapsed(FPlatformTime::Seconds());
+        static const FVector2D Outline[]={{0,-13},{2,-4},{13,2},{13,5},{2,2},{2,8},{6,10},{6,12},{0,10},{-6,12},{-6,10},{-2,8},{-2,2},{-13,5},{-13,2},{-2,-4}};
+        for(const auto& Wing:Runtime->BattleAirWings)
+        {
+            if(!Wing.Track.HasAppeared(Elapsed)||Wing.Track.HasDeparted(Elapsed))continue;
+            const FIntPoint Count=Wing.CountAt(Elapsed);if(Count.X+Count.Y<=0)continue;
+            const FTransform Pose=Wing.Track.Points.IsEmpty()?FTransform(FRotator(0,Wing.Yaw,0),Wing.Position):Wing.Track.Sample(Elapsed);
+            FVector2D At,Ahead;if(!Projection.Project(Pose.GetLocation(),At)||At.X< -32||At.Y< -32||At.X>Canvas->SizeX+32||At.Y>Canvas->SizeY+32)continue;
+            const bool HasHeading=Projection.Project(Pose.TransformPosition(FVector(10000,0,0)),Ahead);
+            const double Angle=HasHeading?FMath::Atan2(Ahead.Y-At.Y,Ahead.X-At.X)+UE_DOUBLE_PI*.5:0.;
+            At=FVector2D(FMath::RoundToDouble(At.X),FMath::RoundToDouble(At.Y));
+            const FLinearColor Colour=Wing.Side==TEXT("B")?FLinearColor(.98f,.55f,.36f):FLinearColor(.46f,.86f,1.f);
+            TArray<FVector2D> Points;Points.Reserve(UE_ARRAY_COUNT(Outline));
+            for(const auto& Point:Outline)Points.Add(At+FVector2D(Point.X*FMath::Cos(Angle)-Point.Y*FMath::Sin(Angle),Point.X*FMath::Sin(Angle)+Point.Y*FMath::Cos(Angle))*UIScale);
+            auto DrawWing=[&](FCanvas* InCanvas)
+            {
+                auto* Batch=InCanvas->GetBatchedElements(FCanvas::ET_Triangle,nullptr,GWhiteTexture,SE_BLEND_Translucent);
+                const auto Proxy=InCanvas->GetHitProxyId();const int32 Centre=Batch->AddVertexf(FVector4f(float(At.X),float(At.Y),0,1),FVector2f::ZeroVector,Colour,Proxy);
+                const int32 Base=Centre+1;
+                for(const auto& Point:Points)Batch->AddVertexf(FVector4f(float(Point.X),float(Point.Y),0,1),FVector2f::ZeroVector,Colour,Proxy);
+                for(int32 I=0;I<Points.Num();++I)Batch->AddTriangle(Centre,Base+I,Base+(I+1)%Points.Num(),GWhiteTexture,SE_BLEND_Translucent);
+            };
+            FChartCanvasItem WingInk(DrawWing);Canvas->DrawItem(WingInk);
+            for(int32 I=0;I<Points.Num();++I)
+            {
+                FCanvasLineItem Line(Points[I],Points[(I+1)%Points.Num()]);Line.SetColor(FLinearColor(.02f,.04f,.06f));Line.LineThickness=1.5f*UIScale;Canvas->DrawItem(Line);
+            }
+            if(GEngine&&GEngine->GetSmallFont())
+            {
+                const FString Label=Wing.Side+TEXT(" ")+FString::FromInt(Count.X+Count.Y);
+                FCanvasTextItem Text(At+FVector2D(17,-7)*UIScale,FText::FromString(Label),GEngine->GetSmallFont(),Colour);
+                Text.Scale=FVector2D(UIScale,UIScale);Text.bOutlined=true;Text.OutlineColor=FLinearColor(.015f,.025f,.04f,1);Canvas->DrawItem(Text);
+            }
+            ++Runtime->VisibleAirWings;Runtime->ChartVertices+=Points.Num()+1;Runtime->ChartTriangles+=Points.Num();
+        }
+        for(const auto& Battery:Runtime->ShoreBatteries)
+        {
+            if(!Battery.Track.HasAppeared(Elapsed)||Battery.Track.HasDeparted(Elapsed))continue;
+            const FVector Position=Battery.Track.Points.IsEmpty()?Battery.Position:Battery.Track.Sample(Elapsed).GetLocation();
+            FVector2D At;if(!Projection.Project(Position,At)||At.X< -32||At.Y< -32||At.X>Canvas->SizeX+32||At.Y>Canvas->SizeY+32)continue;
+            At=FVector2D(FMath::RoundToDouble(At.X),FMath::RoundToDouble(At.Y));
+            const double Health=Battery.HealthAt(Elapsed);
+            const FLinearColor Colour=Health<=0?FLinearColor(.46f,.48f,.49f):Battery.Side==TEXT("B")?FLinearColor(.98f,.55f,.36f):FLinearColor(.46f,.86f,1.f);
+            auto Box=[&](double X,double Y,double W,double H,const FLinearColor& Tint)
+            {FCanvasTileItem Tile(At+FVector2D(X,Y)*UIScale,FVector2D(W,H)*UIScale,Tint);Tile.BlendMode=SE_BLEND_Translucent;Canvas->DrawItem(Tile);};
+            Box(-15,-6,30,19,FLinearColor(.015f,.025f,.04f));Box(-13,-4,26,15,Colour);
+            Box(-11,-10,7,7,Colour);Box(4,-10,7,7,Colour);
+            for(double Side:{-1.,1.})
+            {
+                FCanvasLineItem Barrel(At+FVector2D(Side*7,-6)*UIScale,At+FVector2D(Side*12,-17)*UIScale);
+                Barrel.LineThickness=3*UIScale;Barrel.SetColor(Colour);Canvas->DrawItem(Barrel);
+            }
+            if(GEngine&&GEngine->GetSmallFont())
+            {
+                const FString Label=Battery.Side+FString::Printf(TEXT(" BAT %d%%"),FMath::RoundToInt(Health*100));
+                FCanvasTextItem Text(At+FVector2D(18,-7)*UIScale,FText::FromString(Label),GEngine->GetSmallFont(),Colour);
+                Text.Scale=FVector2D(UIScale,UIScale);Text.bOutlined=true;Text.OutlineColor=FLinearColor(.015f,.025f,.04f);Canvas->DrawItem(Text);
+            }
+            ++Runtime->VisibleShoreBatteries;
+        }
+        Runtime->ChartDrawMilliseconds=(FPlatformTime::Seconds()-Started)*1000.;return;
+    }
     // One stable, ordered Canvas batch. No depth fighting, distance sorting,
     // temporal history, material bloom or frame-dependent icon rotation.
     auto DrawIndexed=[&](FCanvas* InCanvas)
@@ -1019,7 +1213,17 @@ void AWNTWorldActor::DrawChart(UCanvas* Canvas)
 
 double AWNTWorldActor::GetChartPixelSize(const AActor* Actor,double ViewportHeight) const
 {
-    if(!Actor||Actor->IsHidden()||Actor->IsA<AWNTShipActor>())return 0;
+    if(!Actor||Actor->IsHidden())return 0;
+    if(const auto* Ship=Cast<AWNTShipActor>(Actor))
+    {
+        if(!bBattleMode||!Runtime->Selections.Contains(const_cast<AActor*>(Actor)))return 0;
+        const auto* Player=GetWorld()->GetFirstPlayerController();const auto* Camera=Player?Player->PlayerCameraManager.Get():nullptr;
+        if(!Camera)return 0;
+        int32 Width=0,Height=0;Player->GetViewportSize(Width,Height);
+        const double Length=Ship->HasRenderableModel()?Ship->DetailedMesh->Bounds.BoxExtent.GetMax()*2:20000.;
+        const double Depth=FVector::DotProduct(Actor->GetActorLocation()-Camera->GetCameraLocation(),Camera->GetCameraRotation().Vector());
+        return WNTCameraMath::BattleMarkerPixels(Length,Depth,Camera->GetFOVAngle(),FIntPoint(Width,int32(ViewportHeight)));
+    }
     const auto Pick=Runtime->Selections.FindRef(const_cast<AActor*>(Actor));
     const auto Symbol=Object(Object(Runtime->ChartSymbols,TEXT("symbols")),*String(Pick,TEXT("kind")));
     return Symbol.IsValid()?Number(Symbol,TEXT("pixels"),32)*FMath::Clamp(ViewportHeight/1000.,1.,2.):0;
@@ -1027,12 +1231,26 @@ double AWNTWorldActor::GetChartPixelSize(const AActor* Actor,double ViewportHeig
 
 AActor* AWNTWorldActor::HitChart(const FVector2D& NormalizedPointer,const FVector2D& NormalizedPadding) const
 {
-    if(bSceneHidden||bBattleMode)return nullptr;
+    if(bSceneHidden)return nullptr;
     auto* Player=GetWorld()->GetFirstPlayerController();if(!Player)return nullptr;
     int32 Width=0,Height=0;Player->GetViewportSize(Width,Height);if(Width<=0||Height<=0)return nullptr;
     const FChartScreenProjection Projection(Player);
     const FVector2D Pointer(NormalizedPointer.X*Width,NormalizedPointer.Y*Height);
     const FVector2D Padding(FMath::Clamp(NormalizedPadding.X*Width,0.,24.),FMath::Clamp(NormalizedPadding.Y*Height,0.,24.));
+    if(bBattleMode)
+    {
+        AActor* Closest=nullptr;double Best=TNumericLimits<double>::Max();
+        for(const auto& Pair:Runtime->BattleShips)
+        {
+            auto* Actor=Pair.Value.Get();const double Pixels=GetChartPixelSize(Actor,Height);
+            if(Pixels<=0||!Actor->GetActorEnableCollision())continue;
+            FVector2D At;if(!Projection.Project(Actor->GetActorLocation(),At))continue;
+            const FVector2D Delta=Pointer-At;const double Half=Pixels*.6;
+            if(FMath::Abs(Delta.X)<=Half+Padding.X&&FMath::Abs(Delta.Y)<=Half+Padding.Y&&Delta.SizeSquared()<Best)
+            {Closest=Actor;Best=Delta.SizeSquared();}
+        }
+        return Closest;
+    }
     for(int32 I=Runtime->MarkerDrawOrder.Num()-1;I>=0;--I)
     {
         auto* Actor=Runtime->Markers.FindRef(Runtime->MarkerDrawOrder[I]).Get();
@@ -1075,6 +1293,20 @@ TSharedPtr<FJsonObject> AWNTWorldActor::GetChartDiagnostics() const
     Result->SetNumberField(TEXT("submittedVertices"),Runtime->ChartVertices);
     Result->SetNumberField(TEXT("submittedTriangles"),Runtime->ChartTriangles);
     Result->SetNumberField(TEXT("mapRepositionMilliseconds"),Runtime->MapRepositionMilliseconds);
+    Result->SetNumberField(TEXT("tacticalAirWingCount"),Runtime->BattleAirWings.Num());Result->SetNumberField(TEXT("visibleAirWingCount"),Runtime->VisibleAirWings);
+    TArray<TSharedPtr<FJsonValue>> Wings;const double AirElapsed=Runtime->BattleEffects.Elapsed(FPlatformTime::Seconds());
+    for(const auto& Wing:Runtime->BattleAirWings)
+    {
+        auto Row=MakeShared<FJsonObject>();Row->SetStringField(TEXT("key"),Wing.Key);Row->SetStringField(TEXT("side"),Wing.Side);Row->SetStringField(TEXT("phase"),Wing.Phase);
+        const FIntPoint Count=Wing.CountAt(AirElapsed);Row->SetNumberField(TEXT("planes"),Count.X);Row->SetNumberField(TEXT("fighters"),Count.Y);
+        Row->SetBoolField(TEXT("present"),Wing.Track.HasAppeared(AirElapsed)&&!Wing.Track.HasDeparted(AirElapsed)&&Count.X+Count.Y>0);
+        const FVector Position=Wing.Track.Points.IsEmpty()?Wing.Position:Wing.Track.Sample(AirElapsed).GetLocation();
+        Row->SetArrayField(TEXT("position"),{MakeShared<FJsonValueNumber>(Position.X),MakeShared<FJsonValueNumber>(Position.Y),MakeShared<FJsonValueNumber>(Position.Z)});
+        Wings.Add(MakeShared<FJsonValueObject>(Row));
+    }
+    Result->SetArrayField(TEXT("tacticalAirWings"),Wings);
+    Result->SetNumberField(TEXT("shoreBatteryCount"),Runtime->ShoreBatteries.Num());Result->SetNumberField(TEXT("visibleShoreBatteryCount"),Runtime->VisibleShoreBatteries);
+    Result->SetNumberField(TEXT("visibleBattleShipMarkers"),Runtime->VisibleBattleShipMarkers);
     if(Terrain)Result->SetObjectField(TEXT("mapStyle"),Terrain->GetMapStyleDiagnostics());return Result;
 }
 
@@ -1100,7 +1332,7 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
             {
                 const auto& Pose=Runtime->BattlePoses.FindChecked(Pair.Key);const double Elapsed=Runtime->BattleEffects.Elapsed(Now);
                 const bool Tracked=!Pose.Track.Points.IsEmpty(),Lost=Tracked?Pose.Track.IsLost(Elapsed):Pose.bSunk;
-                if((Tracked&&!Pose.Track.HasAppeared(Elapsed))||(Lost&&Runtime->BattleEffects.SinkProgress(Pair.Key,Now)>=1.))continue;
+                if((Tracked&&!Pose.Track.HasAppeared(Elapsed))||Pose.Track.HasDeparted(Elapsed)||(Lost&&Runtime->BattleEffects.SinkProgress(Pair.Key,Now)>=1.))continue;
                 // The watchable battle contains a bounded set of observed
                 // combatants; keep them available throughout its fitted view.
                 Ship->RefreshModelForCamera(Ship->GetActorLocation(),RefreshModels);
@@ -1193,7 +1425,29 @@ FBox AWNTWorldActor::GetForceBounds(const FString& ForceId) const
     return Bounds;
 }
 
-FBox AWNTWorldActor::GetSceneBounds() const { return bBattleMode ? Runtime->BattleBounds : FBox(FVector(-850000000, -1750000000, 0), FVector(850000000, 1750000000, 1000000)); }
+FBox AWNTWorldActor::GetSceneBounds() const { return bBattleMode ? GetBattleBounds() : FBox(FVector(-850000000, -1750000000, 0), FVector(850000000, 1750000000, 1000000)); }
+FBox AWNTWorldActor::GetBattleBounds() const
+{
+    FBox Bounds(ForceInit);const double Now=FPlatformTime::Seconds(),Elapsed=Runtime->BattleEffects.Elapsed(Now);
+    // Current positions only: fitting retained future/history tracks can put
+    // the camera many km away from every presently visible participant.
+    for(const auto& Pair:Runtime->BattleShips)if(const auto* Ship=Pair.Value.Get())
+    {
+        const auto* Pose=Runtime->BattlePoses.Find(Pair.Key);if(!Pose)continue;
+        const bool Tracked=Runtime->bBattleMovie&&!Pose->Track.Points.IsEmpty();
+        if((Tracked&&!Pose->Track.HasAppeared(Elapsed))||Pose->Track.HasDeparted(Elapsed))continue;
+        if((Tracked?Pose->Track.IsLost(Elapsed):Pose->bSunk)&&Runtime->BattleEffects.SinkProgress(Pair.Key,Now)>=1.)continue;
+        const FVector Position=Tracked?Pose->Track.Sample(Elapsed).GetLocation():Ship->GetActorLocation();
+        Bounds+=Position+FVector(40000);Bounds+=Position-FVector(40000);
+    }
+    for(const auto& Battery:Runtime->ShoreBatteries)
+    {
+        if(!Battery.Track.HasAppeared(Elapsed)||Battery.Track.HasDeparted(Elapsed))continue;
+        const FVector Position=Battery.Track.Points.IsEmpty()?Battery.Position:Battery.Track.Sample(Elapsed).GetLocation();
+        Bounds+=Position+FVector(40000);Bounds+=Position-FVector(40000);
+    }
+    return Bounds;
+}
 
 TSharedPtr<FJsonObject> AWNTWorldActor::GetSelection(AActor* Actor) const
 {
@@ -1745,6 +1999,67 @@ bool FWNTWorldSelectionUpdateTest::RunTest(const FString& Parameters)
     Patch->SetArrayField(TEXT("selectedForceIds"),{});Scene->ApplyWorldPacket(Patch);
     TestTrue(TEXT("A current empty selection clears brackets"),Scene->Runtime->SelectedForceIds.IsEmpty());
     TestEqual(TEXT("Clearing selection also leaves navigation time untouched"),Scene->Runtime->ReceivedAt,100.0);
+    World->DestroyWorld(false);return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTTacticalPresentationTest,"WNT.World.TacticalWingAndDepartureTracks",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTTacticalPresentationTest::RunTest(const FString& Parameters)
+{
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false).CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Tactical presentation world"),World))return false;
+    auto* Scene=World->SpawnActor<AWNTWorldActor>();Scene->SetSceneMode(TEXT("battle"));
+    TSharedPtr<FJsonObject> Packet;
+    const FString Json=TEXT(R"({"id":"tactical-tracks","eventKey":"slice-1","tactical":true,"movie":true,"animate":true,"durationSeconds":20,"elapsedSeconds":4,"playbackPaused":true,
+      "units":[{"key":"hull","id":"hull","side":"A","type":"DD","positionMetres":[100,0,0],"disappearsAt":5,
+        "trajectory":[{"time":0,"positionMetres":[0,0,0]},{"time":10,"positionMetres":[100,0,0]}]}],
+      "airstrikes":[{"key":"wing","side":"A","planes":0,"fighters":0,"phase":"returning","appearsAt":2,"disappearsAt":12,"positionMetres":[1000,0,800],
+        "trajectory":[{"time":0,"positionMetres":[0,0,800],"planes":30,"fighters":10},{"time":6,"positionMetres":[600,0,800],"planes":20,"fighters":5},{"time":12,"positionMetres":[1200,0,800],"planes":0,"fighters":0}]}],
+      "shoreBatteries":[{"key":"fort","side":"B","health":0,"positionMetres":[2000,0,0],"lostAtSeconds":10,
+        "trajectory":[{"time":0,"positionMetres":[2000,0,0],"health":1},{"time":6,"positionMetres":[2000,0,0],"health":0.5},{"time":10,"positionMetres":[2000,0,0],"health":0}]}]})");
+    if(!TestTrue(TEXT("Tactical tracked packet parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet))){World->DestroyWorld(false);return false;}
+    Scene->ApplyBattlePacket(Packet);
+    auto* Hull=Scene->Runtime->BattleShips.FindRef(TEXT("hull")).Get();
+    if(!TestNotNull(TEXT("Actual tracked hull exists"),Hull)){World->DestroyWorld(false);return false;}
+    TestFalse(TEXT("Escaping hull remains visible before its recorded departure"),Hull->IsHidden());
+    TestTrue(TEXT("Fit follows the hull's current40m position, not the start/end of its retained history"),FMath::IsNearlyEqual(Scene->GetBattleBounds().Min.X,-36000.,.01));
+    Scene->SetSceneMode(TEXT("hidden"));
+    TestTrue(TEXT("A first battle packet can be fitted even before its viewport activates"),FMath::IsNearlyEqual(Scene->GetBattleBounds().Min.X,-36000.,.01));
+    Scene->SetSceneMode(TEXT("battle"));
+    TestEqual(TEXT("A historical wing remains available even if its final aircraft count is zero"),Scene->Runtime->BattleAirWings.Num(),1);
+    const auto& Wing=Scene->Runtime->BattleAirWings[0];
+    TestEqual(TEXT("Early flight displays the observed strike and escort complement"),Wing.CountAt(4),FIntPoint(30,10));
+    TestEqual(TEXT("Recorded losses change the aggregate count only at their observation"),Wing.CountAt(8),FIntPoint(20,5));
+    TestTrue(TEXT("Aggregate aircraft follow their actual route and altitude"),Wing.Track.Sample(4).GetLocation().Equals(FVector(40000,0,80000),.01));
+    TestFalse(TEXT("A wing cannot appear before launch"),Wing.Track.HasAppeared(1));
+    TestTrue(TEXT("The wing leaves the map at its recorded recovery/loss time"),Wing.Track.HasDeparted(12));
+    TestEqual(TEXT("Coastal batteries use separate chart records"),Scene->Runtime->ShoreBatteries.Num(),1);
+    const auto& Battery=Scene->Runtime->ShoreBatteries[0];
+    TestEqual(TEXT("Early battery health is not replaced by its final result"),Battery.HealthAt(4),1.);
+    TestEqual(TEXT("Battery damage follows its actual observed timeline"),Battery.HealthAt(8),.5);
+    TestEqual(TEXT("Destroyed battery health reaches zero at the recorded loss time"),Battery.HealthAt(10),0.);
+    Packet->SetStringField(TEXT("eventKey"),TEXT("slice-2"));Packet->SetNumberField(TEXT("elapsedSeconds"),6);Scene->ApplyBattlePacket(Packet);
+    TestTrue(TEXT("An escaped hull is no longer drawn or selectable"),Hull->IsHidden()&&!Hull->GetActorEnableCollision());
+    TestTrue(TEXT("Fit no longer includes a departed hull's retained track"),FMath::IsNearlyEqual(Scene->GetBattleBounds().Min.X,160000.,.01));
+    TestFalse(TEXT("Escaping is distinct from sinking"),Scene->Runtime->BattlePoses.FindChecked(TEXT("hull")).Track.IsLost(6));
+    TestEqual(TEXT("An escaping hull has no fabricated sinking depth"),Hull->GetActorLocation().Z,0.);
+    int32 HullActors=0;for(TActorIterator<AWNTShipActor> It(World);It;++It)++HullActors;
+    TestEqual(TEXT("Aircraft and shore batteries add no pretend ship/model actors"),HullActors,1);
+    TestEqual(TEXT("The wing renderer adds no effects components"),Scene->Runtime->BattleEffects.ComponentCount(),0);
+    // Resolve an explicitly mixed-vintage fleet through the same live packet
+    // path. The fixture registers two exact choices; neither may be replaced
+    // by an implicit search of another campaign when a choice is unavailable.
+    Scene->Runtime->ModelFiles.Add(TEXT("fixture-1922"),TEXT("fixture-1922.glb"));
+    Scene->Runtime->ModelFiles.Add(TEXT("fixture-1936"),TEXT("fixture-1936.glb"));
+    Scene->Runtime->PlatformModels.Add(TEXT("campaign_1922:vintage-class"),TEXT("fixture-1922"));
+    Scene->Runtime->PlatformModels.Add(TEXT("in_good_faith_1936:vintage-class"),TEXT("fixture-1936"));
+    Packet->SetStringField(TEXT("campaign"),TEXT("campaign_1922"));
+    const auto Unit=Packet->GetArrayField(TEXT("units"))[0]->AsObject();Unit->SetStringField(TEXT("classId"),TEXT("vintage-class"));Unit->SetStringField(TEXT("campaign"),TEXT("in_good_faith_1936"));
+    Scene->ApplyBattlePacket(Packet);
+    TestEqual(TEXT("An explicit per-hull catalog campaign wins over the enclosing battle campaign"),Scene->Runtime->LoadedBattleModels.FindRef(TEXT("hull")),FString(TEXT("fixture-1936.glb")));
+    Unit->RemoveField(TEXT("campaign"));Scene->ApplyBattlePacket(Packet);
+    TestEqual(TEXT("Legacy packets without a per-hull override retain their enclosing campaign"),Scene->Runtime->LoadedBattleModels.FindRef(TEXT("hull")),FString(TEXT("fixture-1922.glb")));
+    Unit->SetStringField(TEXT("campaign"),TEXT("unavailable-campaign"));Scene->ApplyBattlePacket(Packet);
+    TestTrue(TEXT("A missing explicit catalog variant stays pending rather than substituting another campaign's hull"),Hull->IsModelPending()&&!Scene->Runtime->LoadedBattleModels.Contains(TEXT("hull")));
     World->DestroyWorld(false);return true;
 }
 #endif

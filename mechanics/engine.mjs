@@ -1,5 +1,8 @@
 import { beginEngagement, progressEngagements } from "./engagements.mjs";
 import { shipInEngagement } from './battle-records.mjs';
+import { advanceCombat } from '../combatmechanics/engine.mjs';
+import { campaignCombatOutcomes, markCampaignCombatApplied, synchronizeCampaignCombat, createCampaignCombat, merchantCombatGroup } from '../combatmechanics/campaign.mjs';
+import { tacticalAirPool, reserveTacticalAirWings } from '../combatmechanics/campaign-air-wings.mjs';
 import { armedClass, fireTorpedoes } from "./torpedo-ammunition.mjs";
 import { MORALE, changeMorale, dailyMoraleRecovery, navalWarScore } from './campaign-impact.mjs';
 import { strategicFactor, strategicDemand, shipMaterialCost } from "./strategic-materials.mjs";
@@ -1645,6 +1648,35 @@ export function aiTurn(s, content, id) {
 
 }
 
+function loseExactCombatAircraft(s, content, id, group, quantity, rescue) {
+  const total = { planes: 0, aviators: 0, planesRescued: 0, aviatorsRescued: 0 };
+  let remaining = Math.min(quantity, (group.airWing || []).reduce((n, w) => n + w.count, 0));
+  for (const wing of group.airWing || []) {
+    const count = Math.min(remaining, wing.count);
+    if (!count) continue;
+    // Reuse the established aircraft/personnel ledgers without another loss roll.
+    const result = loseAircraft(s, content, id, { airWing: [wing] }, (count + 1e-9) / wing.count,
+      { rescue, airframeRescue: 0 });
+    for (const field of Object.keys(total)) total[field] += result[field] || 0;
+    remaining -= count;
+  }
+  group.airWing = (group.airWing || []).filter(w => w.count > 0);
+  return total;
+}
+function applyTacticalPoolLosses(s,content,combat,side,result) {
+  const pool=combat.airPools?.[side],op=tacticalAirPool(s,combat,side);if(!pool||!op)return;
+  const ships=combat.ships.filter(ship=>ship.side===side),flights=combat.airstrikes.filter(flight=>flight.side===side);
+  // Preserve aircraft roles as well as totals. Removing an arbitrary first wing
+  // would turn surviving fighters into bombers when a strike aircraft was lost.
+  for(const role of ['fighter','strike']) {
+    const wings=op.airWing.filter(wing=>role==='strike'?['strike','bomber'].includes(wing.role):wing.role===role);
+    const aboard=ships.reduce((n,ship)=>n+ship.aircraft[role],0),airborne=flights.reduce((n,flight)=>n+(role==='fighter'?flight.fighters:flight.planes),0);
+    const lost=Math.max(0,wings.reduce((n,wing)=>n+wing.count,0)-aboard-airborne);
+    addAirLoss(result,loseExactCombatAircraft(s,content,pool.nation,{airWing:wings},lost,.3));
+  }
+  op.airWing=op.airWing.filter(wing=>wing.count>0);
+  pool.lossesApplied=ships.reduce((n,ship)=>n+ship.aircraftLost,0);
+}
 function matchup(own, enemy) {
   return (
     own.surface +
@@ -1665,6 +1697,7 @@ export function damageFleet(
   rescue = 0.3,
   crewCoverage = 1,
   targets = null,
+  tacticalOutcomes = null,
 ) {
   const n = s.nations[id],
     losses = [],
@@ -1718,8 +1751,9 @@ export function damageFleet(
           1,
         )
       : 1;
+    const exact = tacticalOutcomes?.get(g.id);
     const oldHealth = g.health,
-      hit =
+      hit = exact ? Math.max(0, oldHealth - exact.health) :
         (((((damage / protection) * (0.75 + rng(s) * 0.5)) /
           (1 +
             (c.raw?.features?.includes("damage_control") ? 0.08 : 0) +
@@ -1730,12 +1764,14 @@ export function damageFleet(
           detection) /
           (1 + upgradeLevel(n.tech, "damage_control") * 0.06)) *
         (0.8 + 0.2 / Math.max(0.25, crewEffectiveness(g, c)));
-    g.health = clamp(g.health - hit, 0, 1);
+    g.health = exact ? clamp(exact.health, 0, 1) : clamp(g.health - hit, 0, 1);
     const expected = before * clamp(hit * hit * 0.35, 0, 0.3);
-    let lost = Math.floor(expected) + (rng(s) < expected % 1 ? 1 : 0);
-    if (hit > 0 && g.health < 0.25) lost = Math.max(1, lost);
+    let lost = exact ? exact.sunk : Math.floor(expected) + (rng(s) < expected % 1 ? 1 : 0);
+    if (!exact && hit > 0 && g.health < 0.25) lost = Math.max(1, lost);
     lost = Math.min(before, lost);
-    const aircraftLoss = loseAircraft(
+    const aircraftLoss = exact ? loseExactCombatAircraft(s, content, id, g,
+      lost === before ? (g.airWing || []).reduce((n, w) => n + w.count, 0) : exact.trackedAirPool
+        ? Math.ceil((g.airWing||[]).reduce((n,w)=>n+w.count,0)*lost/Math.max(1,before)) : exact.aircraftLost, rescue) : loseAircraft(
       s,
       content,
       id,
@@ -1747,6 +1783,7 @@ export function damageFleet(
     aviatorsLost += aircraftLoss.aviators;
     planesRescued += aircraftLoss.planesRescued;
     aviatorsRescued += aircraftLoss.aviatorsRescued;
+    if (exact && Number.isInteger(c.torpedoCapacity)) g.torpedoesPerHull = Math.min(c.torpedoCapacity, exact.torpedoes);
     if (lost) {
       g.count -= lost;
       sunk += lost;
@@ -1881,7 +1918,7 @@ export function resolveBattle(
 ) {
   const pa = fleetPower(s, content, a, region, fleetA),
     pb = fleetPower(s, content, b, region, fleetB);
-  if (!pa.ships || !pb.ships) return null;
+  if ((!pa.ships || !pb.ships) && !phase?.combat) return null;
   const fa = s.nations[a].fleets.find((f) => f.id === fleetA),
     fb = s.nations[b].fleets.find((f) => f.id === fleetB);
   pa.total -= pa.air;
@@ -1920,123 +1957,39 @@ export function resolveBattle(
     return null;
   }
   if (!phase) return beginEngagement(s,content,{kind:"surface",a,b,region,fleetA,fleetB,position});
-  // Power above includes the loaded salvo; subsequent exchanges see the spent outfit.
-  expendFleetTorpedoes(s, content, a, region, fleetA);
-  expendFleetTorpedoes(s, content, b, region, fleetB);
-  const va = 1 + (rng(s) * 2 - 1) * RULES.battleVariation,
-    vb = 1 + (rng(s) * 2 - 1) * RULES.battleVariation;
-  const preparationA = {
-      training: s.nations[a].training,
-      morale: s.nations[a].morale,
-      supply: pa.supply,
-      crew: readiness(s, content, a),
-    },
-    preparationB = {
-      training: s.nations[b].training,
-      morale: s.nations[b].morale,
-      supply: pb.supply,
-      crew: readiness(s, content, b),
-    };
-  const upset = rng(s) < RULES.upsetChance,
-    upsetSide = upset ? (rng(s) < 0.5 ? a : b) : null,
-    ea = wa * va * (upsetSide === a ? 1.8 : 1),
-    eb = wb * vb * (upsetSide === b ? 1.8 : 1);
-  const mechanism = (p) =>
-    p.air > p.surface && p.air > p.sub
-      ? "carrier air attack"
-      : p.sub > p.surface
-        ? "submarine torpedo attack"
-        : "gunfire and surface torpedoes";
-  const rescueFor = (id, f, control) => {
-    const pos = f ? fleetPosition(s, f) : position;
-    let escorts = 0;
-    for (const [ally, n] of Object.entries(s.nations)) {
-      if (ally !== id && !s.relations[pairKey(id, ally)]?.allied) continue;
-      for (const other of n.fleets) {
-        if (
-          pos
-            ? distanceNm(fleetPosition(s, other), pos) > 120
-            : other.id !== f?.id
-        )
-          continue;
-        escorts += fleetStats(s, content, ally, other)
-          .active.filter((g) =>
-            ["DD", "DE", "DL"].includes(content.classes[g.classId].type),
-          )
-          .reduce((v, g) => v + g.count, 0);
-      }
-    }
-    return clamp(
-      0.12 + control * 0.55 + Math.min(8, escorts) * 0.025,
-      0.1,
-      0.9,
-    );
-  };
-  const pressureA = fa?.aggressiveBattle ? 1.4 : 1,
-    pressureB = fb?.aggressiveBattle ? 1.4 : 1,
-    riskA = fa?.aggressiveBattle ? 1.2 : 1,
-    riskB = fb?.aggressiveBattle ? 1.2 : 1;
-  const da = damageFleet(
-    s,
-    content,
-    a,
-    region,
-    clamp((eb / Math.max(ea, 1)) * 0.2 * pressureB * riskA, 0.04, 0.85) * phase.weight,
-    pb,
-    mechanism(pb),
-    fleetA,
-    rescueFor(a, fa, ea / (ea + eb)),
-    preparationA.crew,
-  );
-  const db = damageFleet(
-    s,
-    content,
-    b,
-    region,
-    clamp((ea / Math.max(eb, 1)) * 0.2 * pressureA * riskB, 0.04, 0.85) * phase.weight,
-    pa,
-    mechanism(pa),
-    fleetB,
-    rescueFor(b, fb, eb / (ea + eb)),
-    preparationB.crew,
-  );
-  staffAircraft(s, content, a);
-  staffAircraft(s, content, b);
-  const costA = da.tons + da.damagedTons * 0.65,
-    costB = db.tons + db.damagedTons * 0.65,
-    winner = costA === costB ? (ea >= eb ? a : b) : costB > costA ? a : b;
-  const magnitude =
-    Math.max(costA, costB) >= Math.max(1000, Math.min(costA, costB) * 2)
-      ? "major"
-      : "minor";
-  const report = {
-    id: s.nextId++,
-    day: s.day,
-    minute: campaignMinutes(s),
-    fleetA,
-    fleetB,
-    position,
-    a,
-    b,
-    region,
-    winner,
-    magnitude,
-    aggressiveA: !!fa?.aggressiveBattle,
-    aggressiveB: !!fb?.aggressiveBattle,
-    upset,
-    upsetSide,
-    powerA: pa,
-    powerB: pb,
-    effectiveA: ea,
-    effectiveB: eb,
-    variationA: va,
-    variationB: vb,
-    resultA: da,
-    resultB: db,
-    preparationA,
-    preparationB,
-  };
-  return report;
+  const storedReport=[...s.reports,...(s.backgroundEngagements||[])].find(r=>r.id===phase.reportId);
+  const legacyPhase = !phase.combat && !storedReport;
+  const combat = phase.combat || createCampaignCombat({ seed: Math.floor(rng(s)*4294967295)||1,
+    classes: content.classes, groupsA: s.nations[a].groups.filter(g=>availableGroup(s,g)&&(fleetA?g.fleetId===fleetA:g.region===region)),
+    groupsB: s.nations[b].groups.filter(g=>availableGroup(s,g)&&(fleetB?g.fleetId===fleetB:g.region===region)),
+    nationA:s.nations[a],nationB:s.nations[b],nameA:PROFILES[a].name,nameB:PROFILES[b].name,
+    aggressiveA:fa?.aggressiveBattle,aggressiveB:fb?.aggressiveBattle });
+  if (!combat) return null;
+  if(storedReport&&!storedReport.tactical){storedReport.tactical=combat;storedReport.tacticalAt=campaignMinutes(s);combat.metadata.campaign=s.campaignId;combat.metadata.migrated=true;reserveTacticalAirWings(s,storedReport);}
+  // Compatibility for direct exchange callers: their weight is elapsed combat
+  // time, never a second damage formula. New campaign reports retain the state.
+  if (legacyPhase) for (const ship of combat.ships) ship.x = ship.side==='A'?-2:2;
+  synchronizeCampaignCombat(combat, s.nations[a].groups, s.nations[b].groups);
+  advanceCombat(combat, phase.seconds ?? (legacyPhase ? Math.max(10,Math.ceil(TICK_MINUTES*60*(phase.weight??1)/10)*10) : TICK_MINUTES * 60));
+  const outcomesA = campaignCombatOutcomes(combat, 'A'), outcomesB = campaignCombatOutcomes(combat, 'B');
+  const groups = (id, outcomes) => s.nations[id].groups.filter(g => g.count > 0 && outcomes.has(g.id));
+  const ea = wa, eb = wb;
+  const rescue = (own, enemy) => clamp(.2 + own / Math.max(1, own + enemy) * .5, .1, .9);
+  const da = damageFleet(s, content, a, region, 0, pb, "tactical gunfire, torpedoes and air strikes", fleetA,
+    rescue(ea, eb), 1, groups(a, outcomesA), outcomesA);
+  const db = damageFleet(s, content, b, region, 0, pa, "tactical gunfire, torpedoes and air strikes", fleetB,
+    rescue(eb, ea), 1, groups(b, outcomesB), outcomesB);
+  applyTacticalPoolLosses(s,content,combat,'A',da);applyTacticalPoolLosses(s,content,combat,'B',db);
+  markCampaignCombatApplied(combat);
+  staffAircraft(s, content, a); staffAircraft(s, content, b);
+  return { id: phase.reportId, day: s.day, minute: campaignMinutes(s), fleetA, fleetB, position, a, b, region,
+    winner: combat.winner === 'A' ? a : combat.winner === 'B' ? b : null,
+    magnitude: 'minor', aggressiveA: !!fa?.aggressiveBattle, aggressiveB: !!fb?.aggressiveBattle,
+    upset: false, upsetSide: null, powerA: pa, powerB: pb, effectiveA: ea, effectiveB: eb,
+    variationA: 1, variationB: 1, resultA: da, resultB: db,
+    preparationA: { training: s.nations[a].training, morale: s.nations[a].morale, supply: pa.supply, crew: readiness(s, content, a) },
+    preparationB: { training: s.nations[b].training, morale: s.nations[b].morale, supply: pb.supply, crew: readiness(s, content, b) } };
+
 }
 
 export function resolvePortAction(s, c, a, f, port, kind, distance = 0, phase = null) {
@@ -2045,8 +1998,26 @@ export function resolvePortAction(s, c, a, f, port, kind, distance = 0, phase = 
   const before = portSummary(s, c, port),
     harbor = kind === "anchorage" ? anchoredShips(s, c, b, port) : [],
     pa = fleetPower(s, c, a, null, f.id, distance * 1.852, harbor.length > 0);
-  if (!pa.ships) return null;
+  if (!pa.ships && !phase?.combat) return null;
   if (!phase) return beginEngagement(s,c,{kind:"port",a,b,fleetA:f.id,port,operation:kind,distance,position:fleetPosition(s,f)});
+  if (phase.combat) {
+    const combat=phase.combat,position=fleetPosition(s,f),region=Object.values(AREAS).sort((x,y)=>distanceNm(x.point,position)-distanceNm(y.point,position))[0].region;
+    synchronizeCampaignCombat(combat,s.nations[a].groups,s.nations[b].groups);
+    advanceCombat(combat,phase.seconds??TICK_MINUTES*60);
+    const oa=campaignCombatOutcomes(combat,'A'),ob=campaignCombatOutcomes(combat,'B'),groups=(id,outcomes)=>s.nations[id].groups.filter(g=>g.count>0&&outcomes.has(g.id));
+    const pb={surface:before.artillery,air:0,sub:0,asw:0,aa:before.artillery*.2,scout:0,total:before.artillery,ships:harbor.reduce((n,g)=>n+g.count,0),speed:0,supply:before.coverage};
+    const da=damageFleet(s,c,a,region,0,pb,'coastal and anchorage gunfire',f.id,.55,1,groups(a,oa),oa),
+      db=damageFleet(s,c,b,region,0,pa,'anchorage gunfire',null,.8,1,groups(b,ob),ob);
+    applyTacticalPoolLosses(s,c,combat,'A',da);applyTacticalPoolLosses(s,c,combat,'B',db);
+    const fort=combat.ships.find(ship=>ship.type==='FORT'),previous=fort?combat.campaignApplied[fort.id]?.health??1:1,
+      portDamage=kind==='shore'?0:damagePort(s,port,Math.min(.12,Math.max(0,previous-(fort?.health??previous))*.25 + (distance<=18?pa.surface*.55/Math.max(3000,before.combat)*(kind==='siege'?.065:.02):0)));
+    markCampaignCombatApplied(combat);
+    const prep=id=>({training:s.nations[id].training,morale:s.nations[id].morale,supply:1,crew:1});
+    return {id:phase.reportId,day:s.day,minute:campaignMinutes(s),kind:'port',operation:kind,portId:port,portDamage,
+      portHealth:s.ports[port].health,portEquivalent:portDamage*60000,position,region,a,b,fleetA:f.id,fleetB:null,
+      winner:combat.winner==='A'?a:combat.winner==='B'?b:null,magnitude:'minor',upset:false,powerA:pa,powerB:pb,
+      effectiveA:pa.total,effectiveB:pb.total,variationA:1,variationB:1,resultA:da,resultB:db,preparationA:prep(a),preparationB:prep(b)};
+  }
   const position = fleetPosition(s, f),
     region = Object.values(AREAS).sort(
       (x, y) => distanceNm(x.point, position) - distanceNm(y.point, position),
@@ -2196,24 +2167,30 @@ export function resolveConvoyAttack(s,c,a,b,fleetId,convoyId,position,phase=null
   if(!f || !v || !s.relations[pairKey(a,b)]?.war) return null;
   const region=Object.values(AREAS).sort((x,y)=>distanceNm(x.point,position)-distanceNm(y.point,position))[0].region;
   if(!phase) return beginEngagement(s,c,{kind:"convoy",a,b,fleetA:fleetId,convoyId,position,region});
-  const pa=fleetPower(s,c,a,region,fleetId);
-  pa.total-=pa.air; pa.air=0;
-  const pb={surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:v.speed,supply:1};
-  for(const escort of s.nations[b].fleets) if(distanceNm(fleetPosition(s,escort),position)<120) {
-    const power=fleetPower(s,c,b,null,escort.id); pb.asw+=power.asw; pb.surface+=power.surface*.2;
-    expendFleetTorpedoes(s,c,b,null,escort.id);
+  const pa=fleetPower(s,c,a,region,fleetId), pb={surface:0,air:0,sub:0,asw:0,aa:0,scout:0,total:0,ships:0,speed:v.speed,supply:1};
+  let combat=phase.combat;
+  if(!combat){
+    const merchant=merchantCombatGroup(v,b),storedReport=[...s.reports,...(s.backgroundEngagements||[])].find(r=>r.id===phase.reportId);
+    combat=createCampaignCombat({seed:Math.floor(rng(s)*4294967295)||1,classes:{...c.classes,[merchant.shipClass.id]:merchant.shipClass},
+      groupsA:s.nations[a].groups.filter(g=>availableGroup(s,g)&&g.fleetId===fleetId),groupsB:[merchant.group],nationA:s.nations[a],nationB:s.nations[b],
+      nameA:PROFILES[a].name,nameB:PROFILES[b].name,aggressiveA:f.aggressiveBattle});
+    if(!combat)return null;
+    if(storedReport){storedReport.tactical=combat;storedReport.tacticalAt=campaignMinutes(s);combat.metadata.campaign=s.campaignId;combat.metadata.migrated=true;reserveTacticalAirWings(s,storedReport);}
   }
-  pb.total=pb.asw+pb.surface;
-  const attack=pa.surface+pa.sub, chance=attack/Math.max(1,attack+pb.total);
-  expendFleetTorpedoes(s,c,a,region,fleetId);
-  const lost=rng(s)<chance ? Math.floor((1+Math.min(7,attack/100)*rng(s))*phase.weight+rng(s)) : 0;
+  synchronizeCampaignCombat(combat,s.nations[a].groups,s.nations[b].groups);
+  advanceCombat(combat,phase.seconds??TICK_MINUTES*60);
+  const oa=campaignCombatOutcomes(combat,'A'),ob=campaignCombatOutcomes(combat,'B');
+  const merchant=ob.get(v.id),lost=merchant?.sunk||0;
   const loss=sinkMerchants(s,b,Math.min(v.count,lost),{details:true,convoy:v});
-  s.nations[a].merchantSunk+=loss.hulls; s.nations[a].merchantSunkGRT+=loss.grt;
-  recordWarRaid(s,a,b,loss.grt);
-  const resultA=damageFleet(s,c,a,region,0,pb,"convoy interception",null,.4,1,[]),
-    resultB=damageFleet(s,c,b,region,0,pa,"convoy interception",null,.4,1,[]);
-  return {a,b,region,powerA:pa,powerB:pb,effectiveA:attack,effectiveB:pb.total,variationA:1,variationB:1,
+  s.nations[a].merchantSunk+=loss.hulls;s.nations[a].merchantSunkGRT+=loss.grt;recordWarRaid(s,a,b,loss.grt);
+  const groups=(id,outcomes)=>s.nations[id].groups.filter(g=>g.count>0&&outcomes.has(g.id));
+  const resultA=damageFleet(s,c,a,region,0,pb,"convoy interception",fleetId,.4,1,groups(a,oa),oa),
+    resultB=damageFleet(s,c,b,region,0,pa,"convoy escort action",null,.4,1,groups(b,ob),ob);
+  applyTacticalPoolLosses(s,c,combat,'A',resultA);applyTacticalPoolLosses(s,c,combat,'B',resultB);
+  markCampaignCombatApplied(combat);
+  return {a,b,region,powerA:pa,powerB:pb,effectiveA:pa.total,effectiveB:pb.total,variationA:1,variationB:1,
     resultA,resultB,merchantGRT:loss.grt,merchantHulls:loss.hulls};
+
 }
 
 export function chooseDecision(
@@ -2305,6 +2282,43 @@ export function campaignScores(s, content) {
 
 // Scheduled maritime air action. Remote aircraft cannot inflict gunfire on a
 // carrier hundreds of kilometers away; CAP and flak fight the airborne wing.
+function resolveTacticalAirAttack(s,c,a,op,position,phase) {
+  const b=op.targetNation,n=s.nations[a],enemy=s.nations[b],combat=phase.combat,
+    target=enemy.fleets.find(f=>f.id===op.targetId),port=op.targetKind==='port'?op.targetId:null,
+    region=Object.values(AREAS).sort((x,y)=>distanceNm(x.point,position)-distanceNm(y.point,position))[0].region;
+  const cap=combatAirPatrol(s,c,b,{fleetId:target?.id,port});
+  synchronizeCampaignCombat(combat,[],enemy.groups);
+  advanceCombat(combat,phase.seconds??TICK_MINUTES*60);
+  const outcomes=campaignCombatOutcomes(combat,'B'),ships=enemy.groups.filter(g=>g.count>0&&outcomes.has(g.id));
+  const pa={surface:0,air:(op.strikes||0)*12,sub:0,asw:0,aa:(op.escorts||0)*2,scout:0,total:(op.strikes||0)*12,ships:0,speed:0,supply:1};
+  const pb=target?fleetPower(s,c,b,null,target.id):{surface:0,air:cap.power*10,sub:0,asw:0,aa:0,scout:0,total:cap.power*10,ships:ships.reduce((n,g)=>n+g.count,0),speed:0,supply:1};
+  const da=damageFleet(s,c,a,region,0,pb,'air combat',null,.25,1,[]),
+    db=damageFleet(s,c,b,region,0,pa,'tactical air strike',target?.id||null,port?.8:.4,1,ships,outcomes);
+  addAirLoss(da,loseExactCombatAircraft(s,c,a,op,Math.max(0,combat.externalAirLosses-(combat.externalLossesApplied||0)),.25));
+  combat.externalLossesApplied=combat.externalAirLosses;
+  let capRemaining=Math.max(0,(combat.externalCapLosses||0)-(combat.externalCapApplied||0));
+  for (const entry of cap.wings) {
+    const loss=Math.min(capRemaining,entry.count,entry.w.count,entry.w.crewed||0);
+    if (loss>0) addAirLoss(db,loseCAP(s,c,b,{wings:[{...entry,count:loss}]},1));
+    capRemaining-=loss;
+  }
+  combat.externalCapApplied=combat.externalCapLosses;
+  let merchantHulls=0,merchantGRT=0;
+  if(op.targetKind==='convoy') {
+    const convoy=enemy.convoys.find(v=>v.id===op.targetId),loss=convoy?sinkMerchants(s,b,outcomes.get(convoy.id)?.sunk||0,{details:true,convoy}):{hulls:0,grt:0};
+    merchantHulls=loss.hulls;merchantGRT=loss.grt;n.merchantSunk+=loss.hulls;n.merchantSunkGRT+=loss.grt;recordWarRaid(s,a,b,loss.grt);
+  }
+  markCampaignCombatApplied(combat);
+  const shore=port?portSummary(s,c,port):null,
+    portDamage=port?damagePort(s,port,clamp(pa.air/Math.max(4000,shore.combat)*.02,0,.1)):0,
+    conditions=airConditions(s,position),prep=id=>({training:s.nations[id].training,morale:s.nations[id].morale,supply:1,crew:1});
+  return {id:phase.reportId,day:s.day,minute:campaignMinutes(s),kind:port?'port':'air',operation:op.operation||'strike',
+    a,b,region,position,fleetA:op.fleetId||null,fleetB:target?.id||null,portId:port,portDamage,portEquivalent:portDamage*60000,portHealth:port?s.ports[port].health:1,
+    powerA:pa,powerB:pb,effectiveA:pa.total,effectiveB:pb.total,variationA:1,variationB:1,resultA:da,resultB:db,upset:false,
+    preparationA:prep(a),preparationB:prep(b),merchantHulls,merchantGRT,
+    airOperation:{source:op.sourcePort?PORTS[op.sourcePort].name:'Carrier strike',light:conditions.light,weather:conditions.weather,
+      strikes:op.strikes,escorts:op.escorts,cap:cap.count,assembly:op.assembly,distanceKm:Math.round(op.outboundKm),merchantHulls,merchantGRT}};
+}
 export function resolveAirAttack(s, c, a, op, position, phase = null) {
   if (!op.airWing?.some(w => ["strike", "bomber"].includes(w.role) && w.count > 0 && w.crewed > 0)) return null;
   const b = op.targetNation,
@@ -2316,6 +2330,7 @@ export function resolveAirAttack(s, c, a, op, position, phase = null) {
   if (op.targetKind === "fleet" && (!target || !fleetStats(s,c,b,target).hulls)) return null;
   if (op.targetKind === "convoy" && !enemy.convoys.some(v=>v.id===op.targetId && v.count)) return null;
   if (!phase) return beginEngagement(s,c,{kind:"air",a,b,fleetA:f?.id,fleetB:target?.id,port,operation:op.operation,opId:op.id,position});
+  if (phase.combat) return resolveTacticalAirAttack(s,c,a,op,position,phase);
   const region = Object.values(AREAS).sort(
       (x, y) => distanceNm(x.point, position) - distanceNm(y.point, position),
     )[0].region,

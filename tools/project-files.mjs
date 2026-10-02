@@ -4,6 +4,7 @@ export const SOURCE_FOLDERS = [
   "ui",
   "catalog",
   "mechanics",
+  "combatmechanics",
   "worker",
   "assets",
 ];

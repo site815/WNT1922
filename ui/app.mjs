@@ -3,6 +3,7 @@ import { NewsTicker } from "./news-ticker.mjs";
 import { startScreen } from './start-screen.mjs';
 import { StartBattleDemo } from './start-battle-demo.mjs';
 import { openModelGallery } from './model-gallery.mjs';
+import { openTacticalEngagements } from './tactical-engagements.mjs';
 import { nativeArtNotice } from './native-art-status.mjs';
 import { battleProgress } from "./battle-progress.mjs";
 import { SCORE_NAVAL_TONS_PER_POINT } from '../mechanics/campaign-impact.mjs';
@@ -119,11 +120,12 @@ import { activeDispatch } from "../mechanics/alert-lifecycle.mjs";
 import { loadRecognition, recognitionCard, recognitionExpanded, recognitionCredits } from "./recognition.mjs";
 import { HoverTask } from "./hover-task.mjs";
 import { shipDescription, aircraftDescription } from "./catalog-presentation.mjs";
-import { readDocument } from '../worker/documents.mjs';
-const DECISIVE_RULES = (await readDocument('common/rules/battle-stages.md')).DECISIVE;
+import { CAMPAIGN_BATTLE_RULES } from '../combatmechanics/campaign-rules.mjs';
+const DECISIVE_RULES = CAMPAIGN_BATTLE_RULES.DECISIVE;
 
 const app = document.querySelector("#app");
 const startDemo = new StartBattleDemo({root: app, SceneClass: UnrealBattleScene});
+let tacticalOpen = false;
 const newsTicker = new NewsTicker((id, receipt) => state ? mutate({type:"read-news",args:{id,receipt}}, "", true) : undefined);
 let newsFocus = null;
 let fleetSelection = new Set();
@@ -184,7 +186,7 @@ const statusBadge = (status) =>
 const soundTracker = createSoundTracker();
 const worldScene = new UnrealWorldScene({
   root: app, chart: () => chart,
-  active: () => !!state && dialog?.type !== 'battle-watch',
+  active: () => !!state && !tacticalOpen && dialog?.type !== 'battle-watch',
   onSelect: selectScene,
   onHover: inspectScene,
   onCameraChange: () => { if (state) render(); },
@@ -272,6 +274,7 @@ function toast(message) {
   toastTimer = setTimeout(() => (el.style.display = "none"), 6000);
 }
 function renderStart() {
+  if (tacticalOpen) return;
   updateDOM(app, startScreen({bundle,content,selectedCampaign,selected,saved,version:GAME_VERSION}) + modalHTML());
   startDemo.mount();
 }
@@ -319,6 +322,7 @@ const CONTROL_HINTS = {
   "step-six-hours": "Advance six simulated hours. Available while paused.",
 };
 function renderPass() {
+  if (tacticalOpen) return;
   if(battleMovie.plan&&(!state||dialog?.type!=='battle-watch'||String(dialog.id)!==battleMovie.plan.reportId))battleMovie.stop(false);
   if (!state) {
     app.style.setProperty('--dialog-top','0px');
@@ -354,6 +358,7 @@ function renderPass() {
     ["economy", "09", "Economy & trade"],
     ["reports", "10", "Battle reports"],
     ["review", "11", "Naval record"],
+    ["tactical", "12", "Tactical Engagements"],
   ];
   const command = commandView();
   const menuTitle = tabs.find(t => t[0] === view)?.[2] || 'Ministry';
@@ -524,6 +529,12 @@ async function selectScene(selection) {
   if (selection.kind === 'fleet' && !selection.zoom) {
     selectChart('fleetId', selection.id, {keepMenu:true});
     render();
+    return;
+  }
+  if (selection.kind === 'port' && !selection.zoom) {
+    selectChart('portId',selection.id,{keepMenu:true});
+    render();
+    requestAnimationFrame(()=>app.querySelector('.port-inspection')?.scrollIntoView({block:'nearest',behavior:'instant'}));
     return;
   }
   if (selection.kind === 'battle') {
@@ -1169,7 +1180,7 @@ function modalHTML() {
       ["Hulls lost", r.resultA.sunk, r.resultB.sunk],
       ["Hulls damaged", r.resultA.damaged, r.resultB.damaged],
     ];
-    body = `${r.status === "ongoing" ? "" : `<p><strong>${r.winner ? r.magnitude.toUpperCase()+" · "+PROFILES[r.winner].name+" inflicted the greater assessed loss." : "No decisive result."}</strong></p>`}${battleDetails(r,state)}<details class="combat-calculations" data-detail-key="combat-calculations"><summary>Combat calculations & loss mechanisms</summary><table><thead><tr><th>Factor</th><th>${PROFILES[r.a].name}</th><th>${PROFILES[r.b].name}</th></tr></thead><tbody>${rows.map(([k, a, b]) => `<tr><td>${k}</td><td>${typeof a === "string" ? esc(a) : number(a, 1)}</td><td>${typeof b === "string" ? esc(b) : number(b, 1)}</td></tr>`).join("")}</tbody></table><h3 class="spaced">Loss mechanisms</h3>${[...r.resultA.losses, ...r.resultB.losses].map((l) => `<p>${l.count} × ${esc(l.name)} · ${esc(l.cause)}</p>`).join("") || "<p>No hulls were sunk. Damaged ships may withdraw for repairs.</p>"}</details>`;
+    body = `${r.status === "ongoing" ? "" : `<p><strong>${r.winner ? r.magnitude.toUpperCase()+" · "+PROFILES[r.winner].name+(r.tactical?" won the engagement.":" inflicted the greater assessed loss.") : "No decisive result."}</strong></p>`}${r.tactical?.reason?`<p>${esc(r.tactical.reason)}</p>`:""}${battleDetails(r,state)}<details class="combat-calculations" data-detail-key="combat-calculations"><summary>Combat calculations & loss mechanisms</summary><table><thead><tr><th>Factor</th><th>${PROFILES[r.a].name}</th><th>${PROFILES[r.b].name}</th></tr></thead><tbody>${rows.map(([k, a, b]) => `<tr><td>${k}</td><td>${typeof a === "string" ? esc(a) : number(a, 1)}</td><td>${typeof b === "string" ? esc(b) : number(b, 1)}</td></tr>`).join("")}</tbody></table><h3 class="spaced">Loss mechanisms</h3>${[...r.resultA.losses, ...r.resultB.losses].map((l) => `<p>${l.count} × ${esc(l.name)} · ${esc(l.cause)}</p>`).join("") || "<p>No hulls were sunk. Damaged ships may withdraw for repairs.</p>"}</details>`;
     body = (r.replay?.frames?.length ? btn(r.status === 'ongoing' ? 'Watch battle · next tick' : 'Replay battle', 'watch-battle', `data-id="${r.id}" class="primary"`) : '<p class="panel-note">No tick recording is retained for this report.</p>') + (r.decisive?.reason ? '<p class="panel-note">'+esc(r.decisive.reason)+'</p>' : '') + body;
   }
   if (dialog.type === 'battle-watch') {
@@ -1181,7 +1192,7 @@ function modalHTML() {
   if (dialog.type === "help") {
     title = "Commanding the ministry";
     body =
-      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Right-drag to pan the wrapping Equal Earth terrain map; left-drag draws a selection box around your fleets. Selection does not issue movement orders; scroll continuously from the strategic world down to individual ships. The camera stays overhead at every zoom until you hold the middle mouse button and drag at close ship zoom. Any zoom out immediately restores overhead and north-up; Home resets the view. Click a fleet to select and highlight it without moving the camera. Double-click a fleet or press Enter on its Naval commands row to center and fit its formation; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Ship stations form stable formations around their recorded fleet positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Outlined fleet symbols are fading intelligence reports, not live enemy positions. Hover shows information; clicking a contact centers the map; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Your decisive naval battles pause at their start even with Autopause off. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Your decisive battles pause the campaign and raise a Watch alert. Opening the viewer pauses play; Play battle resumes the whole campaign at Tactical 60×, one fifteen-minute tick every fifteen real seconds. Next tick advances the whole world by fifteen minutes and remains paused. Play recorded movie illustrates retained exchanges and losses in 20–90 seconds while the campaign stays paused. Its courses and salvo paths are illustrative, not an exact tactical reconstruction. You can pause the movie or return to individual recorded ticks. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 60× to 1,000,000×. Tactical 60× runs one game minute per real second, so live map battles remain readable; a full simulation tick occurs every fifteen seconds. Click a crossed-gun battle badge to pause and watch. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
+      '<ol class="help-list"><li><strong>Invest ahead.</strong> Ships and facility expansions need gold, influence, industry and time. Superseded ship production lines close.</li><li><strong>Fund aircraft and personnel.</strong> Choose production models at the top of Aircraft catalog. Sailors graduate every month on the 1st; aviators graduate on 1 January, April, July and October. Training accrues with daily funding and joins the available pool only on graduation. Naval industry, aircraft factories, naval schools and aviation schools each run at 10–100% funding; expand them in the same panel. Aircraft need full crews to fly; ships need complete sailor complements to leave port.</li><li><strong>Admirals command the fleets.</strong> They choose missions, routes, escorts and engagements automatically. Click a force to circle it on the chart and highlight its list entry. Hover for readiness and individual ships.</li><li><strong>Air warfare is automatic.</strong> Admirals sweep broad search sectors, assemble strikes in daylight, retain CAP and send escorts. Weather, model range, contact age and strategic materials limit operations. Aircraft fly out and back before a 90-minute rearm. Airborne wings can divert when their carrier is lost. Read-only government maritime types reinforce bases through the same physical ferry and merchant system.</li><li><strong>Read the chart.</strong> Right-drag to pan the wrapping Equal Earth terrain map; left-drag draws a selection box around your fleets. Selection does not issue movement orders; scroll continuously from the strategic world down to individual ships. The camera stays overhead at every zoom until you hold the middle mouse button and drag at close ship zoom. Any zoom out immediately restores overhead and north-up; Home resets the view. Click a fleet to select and highlight it without moving the camera. Double-click a fleet or press Enter on its Naval commands row to center and fit its formation; Home restores the strategic view. Page Up and Page Down also zoom. Warship and merchant hulls appear only at close range. Click a hull for its recorded information. Click a port to inspect facilities and known intelligence without moving the camera; double-click to center and zoom. Ship stations form stable formations around their recorded fleet positions. Merchant markers are green when escorted and tan when exposed; green circles show operational escort reach. Outlined fleet symbols are fading intelligence reports, not live enemy positions. Hover shows information; clicking a contact centers the map; contact alerts disappear after 48 hours without an update. The lower legend shows the current zoom. Land fronts respond to sustained naval supply.</li><li><strong>Watch naval news.</strong> With Autopause enabled, war announcements and choices pause play. Your decisive naval battles pause at their start even with Autopause off. Return to ministry acknowledges war news or defers a choice until its displayed default deadline; pending choices remain beside the ticker. Reopening a choice pauses again when Autopause is enabled. Closing or answering resumes only a game interrupted by the dispatch. Other news passes once through the ticker: hover to hold, click to open the related ship, report or panel. Your decisive battles pause the campaign and raise a Watch alert. Opening the viewer pauses play; Play battle resumes the whole campaign at Tactical 60×, one fifteen-minute tick every fifteen real seconds. Next tick advances the whole world by fifteen minutes and remains paused. Play recorded movie follows the shared tactical simulation in 30–90 seconds while the campaign stays paused: actual ship courses, attacks, individual damage and sinkings. Older aggregate reports retain labelled illustrations. Tactical Engagements (12) also lets you set up historical presets or custom opposing fleets, formations and doctrines, then watch the AI or resolve quickly using exactly the same rules. Combat advances in ten-second steps inside the fifteen-minute campaign clock. You can pause the movie or return to individual recorded ticks. Closing leaves it paused. Minor actions keep their real losses in the background attrition ledger. Permanent reports remain in Battle reports.</li><li><strong>Manage hulls.</strong> Click a ship to locate it; hover for individual state and class specifications. Reserve or scrap ships from the register. Seriously damaged ships detach and sail home under escort where possible.</li><li><strong>Control time.</strong> Space pauses; keys 1–9 and 0 open menu options 1–10. Plus and minus change speed from 60× to 1,000,000×. Tactical 60× runs one game minute per real second, so live map battles remain readable; a full simulation tick occurs every fifteen seconds. Click a crossed-gun battle badge to pause and watch. Requested speed is a ceiling: the worker slows safely under load. The simulation advances in fifteen-minute ticks. Autopause also pauses when the window is hidden. Uncheck it for uninterrupted simulation mode; deadline defaults still apply. Autosaves and a previous save are kept on this computer.</li></ol><p class="panel-note">Two campaigns and seven playable navies; land warfare uses strategic campaign corridors. This is a provisional balance for playtesting. Formal campaign reviews preserve your score; the sandbox continues afterward.</p>';
   }
   if (dialog.type === "menu") {
     title = "Campaign menu";
@@ -1333,6 +1344,17 @@ app.addEventListener("click", async (event) => {
   unlockMusic();
   playSound("click");
   try {
+    if (action === 'tactical' || action === 'view' && target.dataset.view === 'tactical') {
+      if (tacticalOpen) return;
+      if (state && !state.paused && !await mutate({type:'pause',args:{value:true}},'',true)) return;
+      tacticalOpen = true;
+      startDemo.stop(); battleMovie.stop(false); battleScene.clear(); worldScene.suspend();
+      hideClassHover(); dialog = null;
+      try {
+        openTacticalEngagements({app,content,bundle,onClose:()=>{tacticalOpen=false;render();}});
+      } catch(error) {tacticalOpen=false;render();throw error;}
+      return;
+    }
     if (dialog?.type === 'battle-watch' && !state.paused &&
         (action === 'close' || !target.closest('[data-dialog-type="battle-watch"]'))) {
       if (!await mutate({type:'pause',args:{value:true}},'',true)) return;
@@ -1970,6 +1992,7 @@ app.addEventListener("change", async (event) => {
   }
 });
 document.addEventListener("keydown", async (event) => {
+  if (tacticalOpen) return;
   if (event.key === 'Escape' && state?.decisions.some(activeDispatch)) {
     event.preventDefault();
     void mutate({type:'defer-decision',args:{key:state.decisions.find(activeDispatch).key}},'',true);

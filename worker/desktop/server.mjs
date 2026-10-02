@@ -183,7 +183,7 @@ export async function createGameServer({
       if (
         !(
           name === "package.json" ||
-          /^(ui|mechanics|worker|catalog|assets)\/[\w./-]+\.(?:mjs|css|html|json|md|mp3)$/.test(
+          /^(ui|mechanics|combatmechanics|worker|catalog|assets)\/[\w./-]+\.(?:mjs|css|html|json|md|mp3)$/.test(
             name,
           ) || /^assets\/recognition\/[\w/-]+\.(?:png|jpe?g|svg)$/.test(name) ||
           /^assets\/models\/ships\/[\w/-]+\.glb$/.test(name)

@@ -319,6 +319,7 @@ export function allocateAircraft(s, c, id, { initial = false } = {}) {
       for (const w of g.airWing || []) free[w.model] -= w.count;
   for (const g of n.groups) {
     if (fleetService(c.classes[g.classId]) !== "warship") continue;
+    if (g.battleId) continue; // Tactical inventory is reserved until the encounter ends.
     g.airWing ??= [];
     if (
       [

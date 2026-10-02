@@ -43,6 +43,6 @@ export function startScreen({bundle, content, selectedCampaign, selected, saved,
       </section>
       <section class="start-demo-host" data-key="start-battle-demo" data-preserve="true" aria-label="Interactive naval battle demonstration"></section>
     </div>
-    <footer class="start-screen-footer"><div><button data-action="ship-gallery">3D ship gallery</button><button data-action="import">Import campaign</button><button data-action="recognition-credits">Artwork & sources</button><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Licenses & credits</a></div><span>Build your fleet. Shape the balance of sea power.</span></footer>
+    <footer class="start-screen-footer"><div><button data-action="tactical">Tactical Engagements</button><button data-action="ship-gallery">3D ship gallery</button><button data-action="import">Import campaign</button><button data-action="recognition-credits">Artwork & sources</button><a href="/assets/licenses/third-party-notices.html" target="_blank" rel="noreferrer">Licenses & credits</a></div><span>Build your fleet. Shape the balance of sea power.</span></footer>
   </main>`;
 }

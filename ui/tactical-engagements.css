@@ -1,0 +1,97 @@
+.tactical-engagements {position:fixed;inset:0;z-index:4;display:grid;grid-template-rows:auto minmax(0,1fr);background:#111f2b;color:var(--text);overflow:hidden;font-size:14px;}
+.tactical-engagements[data-tactical-page="watch"] {grid-template-rows:auto auto minmax(0,1fr) auto;background:transparent;}
+.tactical-engagements button,.tactical-engagements input,.tactical-engagements select {font-size:13px;min-height:32px;}
+.tactical-engagements button {padding:7px 12px;}
+.tactical-engagements select,.tactical-engagements input[type="number"] {max-width:100%;min-width:0;background:#10212d;color:var(--text);border:1px solid #49606c;border-radius:3px;padding:6px 8px;}
+.tactical-engagements label {display:grid;gap:5px;font-size:12px;color:#bbcbd2;}
+.tactical-engagements h2,.tactical-engagements h3 {margin:5px 0 12px;}
+.tactical-engagements p {line-height:1.45;}
+.tactical-header {display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 22px;background:#162936;border-bottom:1px solid #48616e;}
+.tactical-header h1 {margin:3px 0 0;font-size:24px;}
+.tactical-header .eyebrow {font-size:10px;}
+.tactical-header>div:last-child {display:flex;align-items:center;gap:24px;}
+.tactical-header>div:last-child>span {font-size:12px;color:var(--muted);}
+.tactical-header [data-tactical="close"] {font-size:27px;line-height:1;padding:4px 12px;}
+.tactical-setup-content {overflow:auto;overscroll-behavior:contain;padding:22px max(24px,calc((100vw - 1250px)/2));scrollbar-width:thin;}
+.tactical-scenario {display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,340px);gap:8px 30px;}
+.tactical-scenario h2 {font-size:24px;}
+.tactical-scenario p {font-size:13px;margin:5px 0 12px;}
+.tactical-scenario>label {align-self:center;}
+.tactical-scenario-note,.tactical-approximation {grid-column:1/-1;}
+.tactical-approximation {color:#b9b8a6!important;font-size:12px!important;}
+.tactical-approximation a {color:var(--gold);white-space:nowrap;}
+.tactical-setup-fleets {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:18px 0;}
+.tactical-setup-fleets>section,.tactical-environment {padding:16px;border:1px solid #3b5462;border-radius:5px;background:#162935;min-width:0;}
+.tactical-setup-fleets h3,.tactical-environment h3 {font-size:16px;}
+.tactical-side-dot {display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#87c9df;}
+.tactical-side-dot.side-B {background:#ee9d7e;}
+.tactical-doctrine {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.tactical-preset-roster {font-size:12px;margin:14px 0 0;}
+.tactical-doctrine-hint {font-size:11px;color:#acbec7;margin:10px 0 0;}
+.tactical-custom-fleet {margin-top:14px;}
+.tactical-fleet-row {display:grid;grid-template-columns:minmax(0,1fr) 65px 32px;gap:6px;margin:7px 0;}
+.tactical-fleet-row button {padding:4px;font-size:20px;}
+.tactical-add {display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);}
+.tactical-add button {font-size:12px;}
+.tactical-environment>div {display:flex;flex-wrap:wrap;gap:14px;align-items:end;}
+.tactical-environment>div>label {width:135px;}
+.tactical-environment>div>label:has([data-setup="seed"]) {width:170px;}
+.tactical-environment p {font-size:12px;margin:12px 0 0;}
+.tactical-engagements .tactical-checkbox {display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px;}
+.tactical-checkbox input {min-height:0;accent-color:var(--gold);}
+.tactical-setup-actions {display:flex;align-items:center;gap:24px;margin-top:18px;}
+.tactical-setup-actions>span {font-size:12px;color:var(--muted);}
+.tactical-error {padding:10px 14px;background:#522e2b;color:#ffcec1;border:1px solid #b17661;border-radius:4px;font-size:13px;}
+.tactical-watch-toolbar {display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:8px 16px;background:#132632;border-bottom:1px solid #3b5360;}
+.tactical-watch-toolbar>div {display:flex;align-items:center;flex-wrap:wrap;gap:7px;}
+.tactical-watch-toolbar>div:first-child {gap:14px;}
+.tactical-watch-toolbar>div:first-child>strong {font-size:14px;}
+.tactical-watch-toolbar label {display:flex;align-items:center;gap:6px;}
+.tactical-watch-toolbar .native-fps {display:inline-block;width:50px;font-size:11px;text-align:right;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums;}
+.tactical-watch-toolbar select {padding:3px;}
+.tactical-clock {font-variant-numeric:tabular-nums;color:var(--gold);font-size:17px;}
+.tactical-state {color:var(--muted);font-size:12px;}
+.tactical-watch-body {display:grid;grid-template-columns:230px minmax(200px,1fr) 270px;gap:1px;min-height:0;}
+.tactical-rosters,.tactical-information {background:#132632;min-height:0;overflow:auto;overscroll-behavior:contain;padding:12px;scrollbar-width:thin;}
+.tactical-rosters section+section {border-top:1px solid #405865;margin-top:18px;padding-top:12px;}
+.tactical-rosters h3 {font-size:14px;margin:4px 0;}
+.tactical-rosters p {font-size:11px;margin:5px 0 10px;}
+.tactical-engagements .tactical-roster-ship {display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:7px;margin:4px 0;text-align:left;font-size:12px;}
+.tactical-roster-ship span {min-width:0;overflow-wrap:anywhere;}
+.tactical-roster-ship small {display:block;font-size:10px;color:var(--muted);margin-top:3px;}
+.tactical-roster-ship strong {font-size:11px;color:var(--gold);}
+.tactical-roster-ship.selected {border-color:var(--gold);background:#34433f;}
+.tactical-sunk,.tactical-sunk strong {color:#efab9b!important;}
+.tactical-battle-view {display:grid;grid-template-rows:auto minmax(100px,1fr) minmax(72px,19%);min-width:0;min-height:0;}
+.tactical-camera-bar {display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:7px 10px;background:#162c38;}
+.tactical-camera-bar>span {font-size:10px;color:var(--muted);margin-left:auto;}
+.tactical-camera-bar button {font-size:11px;min-height:26px;padding:3px 7px;}
+.tactical-stage {min-height:0;overflow:hidden;background:#17363d;}
+.unreal-mode .tactical-stage {background:transparent;}
+.tactical-battle-events {padding:8px 12px;background:#10222f;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+.tactical-battle-events h3 {font-size:12px;margin:0 0 6px;}
+.tactical-battle-events h3 span {font-size:10px;font-weight:normal;color:var(--muted);float:right;}
+.tactical-battle-events ol {padding:0;margin:0;list-style:none;}
+.tactical-battle-events li {display:flex;gap:10px;border-top:1px solid #263d49;padding:4px 0;font-size:11px;line-height:1.4;}
+.tactical-battle-events time {flex:0 0 53px;font-variant-numeric:tabular-nums;color:var(--gold);}
+.tactical-battle-events p {font-size:12px;}
+.tactical-information h3 {font-size:17px;margin:5px 0 9px;overflow-wrap:anywhere;}
+.tactical-information p,.tactical-information small {font-size:12px;line-height:1.4;}
+.tactical-information strong {font-size:13px;}
+.tactical-information .eyebrow {font-size:10px;}
+.tactical-systems {margin:16px 0;}
+.tactical-systems>div {display:grid;grid-template-columns:1fr auto;gap:3px;font-size:12px;margin:8px 0;}
+.tactical-systems meter {grid-column:1/-1;display:block;width:100%;height:8px;}
+.tactical-inspection dl {display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:12px;margin:16px 0;}
+.tactical-inspection dt {color:var(--muted);}
+.tactical-inspection dd {margin:0;text-align:right;overflow-wrap:anywhere;}
+.tactical-inspection>button {width:100%;font-size:12px;}
+.tactical-airstrikes {margin-top:20px;padding-top:12px;border-top:1px solid #405865;}
+.tactical-airstrikes h3 {font-size:15px;}
+.tactical-result {background:#293c38;border:1px solid #78836a;padding:10px;border-radius:4px;margin-bottom:16px;}
+.tactical-result small {color:var(--muted);}
+.tactical-watch-footer {padding:7px 16px;background:#132632;font-size:10px;color:var(--muted);}
+.tactical-floating-error {position:absolute;bottom:20px;left:25%;right:25%;}
+@media(max-width:1200px) {.tactical-watch-body {grid-template-columns:190px minmax(180px,1fr) 225px;}.tactical-header {padding:8px 14px;}.tactical-header h1 {font-size:21px;}.tactical-camera-bar>span {display:none;}.tactical-watch-toolbar button {font-size:12px;padding:5px 8px;}.tactical-watch-toolbar {padding:6px 10px;}}
+@media(max-width:850px) {.tactical-watch-body {grid-template-columns:160px minmax(150px,1fr) 195px;}.tactical-header>div:last-child>span {display:none;}.tactical-rosters,.tactical-information {padding:8px;}.tactical-setup-content {padding:16px;}.tactical-scenario {grid-template-columns:1fr;}.tactical-setup-fleets {gap:10px;}.tactical-doctrine {gap:6px;}.tactical-setup-fleets>section {padding:10px;}}
+@media(max-height:650px) {.tactical-header {padding:6px 14px;}.tactical-header h1 {font-size:19px;}.tactical-header .eyebrow {font-size:9px;}.tactical-watch-footer {padding:4px 12px;font-size:9px;}.tactical-watch-toolbar button,.tactical-watch-toolbar select {min-height:27px;}.tactical-camera-bar {padding:4px 8px;}.tactical-setup-content {padding-top:12px;padding-bottom:12px;}.tactical-scenario h2 {font-size:21px;}.tactical-setup-fleets {margin:12px 0;}}

@@ -1,5 +1,6 @@
 import { REGIONS } from './catalog.mjs';
 import { ATTRITION_FIELDS, LOSS_FIELDS, REPLAY_FRAME_LIMIT, REPLAY_CHARACTER_BUDGET } from './battle-records.mjs';
+import { validateCombatState } from '../combatmechanics/validation.mjs';
 
 export function validateBattleRecords(s, c) {
   const fail = () => { throw Error('Invalid battle replay or background attrition in save.'); };
@@ -15,6 +16,15 @@ export function validateBattleRecords(s, c) {
     if (!plain(r)) fail();
     if (reportIds.has(r.id)) fail();
     reportIds.add(r.id);
+    if (r.tactical) {
+      validateCombatState(r.tactical, c.classes);
+      if (!minute(r.tacticalAt) || r.tacticalAt < r.startedAt) fail();
+      for (const hull of r.tactical.ships) {
+        if (/^combat-(merchant|shore)-/.test(hull.classId)) continue;
+        const nation = hull.side === 'A' ? r.a : r.b;
+        if (c.classes[hull.classId].nation !== nation || !r['result' + hull.side].conditions.some(row => row.id === hull.groupId)) fail();
+      }
+    }
     if (r.background !== undefined && typeof r.background !== 'boolean') fail();
     if (s.reports.includes(r) && r.background === true) fail();
     if ((s.backgroundEngagements || []).includes(r) && (r.background !== true || r.status !== 'ongoing' || r.decisive?.qualifies !== false || r.replay !== undefined)) fail();

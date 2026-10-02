@@ -24,6 +24,7 @@ class Surface {
 
 function fixture(t, mode = 'world') {
   const previous = new Map();
+  const frames=new Map();let frameId=0;
   for (const [key, value] of Object.entries({innerWidth:1000, innerHeight:500,
     window:new Surface(), document:Object.assign(new Surface(),{
       documentElement:{dataset:{}}, querySelectorAll:()=>[], body:{prepend() {}},
@@ -31,6 +32,8 @@ function fixture(t, mode = 'world') {
     }),
     ue:{wnt:{viewport() {}}},
     ResizeObserver:class {observe() {} disconnect() {}},
+    requestAnimationFrame:callback=>{frames.set(++frameId,callback);return frameId;},
+    cancelAnimationFrame:id=>frames.delete(id),
   })) {
     previous.set(key, Object.getOwnPropertyDescriptor(globalThis,key));
     Object.defineProperty(globalThis,key,{value, configurable:true, writable:true});
@@ -47,7 +50,7 @@ function fixture(t, mode = 'world') {
       if (descriptor) Object.defineProperty(globalThis,key,descriptor); else delete globalThis[key];
     }
   });
-  return {scene, canvas, inputs};
+  return {scene, canvas, inputs,flushFrame(){const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn());}};
 }
 
 for (const [label, button, shiftKey, action] of [['middle',1,false,'tilt'],['right',2,false,'pan'],['Shift-right',2,true,'pan']]) {
@@ -114,15 +117,16 @@ test('battle left drag does not pan or issue a fleet order; only left double-cli
 });
 
 test('world wheel and keyboard controls keep zoom units and cardinal pan direction', t => {
-  const {scene, canvas, inputs} = fixture(t);
+  const {scene, canvas, inputs,flushFrame} = fixture(t);
   const hovers=[]; scene.onHover=value=>hovers.push(value);
   for (const deltaMode of [0,1,2]) assert(canvas.emit('wheel',{deltaY:2,deltaMode}).defaultPrevented);
+  assert.equal(inputs.length,0,'High-rate wheel events wait for one render frame');flushFrame();
   assert.deepEqual(canvas.focusOptions,{preventScroll:true},'Wheel navigation takes focus from the outliner so Home/Page Up work and its focus hover closes');
   for (const key of ['Home','PageUp','PageDown','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'])
     assert(canvas.emit('keydown',{key}).defaultPrevented);
   assert.deepEqual(hovers,Array(10).fill(null),'Camera navigation dismisses stale ship information');
   assert.deepEqual(inputs,[
-    {action:'zoom',delta:2,x:.1,y:.2},{action:'zoom',delta:32,x:.1,y:.2},{action:'zoom',delta:1000,x:.1,y:.2},
+    {action:'zoom',delta:1034,x:.1,y:.2},
     {action:'home'},{action:'zoom',delta:-300},{action:'zoom',delta:300},
     {action:'pan',dx:40,dy:0},{action:'pan',dx:-40,dy:0},{action:'pan',dx:0,dy:40},{action:'pan',dx:0,dy:-40},
   ]);

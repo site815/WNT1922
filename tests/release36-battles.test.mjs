@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CATALOG } from '../worker/catalog-loader.mjs';
-import { readDocument } from '../worker/documents.mjs';
+import { CAMPAIGN_BATTLE_RULES } from '../combatmechanics/campaign-rules.mjs';
 import { newGame, scrapGroup, reserveGroup } from '../mechanics/engine.mjs';
 import { contentFor } from '../mechanics/campaign-content.mjs';
 import { campaignMinutes, setCampaignMinutes } from '../mechanics/campaign-clock.mjs';
@@ -14,7 +14,7 @@ import { simulationHost } from '../worker/simulation-host.mjs';
 import { bulkPlan } from '../mechanics/bulk-fleet.mjs';
 import { initializeOperations } from '../mechanics/task-forces.mjs';
 import { validateSave, exportSave } from '../mechanics/state-io.mjs';
-const rules = (await readDocument('common/rules/battle-stages.md')).DECISIVE;
+const rules = CAMPAIGN_BATTLE_RULES.DECISIVE;
 const start = () => {
   const s = newGame(CATALOG, 'USA', 360036, 'in_good_faith_1936');
   s.decisions = []; s.autoPause = false; s.paused = false;

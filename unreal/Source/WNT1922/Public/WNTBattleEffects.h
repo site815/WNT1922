@@ -29,7 +29,12 @@ public:
     const FString& GetFrameKey() const { return FrameKey; }
 
 private:
-    struct FEvent { FString Key, Type, Source, Target, Weapon; double At=0, Duration=1; };
+    struct FEvent
+    {
+        FString Key, Type, Source, Target, Weapon;
+        double At=0, Duration=1;
+        TOptional<FVector> SourcePosition, TargetPosition;
+    };
     TArray<FEvent> Events;
     TMap<FString,FVector2D> SinkTimes;
     TWeakObjectPtr<UInstancedStaticMeshComponent> Pools[4];

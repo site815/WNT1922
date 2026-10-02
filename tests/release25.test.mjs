@@ -89,23 +89,21 @@ test("merchant sinkings lower shipping capacity immediately, leaving GTP unchang
   assert.equal(merchantEconomy(s,c).gtp,gtp);assert.ok(convoyRecord(s,"USA").sunk>0);
   assert.ok(n.convoys.reduce((v,x)=>v+x.count,0)<=n.merchant.hulls);
 });
-test("five-stage surface combat changes damage over time, supports five main rounds and survives saves",()=>{
+test("surface combat advances the shared ten-second system in campaign ticks and survives saves",()=>{
   const [s,c]=start();war(s,"USA","JPN");
   const forces=["USA","JPN"].map(id=>s.nations[id].fleets.filter(f=>f.role==="battle").sort((a,b)=>fleetStats(s,c,id,b).tons-fleetStats(s,c,id,a).tons)[0]);
   const r=beginEngagement(s,c,{kind:"surface",a:"USA",b:"JPN",fleetA:forces[0].id,fleetB:forces[1].id,region:"pacific",position:[160,20]});
-  r.mainRounds=5;
   assert.equal(r.status,"ongoing");assert.equal(r.resultA.damagedTons+r.resultB.damagedTons,0);
   assert.throws(()=>orderFleet(s,c,forces[0].id,"guard"),/disengages/);
   assert.match(battleDetails(r,s),/ONGOING/);
-  const stages=new Set([0]);let exchanges=0;
-  for(let i=0;i<12 && r.status==="ongoing";i++){
-    const stage=r.stage;setCampaignMinutes(s,r.nextStageAt);progressEngagements(s,c);
-    if(stage===2||stage===3)exchanges++;
-    if(r.status==="ongoing")stages.add(r.stage);
+  let exchanges=0,previousSeconds=0;
+  for(let i=0;i<24 && r.status==="ongoing";i++){
+    setCampaignMinutes(s,r.nextStageAt);progressEngagements(s,c);exchanges++;
+    assert(r.tactical.seconds>previousSeconds&&r.tactical.seconds-previousSeconds<=900);previousSeconds=r.tactical.seconds;
     validateSave(s,CATALOG);
   }
-  assert.deepEqual([...stages],[0,1,2,3,4]);assert.equal(r.status,"completed");assert.equal(exchanges,6);
+  assert.equal(r.status,"completed");assert(exchanges>0);assert.equal(r.tactical.status,'completed');
   assert.ok(r.resultA.tons+r.resultB.tons+r.resultA.damagedTons+r.resultB.damagedTons>0);
-  assert.ok(r.completedAt-r.startedAt>=200);
+  assert.ok(r.completedAt-r.startedAt>=15);
   assert.ok(forces.every(f=>!f.battleId));assert.equal(s.reports.filter(x=>x.id===r.id).length,1);
 });

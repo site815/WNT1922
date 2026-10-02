@@ -138,6 +138,37 @@ double WorldViewDistance()
     // vertical field of view. Do not multiply its height into the fit again.
     return WNTProjection::PoleNorthing()/(FMath::Tan(FMath::DegreesToRadians(22.5))*(1-2*WorldEdgeMargin));
 }
+double BattleFocusDistance(double Aspect)
+{
+    // The gallery applies its dimensional zoom relative to a3x focus. Keep
+    // that shared input contract while making the actual focus range1050m.
+    return 105000.*BattleFocusZoom/FMath::Clamp(Aspect,.35,1.);
+}
+double BattleFitDistance(const FBox& Bounds,const FIntPoint& Pixels,const FVector4& Rect)
+{
+    if(!Bounds.IsValid)return 60000.;
+    const double Aspect=FMath::Max(.02,Pixels.X*Rect.Z/FMath::Max(1.,Pixels.Y*Rect.W));
+    const double Vertical=FMath::Tan(FMath::DegreesToRadians(22.5))*.84,Horizontal=Vertical*Aspect;
+    const FRotationMatrix Basis(FRotator(-90+BattleOverviewTilt,BattleOverviewYaw,0));
+    double Distance=35000.;
+    // Fit the actual clear HUD rectangle, including perspective depth. Fitting
+    // a sphere unnecessarily shrinks two fleets separated by tens of km.
+    for(int32 I=0;I<8;++I)
+    {
+        const FVector Delta=FVector((I&1)?Bounds.Max.X:Bounds.Min.X,(I&2)?Bounds.Max.Y:Bounds.Min.Y,(I&4)?Bounds.Max.Z:Bounds.Min.Z)-Bounds.GetCenter();
+        const double Depth=FVector::DotProduct(Delta,Basis.GetUnitAxis(EAxis::X));
+        Distance=FMath::Max(Distance,FMath::Abs(FVector::DotProduct(Delta,Basis.GetUnitAxis(EAxis::Y)))/Horizontal-Depth);
+        Distance=FMath::Max(Distance,FMath::Abs(FVector::DotProduct(Delta,Basis.GetUnitAxis(EAxis::Z)))/Vertical-Depth);
+    }
+    return Distance;
+}
+double BattleMarkerPixels(double HullLength,double CameraDepth,double HorizontalFOV,const FIntPoint& Pixels)
+{
+    if(CameraDepth<=0||Pixels.X<=0||Pixels.Y<=0)return 0.;
+    const double Scale=FMath::Clamp(Pixels.Y/1000.,1.,2.);
+    const double Span=FMath::Max(1.,HullLength)*Pixels.X/(2*CameraDepth*FMath::Tan(FMath::DegreesToRadians(FMath::Clamp(HorizontalFOV,1.,179.))*.5));
+    return Span<12*Scale?28*Scale:0.;
+}
 double ConstrainWorldNorthing(const FMinimalViewInfo& View,const FVector4& Rect,double Northing)
 {
     const double X=Rect.X+Rect.Z*.5;
@@ -149,6 +180,24 @@ double ConstrainWorldNorthing(const FMinimalViewInfo& View,const FVector4& Rect,
     return Lower<=Upper?FMath::Clamp(Northing,Lower,Upper):(Lower+Upper)*.5;
 }
 bool CanOrbitWorld(double Zoom) { return FMath::IsFinite(Zoom)&&Zoom>=WorldOrbitZoom; }
+double WheelZoom(double CurrentTarget,double Delta,bool bBattle)
+{
+    const double Minimum=bBattle?.1:1.,Maximum=bBattle?1000.:MaxWorldZoom;
+    if(!FMath::IsFinite(CurrentTarget))CurrentTarget=Minimum;
+    CurrentTarget=FMath::Clamp(CurrentTarget,Minimum,Maximum);
+    if(!FMath::IsFinite(Delta))return CurrentTarget;
+    // Clamp in log space before Exp, so high-resolution touchpads and very
+    // large accumulated gestures cannot overflow or become frame dependent.
+    return FMath::Exp(FMath::Clamp(FMath::Loge(CurrentTarget)-Delta*(bBattle?BattleZoomPerPixel:WorldZoomPerPixel),FMath::Loge(Minimum),FMath::Loge(Maximum)));
+}
+double SmoothZoom(double Current,double Target,double DeltaSeconds)
+{
+    if(!FMath::IsFinite(Current)||Current<=0)return Target;
+    if(!FMath::IsFinite(Target)||Target<=0||!FMath::IsFinite(DeltaSeconds)||DeltaSeconds<=0)return Current;
+    const double Difference=FMath::Loge(Target/Current);
+    const double Next=Current*FMath::Exp(Difference*(1-FMath::Exp(-24.0*FMath::Min(DeltaSeconds,.1))));
+    return FMath::Abs(FMath::Loge(Target/Next))<.0005?Target:Next;
+}
 void FWorldOrbit::Reset() { Tilt=0.0;Yaw=0.0; }
 bool FWorldOrbit::Drag(double Zoom,double DeltaX,double DeltaY)
 {
@@ -334,8 +383,7 @@ void AWNTPlayerController::Tick(float DeltaSeconds)
     if(LastViewport!=FIntPoint(ViewWidth,ViewHeight))bCameraDirty=true;
     if(SceneCamera&&WorldScene&&!FMath::IsNearlyEqual(Zoom,TargetZoom,1e-10))
     {
-        const double Difference=FMath::Loge(TargetZoom/Zoom);
-        Zoom=FMath::Abs(Difference)<.001?TargetZoom:Zoom*FMath::Exp(Difference*(1-FMath::Exp(-18.0*FMath::Min(double(DeltaSeconds),.1))));
+        Zoom=WNTCameraMath::SmoothZoom(Zoom,TargetZoom,DeltaSeconds);
         if(bHasZoomAnchor)
         {
             if(Mode!=TEXT("battle"))ZoomAnchor=WNTProjection::ReprojectBetweenMeridians(ZoomAnchor,ZoomAnchorMeridian,Meridian);
@@ -346,7 +394,27 @@ void AWNTPlayerController::Tick(float DeltaSeconds)
         }
         bCameraDirty=true;
     }
-    if (SceneCamera && bCameraDirty) UpdateCamera();
+    bool DirectorMoved=false;
+    if(SceneCamera&&Mode==TEXT("battle")&&BattleDirector.IsEnabled()&&!BattleDirector.IsPaused())
+    {
+        const double Aspect=FMath::Max(.15,ViewWidth*ViewRect.Z/FMath::Max(1.,ViewHeight*ViewRect.W));
+        if(const auto Desired=BattleDirector.Evaluate(FPlatformTime::Seconds(),Aspect);Desired.IsSet())
+        {
+            FWNTBattleCameraDirector::FView Current;
+            Current.Target=BattleTarget;Current.Distance=BattleDistance/Zoom;Current.Tilt=BattleTilt;Current.Yaw=BattleYaw;
+            const bool bCut=FWNTBattleCameraDirector::NeedsCut(Current,Desired.GetValue());
+            const auto View=bCut?Desired.GetValue():FWNTBattleCameraDirector::Ease(Current,Desired.GetValue(),DeltaSeconds);
+            if(bCut){++CinematicCutCount;if(PlayerCameraManager)PlayerCameraManager->SetGameCameraCutThisFrame();}
+            BattleTarget=View.Target;BattleDistance=View.Distance;BattleTilt=View.Tilt;BattleYaw=View.Yaw;
+            Zoom=TargetZoom=1;bHasZoomAnchor=false;bCameraDirty=true;DirectorMoved=true;
+        }
+    }
+    if (SceneCamera && bCameraDirty)
+    {
+        const double Now=FPlatformTime::Seconds();
+        const bool Notify=!DirectorMoved||Now-LastDirectorNotification>=.2;
+        UpdateCamera(Notify);if(Notify)LastDirectorNotification=Now;
+    }
 }
 
 void AWNTPlayerController::OpenHUD()
@@ -437,6 +505,9 @@ void AWNTPlayerController::Fail(const FString& Message)
 
 void AWNTPlayerController::Send(const TSharedPtr<FJsonObject>& Event)
 {
+#if WITH_DEV_AUTOMATION_TESTS
+    if(AutomationEventObserver)AutomationEventObserver(Event);
+#endif
     if (!Browser) return;
     Event->SetStringField(TEXT("instanceId"), InstanceId);
     Browser->ExecuteJavascript(TEXT("globalThis.WNTUnreal?.receive(") + Encode(Event) + TEXT(");"));
@@ -453,6 +524,8 @@ void AWNTPlayerController::Receive(const FString& Kind, const FString& Json)
         const FString Id = String(Packet, TEXT("id"));
         WorldScene->ApplyBattlePacket(Packet);
         if (Id != LastBattleId) { LastBattleId = Id; FitBattle(); }
+        BattleDirector.SetPacket(Packet,FPlatformTime::Seconds());
+        bCameraDirty=true;
     }
     else if (Kind == TEXT("viewport"))
     {
@@ -484,7 +557,10 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
 {
     int32 Width, Height; GetViewportSize(Width, Height);
     if (!SceneCamera || !WorldScene || Width <= 0 || Height <= 0) return;
-    bCameraDirty = false;LastViewport=FIntPoint(Width,Height);
+    // A queued pick/hover can need fresh matrices before the regular Tick.
+    // Its silent refresh must not consume the camera update owed to the HUD.
+    if(bNotify)bCameraDirty=false;
+    LastViewport=FIntPoint(Width,Height);
     const bool Battle = Mode == TEXT("battle");
     const double WorldDistance=WNTCameraMath::WorldViewDistance();
     const double Distance = (Battle ? BattleDistance : WorldDistance) / Zoom;
@@ -526,6 +602,9 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
     Event->SetNumberField(TEXT("latitude"), FocusGeo.Y); Event->SetNumberField(TEXT("tilt"), SceneCamera->View.Rotation.Pitch+90);
     Event->SetNumberField(TEXT("yaw"), SceneCamera->View.Rotation.Yaw);
     Event->SetBoolField(TEXT("orbitEnabled"), Battle||WNTCameraMath::CanOrbitWorld(Zoom));
+    Event->SetBoolField(TEXT("cinematicAvailable"),Battle&&BattleDirector.IsAvailable());
+    Event->SetBoolField(TEXT("cinematicEnabled"),Battle&&BattleDirector.IsEnabled());
+    Event->SetStringField(TEXT("cameraShot"),Battle&&BattleDirector.IsEnabled()?BattleDirector.ActiveShot(FPlatformTime::Seconds()):TEXT("manual"));
     Event->SetNumberField(TEXT("requestedTilt"), Angle);Send(Event);
 }
 
@@ -578,16 +657,16 @@ void AWNTPlayerController::MoveCameraTarget(const FVector& Offset)
     // Equal Earth recenters its longitude-dependent shape continuously. The
     // terrain material shears immutable vertices; this is ordinary movement,
     // not a camera cut or mesh rebuild.
-    if(WNTCameraMath::NeedsOriginRebase(FocusGeo.X,Meridian))
-    {Meridian=FocusGeo.X;WorldScene->SetCentralMeridian(Meridian);}
+    if(WNTCameraMath::NeedsOriginRebase(FocusGeo.X,Meridian))Meridian=FocusGeo.X;
 }
 
 void AWNTPlayerController::AnchorPoint(const FVector& Original,const FVector2D& Pointer)
 {
     const bool Battle=Mode==TEXT("battle");
     FVector Anchor=Original;
+    const double OriginalMeridian=Meridian;
     WNTCameraMath::FAnchorProgress Progress;
-    LastAnchorIterations=0;bLastAnchorConstrained=false;
+    LastAnchorIterations=0;LastAnchorRebases=0;bLastAnchorConstrained=false;
     for(int32 I=0;I<12;++I)
     {
         UpdateCamera(false);
@@ -610,22 +689,26 @@ void AWNTPlayerController::AnchorPoint(const FVector& Original,const FVector2D& 
         // outside ±180 degrees. Folding its longitude would jump a full world.
         if(!Battle)Anchor=WNTProjection::ReprojectBetweenMeridians(Anchor,PreviousMeridian,Meridian);
     }
+    // The solver only needs camera matrices and geographic focus. Repositioning
+    // every terrain tile, harbor, convoy and hull inside each correction made
+    // a wheel frame perform up to twelve complete map updates. Commit the
+    // converged longitude exactly once, then refresh against its final surface.
+    if(!Battle&&WNTCameraMath::NeedsOriginRebase(Meridian,OriginalMeridian))
+    {WorldScene->SetCentralMeridian(Meridian);LastAnchorRebases=1;}
     bCameraDirty=true;
 }
 
 void AWNTPlayerController::FitBattle()
 {
     if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
-    const FBox Bounds = WorldScene->GetSceneBounds();
+    const FBox Bounds = WorldScene->GetBattleBounds();
     if (Bounds.IsValid)
     {
         BattleTarget = Bounds.GetCenter();
-        // Bounding sphere fit accounts for portrait and wide battle windows.
         int32 Width, Height; GetViewportSize(Width, Height);
-        const double Aspect = FMath::Max(.15, Width * ViewRect.Z / FMath::Max(1., Height * ViewRect.W));
-        const double HalfAngle = FMath::Atan(FMath::Tan(FMath::DegreesToRadians(22.5)) * FMath::Min(1., Aspect));
-        BattleDistance = FMath::Max(35000., Bounds.GetExtent().Size() / FMath::Sin(HalfAngle) * 1.2);
+        BattleDistance=WNTCameraMath::BattleFitDistance(Bounds,FIntPoint(Width,Height),ViewRect);
     }
+    BattleTilt=WNTCameraMath::BattleOverviewTilt;BattleYaw=WNTCameraMath::BattleOverviewYaw;
     BattleZoom = 1; if (Mode == TEXT("battle")) Zoom = 1;
     TargetZoom=Zoom;bHasZoomAnchor=false;
     bCameraDirty = true;
@@ -641,6 +724,12 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     const bool Battle = Mode == TEXT("battle");
     if (Action == TEXT("pick") || Action == TEXT("hover")) { Pick(Packet, Action == TEXT("hover")); return; }
     if (Action == TEXT("selectBox")) { if (!Battle) SelectBox(Packet); return; }
+    if(Battle&&Action==TEXT("cinematic"))
+    {
+        bool Enabled=false;Packet->TryGetBoolField(TEXT("enabled"),Enabled);BattleDirector.SetEnabled(Enabled);
+        bHasZoomAnchor=false;TargetZoom=Zoom;bCameraDirty=true;UpdateCamera();return;
+    }
+    if(Battle&&(Action==TEXT("zoom")||Action==TEXT("pan")||Action==TEXT("tilt")||Action==TEXT("focus")))BattleDirector.SetEnabled(false);
     if (Action == TEXT("tilt") && !Battle && !WNTCameraMath::CanOrbitWorld(Zoom)) return;
     if(bCameraDirty)UpdateCamera(false);
     const FVector2D Pointer(FMath::Clamp(Number(Packet,TEXT("x"),ViewRect.X+ViewRect.Z*.5),0.0,1.0),FMath::Clamp(Number(Packet,TEXT("y"),ViewRect.Y+ViewRect.W*.5),0.0,1.0));
@@ -658,8 +747,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         }
         // Gallery fitting scales to each hull's authored dimensions, including
         // small torpedo boats. The ship-distance cap applies to the world map.
-        const double Maximum=Battle?1000.0:WNTCameraMath::MaxWorldZoom;
-        TargetZoom=FMath::Clamp(TargetZoom*FMath::Exp(-Number(Packet,TEXT("delta"))*.0015),Battle?.1:1.,Maximum);
+        TargetZoom=WNTCameraMath::WheelZoom(TargetZoom,Number(Packet,TEXT("delta")),Battle);
         bHasZoomAnchor=Anchor.IsSet();ZoomPointer=Pointer;
         if(bHasZoomAnchor){ZoomAnchor=Anchor.GetValue();ZoomAnchorMeridian=Meridian;}
         return;
@@ -677,7 +765,7 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
     else if (Action == TEXT("home"))
     {
         if (PlayerCameraManager) PlayerCameraManager->SetGameCameraCutThisFrame();
-        if (Battle) FitBattle();
+        if (Battle) {FitBattle();BattleDirector.SetEnabled(true);}
         else { Zoom = 1; WorldOrbit.Reset(); FocusGeo = FVector2D::ZeroVector; Meridian = 0; WorldScene->SetCentralMeridian(0); }
     }
     else if (Action == TEXT("focus") || Action == TEXT("fit-force"))
@@ -686,7 +774,14 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         if (Battle)
         {
             const auto Position = WorldScene->GetSelectedPosition(TEXT("battle-ship"), String(Packet, TEXT("id")), int32(Number(Packet, TEXT("hullIndex"))),String(Packet,TEXT("side")));
-            if (Position.IsSet()) { BattleTarget = Position.GetValue(); Zoom = FMath::Max(Zoom, 3.); }
+            if (Position.IsSet())
+            {
+                BattleTarget = Position.GetValue();
+                const double Aspect=FMath::Max(.35,double(LastViewport.X)*ViewRect.Z/FMath::Max(1.,LastViewport.Y*ViewRect.W));
+                // A relative3x zoom is still tens of km away after Midway Fit.
+                // Focus always brings the real chosen hull to inspection range.
+                BattleDistance=WNTCameraMath::BattleFocusDistance(Aspect);Zoom=WNTCameraMath::BattleFocusZoom;
+            }
         }
         else
         {
@@ -779,6 +874,12 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetNumberField(TEXT("configuredWindowMode"),GEngine&&GEngine->GetGameUserSettings()?int32(GEngine->GetGameUserSettings()->GetFullscreenMode()):-1);
     Event->SetBoolField(TEXT("windowMaximized"),Window.IsValid()&&Window.Pin()->IsWindowMaximized());
     Event->SetNumberField(TEXT("targetZoom"),TargetZoom);
+    if(Mode==TEXT("battle"))
+    {
+        Event->SetNumberField(TEXT("battleDistanceMetres"),BattleDistance/Zoom/100.);
+        const FBox Bounds=WorldScene->GetBattleBounds();
+        if(Bounds.IsValid){Event->SetNumberField(TEXT("battleSpanXMetres"),Bounds.GetSize().X/100.);Event->SetNumberField(TEXT("battleSpanYMetres"),Bounds.GetSize().Y/100.);}
+    }
     Event->SetNumberField(TEXT("maxWorldTilt"),WNTCameraMath::MaxWorldTilt(Zoom));
     const FVector2D RequestedAngles=Mode==TEXT("battle")?FVector2D(BattleTilt,BattleYaw):WorldOrbit.Angles(Zoom);
     Event->SetNumberField(TEXT("requestedTilt"),RequestedAngles.X);
@@ -787,8 +888,15 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetBoolField(TEXT("orbitEnabled"),Mode==TEXT("battle")||WNTCameraMath::CanOrbitWorld(Zoom));
     Event->SetNumberField(TEXT("worldOrbitZoom"),WNTCameraMath::WorldOrbitZoom);
     Event->SetNumberField(TEXT("lastAnchorIterations"),LastAnchorIterations);
+    Event->SetNumberField(TEXT("lastAnchorRebases"),LastAnchorRebases);
+    Event->SetNumberField(TEXT("wheelZoomPerPixel"),Mode==TEXT("battle")?WNTCameraMath::BattleZoomPerPixel:WNTCameraMath::WorldZoomPerPixel);
     Event->SetBoolField(TEXT("lastAnchorConstrained"),bLastAnchorConstrained);
     Event->SetBoolField(TEXT("zoomOutResetsOrbit"),true);
+    Event->SetBoolField(TEXT("cinematicAvailable"),Mode==TEXT("battle")&&BattleDirector.IsAvailable());
+    Event->SetBoolField(TEXT("cinematicEnabled"),Mode==TEXT("battle")&&BattleDirector.IsEnabled());
+    Event->SetStringField(TEXT("cameraShot"),Mode==TEXT("battle")&&BattleDirector.IsEnabled()?BattleDirector.ActiveShot(FPlatformTime::Seconds()):TEXT("manual"));
+    Event->SetNumberField(TEXT("cameraShotCount"),BattleDirector.ShotCount());
+    Event->SetNumberField(TEXT("cinematicCutCount"),CinematicCutCount);
     Event->SetNumberField(TEXT("maxWorldZoom"),WNTCameraMath::MaxWorldZoom);
     Event->SetNumberField(TEXT("centralMeridian"),Meridian);
     if(!FrameSamples.IsEmpty())
@@ -838,12 +946,12 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
         if (!Selection || It->IsHidden() || !It->GetActorEnableCollision()) continue;
         const FBox Bounds = It->GetComponentsBoundingBox();
         const FVector Position = It->GetActorLocation();
-        const TArray<FVector> Candidates{Bounds.GetCenter(), Position + FVector(0, 0, 500), Position + FVector(0, 0, 1200)};
+        const TArray<FVector> Candidates{WorldScene->GetChartPixelSize(*It,LastViewport.Y)>0?Position:Bounds.GetCenter(), Position + FVector(0, 0, 500), Position + FVector(0, 0, 1200)};
         for (const FVector& Candidate : Candidates)
         {
             const auto Screen = WNTCameraMath::Project(SceneCamera->View, Candidate);
             if (!Screen.IsSet() || Screen->X < ViewRect.X || Screen->Y < ViewRect.Y || Screen->X > ViewRect.X + ViewRect.Z || Screen->Y > ViewRect.Y + ViewRect.W) continue;
-            AActor* ChartHit=Mode==TEXT("world")?WorldScene->HitChart(Screen.GetValue(),FVector2D(10.0/FMath::Max(1,LastViewport.X),10.0/FMath::Max(1,LastViewport.Y))):nullptr;
+            AActor* ChartHit=WorldScene->HitChart(Screen.GetValue(),FVector2D(10.0/FMath::Max(1,LastViewport.X),10.0/FMath::Max(1,LastViewport.Y)));
             if(ChartHit&&ChartHit!=*It)continue;
             if(!ChartHit)
             {
@@ -934,7 +1042,7 @@ void AWNTPlayerController::Pick(const TSharedPtr<FJsonObject>& Packet, bool bHov
     TSharedPtr<FJsonObject> Selection;
     // Canvas symbols are drawn above scene geometry. Pick that same topmost
     // visible glyph before tracing hulls/underlying port collision volumes.
-    if(Mode==TEXT("world"))if(AActor* Marker=WorldScene->HitChart(Pointer,Padding))Selection=WorldScene->GetSelection(Marker);
+    if(AActor* Marker=WorldScene->HitChart(Pointer,Padding))Selection=WorldScene->GetSelection(Marker);
     const bool bChartHit=Selection.IsValid();
     const auto Surface=bChartHit?TOptional<FVector>():SurfacePoint(Pointer,false);
     if (!bChartHit&&WNTCameraMath::Ray(SceneCamera->View,Pointer,OriginPoint,Direction))
