@@ -1,3 +1,4 @@
+import { assertNativeChartWithLegend } from './chart-assertions.mjs';
 import { POLITICAL, POLITICAL_1922 } from "../worker/map-assets.mjs";
 import { CATALOG } from "../worker/catalog-loader.mjs";
 import test from "node:test";
@@ -227,7 +228,7 @@ test("map centering and inverse projection work across zoom and the date line wi
     (after.match(/data-fleet-mission=/g) || []).length,
   );
   assert.match(after, /native-world-surface/);
-  assert.doesNotMatch(after, /<svg/);
+  assertNativeChartWithLegend(after);
   assert.doesNotMatch(after, /selected-manifest/);
   assert.match(
     mapHover(s, c, "territory:test", {
@@ -264,7 +265,7 @@ test("native world surface remains preserved when switching between map menus", 
     assert.match(cached, /data-preserve="true"/);
     assert.match(cached, /data-key="native-world-surface"/);
     assert.match(cached, /Land campaigns/);
-    assert.doesNotMatch(cached, /<svg|political-territory/);
+    assertNativeChartWithLegend(cached);
   } finally {
     if (previous === undefined) delete globalThis.document;
     else globalThis.document = previous;

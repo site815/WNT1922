@@ -8,6 +8,14 @@
 namespace
 {
     constexpr double Radians = UE_DOUBLE_PI / 180.0;
+    constexpr double M = 0.86602540378443864676;
+    constexpr double A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796;
+    constexpr double EqualEarthUnitScale = WNTProjection::EarthRadiusMetres * WNTProjection::WorldUnitsPerMetre;
+    double Theta(double Latitude) { return std::asin(M * std::sin(FMath::Clamp(Latitude,-90.0,90.0)*Radians)); }
+    double North(double T)
+    {const double T2=T*T,T6=T2*T2*T2;return T*(A1+A2*T2+T6*(A3+A4*T2));}
+    double Derivative(double T)
+    {const double T2=T*T,T6=T2*T2*T2;return A1+3*A2*T2+T6*(7*A3+9*A4*T2);}
 }
 double WNTProjection::WrapLongitude(double Degrees)
 {
@@ -18,12 +26,20 @@ double WNTProjection::WrapLongitude(double Degrees)
 }
 FVector WNTProjection::ForwardUnwrapped(const FVector2D& Point, double HeightMetres)
 {
-    const double Scale = EarthRadiusMetres * WorldUnitsPerMetre;
-    // A fixed cylindrical chart has a constant wrap width at every latitude.
-    // Scrolling translates existing 3D terrain; it never reprojects continents.
-    return FVector(FMath::Clamp(Point.Y, -90.0, 90.0) * Radians * Scale,
-        Point.X * Radians * Scale, HeightMetres * WorldUnitsPerMetre);
+    // Equal Earth (Savric, Patterson and Jenny, 2018), spherical form.
+    // Longitude is intentionally unbounded for a continuous repeated chart.
+    return FVector(North(Theta(Point.Y))*EqualEarthUnitScale,Point.X*EastUnitsPerDegree(Point.Y),HeightMetres*WorldUnitsPerMetre);
 }
+double WNTProjection::EastUnitsPerDegree(double Latitude)
+{const double T=Theta(Latitude);return EqualEarthUnitScale*Radians*std::cos(T)/(M*Derivative(T));}
+double WNTProjection::EastScaleDerivative(double Latitude)
+{
+    const double T=Theta(Latitude),T2=T*T,T5=T2*T2*T,D=Derivative(T);
+    const double DPrime=6*A2*T+42*A3*T5+72*A4*T5*T2;
+    return Radians/M*(-std::sin(T)*D-std::cos(T)*DPrime)/(D*D*D);
+}
+double WNTProjection::WrapWidthAtLatitude(double Latitude) { return EastUnitsPerDegree(Latitude)*360.0; }
+double WNTProjection::PoleNorthing() { return North(UE_DOUBLE_PI/3.0)*EqualEarthUnitScale; }
 FVector WNTProjection::Forward(const FVector2D& Point, double CentralMeridian, double HeightMetres)
 {
     return ForwardUnwrapped(FVector2D(WrapLongitude(Point.X - CentralMeridian), Point.Y), HeightMetres);
@@ -31,11 +47,34 @@ FVector WNTProjection::Forward(const FVector2D& Point, double CentralMeridian, d
 TOptional<FVector2D> WNTProjection::Inverse(const FVector& World, double CentralMeridian)
 {
     if (!FMath::IsFinite(World.X) || !FMath::IsFinite(World.Y) || !FMath::IsFinite(CentralMeridian)) return {};
-    const double Scale = EarthRadiusMetres * WorldUnitsPerMetre;
-    const double Latitude = World.X / (Scale * Radians);
-    if (FMath::Abs(Latitude) > 90.0 + 1e-9) return {};
-    return FVector2D(WrapLongitude(World.Y / (Scale * Radians) + CentralMeridian), FMath::Clamp(Latitude,-90.0,90.0));
+    const double Y=World.X/EqualEarthUnitScale,Limit=North(UE_DOUBLE_PI/3.0);
+    if(FMath::Abs(Y)>Limit+1e-12)return {};
+    const double Target=FMath::Clamp(Y,-Limit,Limit);double T=Target/A1;
+    for(int32 I=0;I<12;++I)
+    {const double Delta=(North(T)-Target)/Derivative(T);T-=Delta;if(FMath::Abs(Delta)<1e-13)break;}
+    const double Latitude=std::asin(FMath::Clamp(std::sin(T)/M,-1.0,1.0))/Radians;
+    return FVector2D(WrapLongitude(World.Y/EastUnitsPerDegree(Latitude)+CentralMeridian),Latitude);
 }
+FVector WNTProjection::ReprojectBetweenMeridians(const FVector& World,double FromMeridian,double ToMeridian)
+{
+    const auto Geo=Inverse(World,FromMeridian);if(!Geo.IsSet())return World;
+    return World-FVector(0,WrapLongitude(ToMeridian-FromMeridian)*EastUnitsPerDegree(Geo->Y),0);
+}
+FVector2D WNTProjection::ChartVertexMetadata(const FVector& WorldVertex,const FVector& TileOrigin)
+{
+    const auto Vertex=Inverse(FVector(FMath::Clamp(WorldVertex.X,-PoleNorthing(),PoleNorthing()),0,0));
+    const auto Origin=Inverse(FVector(FMath::Clamp(TileOrigin.X,-PoleNorthing(),PoleNorthing()),0,0));
+    if(!Vertex.IsSet()||!Origin.IsSet())return FVector2D::ZeroVector;
+    return FVector2D(EastUnitsPerDegree(Vertex->Y)-EastUnitsPerDegree(Origin->Y),EastScaleDerivative(Vertex->Y));
+}
+FWNTChartShaderData WNTProjection::PackChartShear(double Coefficient,double DerivativeValue)
+{
+    const double High=std::floor(Coefficient/4096.0),Remaining=Coefficient-High*4096.0;
+    const double Middle=std::floor(Remaining/4.0),Low=(Remaining-Middle*4.0)/4.0;
+    return {FVector2D(High,Middle),FVector2D(Low,DerivativeValue*1024.0)};
+}
+double WNTProjection::DecodeChartShear(const FVector2D& UV1,const FVector2D& UV2)
+{return UV1.X*4096.0+UV1.Y*4.0+UV2.X*4.0;}
 bool FWNTElevationGrid::Load(const FString& BinaryPath, const FString& MetadataPath, FString& OutError)
 {
     Values.Reset(); Width = Height = 0;

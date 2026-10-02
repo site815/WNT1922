@@ -23,6 +23,16 @@ namespace WNTCameraMath
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
     WNT1922_API double MaxWorldTilt(double Zoom);
     constexpr double MaxWorldZoom = 65536.0;
+    constexpr double WorldOrbitZoom = 32768.0;
+    constexpr double WorldNorthUpZoom = 16384.0;
+    WNT1922_API bool CanOrbitWorld(double Zoom);
+    struct WNT1922_API FWorldOrbit
+    {
+        double Tilt = 52.0, Yaw = 0.0;
+        void Reset();
+        bool Drag(double Zoom, double DeltaX, double DeltaY);
+        FVector2D Angles(double Zoom);
+    };
     WNT1922_API bool NeedsOriginRebase(double Longitude, double Meridian);
 }
 
@@ -61,6 +71,7 @@ private:
     double ZoomAnchorMeridian = 0;
     bool bHasZoomAnchor = false;
     double BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
+    WNTCameraMath::FWorldOrbit WorldOrbit;
     TArray<double> FrameSamples;
     int32 FrameSampleCursor = 0;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;

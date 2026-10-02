@@ -50,15 +50,15 @@ function fixture(t, mode = 'world') {
   return {scene, canvas, inputs};
 }
 
-for (const [label, button, shiftKey] of [['middle',1,false],['right',2,false],['Shift-right',2,true]]) {
-  test('world '+label+' drag pans and never picks or manually tilts', t => {
+for (const [label, button, shiftKey, action] of [['middle',1,false,'tilt'],['right',2,false,'pan'],['Shift-right',2,true,'pan']]) {
+  test('world '+label+' drag sends '+action+' without selecting (native zoom gate controls orbit)', t => {
     const {canvas, inputs} = fixture(t);
-    canvas.emit('pointerdown',{button,shiftKey});
+    assert(canvas.emit('pointerdown',{button,shiftKey}).defaultPrevented,'Drag cannot start browser middle-button autoscroll');
     assert.deepEqual(canvas.focusOptions,{preventScroll:true});
     assert(canvas.hasPointerCapture(1));
     canvas.emit('pointermove',{button,shiftKey,clientX:125,clientY:115});
     canvas.emit('pointerup',{button,shiftKey,clientX:125,clientY:115});
-    assert.deepEqual(inputs,[{action:'pan',dx:25,dy:15,previousX:.1,previousY:.2,x:.125,y:.23}]);
+    assert.deepEqual(inputs,[{action,dx:25,dy:15,previousX:.1,previousY:.2,x:.125,y:.23}]);
     assert(!canvas.hasPointerCapture(1));
   });
 }
@@ -169,4 +169,24 @@ test('native hover accepts only the latest pointer request and rejects replies a
   const third=inputs.at(-1);scene.suspend();
   scene.receiveHover({...third,selection:{id:'late-scene'}});
   assert.equal(hovers.at(-1),null);
+});
+
+test('world yaw-only orbit invalidates stale hovered ships without changing selection', t => {
+  const {scene,inputs}=fixture(t),hovers=[];scene.onHover=value=>hovers.push(value);
+  scene.cameraChanged({zoom:32768,longitude:0,latitude:0,tilt:52,yaw:0});
+  const before=hovers.length;
+  scene.cameraChanged({zoom:32768,longitude:0,latitude:0,tilt:52,yaw:35});
+  assert.equal(hovers.length,before+1);
+  assert.equal(hovers.at(-1),null);
+  assert.deepEqual(inputs,[],'A camera update never becomes a selection or navigation command');
+});
+
+test('fleet selection signatures detect secondary selection changes without depending on order',t=>{
+  const {scene}=fixture(t);let chart={fleetId:'one',fleetIds:['one']};scene.chart=()=>chart;
+  const single=scene.selection();
+  chart.fleetIds=['one','two','two'];const multiple=scene.selection();
+  assert.equal(multiple.selectedForceId,'one');assert.deepEqual(multiple.selectedForceIds,['one','two']);
+  assert.notEqual(multiple.signature,single.signature);
+  chart.fleetIds=['two','one'];assert.equal(scene.selection().signature,multiple.signature);
+  chart.convoyId='merchant';assert.deepEqual(scene.selection().selectedForceIds,['merchant']);
 });

@@ -6,6 +6,7 @@ import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { mapHover } from './inspection-view.mjs';
 import { linePath } from './projection.mjs';
 import { ongoingMapBattles } from './battle-map.mjs';
+import { mapSymbolLegend } from './map-symbols.mjs';
 const esc = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -103,11 +104,7 @@ export function commandView(s, content, ui = {}) {
   const merchantPanel = convoy ? `<section class="merchant-inspection" data-convoy-id="${esc(convoy.id)}" data-hull-index="${ui.merchantHullIndex ?? ''}"><button data-action="map-overview">Naval commands</button>${Number.isInteger(ui.merchantHullIndex) ? `<p>Merchant hull ${Math.min(convoy.count,ui.merchantHullIndex + 1)} of ${convoy.count}</p>` : ''}${mapHover(s,content,'convoy:'+convoy.id)}<p class="panel-note">Representative freighter geometry. Hull identities and spacing are for inspection; the simulation records the convoy's shared voyage and surviving count.</p></section>` : '';
   const panel = ui.sidePanel || merchantPanel + fleetList;
   const legend =
-    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · right/middle drag to pan · left drag to select fleets · the camera tilts automatically only when inspecting individual ships · double-click a force for ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span><span style="color:' +
-    PROFILES[s.player].color +
-    '">▲ Fleet</span><span style="color:' +
-    PROFILES[s.player].color +
-    '">■ Convoy</span><span title="Scouting or intelligence; brightness fades with age">◇ Contact</span><span>● Port</span><span>◆ Capital</span><span title="Land front / island assault">━/◯ Front</span><span class="legend-powers">' +
+    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · right drag pans · left drag selects fleets · middle drag orbits at close ship zoom (32768× and above) · zooming out restores north-up (16384× and below) · double-click a force to fit its ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span>' + mapSymbolLegend() + '<span class="legend-powers" title="Country ownership colors">' +
     NATION_ORDER.map(
       (id) =>
         '<span style="color:' +
@@ -119,7 +116,7 @@ export function commandView(s, content, ui = {}) {
         "</span>",
     ).join("") +
     "</span>" +
-    '<span title="Green merchant markers are escorted; tan markers are exposed. Green circles show operational escort reach (148 km).">Escort cover ' +
+    '<span title="Convoys currently receiving operational escort defense; inspect a convoy for its detailed coverage.">Escort cover ' +
     coverage.convoys.filter((v) => v.defense > 0).length +
     "/" +
     coverage.convoys.length +

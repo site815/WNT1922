@@ -18,8 +18,11 @@ namespace WNTTerrainGeometry
     WNT1922_API bool TriangulatePolygon(const TArray<TArray<FVector2D>>& Rings, TArray<FWNTGeographicTriangle>& OutTriangles, FString& OutError);
     /** Output longitudes are relative and clipped to [-180,+180], never joined across the seam. */
     WNT1922_API TArray<FWNTGeographicTriangle> ClipAtMeridian(const FWNTGeographicTriangle& Triangle, double CentralMeridian);
-    /** Translate a fixed geographic tile to its nearest repeat, then the requested adjacent copy. */
+    /** Anchor a fixed tile to its nearest repeat; UV1/CPD0 supplies latitude shear. */
     WNT1922_API FVector WrappedTileOrigin(const FVector& GeographicOrigin, double CentralMeridian, int32 Copy);
+    WNT1922_API double TileLongitudeShift(const FVector& GeographicOrigin, double CentralMeridian, int32 Copy);
+    /** Conservative local bounds for shader displacement, including float transport margin. */
+    WNT1922_API FBox ShearedLocalBounds(const FBox& LocalBounds, const FVector2D& ShearLimits, double LongitudeShift);
     /** Stable illustrative elevation/climate colors; no satellite or image sampling. */
     WNT1922_API FLinearColor TerrainColour(const FVector2D& LongitudeLatitude, double HeightMetres, const FLinearColor& PoliticalTint);
     /** Split a boundary on the same global grid used to tessellate land faces. */
@@ -63,9 +66,12 @@ public:
 
 private:
     void RebuildProjectedMeshes();
+    void UpdateTilePlacement(int32 Index, int32 Copy);
     TUniquePtr<FWNTTerrainData, FWNTTerrainDataDeleter> Data;
     UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> TerrainTiles;
     TArray<FVector> TileOrigins;
+    TArray<FBox> TileLocalBounds;
+    TArray<FVector2D> TileShearLimits;
     double CentralMeridian = 0.0;
     FString LoadError;
     bool bGraticuleVisible = true;

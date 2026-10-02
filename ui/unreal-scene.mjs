@@ -100,10 +100,11 @@ class NativeScene {
     }, {...options, passive:false});
     canvas.addEventListener('pointerdown', event => {
       if (![0,1,2].includes(event.button)) return;
+      event.preventDefault(); // Middle dragging must not start browser autoscroll.
       this.dismissHover();
       this.activate(); canvas.focus({preventScroll:true}); canvas.setPointerCapture(event.pointerId);
       this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false,
-        pick:event.button === 0, tilt:this.mode === 'battle' && (event.button === 1 || (event.button === 2 && event.shiftKey))};
+        pick:event.button === 0, tilt:event.button === 1 || (this.mode === 'battle' && event.button === 2 && event.shiftKey)};
     }, options);
     canvas.addEventListener('pointermove', event => {
       if (this.drag) {
@@ -205,22 +206,28 @@ export class UnrealWorldScene extends NativeScene {
     this.mode = 'world'; this.rows = [];
   }
   get ready() {return Boolean(this.canvas?.isConnected);}
+  selection() {
+    const chart = this.chart(), selectedForceId = chart.convoyId || chart.fleetId || null;
+    const selectedForceIds = chart.convoyId ? [chart.convoyId] : [...new Set(chart.fleetIds?.length ? chart.fleetIds : chart.fleetId ? [chart.fleetId] : [])];
+    return {selectedForceId, selectedForceIds, signature:JSON.stringify([selectedForceId,[...selectedForceIds].sort()])};
+  }
   accept(state, content, political) {
     if (this.state !== state) {
       if (state.campaignId !== this.state?.campaignId || state.player !== this.state?.player) this.rows = [];
       const rows = ownFormationScene(state, content, this.rows);
-      this.routeSelection = this.chart().convoyId || this.chart().fleetId || null;
-      this.packet = buildUnrealScenePacket(state, content, this.rows, {rows, selectedForceId:this.routeSelection,
+      const selection = this.selection();
+      this.routeSelection = selection.selectedForceId; this.selectionSignature = selection.signature;
+      this.packet = buildUnrealScenePacket(state, content, this.rows, {rows, selectedForceId:selection.selectedForceId, selectedForceIds:selection.selectedForceIds,
         animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
       send('world', this.packet); this.rows = rows;
     }
     Object.assign(this, {state, content, political}); this.refresh();
   }
   refresh() {
-    const selectedForceId = this.chart().convoyId || this.chart().fleetId || null;
-    if (this.state && selectedForceId !== this.routeSelection) {
-      this.routeSelection = selectedForceId;
-      this.packet = buildUnrealScenePacket(this.state, this.content, this.rows, {rows:this.rows, selectedForceId,
+    const selection = this.selection();
+    if (this.state && selection.signature !== this.selectionSignature) {
+      this.routeSelection = selection.selectedForceId; this.selectionSignature = selection.signature;
+      this.packet = buildUnrealScenePacket(this.state, this.content, this.rows, {rows:this.rows, selectedForceId:selection.selectedForceId, selectedForceIds:selection.selectedForceIds,
         animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
       send('world', this.packet);
     }
@@ -230,7 +237,7 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. North is up. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Scroll to zoom. The camera tilts automatically only at close ship inspection. Home restores the overhead strategic view.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Wheel zooms. At close ship zoom, middle-button drag orbits the camera. Zooming out restores north-up and disables orbit. Home restores the overhead strategic view.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
@@ -243,7 +250,7 @@ export class UnrealWorldScene extends NativeScene {
     return {left, top, width:Math.max(120, right - left), height:Math.max(120, bounds.bottom - top - 48)};
   }
   cameraChanged(event) {
-    const key = JSON.stringify([event.zoom,event.longitude,event.latitude,event.tilt]);
+    const key = JSON.stringify([event.zoom,event.longitude,event.latitude,event.tilt,event.yaw]);
     if (key === this.cameraKey) return; this.cameraKey = key;
     this.dismissHover();
     this.zoom = event.zoom; const chart = this.chart(); chart.zoom = event.zoom;

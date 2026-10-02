@@ -33,10 +33,10 @@ bool FWNTRebaseHistoryTest::RunTest(const FString& Parameters)
         TestEqual(Label,bool(Camera->bGameCameraCutThisFrame),Expected);
     };
     Check(0,false,TEXT("Initial stationary chart keeps its temporal history"));
-    Check(179,true,TEXT("Moving chart origin invalidates old route and marker history"));
+    Check(179,false,TEXT("Equal Earth longitude shear preserves continuous camera history"));
     Check(179,false,TEXT("Repeated same origin does not continually reset TSR"));
     Check(539,false,TEXT("Equivalent wrapped longitude is not a new rebase"));
-    Check(-179,true,TEXT("Crossing the seam invalidates copied primitive history"));
+    Check(-179,false,TEXT("Crossing the seam is continuous camera motion"));
     Check(-179,false,TEXT("Settled seam view can accumulate history again"));
     Camera->bGameCameraCutThisFrame=false;Scene->SetSceneMode(TEXT("battle"));
     TestTrue(TEXT("World to battle cannot reuse unrelated map history"),bool(Camera->bGameCameraCutThisFrame));
@@ -141,16 +141,17 @@ bool FWNTCameraWrappingTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRepeatedCopyAnchorTest,"WNT.Camera.RepeatedCopyAnchor",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTRepeatedCopyAnchorTest::RunTest(const FString& Parameters)
 {
-    for(double Meridian:{-179.,0.,179.})for(double Copy:{-1.,0.,1.})for(double Delta:{-30.,30.})
+    for(double Latitude:{-80.,-25.,0.,25.,80.})for(double Meridian:{-179.,0.,179.})for(double Copy:{-1.,0.,1.})for(double Delta:{-30.,30.})
     {
         const double Next=WNTProjection::WrapLongitude(Meridian+Delta);
-        const FVector Original=WNTProjection::ForwardUnwrapped(FVector2D(170+Copy*360,25));
-        const FVector Rebased=Original-FVector(0,WNTProjection::WrapLongitude(Next-Meridian)/360*WNTProjection::WorldWidth,0);
+        const FVector Original=WNTProjection::ForwardUnwrapped(FVector2D(170+Copy*360,Latitude),123);
+        const FVector Rebased=WNTProjection::ReprojectBetweenMeridians(Original,Meridian,Next);
         const auto Before=WNTProjection::Inverse(Original,Meridian),After=WNTProjection::Inverse(Rebased,Next);
         TestTrue(TEXT("Rebased anchor preserves the actual geographic point"),Before.IsSet()&&After.IsSet()
             &&FMath::Abs(WNTProjection::WrapLongitude(Before->X-After->X))<1e-8&&FMath::Abs(Before->Y-After->Y)<1e-8);
-        TestTrue(TEXT("Anchor moves only by camera translation, never by an extra world-width jump"),
-            FMath::Abs((Rebased.Y-Original.Y)+Delta/360*WNTProjection::WorldWidth)<.001);
+        const FVector Expected=WNTProjection::ForwardUnwrapped(FVector2D(170+Copy*360-Delta,Latitude),123);
+        TestTrue(TEXT("Anchor follows the exact latitude-dependent projection without changing its repeated copy or height"),Rebased.Equals(Expected,.001));
+        TestTrue(TEXT("Forward and inverse meridian shifts do not accumulate drift"),WNTProjection::ReprojectBetweenMeridians(Rebased,Next,Meridian).Equals(Original,.001));
     }
     return true;
 }
@@ -168,10 +169,44 @@ bool FWNTWorldTiltGateTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Close ship view has automatic inspection pitch"),WNTCameraMath::MaxWorldTilt(32768.0),52.0);
     TestEqual(TEXT("Maximum zoom stays at ship scale"),WNTCameraMath::MaxWorldZoom,65536.0);
     TestEqual(TEXT("Pitch stays bounded at the zoom limit"),WNTCameraMath::MaxWorldTilt(WNTCameraMath::MaxWorldZoom),52.0);
-    TestFalse(TEXT("Small pans retain stable terrain and temporal history"),WNTCameraMath::NeedsOriginRebase(20,0));
-    TestFalse(TEXT("Date-line crossing near current origin needs no rebase"),WNTCameraMath::NeedsOriginRebase(-179,179));
-    TestTrue(TEXT("Long journeys rebase before leaving the repeated world"),WNTCameraMath::NeedsOriginRebase(46,0));
+    TestTrue(TEXT("Small pans continuously recenter the Equal Earth meridian"),WNTCameraMath::NeedsOriginRebase(.01,0));
+    TestFalse(TEXT("Equivalent wrapped meridians do not redo geography"),WNTCameraMath::NeedsOriginRebase(181,-179));
+    TestTrue(TEXT("Date-line crossing updates the geographic centre"),WNTCameraMath::NeedsOriginRebase(-179,179));
     TestEqual(TEXT("Returning to strategic scale restores overhead lock"),WNTCameraMath::MaxWorldTilt(1.0),0.0);
+    WNTCameraMath::FWorldOrbit Orientation;
+    for(double Zoom:{1.0,16384.0,24000.0,32767.0})
+    {
+        TestFalse(TEXT("Middle orbit is unavailable before close ship inspection"),Orientation.Drag(Zoom,100,-100));
+        TestEqual(TEXT("Rejected orbit leaves heading unchanged"),Orientation.Yaw,0.0);
+        TestEqual(TEXT("Rejected orbit leaves automatic pitch unchanged"),Orientation.Tilt,52.0);
+    }
+    TestTrue(TEXT("Middle drag orbits at the ship threshold"),Orientation.Drag(WNTCameraMath::WorldOrbitZoom,100,-40));
+    TestTrue(TEXT("Close ship yaw and tilt both follow the drag"),Orientation.Angles(32768).Equals(FVector2D(42,-30),1e-8));
+    FMinimalViewInfo OrbitView;const FVector Pivot(12000,24000,0);
+    WNTCameraMath::ConfigureProjection(OrbitView,FIntPoint(3440,1440),FVector4(.1,.12,.8,.82));
+    const FVector2D Angles=Orientation.Angles(32768);
+    WNTCameraMath::Orbit(OrbitView,Pivot,90000,Angles.X,Angles.Y);
+    const auto PivotScreen=WNTCameraMath::Project(OrbitView,Pivot);
+    TestTrue(TEXT("World orbit keeps the inspected focus in the viewport centre"),PivotScreen.IsSet()&&PivotScreen->Equals(FVector2D(.5,.53),1e-8));
+    FVector2D PreviousAngles=Angles;
+    for(int32 I=1;I<=64;++I)
+    {
+        const double Zoom=32768.0/FMath::Pow(2.0,I/64.0);
+        const FVector2D Current=Orientation.Angles(Zoom);
+        TestTrue(TEXT("Zoom out returns both axes continuously toward overhead north-up"),Current.X<=PreviousAngles.X+1e-8&&FMath::Abs(Current.Y)<=FMath::Abs(PreviousAngles.Y)+1e-8);
+        TestTrue(TEXT("Zoom-out orientation has no threshold snap"),FVector2D::Distance(Current,PreviousAngles)<2.0);
+        TestFalse(TEXT("Orbit remains disabled throughout the zoom-out transition"),Orientation.Drag(Zoom,100,-100));
+        PreviousAngles=Current;
+    }
+    TestTrue(TEXT("Strategic view is exactly north-up and overhead"),Orientation.Angles(16384).IsNearlyZero());
+    TestTrue(TEXT("Re-entering ship zoom does not revive the old manual orbit"),Orientation.Angles(32768).Equals(FVector2D(52,0),1e-8));
+    Orientation.Drag(65536,20000,-20000);
+    TestEqual(TEXT("World tilt cannot fall below overhead"),Orientation.Tilt,0.0);
+    TestTrue(TEXT("Arbitrary orbit headings stay bounded"),FMath::Abs(Orientation.Yaw)<=180);
+    Orientation.Drag(65536,0,20000);
+    TestEqual(TEXT("World tilt remains inside its terrain-safe inspection limit"),Orientation.Tilt,52.0);
+    Orientation.Reset();
+    TestTrue(TEXT("Home resets both orientation axes"),Orientation.Angles(32768).Equals(FVector2D(52,0),1e-8));
     return true;
 }
 #endif

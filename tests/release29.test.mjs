@@ -1,3 +1,4 @@
+import { assertNativeChartWithLegend } from './chart-assertions.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import { CATALOG } from "../worker/catalog-loader.mjs";
@@ -153,7 +154,7 @@ test("selecting a force highlights the list beside the native chart without any 
   const [s,c,n]=start(),f=n.fleets.find(f=>f.role==='battle'),html=commandView(s,c,{fleetId:f.id});
   assert.ok(html.includes('class="fleet-command-row selected" data-action="focus-fleet" data-id="'+f.id+'"'));
   assert.match(html,/class="native-world-surface"/);
-  assert.doesNotMatch(html,/<svg/);
+  assertNativeChartWithLegend(html);
   assert.doesNotMatch(html,/send-inline-order|data-fleet-mission|data-fleet-aggression/);
   assert.doesNotMatch(html,/Admiral control/);assert.match(html,/fleet-mission-status/);
 });

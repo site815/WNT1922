@@ -26,6 +26,22 @@ const nearPoint = (a, b, epsilon = 1e-8) => {
   assert(Math.abs(a[1] - b[1]) < epsilon, `Latitude ${a[1]} != ${b[1]}`);
 };
 
+test('native selection includes single and docked own forces, filters unknown IDs and never changes orders', () => {
+  const s = fixture(force([[0,0],[4,0]]),100), before = JSON.stringify(s);
+  let packet = buildUnrealScenePacket(s,{classes},[],{selectedForceId:'fleet'});
+  assert.deepEqual(packet.selectedForceIds,['fleet']);
+  assert.equal(packet.chartSymbols.symbols.port.label,'Port');
+  assert.equal(packet.chartSymbols.symbols.contact.label,'Contact');
+  const rows = ownFormationScene(s,{classes});
+  rows[0].docked = true;
+  packet = buildUnrealScenePacket(s,{classes},[],{rows,selectedForceId:'fleet',selectedForceIds:['fleet','fleet','foreign','missing']});
+  assert.deepEqual(packet.selectedForceIds,['fleet']);
+  assert.equal(packet.route,null,'a selected docked fleet gets brackets without inventing an ordered route');
+  rows[0].unlocated = true;
+  assert.deepEqual(buildUnrealScenePacket(s,{classes},[],{rows,selectedForceIds:['fleet']}).selectedForceIds,[]);
+  assert.equal(JSON.stringify(s),before);
+});
+
 test('ongoing battle markers expose only player reports and disappear on completion without changing combat state', () => {
   const state = fixture(force([[0,0],[4,0]]),100);
   const report = {id:71,a:'USA',b:'JPN',status:'ongoing',stage:3,round:2,mainRounds:3,region:'pacific',position:[179.8,25],startedAt:40,durations:[15,15,30,60,15],nextStageAt:130,

@@ -148,91 +148,95 @@ namespace
     }
     FVector ChartPosition(const FVector2D& Geo, double Meridian, int32 Copy, double Height=0)
     {
-        return WNTProjection::Forward(Geo,Meridian,Height)+FVector(0,Copy*WNTProjection::WorldWidth,0);
+        return WNTProjection::ForwardUnwrapped(FVector2D(WNTProjection::WrapLongitude(Geo.X-Meridian)+360.0*Copy,Geo.Y),Height);
     }
-    UStaticMeshComponent* Shape(AActor* Owner, UStaticMesh* Mesh, const FVector& Location, const FVector& Metres, UMaterialInterface* Material)
+    // Same 100-unit, y-down paths as assets/ui/map-symbols.json and the SVG legend.
+    UProceduralMeshComponent* ChartSymbol(AActor* Owner, const TSharedPtr<FJsonObject>& Spec,
+        const FString& Kind, UMaterialInterface* Material)
     {
-        auto* Component = NewObject<UStaticMeshComponent>(Owner);
-        Owner->AddInstanceComponent(Component); Component->SetupAttachment(Owner->GetRootComponent()); Component->SetStaticMesh(Mesh);
-        Component->SetMobility(EComponentMobility::Movable);
-        Component->SetCastShadow(false);Component->SetAffectDistanceFieldLighting(false);
-        Component->SetRelativeLocation(Location * 100.0); Component->SetRelativeScale3D(Metres);
-        Component->SetCollisionEnabled(ECollisionEnabled::QueryOnly); Component->SetCollisionResponseToAllChannels(ECR_Ignore); Component->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-        if (Material) Component->SetMaterial(0, Material);
-        Component->RegisterComponent(); return Component;
-    }
-    UProceduralMeshComponent* PortSymbol(AActor* Owner, UMaterialInterface* Material, bool bBattle = false)
-    {
-        // Chart anchor inside a circle. This is a navigation symbol, not scenery.
-        auto* Mesh = NewObject<UProceduralMeshComponent>(Owner);
-        Owner->AddInstanceComponent(Mesh); Mesh->SetupAttachment(Owner->GetRootComponent());
-        Mesh->SetMobility(EComponentMobility::Movable); Mesh->SetCastShadow(false);
-        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        TArray<FVector> Vertices, Normals; TArray<int32> Indices;
-        TArray<FVector2D> UVs; TArray<FLinearColor> Colors; TArray<FProcMeshTangent> Tangents;
-        auto Stroke = [&](FVector2D A, FVector2D B, double Width)
+        const auto Symbol=Object(Object(Spec,TEXT("symbols")),*Kind);
+        if(!Symbol.IsValid())return nullptr;
+        auto* Mesh=NewObject<UProceduralMeshComponent>(Owner);
+        Owner->AddInstanceComponent(Mesh);Mesh->SetupAttachment(Owner->GetRootComponent());
+        Mesh->SetMobility(EComponentMobility::Movable);Mesh->SetCastShadow(false);
+        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);Mesh->SetTranslucentSortPriority(20);
+        TArray<FVector> Vertices,Normals;TArray<int32> Indices;
+        TArray<FVector2D> UVs;TArray<FLinearColor> Colors;TArray<FProcMeshTangent> Tangents;
+        const auto Colour=[](const FString& Hex){return FLinearColor(FColor::FromHex(Hex));};
+        const FLinearColor Backing=Colour(String(Spec,TEXT("backingColor")));
+        auto AddVertex=[&](const FVector2D& P,const FLinearColor& Color)
         {
-            const FVector2D Delta=(B-A).GetSafeNormal(), Side(-Delta.Y*Width*.5,Delta.X*Width*.5); const int32 Base=Vertices.Num();
-            for (const FVector2D P : {A-Side,B-Side,B+Side,A+Side})
-            {
-                Vertices.Add(FVector(0,-P.X*1000.,P.Y*1000.)); Normals.Add(FVector::ForwardVector);
-                UVs.Add(FVector2D::ZeroVector); Colors.Add(FLinearColor::White); Tangents.Add(FProcMeshTangent(FVector::RightVector,false));
-            }
-            Indices.Append({Base,Base+1,Base+2,Base,Base+2,Base+3});
+            Vertices.Add(FVector(0,-P.X*1000.,-P.Y*1000.));Normals.Add(FVector::ForwardVector);
+            UVs.Add(FVector2D::ZeroVector);Colors.Add(Color);Tangents.Add(FProcMeshTangent(FVector::RightVector,false));
         };
-        if (bBattle)
+        auto Disc=[&](FVector2D P,double Radius,FLinearColor Color)
         {
-            // A persistent chart badge with crossed gun barrels. Two small
-            // independently tinted muzzle rays animate without rebuilding mesh
-            // buffers, spawning effects, lights, audio or tactical combatants.
-            for (int32 I=0;I<32;++I)
+            const int32 Base=Vertices.Num();AddVertex(P,Color);
+            for(int32 I=0;I<12;++I)AddVertex(P+FVector2D(FMath::Cos(I*UE_DOUBLE_PI/6),FMath::Sin(I*UE_DOUBLE_PI/6))*Radius,Color);
+            for(int32 I=0;I<12;++I)Indices.Append({Base,Base+1+I,Base+1+(I+1)%12});
+        };
+        auto Stroke=[&](FVector2D A,FVector2D B,double Width,FLinearColor Color)
+        {
+            const FVector2D Delta=(B-A).GetSafeNormal(),Side(-Delta.Y*Width*.5,Delta.X*Width*.5);const int32 Base=Vertices.Num();
+            for(const FVector2D P:{A-Side,B-Side,B+Side,A+Side})AddVertex(P,Color);
+            Indices.Append({Base,Base+1,Base+2,Base,Base+2,Base+3});
+            Disc(A,Width*.5,Color);Disc(B,Width*.5,Color);
+        };
+        auto Points=[](const TSharedPtr<FJsonObject>& Row)
+        {
+            TArray<FVector2D> Result;
+            for(const auto& Value:Array(Row,TEXT("points")))
             {
-                const double A=I*UE_DOUBLE_PI/16.,B=(I+1)*UE_DOUBLE_PI/16.;
-                Stroke(FVector2D(FMath::Cos(A)*47,FMath::Sin(A)*47),FVector2D(FMath::Cos(B)*47,FMath::Sin(B)*47),2.4);
+                const auto& Pair=Value->AsArray();double X=0,Y=0;
+                if(Pair.Num()==2&&Pair[0]->TryGetNumber(X)&&Pair[1]->TryGetNumber(Y)&&FMath::IsFinite(X)&&FMath::IsFinite(Y)
+                    &&FMath::Abs(X)<=60&&FMath::Abs(Y)<=60)Result.Add(FVector2D(X,Y));
             }
-            for (double Sign : {-1.,1.})
+            return Result;
+        };
+        auto Paths=[&](const TSharedPtr<FJsonObject>& Shape)
+        {
+            const FLinearColor Main=Colour(String(Shape,TEXT("color")));
+            for(const auto& Value:Array(Shape,TEXT("polygons")))
             {
-                Stroke(FVector2D(-Sign*25,-23),FVector2D(Sign*21,23),8.);
-                Stroke(FVector2D(-Sign*31,-17),FVector2D(-Sign*19,-29),6.);
-                Stroke(FVector2D(Sign*16,27),FVector2D(Sign*25,18),4.);
+                const auto Row=Value->AsObject();const auto P=Points(Row);if(P.Num()<3)continue;
+                const auto Color=Colour(String(Row,TEXT("color"),String(Shape,TEXT("color"))));
+                FVector2D Centre=FVector2D::ZeroVector;for(const auto& Point:P)Centre+=Point;Centre/=P.Num();
+                const int32 Base=Vertices.Num();AddVertex(Centre,Color);for(const auto& Point:P)AddVertex(Point,Color);
+                for(int32 I=0;I<P.Num();++I)Indices.Append({Base,Base+1+I,Base+1+(I+1)%P.Num()});
+                for(int32 I=0;I<P.Num();++I)Stroke(P[I],P[(I+1)%P.Num()],Number(Spec,TEXT("casingWidth"),4),Backing);
             }
-        }
-        else
+            for(const auto& Value:Array(Shape,TEXT("strokes")))
+            {
+                const auto Row=Value->AsObject();const auto P=Points(Row);if(P.Num()<2)continue;
+                const int32 Segments=P.Num()-1+(Boolean(Row,TEXT("closed"))?1:0);
+                const double Width=FMath::Clamp(Number(Row,TEXT("width"),6),1.,12.);
+                const FLinearColor Color=Row->HasField(TEXT("color"))?Colour(String(Row,TEXT("color"))):Main;
+                for(int32 Layer=0;Layer<2;++Layer)for(int32 I=0;I<Segments;++I)
+                    Stroke(P[I],P[(I+1)%P.Num()],Width+(Layer==0?Number(Spec,TEXT("casingWidth"),4):0),Layer==0?Backing:Color);
+            }
+        };
+        auto SaveSection=[&](int32 Index)
         {
-        for(int32 I=0;I<48;++I)
-        {
-            const double A=I*UE_DOUBLE_PI/24.,B=(I+1)*UE_DOUBLE_PI/24.;
-            Stroke(FVector2D(FMath::Cos(A)*47,FMath::Sin(A)*47),FVector2D(FMath::Cos(B)*47,FMath::Sin(B)*47),3.1);
-        }
-        for(int32 I=0;I<20;++I)
-        {
-            const double A=I*UE_DOUBLE_PI/10.,B=(I+1)*UE_DOUBLE_PI/10.;
-            Stroke(FVector2D(FMath::Cos(A)*7,24+FMath::Sin(A)*7),FVector2D(FMath::Cos(B)*7,24+FMath::Sin(B)*7),3.4);
-        }
-        Stroke(FVector2D(0,17),FVector2D(0,-29),4.5); Stroke(FVector2D(-18,10),FVector2D(18,10),4.5);
-        for(double Sign : {-1.,1.})
-        {
-            Stroke(FVector2D(0,-29),FVector2D(Sign*21,-17),4.5); Stroke(FVector2D(Sign*21,-17),FVector2D(Sign*27,-4),4.5);
-            Stroke(FVector2D(Sign*27,-4),FVector2D(Sign*15,-8),4.5);
-        }
-        }
-        Mesh->CreateMeshSection_LinearColor(0,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
-        if (bBattle) for (int32 Side=0;Side<2;++Side)
-        {
+            Mesh->CreateMeshSection_LinearColor(Index,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
+            if(Material)Mesh->SetMaterial(Index,Material);
             Vertices.Reset();Indices.Reset();Normals.Reset();UVs.Reset();Colors.Reset();Tangents.Reset();
+        };
+        Paths(Symbol);SaveSection(0);
+        if(Kind==TEXT("battle"))for(int32 Side=0;Side<2;++Side)
+        {
             const double Sign=Side==0?-1.:1.;
-            Stroke(FVector2D(Sign*27,29),FVector2D(Sign*34,36),4.);
-            Stroke(FVector2D(Sign*27,24),FVector2D(Sign*38,25),3.);
-            Stroke(FVector2D(Sign*22,29),FVector2D(Sign*23,40),3.);
-            Mesh->CreateMeshSection_LinearColor(Side+1,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
-            if(Material)Mesh->SetMaterial(Side+1,Material);
+            Stroke(FVector2D(Sign*27,-29),FVector2D(Sign*34,-36),4,FLinearColor::White);
+            Stroke(FVector2D(Sign*27,-24),FVector2D(Sign*38,-25),3,FLinearColor::White);
+            Stroke(FVector2D(Sign*22,-29),FVector2D(Sign*23,-40),3,FLinearColor::White);
+            SaveSection(Side+1);Mesh->CreateDynamicMaterialInstance(Side+1);
         }
-        if(Material)Mesh->SetMaterial(0,Material); Mesh->RegisterComponent();
-        auto* HitBox=NewObject<UBoxComponent>(Owner); Owner->AddInstanceComponent(HitBox); HitBox->SetupAttachment(Owner->GetRootComponent());
-        HitBox->SetMobility(EComponentMobility::Movable); HitBox->SetBoxExtent(FVector(40,50000,50000)); HitBox->SetHiddenInGame(true);
-        HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly); HitBox->SetCollisionResponseToAllChannels(ECR_Ignore); HitBox->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
-        HitBox->SetGenerateOverlapEvents(false); HitBox->RegisterComponent();
-        return Mesh;
+        if(Kind==TEXT("fleet")||Kind==TEXT("convoy"))
+        {Paths(Object(Spec,TEXT("selection")));SaveSection(3);Mesh->SetMeshSectionVisible(3,false);}
+        Mesh->RegisterComponent();
+        auto* HitBox=NewObject<UBoxComponent>(Owner);Owner->AddInstanceComponent(HitBox);HitBox->SetupAttachment(Owner->GetRootComponent());
+        HitBox->SetMobility(EComponentMobility::Movable);HitBox->SetBoxExtent(FVector(40,50000,50000));HitBox->SetHiddenInGame(true);
+        HitBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);HitBox->SetCollisionResponseToAllChannels(ECR_Ignore);HitBox->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+        HitBox->SetGenerateOverlapEvents(false);HitBox->RegisterComponent();return Mesh;
     }
     void AnimateBattleSymbol(AActor* Actor, double Time, bool bFiring)
     {
@@ -254,19 +258,24 @@ namespace
         auto* Actor = World->SpawnActor<AActor>(); if (!Actor) return nullptr; Actor->SetOwner(Owner);
         auto* Root = NewObject<USceneComponent>(Actor); Actor->AddInstanceComponent(Root); Actor->SetRootComponent(Root); Root->RegisterComponent(); return Actor;
     }
-    void PositionPortSymbol(AActor* Actor, const FVector& Ground, const FVector& Camera, const FRotator& CameraRotation)
+    void PositionPortSymbol(AActor* Actor,const FVector& Ground,const FVector& Camera,const FRotator& CameraRotation,
+        double Pixels=32,double ViewportWidth=1800,double HorizontalFOV=60)
     {
-        const double Scale=FMath::Max(.002,FVector::Distance(Camera,Ground)*.014/100000.);
-        Actor->SetActorScale3D(FVector(Scale));
-        Actor->SetActorLocation(Ground+FVector(0,0,50000.*Scale+100.));
-        Actor->SetActorRotation(FRotationMatrix::MakeFromXZ(-CameraRotation.Vector(),
-            CameraRotation.RotateVector(FVector::UpVector)).ToQuat());
+        const double Depth=FMath::Max(1.,FVector::DotProduct(Ground-Camera,CameraRotation.Vector()));
+        const double CentimetresPerPixel=2.*Depth*FMath::Tan(FMath::DegreesToRadians(HorizontalFOV*.5))/FMath::Max(1.,ViewportWidth);
+        Actor->SetActorScale3D(FVector(CentimetresPerPixel*Pixels/100000.));
+        // Depth-safe chart material lets the centre stay at the exact geography.
+        // No world-height lift or view-dependent drift away from its port/force.
+        Actor->SetActorLocation(Ground);
+        Actor->SetActorRotation(FRotationMatrix::MakeFromXZ(-CameraRotation.Vector(),CameraRotation.RotateVector(FVector::UpVector)).ToQuat());
     }
+
 }
 
 struct FWNTWorldRuntime
 {
-    TSharedPtr<FJsonObject> Packet;
+    TSharedPtr<FJsonObject> Packet, ChartSymbols;
+    TSet<FString> SelectedForceIds;
     TMap<FString, FString> ModelFiles, PlatformModels, CustomDesignModels;
     TMap<FString, FString> LoadedWorldModels, LoadedBattleModels;
     TMap<FString, FLinearColor> Colours;
@@ -290,6 +299,7 @@ struct FWNTWorldRuntime
     FVector LastMarkerCamera = FVector(TNumericLimits<double>::Max());
     FQuat LastMarkerCameraRotation = FQuat::Identity;
     FIntPoint LastMarkerViewport=FIntPoint::ZeroValue;
+    float LastMarkerFOV=-1;
 };
 
 void FWNTWorldRuntimeDeleter::operator()(FWNTWorldRuntime* Pointer) const { delete Pointer; }
@@ -316,6 +326,8 @@ AWNTWorldActor::~AWNTWorldActor() = default;
 bool AWNTWorldActor::Initialize(const FString& DataRoot)
 {
     DataDirectory = FPaths::ConvertRelativePathToFull(DataRoot); FPaths::NormalizeDirectoryName(DataDirectory); LoadError.Reset();
+    Runtime->ChartSymbols=ReadJson(FPaths::Combine(DataDirectory,TEXT("assets/ui/map-symbols.json")));
+    if(Number(Runtime->ChartSymbols,TEXT("format"))!=1){LoadError=TEXT("Chart symbol specification is unavailable.");return false;}
     const auto Registry = ReadJson(FPaths::Combine(DataDirectory, TEXT("assets/models/ships/index.json")));
     if (!Registry.IsValid() || Number(Registry, TEXT("format")) != 1) { LoadError = TEXT("Ship model index is unavailable or unsupported."); return false; }
     Runtime->ModelFiles.Reset(); Runtime->PlatformModels.Reset(); Runtime->CustomDesignModels.Reset();
@@ -375,8 +387,8 @@ bool AWNTWorldActor::Initialize(const FString& DataRoot)
 
 bool AWNTWorldActor::BuildOcean()
 {
-    // Fixed local tiles repeat across both seams. No geographic mesh is rebuilt
-    // while scrolling, and the water never enters the virtual-shadow queue.
+    // Immutable Equal Earth tiles use the same latitude-dependent longitude
+    // shear as land. Panning updates transforms/CPD, never ocean mesh buffers.
     UMaterialInterface* Material=OceanDetail?OceanDetail->GetFarMaterial():nullptr;
     if(!Material){LoadError=TEXT("Missing native ocean material. Run the Unreal asset preparation step.");return false;}
     if(!OceanTiles.IsEmpty())
@@ -390,10 +402,16 @@ bool AWNTWorldActor::BuildOcean()
     {
         const double West=-180+Column*TileDegrees,South=-90+Row*TileDegrees;
         const FVector Origin=WNTProjection::ForwardUnwrapped(FVector2D(West+TileDegrees*.5,South+TileDegrees*.5));
-        TArray<FVector> Vertices,Normals;TArray<int32> Indices;TArray<FVector2D> UVs;TArray<FLinearColor> Colours;TArray<FProcMeshTangent> Tangents;
+        TArray<FVector> Vertices,Normals;TArray<int32> Indices;TArray<FVector2D> UVs,ProjectionUVs,ProjectionFineUVs;TArray<FLinearColor> Colours;TArray<FProcMeshTangent> Tangents;
+        FVector HalfExtent=FVector::ZeroVector;double ShearExtent=0;
+        const double CentreScale=WNTProjection::EastUnitsPerDegree(South+TileDegrees*.5);
         for(int32 Y=0;Y<=Divisions;++Y)for(int32 X=0;X<=Divisions;++X)
         {
-            Vertices.Add(WNTProjection::ForwardUnwrapped(FVector2D(West+X*Step,South+Y*Step))-Origin);
+            const FVector Vertex=WNTProjection::ForwardUnwrapped(FVector2D(West+X*Step,South+Y*Step))-Origin;
+            const double Shear=WNTProjection::EastUnitsPerDegree(South+Y*Step)-CentreScale;
+            const auto Packed=WNTProjection::PackChartShear(Shear);
+            Vertices.Add(Vertex);ProjectionUVs.Add(Packed.UV1);ProjectionFineUVs.Add(Packed.UV2);
+            HalfExtent=HalfExtent.ComponentMax(Vertex.GetAbs());ShearExtent=FMath::Max(ShearExtent,FMath::Abs(Shear));
             Normals.Add(FVector::UpVector);UVs.Emplace(double(X)/Divisions,double(Y)/Divisions);
             Colours.Add(FLinearColor::White);Tangents.Emplace(FVector::ForwardVector,false);
         }
@@ -404,15 +422,18 @@ bool AWNTWorldActor::BuildOcean()
             Indices.Append({A,B,C,B,D,C});
         }
         auto* Tile=NewObject<UWNTMapTileComponent>(this,*FString::Printf(TEXT("OceanTile_%d_%d_%d"),Copy,Row,Column));
-        Tile->SetGeographicHalfExtent(FVector(WNTProjection::WorldWidth/48.0,WNTProjection::WorldWidth/48.0,10000.0));
+        const double Shift=WNTTerrainGeometry::TileLongitudeShift(Origin,CentralMeridian,Copy);
+        Tile->SetGeographicHalfExtent(HalfExtent+FVector(500,ShearExtent*FMath::Abs(Shift)+500,10000));
+        Tile->SetCustomPrimitiveDataFloat(0,float(Shift));
         AddInstanceComponent(Tile);Tile->SetupAttachment(Ocean);Tile->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(Origin,CentralMeridian,Copy));
         Tile->SetMobility(EComponentMobility::Movable);Tile->SetCastShadow(false);Tile->SetAffectDistanceFieldLighting(false);
-        Tile->bUseAsyncCooking=true;Tile->bUseComplexAsSimpleCollision=true;
-        Tile->SetCollisionEnabled(ECollisionEnabled::QueryOnly);Tile->SetCollisionResponseToAllChannels(ECR_Ignore);Tile->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+        // Pointer geography uses the analytic surface; an undeformed physics
+        // copy would intercept clicks at the old longitude after projection.
+        Tile->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         Tile->RegisterComponent();
-        Tile->CreateMeshSection_LinearColor(0,Vertices,Indices,Normals,UVs,Colours,Tangents,true,false);
+        Tile->CreateMeshSection_LinearColor(0,Vertices,Indices,Normals,UVs,ProjectionUVs,ProjectionFineUVs,{},Colours,Tangents,false,false);
         if(Material)Tile->SetMaterial(0,Material);
-        OceanTiles.Add(Tile);OceanTileOrigins.Add(Origin);
+        OceanTiles.Add(Tile);OceanTileOrigins.Add(Origin);OceanTileHalfExtents.Add(HalfExtent);OceanTileShearExtents.Add(ShearExtent);
     }
     return true;
 }
@@ -443,11 +464,13 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         Terrain->SetCentralMeridian(CentralMeridian);
     }
     TSet<FString> KeepShips, KeepMarkers, KeepPorts;
-    UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    UMaterialInterface* MarkerMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Materials/M_Marker.M_Marker"));
-    auto Marker = [&](const FString& Key, const TSharedPtr<FJsonObject>& Pick, FLinearColor Tint = FLinearColor(.55f, .75f, .65f)) -> AActor*
+    if(const auto Spec=Object(Packet,TEXT("chartSymbols"));Number(Spec,TEXT("format"))==1)Runtime->ChartSymbols=Spec;
+    Runtime->SelectedForceIds.Reset();
+    for(const auto& Value:Array(Packet,TEXT("selectedForceIds"))){FString ForceId;if(Value->TryGetString(ForceId))Runtime->SelectedForceIds.Add(ForceId);}
+    UMaterialInterface* MarkerMaterial=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/Materials/M_ChartSymbol.M_ChartSymbol"));
+    auto Marker=[&](const FString& Key,const TSharedPtr<FJsonObject>& Pick)->AActor*
     {
-        if (Packet->HasField(TEXT("instanceId"))) Pick->SetField(TEXT("instanceId"), Packet->TryGetField(TEXT("instanceId")));
+        if(Packet->HasField(TEXT("instanceId")))Pick->SetField(TEXT("instanceId"),Packet->TryGetField(TEXT("instanceId")));
         AActor* CentralActor=nullptr;
         for(int32 Copy=-1;Copy<=1;++Copy)
         {
@@ -456,18 +479,8 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
             if(!Actor)
             {
                 Actor=PlainActor(GetWorld(),this);if(!Actor)continue;
-                const FString Kind=Pick->GetStringField(TEXT("kind"));
-                UMeshComponent* Mesh=(Kind==TEXT("port")||Kind==TEXT("battle"))
-                    ?static_cast<UMeshComponent*>(PortSymbol(Actor,MarkerMaterial,Kind==TEXT("battle")))
-                    :static_cast<UMeshComponent*>(Shape(Actor,Sphere,FVector::ZeroVector,FVector(1000),MarkerMaterial));
-                if(auto* Material=Mesh->CreateDynamicMaterialInstance(0))Material->SetVectorParameterValue(TEXT("Tint"),Tint);
-                if(Kind==TEXT("battle"))for(int32 Side=1;Side<=2;++Side)Mesh->CreateDynamicMaterialInstance(Side);
+                if(!ChartSymbol(Actor,Runtime->ChartSymbols,String(Pick,TEXT("kind")),MarkerMaterial)){Actor->Destroy();continue;}
                 Runtime->Markers.Add(KeyCopy,Actor);
-            }
-            else
-            {
-                TArray<UMeshComponent*> Meshes;Actor->GetComponents<UMeshComponent>(Meshes);
-                for(auto* Mesh:Meshes)if(auto* Material=Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(0)))Material->SetVectorParameterValue(TEXT("Tint"),Tint);
             }
             auto CopyPick=MakeShared<FJsonObject>(*Pick);CopyPick->SetNumberField(TEXT("worldCopy"),Copy);
             Runtime->Selections.Add(Actor,CopyPick);if(Copy==0)CentralActor=Actor;
@@ -479,10 +492,11 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         const auto Force = Value->AsObject(); const FString ForceId = Id(Force, TEXT("id")); const bool Merchant = Boolean(Force, TEXT("merchant"));
         FVector2D Geo; const bool Located = Point(Force, TEXT("position"), Geo);
         if (!Located) continue; // Explicitly unlocated, never placed at (0,0).
-        auto FleetPick = Selection(Merchant ? TEXT("convoy") : Boolean(Force, TEXT("docked")) ? TEXT("port") : TEXT("fleet"), ForceId, String(Force, TEXT("name")));
+        auto FleetPick = Selection(Merchant ? TEXT("convoy") : TEXT("fleet"), ForceId, String(Force, TEXT("name")));
         FleetPick->SetStringField(TEXT("forceId"), ForceId);
-        const FLinearColor OwnColor = Runtime->Colours.Contains(String(Packet, TEXT("player"))) ? Runtime->Colours[String(Packet, TEXT("player"))] : FLinearColor(.55f, .75f, .65f);
-        if (!Boolean(Force, TEXT("docked"))) Marker(TEXT("force:") + ForceId, FleetPick, Merchant ? FLinearColor(.76f, .64f, .35f) : OwnColor);
+        FleetPick->SetBoolField(TEXT("docked"),Boolean(Force,TEXT("docked")));
+        FleetPick->SetBoolField(TEXT("selected"),Runtime->SelectedForceIds.Contains(ForceId));
+        Marker(TEXT("force:")+ForceId,FleetPick);
         for (const auto& HullValue : Array(Force, TEXT("hulls")))
         {
             const auto Hull = HullValue->AsObject(); const FString Key = String(Hull, TEXT("key")); KeepShips.Add(Key);
@@ -509,16 +523,15 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
     {
         const auto Contact = Value->AsObject(); FVector2D Geo; if (!Point(Contact, TEXT("position"), Geo)) continue;
         const FString ContactId = Id(Contact, TEXT("id")); auto Pick = Selection(TEXT("contact"), ContactId, String(Contact, TEXT("nation")) + TEXT(" · ") + String(Contact, TEXT("stage")) + TEXT(" report"));
-        if (auto* Actor = Marker(TEXT("contact:") + ContactId, Pick, FLinearColor(.84f, .32f, .23f))) Actor->SetActorLocation(WNTProjection::Forward(Geo, CentralMeridian));
+        if (auto* Actor = Marker(TEXT("contact:") + ContactId, Pick)) Actor->SetActorLocation(WNTProjection::Forward(Geo, CentralMeridian));
     }
     for (const auto& Value : Array(Packet, TEXT("ports")))
     {
         const auto Port = Value->AsObject(); FVector2D Geo; if (!Point(Port, TEXT("position"), Geo)) continue;
         const FString PortId = Id(Port, TEXT("id")); KeepPorts.Add(PortId); Runtime->PortPositions.Add(PortId, Geo);
-        const FLinearColor PortColor = Runtime->Colours.Contains(String(Port, TEXT("owner"))) ? Runtime->Colours[String(Port, TEXT("owner"))] : FLinearColor(.4f, .45f, .48f);
         auto PortPick = Selection(TEXT("port"), PortId, String(Port, TEXT("name")));
         PortPick->SetStringField(TEXT("visualStatus"),TEXT("navigation-symbol")); PortPick->SetBoolField(TEXT("pendingScenery"),true);
-        Marker(TEXT("port:") + PortId, PortPick, PortColor);
+        Marker(TEXT("port:") + PortId, PortPick);
     }
     Runtime->PublicPositions.Reset();
     for (const auto* Field : { TEXT("countries"), TEXT("fronts"), TEXT("battles") }) for (const auto& Value : Array(Packet, Field))
@@ -526,11 +539,10 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         const auto Entry = Value->AsObject(); FVector2D Geo; if (!Point(Entry, TEXT("position"), Geo)) continue;
         const bool Country = FString(Field) == TEXT("countries"), Battle = FString(Field) == TEXT("battles");
         const FString Kind = Country ? TEXT("country") : Battle ? TEXT("battle") : TEXT("front"), Identity = Id(Entry, TEXT("id")), Key = Kind + TEXT(":") + Identity;
-        const FLinearColor Color = Country ? FLinearColor(FColor::FromHex(String(Entry, TEXT("color"), TEXT("#e5cf9d")))) : FLinearColor(.9f, .37f, .21f);
         Runtime->PublicPositions.Add(Key, Geo);
         auto Pick=Selection(Kind, Identity, String(Entry, Battle?TEXT("label"):TEXT("name")));
         if(Battle)Pick->SetNumberField(TEXT("stage"),Number(Entry,TEXT("stage")));
-        Marker(Key, Pick, Battle?FLinearColor(.94f,.62f,.26f):Color);
+        Marker(Key, Pick);
     }
     auto Prune = [&](auto& Actors, const TSet<FString>& Keep)
     {
@@ -554,6 +566,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
 void AWNTWorldActor::UpdateWorld(double Fraction)
 {
     Runtime->LastWorldFraction = Fraction;
+    Runtime->LastMarkerCamera=FVector(TNumericLimits<double>::Max());
     if (!Runtime->Packet.IsValid()) return;
     for (const auto& Value : Array(Runtime->Packet, TEXT("forces")))
     {
@@ -607,19 +620,19 @@ void AWNTWorldActor::RebuildRoute(double WidthCentimetres)
         if (Pair.Num() != 2 || !Pair[0]->TryGetNumber(X) || !Pair[1]->TryGetNumber(Y) || !FMath::IsFinite(X) || !FMath::IsFinite(Y)) {Clear();return;}
         Geos.Add(FVector2D(X, Y));
     }
-    // Route buffers use fixed geographic strips just like terrain. A pan only
-    // translates their three copies; neither widths nor vertices depend on the
-    // camera meridian. Dividing at longitude boundaries prevents long seam
-    // segments from disappearing when a tile moves to its nearest repeat.
+    // Route strips keep their original buffers; per-vertex projection metadata
+    // moves them by the same Equal Earth longitude shear as land and markers.
     constexpr int32 Columns=24;constexpr double DegreesPerTile=15.0;
     struct FRouteStrip
     {
         FVector Origin;
         TArray<FVector> Vertices,Normals;
         TArray<int32> Indices;
-        TArray<FVector2D> UVs;
+        TArray<FVector2D> UVs,ProjectionUVs,ProjectionFineUVs;
         TArray<FLinearColor> Colors;
         TArray<FProcMeshTangent> Tangents;
+        FVector HalfExtent=FVector::ZeroVector;
+        double ShearExtent=0;
     };
     TArray<FRouteStrip> Strips;Strips.SetNum(Columns);
     for(int32 Column=0;Column<Columns;++Column)
@@ -637,7 +650,15 @@ void AWNTWorldActor::RebuildRoute(double WidthCentimetres)
             const FVector Direction = (P1 - P0).GetSafeNormal(), Side = FVector::CrossProduct(Direction, FVector::UpVector).GetSafeNormal() * WidthCentimetres * .5;
             const int32 Base=Strip.Vertices.Num();Strip.Vertices.Append({P0-Side-Strip.Origin,P0+Side-Strip.Origin,P1+Side-Strip.Origin,P1-Side-Strip.Origin});
             Strip.Indices.Append({Base,Base+2,Base+1,Base,Base+3,Base+2});
-            for(int32 Corner=0;Corner<4;++Corner){Strip.Normals.Add(FVector::UpVector);Strip.UVs.Add(FVector2D::ZeroVector);Strip.Colors.Add(FLinearColor(.9f,.7f,.32f));Strip.Tangents.Add(FProcMeshTangent(Direction,false));}
+            for(int32 Corner=0;Corner<4;++Corner)
+            {
+                const FVector Vertex=Strip.Vertices[Base+Corner];
+                const auto Geo=WNTProjection::Inverse(Vertex+Strip.Origin);
+                const double Shear=WNTProjection::EastUnitsPerDegree(Geo.IsSet()?Geo->Y:(Corner<2?G0.Y:G1.Y))-WNTProjection::EastUnitsPerDegree(0);
+                const auto Packed=WNTProjection::PackChartShear(Shear);Strip.ProjectionUVs.Add(Packed.UV1);Strip.ProjectionFineUVs.Add(Packed.UV2);
+                Strip.HalfExtent=Strip.HalfExtent.ComponentMax(Vertex.GetAbs());Strip.ShearExtent=FMath::Max(Strip.ShearExtent,FMath::Abs(Shear));
+                Strip.Normals.Add(FVector::UpVector);Strip.UVs.Add(FVector2D::ZeroVector);Strip.Colors.Add(FLinearColor(.9f,.7f,.32f));Strip.Tangents.Add(FProcMeshTangent(Direction,false));
+            }
         }
     };
     for (int32 Index = 1; Index < Geos.Num(); ++Index)
@@ -652,14 +673,14 @@ void AWNTWorldActor::RebuildRoute(double WidthCentimetres)
         }
         else AddPiece(A, B);
     }
-    RouteTiles.SetNum(Columns*3);RouteTileOrigins.SetNum(Columns*3);
+    RouteTiles.SetNum(Columns*3);RouteTileOrigins.SetNum(Columns*3);RouteTileHalfExtents.SetNum(Columns*3);RouteTileShearExtents.SetNum(Columns*3);
     for(int32 Copy=-1;Copy<=1;++Copy)for(int32 Column=0;Column<Columns;++Column)
     {
         const int32 Index=(Copy+1)*Columns+Column;FRouteStrip& Strip=Strips[Column];
-        RouteTileOrigins[Index]=Strip.Origin;auto* Tile=RouteTiles[Index].Get();
+        RouteTileOrigins[Index]=Strip.Origin;RouteTileHalfExtents[Index]=Strip.HalfExtent;RouteTileShearExtents[Index]=Strip.ShearExtent;auto* Tile=RouteTiles[Index].Get();
         if(!Tile&&!Strip.Vertices.IsEmpty())
         {
-            Tile=NewObject<UProceduralMeshComponent>(this,*FString::Printf(TEXT("RouteTile_%d_%d"),Copy,Column));
+            Tile=NewObject<UWNTMapTileComponent>(this,*FString::Printf(TEXT("RouteTile_%d_%d"),Copy,Column));
             AddInstanceComponent(Tile);Tile->SetupAttachment(RouteMesh);Tile->SetMobility(EComponentMobility::Movable);
             Tile->SetCollisionEnabled(ECollisionEnabled::NoCollision);Tile->SetCastShadow(false);Tile->SetAffectDistanceFieldLighting(false);
             Tile->RegisterComponent();RouteTiles[Index]=Tile;
@@ -667,7 +688,10 @@ void AWNTWorldActor::RebuildRoute(double WidthCentimetres)
         if(!Tile)continue;
         if(Strip.Vertices.IsEmpty()){Tile->ClearAllMeshSections();continue;}
         Tile->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(Strip.Origin,CentralMeridian,Copy));
-        Tile->CreateMeshSection_LinearColor(0,Strip.Vertices,Strip.Indices,Strip.Normals,Strip.UVs,Strip.Colors,Strip.Tangents,false,false);
+        const double Shift=WNTTerrainGeometry::TileLongitudeShift(Strip.Origin,CentralMeridian,Copy);
+        Tile->SetCustomPrimitiveDataFloat(0,float(Shift));
+        if(auto* MapTile=Cast<UWNTMapTileComponent>(Tile))MapTile->SetGeographicHalfExtent(Strip.HalfExtent+FVector(500,Strip.ShearExtent*FMath::Abs(Shift)+500,10000));
+        Tile->CreateMeshSection_LinearColor(0,Strip.Vertices,Strip.Indices,Strip.Normals,Strip.UVs,Strip.ProjectionUVs,Strip.ProjectionFineUVs,{},Strip.Colors,Strip.Tangents,false,false);
         Tile->SetMaterial(0,RouteMesh->GetMaterial(0));Tile->SetVisibility(!bSceneHidden&&!bBattleMode);
     }
 }
@@ -677,9 +701,19 @@ void AWNTWorldActor::RepositionWorldTiles()
     Ocean->SetRelativeLocation(FVector::ZeroVector);
     const int32 SeaCount=OceanTiles.Num()/3,RouteCount=RouteTiles.Num()/3;
     for(int32 I=0;I<OceanTiles.Num();++I)if(OceanTiles[I]&&OceanTileOrigins.IsValidIndex(I))
+    {
+        const double Shift=WNTTerrainGeometry::TileLongitudeShift(OceanTileOrigins[I],CentralMeridian,I/SeaCount-1);
         OceanTiles[I]->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(OceanTileOrigins[I],CentralMeridian,I/SeaCount-1));
+        OceanTiles[I]->SetCustomPrimitiveDataFloat(0,float(Shift));
+        if(auto* Tile=Cast<UWNTMapTileComponent>(OceanTiles[I]))Tile->SetGeographicHalfExtent(OceanTileHalfExtents[I]+FVector(500,OceanTileShearExtents[I]*FMath::Abs(Shift)+500,10000));
+    }
     for(int32 I=0;I<RouteTiles.Num();++I)if(RouteTiles[I]&&RouteTileOrigins.IsValidIndex(I))
+    {
+        const double Shift=WNTTerrainGeometry::TileLongitudeShift(RouteTileOrigins[I],CentralMeridian,I/RouteCount-1);
         RouteTiles[I]->SetRelativeLocation(WNTTerrainGeometry::WrappedTileOrigin(RouteTileOrigins[I],CentralMeridian,I/RouteCount-1));
+        RouteTiles[I]->SetCustomPrimitiveDataFloat(0,float(Shift));
+        if(auto* Tile=Cast<UWNTMapTileComponent>(RouteTiles[I]))Tile->SetGeographicHalfExtent(RouteTileHalfExtents[I]+FVector(500,RouteTileShearExtents[I]*FMath::Abs(Shift)+500,10000));
+    }
 }
 
 void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
@@ -758,7 +792,8 @@ void AWNTWorldActor::UpdateVisibility()
     Ocean->SetVisibility(!bSceneHidden,true);
     SkyBackground->SetVisibility(!bSceneHidden);
     if(OceanDetail)OceanDetail->SetSceneVisible(!bSceneHidden);
-    for(UProceduralMeshComponent* Tile:OceanTiles)Tile->SetCollisionEnabled(bSceneHidden ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
+    // Far-ocean WPO is visual only; the controller uses analytic water/land picking.
+    for(UProceduralMeshComponent* Tile:OceanTiles)Tile->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     RouteMesh->SetVisibility(WorldVisible,true);
     if (Terrain) { Terrain->SetActorHiddenInGame(!WorldVisible); Terrain->SetActorEnableCollision(WorldVisible); }
     for (const auto& Pair : Runtime->Ships) if (auto* Actor = Pair.Value.Get()) { Actor->SetActorHiddenInGame(!WorldVisible); Actor->SetActorEnableCollision(WorldVisible); }
@@ -769,21 +804,7 @@ void AWNTWorldActor::UpdateVisibility()
         for(const auto& Pair:Runtime->Ships)if(auto* Ship=Pair.Value.Get())Ship->UpdateSymbolForCamera(Camera->GetCameraLocation(),Camera->GetCameraRotation());
         for(const auto& Pair:Runtime->BattleShips)if(auto* Ship=Pair.Value.Get())Ship->UpdateSymbolForCamera(Camera->GetCameraLocation(),Camera->GetCameraRotation());
     }
-    for (const auto& Pair : Runtime->Markers) if (auto* Actor = Pair.Value.Get())
-    {
-        const double Distance = Camera ? FVector::Distance(Camera->GetCameraLocation(), Actor->GetActorLocation()) : 0;
-        const bool Battle=Pair.Key.StartsWith(TEXT("battle:"));
-        const bool Visible = WorldVisible && (Battle || Pair.Key.StartsWith(TEXT("port:")) || Distance > (Pair.Key.StartsWith(TEXT("country:")) ? 400000000.0 : 2000000.0));
-        // Apply immediately, not a frame later: a fresh simulation packet must
-        // never briefly reactivate a large marker over a close-up ship's hull.
-        Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
-        if(Camera&&(Battle||Pair.Key.StartsWith(TEXT("port:"))))
-        {
-            const auto Pick=Runtime->Selections.FindRef(Actor);
-            const FVector2D Geo=Battle?Runtime->PublicPositions.FindRef(TEXT("battle:")+Id(Pick,TEXT("id"))):Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
-            PositionPortSymbol(Actor,ChartPosition(Geo,CentralMeridian,static_cast<int32>(Number(Pick,TEXT("worldCopy"))),GroundHeight(Geo)),Camera->GetCameraLocation(),Camera->GetCameraRotation());
-        }
-    }
+    UpdateChartMarkers();
     for (const auto& Pair : Runtime->BattleShips) if (auto* Actor = Pair.Value.Get())
     {
         const bool Visible = !bSceneHidden && bBattleMode && (!Runtime->BattlePoses.FindRef(Pair.Key).bSunk
@@ -791,6 +812,60 @@ void AWNTWorldActor::UpdateVisibility()
         Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
     }
     Runtime->BattleEffects.SetVisible(!bSceneHidden&&bBattleMode);
+}
+
+void AWNTWorldActor::UpdateChartMarkers()
+{
+    const bool WorldVisible=!bSceneHidden&&!bBattleMode;
+    const auto* Player=GetWorld()->GetFirstPlayerController();
+    const APlayerCameraManager* Camera=Player?Player->PlayerCameraManager.Get():nullptr;
+    int32 PixelWidth=1800,PixelHeight=1000;if(Player)Player->GetViewportSize(PixelWidth,PixelHeight);
+    for(const auto& Pair:Runtime->Markers)if(auto* Actor=Pair.Value.Get())
+    {
+        const auto Pick=Runtime->Selections.FindRef(Actor);const FString Kind=String(Pick,TEXT("kind"));
+        const bool Selected=Boolean(Pick,TEXT("selected"));
+        const FVector Ground=Actor->GetActorLocation();
+        const double Distance=Camera?FVector::Distance(Camera->GetCameraLocation(),Ground):0;
+        const bool Ahead=!Camera||FVector::DotProduct(Ground-Camera->GetCameraLocation(),Camera->GetCameraRotation().Vector())>1;
+        const bool Glyph=WorldVisible&&Ahead&&!Boolean(Pick,TEXT("docked"))&&(Kind==TEXT("port")||Kind==TEXT("battle")
+            ||Distance>2000000.);
+        const bool Highlight=WorldVisible&&Ahead&&Selected;
+        Actor->SetActorHiddenInGame(!Glyph&&!Highlight);
+        // At hull range only the non-intercepting selection brackets remain.
+        Actor->SetActorEnableCollision(Glyph);
+        if(auto* Mesh=Actor->FindComponentByClass<UProceduralMeshComponent>())
+        {
+            Mesh->SetMeshSectionVisible(0,Glyph);
+            if(Kind==TEXT("battle")){Mesh->SetMeshSectionVisible(1,Glyph);Mesh->SetMeshSectionVisible(2,Glyph);}
+            if(Mesh->GetProcMeshSection(3))Mesh->SetMeshSectionVisible(3,Highlight);
+            Mesh->SetTranslucentSortPriority(Highlight?30:Kind==TEXT("port")?22:20);
+        }
+        if(Camera)PositionPortSymbol(Actor,Ground,Camera->GetCameraLocation(),Camera->GetCameraRotation(),
+            Number(Object(Object(Runtime->ChartSymbols,TEXT("symbols")),*Kind),TEXT("pixels"),32),PixelWidth,Camera->GetFOVAngle());
+    }
+}
+
+TSharedPtr<FJsonObject> AWNTWorldActor::GetChartDiagnostics() const
+{
+    auto Result=MakeShared<FJsonObject>();TArray<TSharedPtr<FJsonValue>> Ids,Markers;int32 VisibleSelected=0;
+    for(const auto& ForceId:Runtime->SelectedForceIds)Ids.Add(MakeShared<FJsonValueString>(ForceId));
+    for(const auto& Pair:Runtime->Markers)if(auto* Actor=Pair.Value.Get())
+    {
+        const auto Pick=Runtime->Selections.FindRef(Actor);if(!Boolean(Pick,TEXT("selected")))continue;
+        auto Row=MakeShared<FJsonObject>();auto* Mesh=Actor->FindComponentByClass<UProceduralMeshComponent>();
+        const bool Highlight=Mesh&&Mesh->IsMeshSectionVisible(3)&&!Actor->IsHidden();
+        Row->SetStringField(TEXT("forceId"),Id(Pick,TEXT("forceId")));Row->SetNumberField(TEXT("worldCopy"),Number(Pick,TEXT("worldCopy")));
+        Row->SetBoolField(TEXT("visible"),!Actor->IsHidden());Row->SetBoolField(TEXT("highlightVisible"),Highlight);
+        Row->SetBoolField(TEXT("glyphVisible"),Mesh&&Mesh->IsMeshSectionVisible(0)&&!Actor->IsHidden());
+        Row->SetBoolField(TEXT("collisionEnabled"),Actor->GetActorEnableCollision());
+        Row->SetStringField(TEXT("material"),Mesh&&Mesh->GetMaterial(3)?Mesh->GetMaterial(3)->GetPathName():TEXT(""));
+        Row->SetStringField(TEXT("color"),String(Object(Runtime->ChartSymbols,TEXT("selection")),TEXT("color")));
+        const FVector P=Actor->GetActorLocation();Row->SetArrayField(TEXT("position"),{MakeShared<FJsonValueNumber>(P.X),MakeShared<FJsonValueNumber>(P.Y),MakeShared<FJsonValueNumber>(P.Z)});
+        Row->SetNumberField(TEXT("pixels"),Number(Object(Object(Runtime->ChartSymbols,TEXT("symbols")),*String(Pick,TEXT("kind"))),TEXT("pixels"),32));
+        Markers.Add(MakeShared<FJsonValueObject>(Row));if(Highlight)++VisibleSelected;
+    }
+    Result->SetArrayField(TEXT("selectedForceIds"),Ids);Result->SetArrayField(TEXT("selectedMarkers"),Markers);
+    Result->SetNumberField(TEXT("visibleSelectedMarkerCount"),VisibleSelected);Result->SetNumberField(TEXT("markerCount"),Runtime->Markers.Num());return Result;
 }
 
 void AWNTWorldActor::Tick(float DeltaSeconds)
@@ -842,10 +917,12 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
             int32 PixelWidth,PixelHeight;Player->GetViewportSize(PixelWidth,PixelHeight);
             if (Camera->GetCameraLocation().Equals(Runtime->LastMarkerCamera, .01)
                 && Camera->GetCameraRotation().Quaternion().Equals(Runtime->LastMarkerCameraRotation, .000001)
-                &&Runtime->LastMarkerViewport==FIntPoint(PixelWidth,PixelHeight)) return;
+                &&Runtime->LastMarkerViewport==FIntPoint(PixelWidth,PixelHeight)
+                &&FMath::IsNearlyEqual(Runtime->LastMarkerFOV,Camera->GetFOVAngle())) return;
             Runtime->LastMarkerCamera = Camera->GetCameraLocation();
             Runtime->LastMarkerCameraRotation = Camera->GetCameraRotation().Quaternion();
             Runtime->LastMarkerViewport=FIntPoint(PixelWidth,PixelHeight);
+            Runtime->LastMarkerFOV=Camera->GetFOVAngle();
             const double DistanceToMap = FMath::Max(1.0, FMath::Abs(Camera->GetCameraLocation().Z));
             if(Terrain)
             {
@@ -861,20 +938,7 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
             }
             const double RouteWidth = FMath::Clamp(DistanceToMap * .001, 200.0, 3000000.0);
             if (RouteWidth > Runtime->RouteWidth * 1.2 || RouteWidth < Runtime->RouteWidth * .8) RebuildRoute(RouteWidth);
-            for (const auto& Pair : Runtime->Markers) if (auto* Actor = Pair.Value.Get())
-            {
-                const double Distance = FVector::Distance(Camera->GetCameraLocation(), Actor->GetActorLocation());
-                const bool Country = Pair.Key.StartsWith(TEXT("country:")), Port = Pair.Key.StartsWith(TEXT("port:")), Battle=Pair.Key.StartsWith(TEXT("battle:"));
-                const bool Visible = Port || Battle || Distance > (Country ? 400000000.0 : 2000000.0);
-                Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
-                if(Port||Battle)
-                {
-                    const auto Pick=Runtime->Selections.FindRef(Actor);
-                    const FVector2D Geo=Battle?Runtime->PublicPositions.FindRef(TEXT("battle:")+Id(Pick,TEXT("id"))):Runtime->PortPositions.FindRef(Id(Pick,TEXT("id")));
-                    PositionPortSymbol(Actor,ChartPosition(Geo,CentralMeridian,static_cast<int32>(Number(Pick,TEXT("worldCopy"))),GroundHeight(Geo)),Camera->GetCameraLocation(),Camera->GetCameraRotation());
-                }
-                else Actor->SetActorScale3D(FVector(FMath::Max(.1, Distance * .006 / 100000.0)));
-            }
+            UpdateChartMarkers();
         }
     }
 }
@@ -883,11 +947,8 @@ void AWNTWorldActor::SetCentralMeridian(double Degrees)
 {
     const double Next=WNTProjection::WrapLongitude(Degrees);
     if(FMath::Abs(WNTProjection::WrapLongitude(Next-CentralMeridian))<1e-9)return;
-    // This is a chart-origin rebase: world copies, procedural tiles and symbols
-    // move while the camera stays centered. Their old motion/history cannot be
-    // reprojected as ordinary object animation (some copies jump a full world).
-    // Invalidate only changed rebases; stationary views keep accumulating TSR.
-    ResetTemporalHistory(GetWorld());
+    // Continuous Equal Earth longitude shear is normal camera motion. Cutting
+    // temporal history on each pointer event makes stable chart lines shimmer.
     CentralMeridian=Next;if(Terrain)Terrain->SetCentralMeridian(CentralMeridian);
     RepositionWorldTiles();
     Runtime->LastMarkerCamera = FVector(TNumericLimits<double>::Max());
@@ -1025,6 +1086,20 @@ void AWNTWorldActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 #include "KismetProceduralMeshLibrary.h"
 #include "EngineUtils.h"
 
+namespace
+{
+    TSharedPtr<FJsonObject> ChartTestSpec()
+    {
+        FString Root;if(!FParse::Value(FCommandLine::Get(),TEXT("WNTDataRoot="),Root))Root=FPaths::Combine(FPaths::ProjectDir(),TEXT(".."));
+        return ReadJson(FPaths::Combine(Root,TEXT("assets/ui/map-symbols.json")));
+    }
+    FVector RenderedTileVertex(const UProceduralMeshComponent* Tile,const FProcMeshVertex& Vertex)
+    {
+        FVector P=Tile->GetComponentTransform().TransformPosition(Vertex.Position);
+        const auto& CPD=Tile->GetCustomPrimitiveData().Data;if(!CPD.IsEmpty())P.Y+=WNTProjection::DecodeChartShear(Vertex.UV1,Vertex.UV2)*CPD[0];return P;
+    }
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWorldBootstrapTest, "WNT.World.CampaignAssetBootstrap",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
@@ -1086,7 +1161,7 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
                 const auto* Section=Tile->GetProcMeshSection(SectionIndex);if(!Section)continue;
                 if(SectionIndex==0)for(int32 VertexIndex=0;VertexIndex<Section->ProcVertexBuffer.Num();VertexIndex+=97)
                 {
-                    const FVector P=Tile->GetComponentTransform().TransformPosition(Section->ProcVertexBuffer[VertexIndex].Position);
+                    const FVector P=RenderedTileVertex(Tile,Section->ProcVertexBuffer[VertexIndex]);
                     if(const auto Geo=WNTProjection::Inverse(P,Terrain->GetCentralMeridian()))
                     {
                         const double Expected=Terrain->LandBaseMetres+FMath::Max(0.,Terrain->HeightAt(Geo.GetValue()));
@@ -1141,9 +1216,10 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
             {
                 TestTrue(TEXT("Scrolling retains the same mesh buffers"),Sections[I]==Tiles[I]->GetProcMeshSection(0));
                 const FVector Delta=Tiles[I]->GetRelativeLocation()-BeforeLocations[I];
-                TestTrue(TEXT("Each tile retains geography while translating to a nearest repeat"),
-                    FMath::Abs(Delta.X)<.001&&FMath::Abs(Delta.Z)<.001
-                    &&FMath::Abs(WNTProjection::WrapLongitude(Delta.Y/WNTProjection::WorldWidth*360.0+147.0))<1e-8);
+                const auto CentreGeo=WNTProjection::Inverse(BeforeLocations[I],0);
+                TestTrue(TEXT("Each tile retains geography under its latitude-dependent longitude shear"),
+                    CentreGeo.IsSet()&&FMath::Abs(Delta.X)<.001&&FMath::Abs(Delta.Z)<.001
+                    &&FMath::Abs(WNTProjection::WrapLongitude(Delta.Y/WNTProjection::EastUnitsPerDegree(CentreGeo->Y)+147.0))<1e-5);
             }
             Terrain->SetCentralMeridian(0);
             TMap<UProceduralMeshComponent*,const FProcMeshVertex*> SeaBuffers;
@@ -1158,10 +1234,13 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
                 {
                     const auto* Section=Pair.Key->GetProcMeshSection(0);
                     BuffersUnchanged&=Section&&Section->ProcVertexBuffer.GetData()==Pair.Value;
-                    West=FMath::Min(West,Pair.Key->GetComponentLocation().Y-WNTProjection::WorldWidth/48.0);
-                    East=FMath::Max(East,Pair.Key->GetComponentLocation().Y+WNTProjection::WorldWidth/48.0);
+                    if(Section)for(const auto& Vertex:Section->ProcVertexBuffer)
+                    {
+                        const FVector P=RenderedTileVertex(Pair.Key,Vertex);
+                        if(FMath::Abs(P.X)<1.){West=FMath::Min(West,P.Y);East=FMath::Max(East,P.Y);}
+                    }
                 }
-                TestTrue(TEXT("Ocean pan only translates existing vertex buffers"),BuffersUnchanged);
+                TestTrue(TEXT("Ocean pan shears existing vertex buffers without reallocating"),BuffersUnchanged);
                 TestTrue(TEXT("Ocean coverage stays centered on both sides of the dateline"),
                     West<=-WNTProjection::WorldWidth*1.47&&East>=WNTProjection::WorldWidth*1.47);
             }
@@ -1225,6 +1304,7 @@ bool FWNTWrappedChartTest::RunTest(const FString& Parameters)
     const bool Parsed=FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet);
     TestTrue(TEXT("Wrapped chart fixture parses"),Parsed);
     if(!Parsed){World->DestroyWorld(false);return false;}
+    Packet->SetObjectField(TEXT("chartSymbols"),ChartTestSpec());
     Scene->ApplyWorldPacket(Packet);
     TArray<UProceduralMeshComponent*> Components;Scene->GetComponents(Components);
     TMap<UProceduralMeshComponent*,const FProcMeshVertex*> RouteBuffers;
@@ -1267,12 +1347,64 @@ bool FWNTWrappedChartTest::RunTest(const FString& Parameters)
             if(!Section)continue;
             for(const auto& Vertex:Section->ProcVertexBuffer)
             {
-                const FVector P=Pair.Key->GetComponentTransform().TransformPosition(Vertex.Position);
+                const FVector P=RenderedTileVertex(Pair.Key,Vertex);
                 const auto Geo=WNTProjection::Inverse(P,Meridian);
                 TestTrue(TEXT("Repeated route stays on the short dateline-crossing corridor"),Geo.IsSet()&&FMath::Abs(Geo->X)>159&&Geo->Y>24.9&&Geo->Y<26.1);
             }
         }
     }
+    World->DestroyWorld(false);return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTChartSelectionTest,"WNT.World.ChartSelectionAndPixelSizing",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTChartSelectionTest::RunTest(const FString& Parameters)
+{
+    const auto Spec=ChartTestSpec();if(!TestNotNull(TEXT("Shared SVG/native chart specification"),Spec.Get()))return false;
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Chart selection test world"),World))return false;
+    auto* Scene=World->SpawnActor<AWNTWorldActor>();TSharedPtr<FJsonObject> Packet;
+    const FString Json=TEXT(R"({"format":1,"campaign":"test","paused":true,"selectedForceIds":["fleet"],"forces":[{"id":"fleet","name":"Docked fleet","docked":true,"position":[1,50],"hulls":[]}]})");
+    if(!TestNotNull(TEXT("Chart selection test scene"),Scene)||!FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet))
+    {World->DestroyWorld(false);return false;}
+    Packet->SetObjectField(TEXT("chartSymbols"),Spec);Scene->ApplyWorldPacket(Packet);
+    auto Diagnostics=Scene->GetChartDiagnostics();
+    TestEqual(TEXT("Single selection produces three geographic highlight copies"),Number(Diagnostics,TEXT("visibleSelectedMarkerCount")),3.);
+    TestEqual(TEXT("Only one force is selected"),Array(Diagnostics,TEXT("selectedForceIds")).Num(),1);
+    for(const auto& Row:Array(Diagnostics,TEXT("selectedMarkers")))
+    {
+        TestTrue(TEXT("Docked selected fleet has visible brackets"),Boolean(Row->AsObject(),TEXT("highlightVisible")));
+        TestFalse(TEXT("Docked fleet does not obscure its port with a second filled badge"),Boolean(Row->AsObject(),TEXT("glyphVisible")));
+        TestFalse(TEXT("Brackets cannot intercept clicks on actual hulls or ports"),Boolean(Row->AsObject(),TEXT("collisionEnabled")));
+        TestTrue(TEXT("Selection uses the depth-safe chart material"),String(Row->AsObject(),TEXT("material")).Contains(TEXT("M_ChartSymbol")));
+    }
+    auto* Probe=PlainActor(World,nullptr);
+    auto* Material=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/Materials/M_ChartSymbol.M_ChartSymbol"));
+    for(const TCHAR* Kind:{TEXT("fleet"),TEXT("contact"),TEXT("convoy"),TEXT("port"),TEXT("country"),TEXT("front"),TEXT("battle")})
+    {
+        auto* Glyph=ChartSymbol(Probe,Spec,Kind,Material);
+        if(TestNotNull(TEXT("Every role creates a procedural glyph"),Glyph))
+        {
+            const auto* Section=Glyph->GetProcMeshSection(0);
+            TestTrue(TEXT("Glyph has real colored geometry"),Section&&Section->ProcIndexBuffer.Num()>0);
+            if(Section)for(const auto& Vertex:Section->ProcVertexBuffer)
+                TestTrue(TEXT("Glyph stays within its stable physical-pixel bounds"),FMath::Abs(Vertex.Position.Y)<=60000&&FMath::Abs(Vertex.Position.Z)<=60000);
+            Glyph->DestroyComponent();
+        }
+    }
+    for(double Width:{1800.,2560.,3440.})for(double Depth:{200000.,20000000.,2000000000.})for(double FOV:{45.,70.,100.})
+    {
+        PositionPortSymbol(Probe,FVector::ZeroVector,FVector(0,0,Depth),FRotator(-90,0,0),32,Width,FOV);
+        const double ScreenPixels=Probe->GetActorScale3D().Y*100000.*Width/(2.*Depth*FMath::Tan(FMath::DegreesToRadians(FOV*.5)));
+        TestTrue(TEXT("Marker sizing stays 32 pixels across zoom, aspect ratio and FOV"),FMath::IsNearlyEqual(ScreenPixels,32.,1e-6));
+        TestTrue(TEXT("Chart centre remains exactly at its geographic position"),Probe->GetActorLocation().IsNearlyZero());
+    }
+    const double MarkerCount=Number(Diagnostics,TEXT("markerCount"));
+    Packet->SetArrayField(TEXT("selectedForceIds"),{});Scene->ApplyWorldPacket(Packet);Diagnostics=Scene->GetChartDiagnostics();
+    TestEqual(TEXT("Deselect removes every selection highlight immediately"),Number(Diagnostics,TEXT("visibleSelectedMarkerCount")),0.);
+    TestEqual(TEXT("Selection changes reuse the same marker actors"),Number(Diagnostics,TEXT("markerCount")),MarkerCount);
     World->DestroyWorld(false);return true;
 }
 
@@ -1290,6 +1422,7 @@ bool FWNTBattleChartTest::RunTest(const FString& Parameters)
     const FString Json=TEXT(R"({"format":1,"campaign":"test","paused":false,"instanceId":"battle-map-test","battles":[{"id":"71","position":[179.8,25],"label":"Decisive battle","stage":3}]})");
     if(!TestTrue(TEXT("Battle chart packet parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet)))
     {World->DestroyWorld(false);return false;}
+    Packet->SetObjectField(TEXT("chartSymbols"),ChartTestSpec());
     Scene->ApplyWorldPacket(Packet);
     TArray<TWeakObjectPtr<AActor>> Markers;
     for(TActorIterator<AActor> It(World);It;++It)if(const auto Pick=Scene->GetSelection(*It))

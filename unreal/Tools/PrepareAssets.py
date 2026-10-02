@@ -7,6 +7,11 @@ import json
 import os
 from pathlib import Path
 import unreal
+import importlib.util
+
+projection_spec = importlib.util.spec_from_file_location("wnt_chart_projection", Path(__file__).with_name("PrepareChartProjection.py"))
+projection = importlib.util.module_from_spec(projection_spec)
+projection_spec.loader.exec_module(projection)
 
 force = os.environ.get("WNT_FORCE_ASSETS") == "1"
 assets = unreal.get_editor_subsystem(unreal.EditorAssetSubsystem)
@@ -89,10 +94,11 @@ def ocean_normal(material):
         raise RuntimeError("Cannot connect ocean ripple normal")
 
 
-def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint", instanced=False):
+def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint", instanced=False, projected=False):
     asset_path = "/Game/Materials/" + name
     exists = assets.does_asset_exist(asset_path)
-    if exists and not force:
+    refresh_projection = projected and exists and assets.get_metadata_tag(assets.load_asset(asset_path), "WNTChartProjectionSchema") != projection.SCHEMA
+    if exists and not force and not refresh_projection:
         if instanced:
             mat = assets.load_asset(asset_path)
             if not isinstance(mat, unreal.Material):
@@ -137,6 +143,9 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
         scalar(mat, "Metallic", metallic, unreal.MaterialProperty.MP_METALLIC, 300)
     if name == "M_Ocean":
         ocean_normal(mat)
+    if projected:
+        projection.add_projection(mat, correct_normals=not unlit)
+        assets.set_metadata_tag(mat, "WNTChartProjectionSchema", projection.SCHEMA)
     compile_errors = editing.recompile_material(mat)
     if compile_errors:
         raise RuntimeError("Material compilation failed for " + name + ": " + "; ".join(str(error) for error in compile_errors))
@@ -148,7 +157,7 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
 def terrain_surface():
     """Lit geometric relief with CPU-authored elevation/climate vertex colors."""
     asset_path = "/Game/Materials/M_TerrainSurface"
-    shader_schema = "5-geometric-biome-clean-graph"
+    shader_schema = "6-equal-earth-geometric"
     existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
     if existing and not force and assets.get_metadata_tag(existing, "WNTTerrainShaderSchema") == shader_schema:
         preserved.append(asset_path)
@@ -163,13 +172,11 @@ def terrain_surface():
     color = expression(mat, unreal.MaterialExpressionVertexColor, -450, 0)
     if not editing.connect_material_property(color, "", unreal.MaterialProperty.MP_BASE_COLOR):
         raise RuntimeError("Cannot connect geometric terrain color")
-    # No texture, noise normal or displacement: actual sampled elevation and
-    # triangle normals supply relief at every zoom. All inputs remain local.
+    # Elevation supplies relief; the chart shear only changes east coordinates.
     scalar(mat, "Roughness", 1.0, unreal.MaterialProperty.MP_ROUGHNESS, 150)
     scalar(mat, "Metallic", 0.0, unreal.MaterialProperty.MP_METALLIC, 300)
     scalar(mat, "Specular", .12, unreal.MaterialProperty.MP_SPECULAR, 450)
-    if editing.get_num_material_expressions(mat) != 4:
-        raise RuntimeError("Geometric terrain must contain only vertex color and three scalar parameters")
+    projection.add_projection(mat, correct_normals=True)
     errors = editing.recompile_material(mat)
     if errors:
         raise RuntimeError("Geometric terrain compilation: " + str(errors))
@@ -182,7 +189,7 @@ def terrain_surface():
 def graticule_material():
     """A screen-filtered overlay on the existing fixed geographic ribbons."""
     asset_path = "/Game/Materials/M_Graticule"
-    shader_schema = "2-pixel-filtered-clean-graph"
+    shader_schema = "3-equal-earth-filtered"
     existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
     if existing and not force and assets.get_metadata_tag(existing, "WNTGraticuleShaderSchema") == shader_schema:
         preserved.append(asset_path)
@@ -244,6 +251,7 @@ def graticule_material():
     connect(inverse, opacity, "A")
     if not editing.connect_material_property(opacity, "", unreal.MaterialProperty.MP_OPACITY):
         raise RuntimeError("Cannot connect filtered graticule opacity")
+    projection.add_projection(mat)
     errors = editing.recompile_material(mat)
     if errors:
         raise RuntimeError("Graticule compilation: " + str(errors))
@@ -253,14 +261,49 @@ def graticule_material():
     changed.append(asset_path)
 
 
+def chart_symbol_material():
+    asset_path = "/Game/Materials/M_ChartSymbol"
+    schema = "1-vertex-color-depth-safe-chart"
+    existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
+    if existing and not force and assets.get_metadata_tag(existing, "WNTChartSymbolSchema") == schema:
+        preserved.append(asset_path)
+        return
+    mat = existing or tools.create_asset("M_ChartSymbol", "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
+    clear_expressions(mat)
+    mat.set_editor_property("blend_mode", unreal.BlendMode.BLEND_TRANSLUCENT)
+    mat.set_editor_property("shading_model", unreal.MaterialShadingModel.MSM_UNLIT)
+    mat.set_editor_property("two_sided", True)
+    mat.set_editor_property("disable_depth_test", True)
+    mat.set_editor_property("translucency_pass", unreal.MaterialTranslucencyPass.MTP_AFTER_MOTION_BLUR)
+    color = expression(mat, unreal.MaterialExpressionVertexColor, -350, 0)
+    tint = expression(mat, unreal.MaterialExpressionVectorParameter, -350, -180)
+    tint.set_editor_property("parameter_name", "Tint")
+    tint.set_editor_property("default_value", unreal.LinearColor(1, 1, 1, 1))
+    tinted = expression(mat, unreal.MaterialExpressionMultiply, -100, 0)
+    connect(color, tinted, "A")
+    connect(tint, tinted, "B")
+    if not editing.connect_material_property(tinted, "", unreal.MaterialProperty.MP_EMISSIVE_COLOR):
+        raise RuntimeError("Cannot connect chart symbol color")
+    if not editing.connect_material_property(color, "A", unreal.MaterialProperty.MP_OPACITY):
+        raise RuntimeError("Cannot connect chart symbol opacity")
+    errors = editing.recompile_material(mat)
+    if errors:
+        raise RuntimeError("Chart symbol material compilation: " + str(errors))
+    assets.set_metadata_tag(mat, "WNTChartSymbolSchema", schema)
+    if not assets.save_loaded_asset(mat, only_if_is_dirty=False):
+        raise RuntimeError("Cannot save chart symbol material")
+    changed.append(asset_path)
+
+
 material("M_Ship", .85, .12)
-material("M_Terrain", 1.0, 0.0)
+material("M_Terrain", 1.0, 0.0, projected=True)
 terrain_surface()
 graticule_material()
 material("M_Ocean", .26, .15, color=(.018, .065, .10), parameter="BaseColor")
-material("M_Line", 1.0, 0.0, unlit=True)
+material("M_Line", 1.0, 0.0, unlit=True, projected=True)
 material("M_Marker", 1.0, 0.0, unlit=True, color=(.5, .65, .8), instanced=True)
 material("M_Port", .9, 0.0, color=(.35, .38, .4))
+chart_symbol_material()
 
 map_path = "/Game/Maps/WNTWorld"
 if assets.does_asset_exist(map_path):

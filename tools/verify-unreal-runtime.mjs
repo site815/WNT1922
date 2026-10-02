@@ -16,6 +16,7 @@ import {campaignMinutes} from '../mechanics/campaign-clock.mjs';
 import {newGame} from '../mechanics/engine.mjs';
 import {beginEngagement} from '../mechanics/engagements.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
+import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2);
@@ -241,7 +242,7 @@ try {
 
  phase='persistent command map and ministry menus';
  await page.evaluate(()=>{globalThis.__runtimeWorldCanvas=document.querySelector('.native-world-input');globalThis.__runtimeOutliner=document.querySelector('.command-side-panel');});
- const cameraFields=d=>({instanceId:d.instanceId,zoom:d.zoom,longitude:d.longitude,latitude:d.latitude,tilt:d.tilt});
+ const cameraFields=nativeCameraFields;
  const menuBaseline=await diagnostics('world'),menuGeometry=await page.locator('.command-side-panel').boundingBox();
  for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports','review']) {
   await page.locator('.nav-item[data-view="'+menu+'"]').click();await page.locator('.menu-popup.view-'+menu).waitFor();
@@ -250,6 +251,8 @@ try {
   assert.equal(menuNative.shipActorCount,menuBaseline.shipActorCount,'Opening menus preserves loaded ship actors');
   assert.equal(menuNative.terrainTileCount,menuBaseline.terrainTileCount,'Opening menus preserves loaded terrain');
   assert.deepEqual(await page.locator('.command-side-panel').boundingBox(),menuGeometry,'Naval outliner stays fixed');
+  const menuLayout=await page.locator('.menu-popup').evaluate(popup=>({left:popup.getBoundingClientRect().left,layerLeft:popup.parentElement.getBoundingClientRect().left,sidebarRight:document.querySelector('.sidebar').getBoundingClientRect().right}));
+  assert(Math.abs(menuLayout.left-menuLayout.layerLeft)<2&&menuLayout.left>=menuLayout.sidebarRight,'Ministry menu remains left-aligned beside the sidebar');
   assert(await page.evaluate(()=>__runtimeWorldCanvas===document.querySelector('.native-world-input')&&__runtimeOutliner===document.querySelector('.command-side-panel')),'Map and outliner DOM nodes persist');
  }
  await nativeCapture('native-ministry-popup',true);
@@ -257,11 +260,18 @@ try {
  result.checks.push('Menus 02–11 preserve the native world instance, camera, loaded terrain/ship actors and naval outliner; Escape restores the unobstructed command map.');
 
  phase='world camera and hull picking';
+ const selectState=await save();
  const selectedBefore=await diagnostics('world');
- await page.locator('.fleet-command-row').first().click();
- assert.deepEqual(cameraFields(await diagnostics('world')),cameraFields(selectedBefore),'Single outliner click selects without moving the camera');
  const fittedRow=page.locator('.fleet-command-row').first(),fittedId=await fittedRow.getAttribute('data-id');
  assert(packet.forces.some(force=>force.id===fittedId&&!force.merchant));
+ await fittedRow.click();
+ const selectedNative=await until(()=>diagnostics('world'),d=>d.chart?.selectedForceIds?.includes(fittedId)&&d.chart.selectedMarkers?.some(marker=>marker.forceId===fittedId&&marker.visible&&marker.highlightVisible),{label:'single-click native fleet highlight'});
+ assert.deepEqual(selectedNative.chart.selectedForceIds,[fittedId],'A single click leaves only the chosen native fleet highlighted');
+ assert(selectedNative.chart.visibleSelectedMarkerCount>0,'An actual native marker highlight is visible');
+ assert.deepEqual(cameraFields(selectedNative),cameraFields(selectedBefore),'Single outliner click selects without moving the camera');
+ const selectAfter=await save();assert.equal(campaignMinutes(selectAfter),campaignMinutes(selectState));assert.equal(selectAfter.minuteTicks,selectState.minuteTicks);
+ assert.deepEqual(selectAfter.nations.USA.fleets,selectState.nations.USA.fleets,'Single fleet selection issues no movement or mission order');
+ result.metrics.push({kind:'single-fleet-native-highlight',chart:selectedNative.chart,camera:cameraFields(selectedNative)});
  await fittedRow.dblclick();
  const fitted=await until(()=>diagnostics('world'),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.001&&d.visibleShipCount>0,{label:'real double-click fleet fit'});
  assert.equal(fitted.tilt,0,'Fleet fit remains overhead');
@@ -279,10 +289,11 @@ try {
  const boxSelection=boxEvents.find(row=>row.event.type==='select'&&row.event.selection?.kind==='fleet-group').event.selection;
  assert(boxSelection.ids.includes(boxForce.id),'Box selects the fleet containing the enclosed own hull');
  assert(boxSelection.ids.every(id=>packet.forces.some(force=>!force.merchant&&force.id===id)),'Box selection exposes only own fleets');
- assert.deepEqual(cameraFields(await diagnostics('world')),cameraFields(boxCamera),'Left box selection does not move the camera');
+ const boxNative=await until(()=>diagnostics('world'),d=>d.chart?.selectedForceIds?.length===boxSelection.ids.length&&boxSelection.ids.every(id=>d.chart.selectedForceIds.includes(id)),{label:'native selected fleet set after real box gesture'});
+ assert.deepEqual(cameraFields(boxNative),cameraFields(boxCamera),'Left box selection does not move the camera');
  const boxAfter=await save();assert.equal(campaignMinutes(boxAfter),campaignMinutes(boxState));assert.equal(boxAfter.minuteTicks,boxState.minuteTicks);
  assert.deepEqual(boxAfter.nations.USA.fleets,boxState.nations.USA.fleets,'Selecting a box issues no movement or mission orders');
- result.checks.push('Real outliner single click selects without centering, double click fits a visible detailed overhead fleet, and left-drag selects only enclosed own fleets without camera movement, orders or campaign time.');
+ result.checks.push('Real outliner single click visibly highlights only its native fleet without centering or issuing orders. Double click fits a detailed overhead fleet. Left-drag selects only enclosed own fleets and updates native selection without camera movement, orders or campaign time.');
  await surface().focus();await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'Home after selection checks'});
  let before=await diagnostics('world');
  const point=await clearPoint();await page.mouse.move(point.x,point.y);await page.mouse.wheel(0,-300);
@@ -290,6 +301,7 @@ try {
  await surface().focus();before=await diagnostics();await page.keyboard.press('PageUp');
  await until(()=>diagnostics(),after=>after.zoom>before.zoom,{label:'real keyboard zoom'});
  await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'strategic Home'});
+ await verifyStrategicMiddleNoop({page,diagnostics,clearPoint,metrics:result.metrics});
  const warshipForce=packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.some(h=>['BB','BC','CV'].includes(h.type)))||packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.length);
  assert(warshipForce);await focusOwnForce(warshipForce);assert.equal((await diagnostics()).tilt,0,'Fleet view remains overhead');await nativeCapture('native-fleet');
  const hovered=await pick('ship',{hover:true});
@@ -306,13 +318,11 @@ try {
  assert.equal(await page.locator('[data-dialog-type="ship"]').getAttribute('data-key'),'dialog-ship-'+selection.id);
  await page.locator('.modal [data-action="close"]').first().click();await worldReady();
  await focusOwnForce(warshipForce,60000);await nativeCapture('native-ship');
- const beforeTilt=await diagnostics(),p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+38,p.y+40,{steps:8});await page.mouse.up({button:'right'});
+ const beforeTilt=await diagnostics();
  assert(beforeTilt.tilt>0&&beforeTilt.tilt<=beforeTilt.maxWorldTilt,'Individual ship zoom chooses its inspection tilt automatically');
- const afterPan=await until(()=>diagnostics(),d=>Math.abs(d.longitude-beforeTilt.longitude)>1e-10||Math.abs(d.latitude-beforeTilt.latitude)>1e-10,{label:'real right-drag pans the native map'});
- assert(Math.abs(afterPan.tilt-beforeTilt.tilt)<.01,'Right drag preserves automatic inspection tilt');
- assert.equal(await page.locator('.modal').count(),0,'A pan gesture must not open a selection dialog');
+ await verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,{label}),metrics:result.metrics});
  await nativeCapture('native-ship-tilted');
- result.checks.push('Real wheel/PageUp/Home input changes the native camera; fleet view stays overhead, ship zoom tilts automatically, and right drag pans without changing tilt or selecting. Native hull hover/click reach exact game inspections.');
+ result.checks.push('Real wheel/PageUp/Home input changes the native camera. Strategic middle drag is inert; close middle drag orbits without moving focus, right drag pans while retaining requested orientation, and wheel zoom out/in clears manual yaw and tilt. Native hull hover/click reach exact game inspections.');
  result.metrics.push({kind:'hovered-ship',selection:hovered});
 
  phase='merchant hulls';

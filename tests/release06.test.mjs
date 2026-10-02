@@ -1,3 +1,4 @@
+import { assertNativeChartWithLegend } from './chart-assertions.mjs';
 import { politicalPopup } from "../ui/diplomacy-popup.mjs";
 import { resolvePortActionToEnd } from "./battle-helper.mjs";
 import { syncConvoys } from "../mechanics/task-forces.mjs";
@@ -339,7 +340,7 @@ test("dismissed dispatches stay dismissed and mandatory defaults apply exactly o
   assert.equal(r.influence, before - 5);
   assert.equal(s.decisions.length, 0);
 });
-test("all zoom levels preserve national convoy color, port icons and labels; manifests sort capitals first and newest within type", () => {
+test("all zoom levels preserve shared convoy symbols and public port labels; manifests sort capitals first and newest within type", () => {
   const s = start(),
     c = contentFor(b, s);
   s.relations["JPN-USA"].war = true;
@@ -351,11 +352,13 @@ test("all zoom levels preserve national convoy color, port icons and labels; man
       scene.ports.length,
       Object.keys(PORTS).length,
     );
-    assert.match(html, /style="color:#f27b73">■ Convoy/);
+    assert.match(html, /data-chart-symbol="convoy"/);
+    assert(html.includes(scene.chartSymbols.symbols.convoy.color));
+    assert.match(html, /style="color:#f27b73" title="Japan">JPN/);
     assert(scene.ports.some(port => port.name === 'Pearl Harbor'));
     assert(scene.forces.some(force => force.merchant));
     assert.match(html, /class="native-world-surface"/);
-    assert.doesNotMatch(html, /<svg/);
+    assertNativeChartWithLegend(html);
   }
   const ships = s.nations.JPN.groups
     .filter((g) => g.count)

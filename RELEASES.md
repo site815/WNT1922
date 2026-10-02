@@ -4,6 +4,16 @@
 
 The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
 
+## Native preview — 0.43.0-dev
+
+- The 3D terrain chart now uses true Equal Earth geometry with continuous horizontal wrapping. Land, coastlines, longitude/latitude lines, routes and map symbols share the projection; country shapes change naturally as the chart's central longitude moves.
+- Right drag pans. Left click selects a unit; left drag selects owned fleets in a box. Double-click a fleet to fit its formation. Middle drag rotates and tilts the camera at close ship zoom, from **32,768×**. Zooming out restores north-up and overhead viewing at **16,384×** and below. Maximum zoom remains **65,536×**; **Home** returns to the strategic view.
+- Ministry panels open against the left side of the workspace, leaving more map visible beside them. The map and naval outliner stay loaded; **X** or **Escape** closes the panel. Panel widths remain consistent between standard and ultrawide windows of equal height.
+- Ports use clear anchor symbols and capitals use stars. Fleets use cyan naval badges; intelligence contacts use outlined amber badges with a question mark. Convoys have smaller, quieter cargo symbols. Native icons and the legend read the same editable geometry and color specification.
+- Selecting one or several fleets adds gold corner brackets on the chart as well as the outliner highlight. Docked fleets retain brackets without covering their port with another filled badge. At ship range, brackets do not intercept clicks on individual hulls. Icons retain stable screen sizes and use a depth-safe material.
+
+The window remains resizable and maximizable with a default/minimum 1800×1000 client area. The Shipping archive passed 479 selected JavaScript checks, 33 native checks, all 198 gallery loads/picks, seven actual native resolutions, and bounded on-screen/Equal Earth GPU review. Normal play remained loopback-only during the network observation. See [verification status](SYSTEMS-CHECK.md).
+
 ## Native preview — 0.42.0-dev
 
 - The command map and naval outliner remain loaded under menus 02–11. Ministry menus use centered panels with a consistent width at equal-height standard and ultrawide resolutions; X or Escape returns to the map.

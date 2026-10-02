@@ -4,9 +4,14 @@ The native actor supplies wave spectrum/phase parameters. No textures or plugins
 are required by the water shader, and no CPU mesh rebuild occurs during play.
 """
 import unreal
+import importlib.util
+from pathlib import Path
 
 
 def prepare(force=False):
+    spec = importlib.util.spec_from_file_location("wnt_ocean_chart_projection", Path(__file__).with_name("PrepareChartProjection.py"))
+    projection = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(projection)
     assets = unreal.get_editor_subsystem(unreal.EditorAssetSubsystem)
     tools = unreal.AssetToolsHelpers.get_asset_tools()
     edit = unreal.MaterialEditingLibrary
@@ -51,7 +56,8 @@ def prepare(force=False):
     def material(name):
         path = "/Game/Materials/" + name
         exists = assets.does_asset_exist(path)
-        if exists and not force:
+        refresh_projection = name == "M_OceanFar" and exists and assets.get_metadata_tag(assets.load_asset(path), "WNTChartProjectionSchema") != projection.SCHEMA
+        if exists and not force and not refresh_projection:
             preserved.append(path)
             return None
         mat = assets.load_asset(path) if exists else tools.create_asset(name, "/Game/Materials", unreal.Material, unreal.MaterialFactoryNew())
@@ -129,6 +135,15 @@ float2 slope=0;
         if detailed:
             displacement = custom(mat, "Resolved gravity-wave height in centimetres", common + "return float3(0,0,100*height*window*Strength);", parameters)
             prop(displacement, unreal.MaterialProperty.MP_WORLD_POSITION_OFFSET)
+        else:
+            chart_offset = projection.add_projection(mat)
+            # Water masking and phase must use the same displaced chart point
+            # as the visible surface, while near water remains camera-local.
+            projected_local = node(mat, unreal.MaterialExpressionAdd)
+            wire(local, projected_local, "A"); wire(chart_offset, projected_local, "B")
+            local = projected_local
+            parameters["P"] = (local, "")
+            assets.set_metadata_tag(mat, "WNTChartProjectionSchema", projection.SCHEMA)
         normal_code = common + """
 slope=Strength*(slope*window+height*windowGradient);
 // Small wind waves use a multiscale anisotropic height field, rather than a

@@ -34,6 +34,7 @@ public:
     TSharedPtr<FJsonObject> GetSelection(AActor* Actor) const;
     TSharedPtr<FJsonObject> GetSelection(const FHitResult& Hit) const;
     TOptional<FVector> GetSelectedPosition(const FString& Kind, const FString& Id, int32 HullIndex = -1, const FString& Side = TEXT("")) const;
+    TSharedPtr<FJsonObject> GetChartDiagnostics() const;
     FBox GetSceneBounds() const;
     FBox GetForceBounds(const FString& ForceId) const;
     AWNTTerrainActor* GetTerrain() const { return Terrain; }
@@ -44,6 +45,7 @@ private:
     void UpdateWorld(double Fraction);
     void UpdateBattle(double Fraction);
     void UpdateVisibility();
+    void UpdateChartMarkers();
     void RepositionPorts();
     void RebuildRoute(double WidthCentimetres);
     void RepositionWorldTiles();
@@ -60,6 +62,8 @@ private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<UProceduralMeshComponent> RouteMesh;
     UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> RouteTiles;
     TArray<FVector> OceanTileOrigins, RouteTileOrigins;
+    TArray<FVector> OceanTileHalfExtents, RouteTileHalfExtents;
+    TArray<double> OceanTileShearExtents, RouteTileShearExtents;
     TUniquePtr<FWNTWorldRuntime, FWNTWorldRuntimeDeleter> Runtime;
     FString DataDirectory, LoadError, Campaign;
     double CentralMeridian = 0.0;

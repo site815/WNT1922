@@ -10,6 +10,7 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
+#include "Math/Float16.h"
 #if WITH_EDITOR
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionTextureBase.h"
@@ -64,7 +65,26 @@ bool FWNTEqualEarthProjectionTest::RunTest(const FString& Parameters)
         const auto Inverse=WNTProjection::Inverse(Point);
         TestTrue(TEXT("Repeated world copies pick the same geography"),Inverse.IsSet()&&Inverse->Equals(FVector2D(42,Lat),1e-7));
         const FVector Shift=WNTProjection::ForwardUnwrapped(FVector2D(42+360,Lat))-WNTProjection::ForwardUnwrapped(FVector2D(42,Lat));
-        TestTrue(TEXT("Seam joins by one constant translation at every latitude"),Shift.Equals(FVector(0,WNTProjection::WorldWidth,0),1e-5));
+        TestTrue(TEXT("Seam joins by its actual latitude-dependent repeat width"),Shift.Equals(FVector(0,WNTProjection::WrapWidthAtLatitude(Lat),0),1e-5));
+    }
+    TestTrue(TEXT("Equal Earth tapers toward each pole"),WNTProjection::WrapWidthAtLatitude(85)<WNTProjection::WorldWidth*.7);
+    TestTrue(TEXT("Equal Earth pole northing follows the published normalized extent"),FMath::Abs(WNTProjection::PoleNorthing()/(WNTProjection::EarthRadiusMetres*100)-1.3173627591574)<1e-12);
+    for(double Lat:{-80.0,-45.0,0.0,45.0,80.0})
+    {
+        constexpr double Step=.0001,Radians=UE_DOUBLE_PI/180.0;
+        const FVector NorthA=WNTProjection::ForwardUnwrapped(FVector2D(37,Lat-Step)),NorthB=WNTProjection::ForwardUnwrapped(FVector2D(37,Lat+Step));
+        const double DNorth=(NorthB.X-NorthA.X)/(2*Step*Radians),DEast=WNTProjection::EastUnitsPerDegree(Lat)/Radians;
+        const double Scale=WNTProjection::EarthRadiusMetres*100;
+        TestTrue(TEXT("Equal Earth local Jacobian preserves spherical area"),FMath::Abs(DNorth*DEast/(Scale*Scale)-FMath::Cos(Lat*Radians))<1e-8);
+        const double DScale=(WNTProjection::EastUnitsPerDegree(Lat+Step)-WNTProjection::EastUnitsPerDegree(Lat-Step))/(NorthB.X-NorthA.X);
+        TestTrue(TEXT("Shader normal derivative matches geographic projection"),FMath::Abs(DScale-WNTProjection::EastScaleDerivative(Lat))<1e-10);
+        for(double From:{-179.9,0.0,179.9})for(double To:{-179.99,89.0,179.99})
+        {
+            const FVector P=WNTProjection::ForwardUnwrapped(FVector2D(410,Lat),5);
+            const FVector Rebased=WNTProjection::ReprojectBetweenMeridians(P,From,To);
+            const FVector Expected=WNTProjection::ForwardUnwrapped(FVector2D(410-WNTProjection::WrapLongitude(To-From),Lat),5);
+            TestTrue(TEXT("Camera anchor rebase preserves its repeated-copy branch"),Rebased.Equals(Expected,.001));
+        }
     }
     TestTrue(TEXT("Seam endpoints have distinct positions"),WNTProjection::ForwardUnwrapped(FVector2D(180,0)).Y>0&&WNTProjection::ForwardUnwrapped(FVector2D(-180,0)).Y<0);
     return true;
@@ -105,6 +125,46 @@ bool FWNTGeographicSeamsTest::RunTest(const FString& Parameters)
         Total=0;for(const auto& T:Triangles)Total+=Area(T);
         TestTrue(TEXT("Polar cap spans the full world width"),FMath::Abs(Total-5400.0)<1e-7);
     }
+    FString GeographyText;TSharedPtr<FJsonObject> Geography;
+    if(!TestTrue(TEXT("Read the actual Antarctica display rings"),FFileHelper::LoadFileToString(GeographyText,*FPaths::Combine(DataRoot(),TEXT("assets/maps/geometry.json")))&&FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(GeographyText),Geography)))return false;
+    const auto Antarctic=Geography->GetObjectField(TEXT("geometry"))->GetObjectField(TEXT("ne_ATA"));
+    TArray<FWNTGeographicTriangle> AntarcticTriangles;
+    for(const auto& PolygonValue:Antarctic->GetArrayField(TEXT("coordinates")))
+    {
+        TArray<TArray<FVector2D>> Polygon;
+        for(const auto& RingValue:PolygonValue->AsArray())
+        {
+            TArray<FVector2D> Ring;
+            for(const auto& PointValue:RingValue->AsArray()){const auto& XY=PointValue->AsArray();Ring.Add(FVector2D(XY[0]->AsNumber(),XY[1]->AsNumber()));}
+            Polygon.Add(MoveTemp(Ring));
+        }
+        TArray<FWNTGeographicTriangle> Part;
+        if(!TestTrue(TEXT("Every actual Antarctic island and mainland ring triangulates"),WNTTerrainGeometry::TriangulatePolygon(Polygon,Part,Error)))return false;
+        AntarcticTriangles.Append(Part);
+        if(Polygon[0].ContainsByPredicate([](const FVector2D& P){return P.Y< -89.9;}))
+        {
+            const auto Unwrapped=WNTTerrainGeometry::UnwrapRing(Polygon[0]);
+            FBox2D Bounds(ForceInit);for(const auto& P:Unwrapped)Bounds+=P;
+            TestTrue(TEXT("Antarctic cap retains the authored dateline closure, not a peninsula cut"),Bounds.Min.X== -180&&Bounds.Max.X==180&&Bounds.Min.Y== -90);
+            for(const FVector2D P:{FVector2D(-75,-85),FVector2D(-65,-85),FVector2D(-60,-85),FVector2D(-57.077,-85),FVector2D(-55,-85)})
+            {
+                bool Covered=false;for(const auto& T:Part)if(Contains(T,P)){Covered=true;break;}
+                TestTrue(TEXT("Actual mainland remains present directly south of South America"),Covered);
+            }
+        }
+    }
+    for(double Meridian:{-179.999,-90.0,0.0,90.0,179.999})
+    {
+        TArray<FWNTGeographicTriangle> Pieces;double OriginalArea=0,WrappedArea=0;
+        for(const auto& T:AntarcticTriangles){OriginalArea+=Area(T);for(const auto& C:WNTTerrainGeometry::ClipAtMeridian(T,Meridian)){Pieces.Add(C);WrappedArea+=Area(C);}}
+        TestTrue(TEXT("Actual Antarctic triangulation conserves area through every moving seam"),FMath::Abs(OriginalArea-WrappedArea)<1e-6);
+        for(double Longitude=-175;Longitude<180;Longitude+=10)
+        {
+            const FVector2D Query(WNTProjection::WrapLongitude(Longitude-Meridian),-85);
+            bool Covered=false;for(const auto& T:Pieces)if(Contains(T,Query)){Covered=true;break;}
+            TestTrue(TEXT("Full Antarctic interior survives every longitude and seam rotation"),Covered);
+        }
+    }
     // Authored historical borders can cross their source coastline, as in c365w.
     // Preserve both odd/even lobes after splitting the crossed boundary.
     Triangles.Reset();
@@ -118,7 +178,7 @@ bool FWNTGeographicSeamsTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWrappedTileCoverageTest,"WNT.Geography.RepeatedTileCoverage",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTWrappedTileCoverageTest::RunTest(const FString& Parameters)
 {
-    const double Width=WNTProjection::WorldWidth,TileWidth=Width/24.0;
+    const double Width=WNTProjection::WrapWidthAtLatitude(37),TileWidth=Width/24.0;
     for(double Meridian:{-720.25,-179.999,-147.,0.,89.,179.999,540.2})
     {
         TArray<double> Centres;
@@ -138,6 +198,39 @@ bool FWNTWrappedTileCoverageTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("Three repeated worlds have no gaps or duplicated tiles"),NoGaps);
         TestTrue(TEXT("Coverage remains centered across an ultrawide strategic view"),
             Centres[0]-TileWidth*.5<=-Width*1.47&&Centres.Last()+TileWidth*.5>=Width*1.47);
+    }
+    // UV1 + per-tile CPD0 must reproduce the same projection used by CPU picks
+    // at all corners and intermediate rows, including repeated polar tiles.
+    for(double Latitude:{-82.5,-52.5,-7.5,7.5,52.5,82.5})for(double Longitude:{-172.5,-7.5,7.5,172.5})
+    {
+        const FVector Origin=WNTProjection::ForwardUnwrapped(FVector2D(Longitude,Latitude));
+        for(double Meridian:{-179.999,-90.0,0.0,90.0,179.999})for(int32 Copy=-1;Copy<=1;++Copy)
+        {
+            const FVector Placed=WNTTerrainGeometry::WrappedTileOrigin(Origin,Meridian,Copy);
+            const double Shift=WNTTerrainGeometry::TileLongitudeShift(Origin,Meridian,Copy);
+            for(double DY:{-7.5,-2.3,0.0,4.1,7.5})for(double DX:{-7.5,0.0,7.5})
+            {
+                const FVector2D Geo(Longitude+DX,Latitude+DY);
+                const FVector Vertex=WNTProjection::ForwardUnwrapped(Geo,2500);
+                const FVector2D Metadata=WNTProjection::ChartVertexMetadata(Vertex,Origin);
+                const FVector Actual=Placed+Vertex-Origin+FVector(0,Metadata.X*Shift,0);
+                const FVector Expected=WNTProjection::ForwardUnwrapped(FVector2D(Geo.X+Shift,Geo.Y),2500);
+                TestTrue(TEXT("GPU latitude shear matches exact CPU Equal Earth on every wrapped tile"),Actual.Equals(Expected,.001));
+                // Stock ProceduralMeshComponent stores UVs as half floats. Test
+                // that actual path, plus float shader arithmetic and local vertices.
+                const auto Packed=WNTProjection::PackChartShear(Metadata.X,Metadata.Y);
+                const FVector2D UV1(FFloat16(float(Packed.UV1.X)).GetFloat(),FFloat16(float(Packed.UV1.Y)).GetFloat());
+                const FVector2D UV2(FFloat16(float(Packed.UV2.X)).GetFloat(),FFloat16(float(Packed.UV2.Y)).GetFloat());
+                TestTrue(TEXT("Encoded shear is finite in every half-float channel"),FMath::IsFinite(UV1.X)&&FMath::IsFinite(UV1.Y)&&FMath::IsFinite(UV2.X)&&FMath::IsFinite(UV2.Y));
+                TestTrue(TEXT("Three-part half encoding preserves the longitude coefficient"),FMath::Abs(WNTProjection::DecodeChartShear(UV1,UV2)-Metadata.X)<.002);
+                const float ShaderCoefficient=(float(UV1.X)*4096.0f+float(UV1.Y)*4.0f)+float(UV2.X)*4.0f;
+                const FVector FloatShifted=Placed+FVector(FVector3f(Vertex-Origin))+FVector(0,ShaderCoefficient*float(Shift),0);
+                TestTrue(TEXT("Actual half UV and float shader path remains within two metres at repeated polar edges"),FloatShifted.Equals(Expected,200));
+                const FBox Local(Vertex-Origin,Vertex-Origin);
+                const FBox Bound=WNTTerrainGeometry::ShearedLocalBounds(Local,FVector2D(Metadata.X,Metadata.X),Shift);
+                TestTrue(TEXT("Displaced vertex remains inside its conservative bounds after real shader rounding"),Bound.IsInsideOrOn(FloatShifted-Placed));
+            }
+        }
     }
     return true;
 }
@@ -201,11 +294,13 @@ bool FWNTGeometricMaterialTest::RunTest(const FString& Parameters)
     if(!TestNotNull(TEXT("Prepared geometric land material"),Terrain)||!TestNotNull(TEXT("Prepared filtered geographic grid"),Grid))return false;
     TestTrue(TEXT("Land remains opaque lit geometry"),Terrain->BlendMode==BLEND_Opaque&&Terrain->GetShadingModels().HasShadingModel(MSM_DefaultLit));
     TestEqual(TEXT("Terrain loads without any external photograph directory"),WNTVisualAssets::LoadTerrainMaterial(TEXT("nonexistent-terrain-photograph-root")),static_cast<UMaterialInterface*>(Terrain));
-    TestEqual(TEXT("Replacement terrain graph has only vertex color and three scalar parameters"),Terrain->GetExpressions().Num(),4);
+    TestTrue(TEXT("Prepared terrain includes GPU Equal Earth displacement"),Terrain->HasVertexPositionOffsetConnected());
+    TestTrue(TEXT("Prepared terrain corrects its geometric normals after projection"),Terrain->GetEditorOnlyData()->Normal.Expression!=nullptr);
     for(UMaterialExpression* Expression:Terrain->GetExpressions())
         TestFalse(TEXT("Geometric terrain has no texture sampling dependency"),Expression->IsA<UMaterialExpressionTextureBase>());
     TestTrue(TEXT("Grid is an unlit translucent chart overlay with no terrain depth fighting"),Grid->BlendMode==BLEND_Translucent&&Grid->bDisableDepthTest&&Grid->GetShadingModels().HasShadingModel(MSM_Unlit));
     TestTrue(TEXT("Grid overlay runs after temporal reconstruction and motion blur"),Grid->TranslucencyPass==MTP_AfterMotionBlur);
+    TestTrue(TEXT("Prepared geographic grid shares GPU Equal Earth displacement"),Grid->HasVertexPositionOffsetConnected());
     bool HasDX=false,HasDY=false;
     for(UMaterialExpression* Expression:Grid->GetExpressions())
     {

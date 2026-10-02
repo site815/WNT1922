@@ -64,7 +64,7 @@ try {
       const layout = await page.evaluate(() => {
         const popup=document.querySelector('.menu-popup'),body=popup.querySelector('.workspace-inner'),panel=document.querySelector('.command-side-panel');
         const bounds=popup.getBoundingClientRect(),p=panel.getBoundingClientRect(),close=popup.querySelector('.workspace-close').getBoundingClientRect();
-        return {popup:bounds.toJSON(),panel:p.toJSON(),close:close.toJSON(),bodyWidth:body.clientWidth,bodyScrollWidth:body.scrollWidth,
+        return {popup:bounds.toJSON(),mapLeft:document.querySelector('.menu-layer').getBoundingClientRect().left,panel:p.toJSON(),close:close.toJSON(),bodyWidth:body.clientWidth,bodyScrollWidth:body.scrollWidth,
           sameCanvas:window.__worldCanvas===document.querySelector('.native-world-input'),samePanel:window.__outliner===panel,
           worldCanvases:document.querySelectorAll('.native-world-input').length,
           panelHit:!!document.elementFromPoint(p.left+10,p.top+10)?.closest('.command-side-panel'),
@@ -77,6 +77,7 @@ try {
       assert.deepEqual(layout.panel,baseline.panel,tab+' leaves naval outliner fixed');
       assert(layout.panelHit,tab+' leaves the outliner reachable');
       assert(layout.popup.right < layout.panel.left,tab+' does not cover naval commands');
+      assert(Math.abs(layout.popup.left-layout.mapLeft)<1,tab+' aligns with the left edge of the map workspace');
       assert(layout.close.top>=layout.popup.top && layout.close.bottom<=layout.popup.bottom,tab+' close button remains visible');
       assert(layout.documentWidth<=width && layout.documentHeight<=height,'No outer scrollbar');
       if (layout.bodyScrollWidth>layout.bodyWidth+1) {

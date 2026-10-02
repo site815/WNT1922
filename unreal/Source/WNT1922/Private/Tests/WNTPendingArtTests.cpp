@@ -120,7 +120,16 @@ bool FWNTPendingSceneIdentityTest::RunTest(const FString& Parameters)
     auto* Scene=World->SpawnActor<AWNTWorldActor>();if(!TestNotNull(TEXT("Pending scene"),Scene))return false;
     // No asset registry is installed in this isolated scene: every requested
     // class must remain a symbol instead of selecting a type fallback hull.
-    Scene->ApplyWorldPacket(Packet(TEXT(R"({"format":1,"campaign":"in_good_faith_1936","player":"USA","paused":true,"forces":[{"id":"force-1","name":"Original fleet","position":[-35,25],"heading":90,"hulls":[{"key":"h0","groupId":"g1","classId":"unmodeled-capital","type":"BB","hullIndex":0,"label":"Hull one","stationMeters":[0,0]},{"key":"h1","groupId":"g1","classId":"unmodeled-capital","type":"BB","hullIndex":1,"label":"Hull two","stationMeters":[200,0]}]}],"ports":[{"id":"test-port","name":"Test harbor","position":[-34,25],"owner":"USA"}]})")));
+    const auto WorldPacket=Packet(TEXT(R"({"format":1,"campaign":"in_good_faith_1936","player":"USA","paused":true,"forces":[{"id":"force-1","name":"Original fleet","position":[-35,25],"heading":90,"hulls":[{"key":"h0","groupId":"g1","classId":"unmodeled-capital","type":"BB","hullIndex":0,"label":"Hull one","stationMeters":[0,0]},{"key":"h1","groupId":"g1","classId":"unmodeled-capital","type":"BB","hullIndex":1,"label":"Hull two","stationMeters":[200,0]}]}],"ports":[{"id":"test-port","name":"Test harbor","position":[-34,25],"owner":"USA"}]})"));
+    // Match the real packet's chart geometry while deliberately leaving the
+    // ship registry unavailable: no model fallback is permitted in this test.
+    FString SymbolText;
+    if(!TestTrue(TEXT("Shared chart symbols load independently of ship models"),
+        FFileHelper::LoadFileToString(SymbolText,*FPaths::Combine(ArtRoot(),TEXT("assets/ui/map-symbols.json")))))return false;
+    const auto Symbols=Packet(SymbolText);
+    if(!TestNotNull(TEXT("Shared chart specification parses"),Symbols.Get()))return false;
+    WorldPacket->SetObjectField(TEXT("chartSymbols"),Symbols);
+    Scene->ApplyWorldPacket(WorldPacket);
     int32 Hulls=0,Ports=0;FVector First=FVector::ZeroVector,Second=FVector::ZeroVector;
     for(TActorIterator<AActor> It(World);It;++It)if(const auto Pick=Scene->GetSelection(*It))
     {
