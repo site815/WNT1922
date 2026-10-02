@@ -319,6 +319,11 @@ else:
 
 import importlib.util
 
+map_style_spec = importlib.util.spec_from_file_location("wnt_map_style", Path(__file__).with_name("PrepareMapStyle.py"))
+map_style_module = importlib.util.module_from_spec(map_style_spec)
+map_style_spec.loader.exec_module(map_style_module)
+map_style_module.prepare_map_style(globals())
+
 ocean_module_spec = importlib.util.spec_from_file_location("wnt_ocean_materials", Path(__file__).with_name("PrepareOceanDetail.py"))
 ocean_module = importlib.util.module_from_spec(ocean_module_spec)
 ocean_module_spec.loader.exec_module(ocean_module)

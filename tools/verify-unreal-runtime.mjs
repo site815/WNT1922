@@ -16,7 +16,7 @@ import {campaignMinutes} from '../mechanics/campaign-clock.mjs';
 import {newGame} from '../mechanics/engine.mjs';
 import {beginEngagement} from '../mechanics/engagements.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
-import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit} from './native-camera-gesture-checks.mjs';
+import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2);
@@ -319,12 +319,13 @@ try {
  await page.locator('.modal [data-action="close"]').first().click();await worldReady();
  await focusOwnForce(warshipForce,60000);await nativeCapture('native-ship');
  const beforeTilt=await diagnostics();
- assert(beforeTilt.tilt>0&&beforeTilt.tilt<=beforeTilt.maxWorldTilt,'Individual ship zoom chooses its inspection tilt automatically');
+ assert.equal(beforeTilt.tilt,0,'Individual ship zoom remains overhead until a middle drag');
  await verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,{label}),metrics:result.metrics});
  await nativeCapture('native-ship-tilted');
  result.checks.push('Real wheel/PageUp/Home input changes the native camera. Strategic middle drag is inert; close middle drag orbits without moving focus, right drag pans while retaining requested orientation, and wheel zoom out/in clears manual yaw and tilt. Native hull hover/click reach exact game inspections.');
  result.metrics.push({kind:'hovered-ship',selection:hovered});
 
+ await verifyNativeFPS({page,metrics:result.metrics});
  phase='merchant hulls';
  const merchant=packet.forces.find(f=>f.merchant&&f.position&&f.hulls.length);
  if(merchant) {
@@ -386,6 +387,23 @@ try {
  await until(()=>watch.locator('.battle-watch-heading').textContent(),text=>text.includes('+0 min'),{label:'recorded battle frame'});
  await watch.locator('[data-action="battle-next"]').click();
  await until(()=>watch.locator('.battle-watch-heading').textContent(),text=>text.includes('+15 min'),{label:'recorded tick playback'});
+ // The movie must be a separate presentation clock: real UI controls pause
+ // and resume it while the campaign snapshot/one-tick budget stays untouched.
+ await watch.locator('[data-action="battle-movie"]').click();
+ await until(()=>watch.locator('.battle-watch').getAttribute('data-movie-paused'),value=>value==='false',{label:'recorded movie playing'});
+ const movieKey=await watch.locator('.battle-watch').getAttribute('data-movie-key');assert(movieKey);
+ await until(()=>watch.locator('[data-movie-progress]').textContent(),text=>parseInt(text,10)>=2,{label:'independent movie presentation clock'});
+ await watch.locator('[data-action="battle-movie-toggle"]').click();
+ await until(()=>watch.locator('.battle-watch').getAttribute('data-movie-paused'),value=>value==='true',{label:'movie paused'});
+ const moviePausedProgress=await watch.locator('[data-movie-progress]').textContent();
+ await new Promise(resolve=>setTimeout(resolve,1100));
+ assert.equal(await watch.locator('[data-movie-progress]').textContent(),moviePausedProgress,'Movie pause freezes its own clock');
+ assert.equal(await watch.locator('.battle-watch').getAttribute('data-movie-key'),movieKey,'Pause keeps the native event identity');
+ assert.match(await watch.locator('.battle-watch-heading').textContent(),/CAMPAIGN PAUSED/);
+ await nativeCapture('native-recorded-movie-paused');
+ await watch.locator('[data-action="battle-movie-toggle"]').click();
+ await until(()=>watch.locator('[data-movie-progress]').textContent(),text=>parseInt(text,10)>parseInt(moviePausedProgress,10),{label:'movie resumes without restart'});
+ assert.equal(await watch.locator('.battle-watch').getAttribute('data-movie-key'),movieKey);
  await watch.locator('[data-action="close"]').first().click();await worldReady();
  const watched=await save();
  assert.equal(campaignMinutes(watched),campaignMinutes(battleState)+15,'Only the live Next tick advances the whole simulation');
@@ -394,7 +412,7 @@ try {
  assert.equal(recording.replay.frames.at(-1).at,campaignMinutes(watched));
  await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(watched));
  result.metrics.push({kind:'campaign-battle-watch',reportId:engagement.id,minutesAdvanced:15,ticksAdvanced:1,paused:watched.paused,frames:recording.replay.frames.length});
- result.checks.push('A real decisive engagement raises an optional alert and a clickable native map badge; selecting that badge opens its battle, live Next tick advances exactly 15 campaign minutes once, recorded replay advances no time, and closing keeps the campaign paused.');
+ result.checks.push('A real decisive engagement raises an optional alert and a clickable native map badge; selecting it opens its battle. Live Next tick advances exactly 15 campaign minutes once. Recorded tick navigation and the real movie Play/Pause/Resume controls advance no campaign time; the movie clock freezes and resumes with one stable event identity, and closing leaves the campaign paused.');
  await collectEvidence();
  assert(!contexts.some(type=>/webgl|experimental-webgl/i.test(type)),'Unreal mode must not create a browser WebGL scene');
  result.metrics.push({kind:'browser-context-requests',contexts});

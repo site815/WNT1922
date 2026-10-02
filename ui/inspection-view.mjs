@@ -79,8 +79,9 @@ export function mapHover(s, c, key, data = {}) {
             "%",
         ],
         ["Naval influence", navalInfluence(f)],
+        ["Map line", f.island ? "Campaign assault territory" : "Recorded campaign progress"],
       ]) +
-      "<p>Shipping and local naval control influence the supply of overseas forces. Click to center; double-click to zoom.</p>"
+      "<p>The line shows strategic progress within the campaign territories, not individual troop positions. Shipping and local naval control influence supply. Click to center; double-click to zoom.</p>"
     );
   }
   if (kind === "territory") {

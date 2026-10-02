@@ -22,16 +22,32 @@ namespace WNTCameraMath
     WNT1922_API void EnsureClearance(FMinimalViewInfo& View, const FVector& Target, TFunctionRef<double(const FVector&)> SurfaceHeight);
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
     WNT1922_API double MaxWorldTilt(double Zoom);
+    WNT1922_API double WorldViewDistance();
+    WNT1922_API double ConstrainWorldNorthing(const FMinimalViewInfo& View, const FVector4& ClearRect, double Northing);
     constexpr double MaxWorldZoom = 65536.0;
     constexpr double WorldOrbitZoom = 32768.0;
-    constexpr double WorldNorthUpZoom = 16384.0;
+    constexpr double WorldEdgeMargin = .03;
     WNT1922_API bool CanOrbitWorld(double Zoom);
     struct WNT1922_API FWorldOrbit
     {
-        double Tilt = 52.0, Yaw = 0.0;
+        double Tilt = 0.0, Yaw = 0.0;
         void Reset();
         bool Drag(double Zoom, double DeltaX, double DeltaY);
+        void ZoomInput(double Delta);
         FVector2D Angles(double Zoom);
+    };
+    struct WNT1922_API FFrameRateSampler
+    {
+        double WindowStart = -1;
+        int32 Frames = 0;
+        TOptional<double> Observe(double Now);
+    };
+    struct WNT1922_API FAnchorProgress
+    {
+        double PreviousError = TNumericLimits<double>::Max();
+        FVector PreviousFocus = FVector::ZeroVector;
+        bool bObserved = false;
+        bool Stalled(double PixelError, const FVector& ConstrainedFocus);
     };
     WNT1922_API bool NeedsOriginRebase(double Longitude, double Meridian);
 }
@@ -72,8 +88,11 @@ private:
     bool bHasZoomAnchor = false;
     double BattleYaw = -25, BattleTilt = 48, BattleDistance = 600000;
     WNTCameraMath::FWorldOrbit WorldOrbit;
+    WNTCameraMath::FFrameRateSampler FrameRate;
     TArray<double> FrameSamples;
     int32 FrameSampleCursor = 0;
+    int32 LastAnchorIterations = 0;
+    bool bLastAnchorConstrained = false;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;
     bool bClosing = false, bHostFailed = false, bCameraDirty = true;
     bool bOwnsCloseOverride = false;

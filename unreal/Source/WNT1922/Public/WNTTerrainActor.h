@@ -5,6 +5,8 @@
 
 class UMaterialInterface;
 class UProceduralMeshComponent;
+class FJsonValue;
+class FJsonObject;
 struct FWNTTerrainData;
 struct FWNTTerrainDataDeleter { void operator()(FWNTTerrainData* Pointer) const; };
 
@@ -28,6 +30,9 @@ namespace WNTTerrainGeometry
     /** Split a boundary on the same global grid used to tessellate land faces. */
     WNT1922_API TArray<FVector2D> SplitSurfaceEdge(const FVector2D& A, const FVector2D& B, double Step);
     WNT1922_API TArray<FWNTGeographicTriangle> SubdivideSurface(const FWNTGeographicTriangle& Triangle, double Step);
+    /** Strategic progress cross-section clipped to the territory, including holes. */
+    WNT1922_API TArray<TPair<FVector2D,FVector2D>> CampaignFrontSegments(const TArray<TArray<FVector2D>>& Rings,
+        const FVector2D& From,const FVector2D& To,double Progress);
     /** Padded support ribbon for the material's antialiased, constant-pixel chart line. */
     WNT1922_API double GraticuleWidthForPixelSize(double CentimetresPerPixel);
 }
@@ -47,6 +52,8 @@ public:
     bool IsLandAt(const FVector2D& LongitudeLatitude) const;
     FString TerritoryAt(const FVector2D& LongitudeLatitude) const;
     void SetControl(const TMap<FString, FLinearColor>& TerritoryColours);
+    void ApplyCampaignFronts(const TArray<TSharedPtr<FJsonValue>>& Fronts);
+    TSharedPtr<FJsonObject> GetMapStyleDiagnostics() const;
     void SetGraticuleVisible(bool Visible);
     void SetGraticulePixelSize(double CentimetresPerPixel);
     double GetCentralMeridian() const { return CentralMeridian; }
@@ -63,9 +70,12 @@ public:
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") double GridWidthMetres = 96000.0;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> TerrainMaterial;
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") TObjectPtr<UMaterialInterface> LineMaterial;
+    UPROPERTY(Transient) TObjectPtr<UMaterialInterface> BorderMaterial;
+    UPROPERTY(Transient) TObjectPtr<UMaterialInterface> FrontMaterial;
 
 private:
     void RebuildProjectedMeshes();
+    void RebuildMapOverlays(bool Borders,bool Fronts);
     void UpdateTilePlacement(int32 Index, int32 Copy);
     TUniquePtr<FWNTTerrainData, FWNTTerrainDataDeleter> Data;
     UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> TerrainTiles;

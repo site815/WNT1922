@@ -11,7 +11,7 @@ class UInstancedStaticMeshComponent;
 class WNT1922_API FWNTBattleEffects
 {
 public:
-    static constexpr int32 MaxEvents = 256;
+    static constexpr int32 MaxEvents = 4096;
     static constexpr int32 PoolSize = 48;
     /** Same frame/selection packets never restart the presentation clock. */
     bool SetPacket(const TSharedPtr<FJsonObject>& Packet, double Now);
@@ -20,6 +20,7 @@ public:
     void SetVisible(bool bVisible);
     double SinkProgress(const FString& Key, double Now) const;
     bool IsAnimating(double Now) const;
+    double Elapsed(double Now) const;
     static FTransform SinkingTransform(const FTransform& Surface, double Progress);
     static double ReadableDiameter(double BaseCentimetres, double MinimumPixels, double MaximumCentimetres,
         double CameraDepth, double HorizontalFOV, int32 ViewportWidth);
@@ -35,7 +36,7 @@ private:
     TArray<FTransform> Transforms[4];
     int32 LastCount[4] = {0,0,0,0};
     FString FrameKey;
-    double StartedAt = 0, Duration = 15;
-    bool bAnimate = false;
+    double StartedAt = 0, Duration = 15, PausedElapsed = 0;
+    bool bAnimate = false, bPlaybackPaused = false;
     void EnsurePools(AActor* Owner);
 };

@@ -12,8 +12,9 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {createHash} from 'node:crypto';
 
 const args=process.argv.slice(2),option=name=>args.find(a=>a.startsWith(name+'='))?.slice(name.length+1);
+const movieMode=args.includes('--movie');
 if(args.includes('--help')){
- console.log('Usage: node tools/verify-unreal-battle-effects.mjs --package-report=<passed Shipping package-test.json> --debug-port=9333 --confirm-isolated-session\nRequires exclusive CDP access to that already-running disposable process, paused on its command map. Uses the packaged Denmark Strait demonstration and a labeled 15-second diagnostic time scale for six native GPU captures. Does not modify campaign/save data. Restores the native world viewport and camera. Appearance needs human review.');
+ console.log('Usage: node tools/verify-unreal-battle-effects.mjs --package-report=<passed Shipping package-test.json> --debug-port=9333 --confirm-isolated-session [--movie]\nRequires exclusive CDP access to that already-running disposable process, paused on its command map. Six native GPU captures use the packaged Denmark Strait script: --movie tests its complete recorded movie timeline; default stretches one title frame to a labeled 15-second diagnostic scale. Does not modify campaign/save data. Restores the native world viewport and camera. Appearance needs human review.');
  process.exit(0);
 }
 assert(args.includes('--confirm-isolated-session'),'Explicit --confirm-isolated-session is required; never use a normal player session.');
@@ -63,7 +64,7 @@ const result={format:1,kind:'native-battle-effects-capture-diagnostic',captureCh
  sourceProcessId:live[0].ProcessId,endpoint:'http://127.0.0.1:'+port,captures:[],metrics:[],errors:[],limitations:[
  'Native Unreal GPU screenshots, not CEF screenshots. A human must review visual quality, attack visibility and sinking motion.',
  'The shipped title demonstration is explicitly scripted illustration. Its outcomes are not generated or added to the campaign by this verifier.',
- 'The 3.6-second title event packet is stretched uniformly to a labeled 15-second diagnostic playback so screenshots can sample its phases. Geometry, effects, order and outcomes are unchanged.',
+ movieMode?'The packaged movie planner supplies a complete native trajectory/event timeline from a frozen scripted title record at its actual movie duration. No campaign outcomes are created.':'The 3.6-second title event packet is stretched uniformly to a labeled 15-second diagnostic playback so screenshots can sample its phases. Geometry, effects, order and outcomes are unchanged.',
  'One salvo capture uses the untouched default fit; subsequent damage/sinking captures use actual native ship focus at its threefold inspection zoom. Neither substitutes for reviewing effect visibility at default fit.',
  'Duplicate packet timing is checked through the original sinking deadline and observed visible-hull count; this is not an instrumented per-component transform trace.',
  'The campaign stays paused. Native world data and HTML are not replaced; only a temporary battle viewport/camera and presentation packet are used.',
@@ -126,18 +127,25 @@ try{
  // Require and preserve the renderer's actual rectangle exactly.
  view=initial.viewRect;
  assert(view&&['x','y','width','height'].every(key=>Number.isFinite(view[key]))&&view.width>0&&view.height>0,'Packaged diagnostics must expose the exact native viewRect before captures can run');
- const authored=await page.evaluate(async()=>{
+ const authored=await page.evaluate(async movieMode=>{
   const [{DEMO_BATTLES,createDemoReport},{unrealBattlePacket}]=await Promise.all([import('/ui/start-battle-data.mjs'),import('/ui/unreal-scene.mjs')]);
   const battle=DEMO_BATTLES.find(row=>row.id==='denmark-strait');if(!battle)throw Error('Packaged Denmark Strait script is missing');
   const report=createDemoReport(battle),index=2;
+  if(movieMode){
+   const {buildBattleMovie}=await import('/ui/battle-movie.mjs'),plan=buildBattleMovie(report);
+   return {title:battle.title,source:battle.source,scope:battle.scope,frameTimes:plan.frameTimes,
+    warm:unrealBattlePacket(report,'campaign_1922',0,null,false),
+    packet:unrealBattlePacket(report,'campaign_1922',0,null,true,{plan,key:'movie-evidence:'+report.id,elapsedSeconds:0,paused:false})};
+  }
   return {title:battle.title,source:battle.source,scope:battle.scope,stage:battle.stages[index],
    warm:unrealBattlePacket(report,'campaign_1922',index-1,null,false),packet:unrealBattlePacket(report,'campaign_1922',index,null,true)};
- });
- assert.equal(authored.packet.durationSeconds,3.6,'The packaged title timing fix must be present');
+ },movieMode);
+ if(movieMode)assert(authored.packet.movie&&authored.packet.durationSeconds>=20&&authored.packet.durationSeconds<=90,'The actual complete movie timeline is required');
+ else assert.equal(authored.packet.durationSeconds,3.6,'The packaged title timing fix must be present');
  assert(authored.packet.events.some(e=>e.type==='salvo')&&authored.packet.events.some(e=>e.type==='hit')&&authored.packet.events.some(e=>e.type==='sink'),'The authored frame must contain attack, damage and sinking');
  result.authored={...authored,unmodifiedPacketSha256:hash(JSON.stringify(authored.packet))};
- const packet=structuredClone(authored.packet),scale=15/packet.durationSeconds;
- packet.eventKey+=':diagnostic-'+stamp;packet.durationSeconds=15;
+ const packet=structuredClone(authored.packet),scale=movieMode?1:15/packet.durationSeconds;
+ packet.eventKey+=':diagnostic-'+stamp;if(!movieMode)packet.durationSeconds=15;
  packet.events=packet.events.map(e=>({...e,time:e.time*scale,duration:e.duration*scale}));
  const warm=structuredClone(authored.warm);warm.eventKey+=':diagnostic-warm-'+stamp;
  await page.evaluate(viewport=>ue.wnt.viewport(JSON.stringify(viewport)),{instanceId,mode:'battle',...view});viewportChanged=true;
@@ -149,12 +157,12 @@ try{
  const delivery=await sendPacket(packet);startedFrameAt=delivery.before;result.delivery={...delivery,uncertaintyMs:delivery.after-delivery.before};
  assert(delivery.after-delivery.before<=500,'Native packet delivery is too slow for reliable timed effect captures');
  const salvo=packet.events.find(e=>e.type==='salvo'),sink=packet.events.find(e=>e.type==='sink');
- const hit=packet.events.find(e=>e.type==='hit'&&e.targetKey===sink.targetKey)||packet.events.find(e=>e.type==='hit');
+ const hit=packet.events.filter(e=>e.type==='hit'&&e.targetKey===sink.targetKey&&e.time<sink.time).at(-1)||packet.events.find(e=>e.type==='hit');
  const sinkUnit=packet.units.find(unit=>unit.key===sink.targetKey);assert(sinkUnit,'Recorded sinking needs an authored hull');
- const end=Math.max(...packet.events.map(e=>e.time+e.duration));
+ const end=movieMode?packet.durationSeconds:Math.max(...packet.events.map(e=>e.time+e.duration));
  const plan=[{name:'default-fit-salvo',at:salvo.time+.12,event:salvo},{name:'hit-smoke',at:hit.time+.3,event:hit},
-  {name:'sink-start',at:sink.time+1.1,event:sink},{name:'sink-mid-before-repeat',at:sink.time+3.8,event:sink},
-  {name:'sink-late-after-repeat',at:sink.time+6.1,event:sink},{name:'settled',at:end+.5,event:sink}].sort((a,b)=>a.at-b.at);
+  {name:'sink-start',at:sink.time+sink.duration*.14,event:sink},{name:'sink-mid-before-repeat',at:sink.time+sink.duration*.475,event:sink},
+  {name:'sink-late-after-repeat',at:sink.time+sink.duration*.7625,event:sink},{name:'settled',at:end+.5,event:sink}].sort((a,b)=>a.at-b.at);
  for(const step of plan){
   const row=await capture(step.name,step.at,{event:step.event,framing:step.name==='default-fit-salvo'?'unmodified-default-fit':'native-ship-focus'});
   assert(row.requestedElapsedSeconds-step.at<=.7,'GPU capture scheduling drift exceeded the phase sampling budget');

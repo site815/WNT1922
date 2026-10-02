@@ -1,8 +1,9 @@
 import { ownFormationScene } from './fleet-formation.mjs';
-import { buildUnrealScenePacket } from './unreal-scene-packet.mjs';
+import { buildUnrealScenePacket, buildUnrealSelectionPacket } from './unreal-scene-packet.mjs';
 import { chartPosition } from './map-focus.mjs';
 import { watchFrame, battleInstances } from './battle-watch.mjs';
 import { battleVisualEvents } from './battle-events.mjs';
+import { receiveNativePerformance } from './native-performance.mjs';
 
 export const UNREAL_MODE = globalThis.location?.search != null && new URLSearchParams(globalThis.location.search).get('unreal') === '1';
 const scenes = new Map();
@@ -40,6 +41,7 @@ if (UNREAL_MODE) {
   globalThis.WNTUnreal = {
     receive(event) {
       if (event.type === 'error') { reportError(event.message); return; }
+      if (event.type === 'performance') { receiveNativePerformance(event); return; }
       const scene = scenes.get(event.instanceId);
       if (!scene || scene !== activeScene) return;
       if (event.type === 'select' && event.selection) scene.onSelect({...event.selection,zoom:!!event.zoom});
@@ -203,7 +205,7 @@ class NativeScene {
 export class UnrealWorldScene extends NativeScene {
   constructor(options) {
     super(options); Object.assign(this, {chart:options.chart, active:options.active, onCameraChange:options.onCameraChange});
-    this.mode = 'world'; this.rows = [];
+    this.mode = 'world'; this.rows = []; this.worldRevision = 0;
   }
   get ready() {return Boolean(this.canvas?.isConnected);}
   selection() {
@@ -219,6 +221,7 @@ export class UnrealWorldScene extends NativeScene {
       this.routeSelection = selection.selectedForceId; this.selectionSignature = selection.signature;
       this.packet = buildUnrealScenePacket(state, content, this.rows, {rows, selectedForceId:selection.selectedForceId, selectedForceIds:selection.selectedForceIds,
         animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
+      Object.assign(this.packet, {instanceId:this.instanceId, revision:++this.worldRevision});
       send('world', this.packet); this.rows = rows;
     }
     Object.assign(this, {state, content, political}); this.refresh();
@@ -227,9 +230,8 @@ export class UnrealWorldScene extends NativeScene {
     const selection = this.selection();
     if (this.state && selection.signature !== this.selectionSignature) {
       this.routeSelection = selection.selectedForceId; this.selectionSignature = selection.signature;
-      this.packet = buildUnrealScenePacket(this.state, this.content, this.rows, {rows:this.rows, selectedForceId:selection.selectedForceId, selectedForceIds:selection.selectedForceIds,
-        animate:!matchMedia('(prefers-reduced-motion: reduce)').matches});
-      send('world', this.packet);
+      const packet = buildUnrealSelectionPacket(this.state, this.rows, selection);
+      send('world', {...packet, instanceId:this.instanceId, revision:this.worldRevision});
     }
     const surface = this.root.querySelector('.native-world-surface');
     if (!surface || !this.active()) {this.suspend(); return;}
@@ -237,7 +239,7 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Wheel zooms. At close ship zoom, middle-button drag orbits the camera. Zooming out restores north-up and disables orbit. Home restores the overhead strategic view.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Wheel zooms. The map stays overhead until middle-button drag at close ship zoom adjusts the camera. Any zoom out immediately restores overhead north-up. Home fits the full world.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
@@ -265,7 +267,16 @@ export class UnrealWorldScene extends NativeScene {
   reloadModels() { /* Native meshes reload from external files on subsequent scene packets. */ }
 }
 
-export function unrealBattlePacket(report, campaign, frameIndex, selected, animate = true) {
+export function unrealBattlePacket(report, campaign, frameIndex, selected, animate = true, playback = null) {
+  if(playback?.plan){
+    const {plan,key,elapsedSeconds,paused}=playback;
+    return {format:1,campaign,id:plan.reportId,at:plan.recordedUntil,index:0,animate,movie:true,
+      eventKey:key,durationSeconds:plan.durationSeconds,elapsedSeconds,playbackPaused:paused,
+      events:plan.events,units:plan.units.map(unit=>({key:unit.key,id:unit.id,side:unit.side,hullIndex:unit.hullIndex,
+        classId:unit.classId,type:unit.type,label:unit.name,positionMetres:unit.positionMetres,headingDegrees:unit.headingDegrees,
+        health:unit.health,sunk:unit.sunkHull,trajectory:unit.trajectory,appearsAt:unit.appearsAt,lostAtSeconds:unit.lostAtSeconds,
+        selected:selected?.side===unit.side&&selected.id===unit.id&&(selected.hullIndex||0)===unit.hullIndex}))};
+  }
   const {frame, index} = watchFrame(report, frameIndex);
   const durationSeconds = String(report.id).startsWith('title-demo-') ? 3.6 : 15;
   const timeScale = durationSeconds / 15;
@@ -281,17 +292,18 @@ export function unrealBattlePacket(report, campaign, frameIndex, selected, anima
 
 export class UnrealBattleScene extends NativeScene {
   constructor(options) {super(options); this.mode = 'battle';}
-  refresh(report, campaign, frameIndex = null, selected = null, animationEnabled = true) {
+  refresh(report, campaign, frameIndex = null, selected = null, animationEnabled = true, playback = null) {
     const canvas = this.root.querySelector('.battle-canvas');
     if (!canvas || !report) {this.clear(); return;}
     const current = watchFrame(report, frameIndex);
     const animate = animationEnabled && !matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const changed = this.report?.id !== report.id || this.frameIndex !== current.index || this.frame?.at !== current.frame.at || this.selected !== selected || this.animate !== animate;
-    Object.assign(this, {report,campaign,frame:current.frame,frameIndex:current.index,selected,animate});
+    const changed = this.report?.id !== report.id || this.movieKey !== playback?.key || this.moviePaused !== playback?.paused ||
+      (!playback && (this.frameIndex !== current.index || this.frame?.at !== current.frame.at)) || this.selected !== selected || this.animate !== animate;
+    Object.assign(this, {report,campaign,frame:current.frame,frameIndex:current.index,selected,animate,movieKey:playback?.key,moviePaused:playback?.paused});
     this.attach(canvas); this.activate();
     if (changed) {
       this.started = performance.now();
-      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,animate));
+      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,animate,playback));
     }
     this.view = {native:true};
     // Callers that fit a newly selected model must wait for the native packet:

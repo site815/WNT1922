@@ -12,6 +12,7 @@ class UDirectionalLightComponent;
 class USkyLightComponent;
 class UProceduralMeshComponent;
 class FJsonObject;
+class UCanvas;
 struct FWNTWorldRuntime;
 struct FWNTWorldRuntimeDeleter { void operator()(FWNTWorldRuntime* Pointer) const; };
 
@@ -28,6 +29,7 @@ public:
 
     bool Initialize(const FString& DataRoot);
     void ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet);
+    void ApplyWorldSelection(const TSharedPtr<FJsonObject>& Packet);
     void SetCentralMeridian(double Degrees);
     void SetSceneMode(const FString& Mode);
     void ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet);
@@ -35,6 +37,9 @@ public:
     TSharedPtr<FJsonObject> GetSelection(const FHitResult& Hit) const;
     TOptional<FVector> GetSelectedPosition(const FString& Kind, const FString& Id, int32 HullIndex = -1, const FString& Side = TEXT("")) const;
     TSharedPtr<FJsonObject> GetChartDiagnostics() const;
+    void DrawChart(UCanvas* Canvas);
+    double GetChartPixelSize(const AActor* Actor, double ViewportHeight) const;
+    AActor* HitChart(const FVector2D& NormalizedPointer, const FVector2D& NormalizedPadding) const;
     FBox GetSceneBounds() const;
     FBox GetForceBounds(const FString& ForceId) const;
     AWNTTerrainActor* GetTerrain() const { return Terrain; }
@@ -42,6 +47,9 @@ public:
     const FString& GetLoadError() const { return LoadError; }
 
 private:
+#if WITH_DEV_AUTOMATION_TESTS
+    friend class FWNTWorldSelectionUpdateTest;
+#endif
     void UpdateWorld(double Fraction);
     void UpdateBattle(double Fraction);
     void UpdateVisibility();

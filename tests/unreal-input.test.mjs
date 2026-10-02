@@ -190,3 +190,19 @@ test('fleet selection signatures detect secondary selection changes without depe
   chart.fleetIds=['two','one'];assert.equal(scene.selection().signature,multiple.signature);
   chart.convoyId='merchant';assert.deepEqual(scene.selection().selectedForceIds,['merchant']);
 });
+
+test('a native selection change sends one revision-bound patch and preserves the full world packet',async t=>{
+  const {scene}=fixture(t);const messages=[];globalThis.ue.wnt.world=json=>messages.push(JSON.parse(json));
+  let chart={fleetId:'one',fleetIds:['one']};scene.chart=()=>chart;
+  scene.state={campaignId:'fixture',player:'USA',day:0,fraction:0};
+  scene.rows=[{fleet:{id:'one'},docked:true}];scene.worldRevision=7;
+  const full={forces:[{navigation:{fromAt:0,toAt:15}}]};scene.packet=full;
+  scene.refresh();await Promise.resolve();
+  assert.equal(messages.length,1);assert.equal(messages[0].selectionOnly,true);
+  assert.equal(messages[0].revision,7);assert.equal(messages[0].instanceId,scene.instanceId);
+  assert.equal(scene.packet,full);assert.equal('forces' in messages[0],false);
+  scene.refresh();await Promise.resolve();assert.equal(messages.length,1,'A repeated render sends no duplicate selection');
+  chart={};scene.refresh();await Promise.resolve();
+  assert.deepEqual(messages[1].selectedForceIds,[]);assert.equal(messages[1].revision,7);
+  assert.equal(scene.packet,full);
+});

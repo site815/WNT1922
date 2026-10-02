@@ -158,55 +158,107 @@ bool FWNTRepeatedCopyAnchorTest::RunTest(const FString& Parameters)
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWorldTiltGateTest,"WNT.Camera.ShipInspectionTiltGate",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTWorldTiltGateTest::RunTest(const FString& Parameters)
 {
-    for(double Zoom:{1.0,10.0,128.0,1024.0,2048.0,12000.0,16384.0})
-        TestEqual(TEXT("Strategic map rejects angle changes"),WNTCameraMath::MaxWorldTilt(Zoom),0.0);
-    double Previous=0;
-    for(int32 I=0;I<=64;++I)
-    {
-        const double Angle=WNTCameraMath::MaxWorldTilt(16384.0*FMath::Pow(2.0,I/64.0));
-        TestTrue(TEXT("Ship inspection tilt opens continuously"),Angle>=Previous&&Angle-Previous<2.0);Previous=Angle;
-    }
-    TestEqual(TEXT("Close ship view has automatic inspection pitch"),WNTCameraMath::MaxWorldTilt(32768.0),52.0);
-    TestEqual(TEXT("Maximum zoom stays at ship scale"),WNTCameraMath::MaxWorldZoom,65536.0);
-    TestEqual(TEXT("Pitch stays bounded at the zoom limit"),WNTCameraMath::MaxWorldTilt(WNTCameraMath::MaxWorldZoom),52.0);
-    TestTrue(TEXT("Small pans continuously recenter the Equal Earth meridian"),WNTCameraMath::NeedsOriginRebase(.01,0));
-    TestFalse(TEXT("Equivalent wrapped meridians do not redo geography"),WNTCameraMath::NeedsOriginRebase(181,-179));
-    TestTrue(TEXT("Date-line crossing updates the geographic centre"),WNTCameraMath::NeedsOriginRebase(-179,179));
-    TestEqual(TEXT("Returning to strategic scale restores overhead lock"),WNTCameraMath::MaxWorldTilt(1.0),0.0);
     WNTCameraMath::FWorldOrbit Orientation;
+    for(double Zoom:{1.0,12000.0,16384.0,24000.0,32768.0,65536.0})
+        TestTrue(TEXT("Every zoom starts overhead north-up without automatic tilt"),Orientation.Angles(Zoom).IsNearlyZero());
     for(double Zoom:{1.0,16384.0,24000.0,32767.0})
     {
-        TestFalse(TEXT("Middle orbit is unavailable before close ship inspection"),Orientation.Drag(Zoom,100,-100));
-        TestEqual(TEXT("Rejected orbit leaves heading unchanged"),Orientation.Yaw,0.0);
-        TestEqual(TEXT("Rejected orbit leaves automatic pitch unchanged"),Orientation.Tilt,52.0);
+        TestFalse(TEXT("Middle orbit is unavailable before close ship inspection"),Orientation.Drag(Zoom,100,100));
+        TestTrue(TEXT("Rejected orbit leaves both axes overhead"),Orientation.Angles(Zoom).IsNearlyZero());
     }
-    TestTrue(TEXT("Middle drag orbits at the ship threshold"),Orientation.Drag(WNTCameraMath::WorldOrbitZoom,100,-40));
-    TestTrue(TEXT("Close ship yaw and tilt both follow the drag"),Orientation.Angles(32768).Equals(FVector2D(42,-30),1e-8));
+    TestEqual(TEXT("Maximum zoom stays at ship scale"),WNTCameraMath::MaxWorldZoom,65536.0);
+    TestTrue(TEXT("Middle drag orbits at the ship threshold"),Orientation.Drag(WNTCameraMath::WorldOrbitZoom,100,80));
+    TestTrue(TEXT("Close ship yaw and tilt follow only the drag"),Orientation.Angles(32768).Equals(FVector2D(20,-30),1e-8));
     FMinimalViewInfo OrbitView;const FVector Pivot(12000,24000,0);
     WNTCameraMath::ConfigureProjection(OrbitView,FIntPoint(3440,1440),FVector4(.1,.12,.8,.82));
     const FVector2D Angles=Orientation.Angles(32768);
     WNTCameraMath::Orbit(OrbitView,Pivot,90000,Angles.X,Angles.Y);
     const auto PivotScreen=WNTCameraMath::Project(OrbitView,Pivot);
     TestTrue(TEXT("World orbit keeps the inspected focus in the viewport centre"),PivotScreen.IsSet()&&PivotScreen->Equals(FVector2D(.5,.53),1e-8));
-    FVector2D PreviousAngles=Angles;
-    for(int32 I=1;I<=64;++I)
-    {
-        const double Zoom=32768.0/FMath::Pow(2.0,I/64.0);
-        const FVector2D Current=Orientation.Angles(Zoom);
-        TestTrue(TEXT("Zoom out returns both axes continuously toward overhead north-up"),Current.X<=PreviousAngles.X+1e-8&&FMath::Abs(Current.Y)<=FMath::Abs(PreviousAngles.Y)+1e-8);
-        TestTrue(TEXT("Zoom-out orientation has no threshold snap"),FVector2D::Distance(Current,PreviousAngles)<2.0);
-        TestFalse(TEXT("Orbit remains disabled throughout the zoom-out transition"),Orientation.Drag(Zoom,100,-100));
-        PreviousAngles=Current;
-    }
-    TestTrue(TEXT("Strategic view is exactly north-up and overhead"),Orientation.Angles(16384).IsNearlyZero());
-    TestTrue(TEXT("Re-entering ship zoom does not revive the old manual orbit"),Orientation.Angles(32768).Equals(FVector2D(52,0),1e-8));
+    Orientation.ZoomInput(-1);
+    TestTrue(TEXT("Zooming in retains the user's orbit"),Orientation.Angles(65536).Equals(Angles,1e-8));
+    Orientation.ZoomInput(.001);
+    TestTrue(TEXT("Even the smallest outward input immediately resets orbit while still at close zoom"),Orientation.Angles(65536).IsNearlyZero());
+    TestTrue(TEXT("Zooming back in cannot revive the previous orbit"),Orientation.Angles(65536).IsNearlyZero());
     Orientation.Drag(65536,20000,-20000);
     TestEqual(TEXT("World tilt cannot fall below overhead"),Orientation.Tilt,0.0);
     TestTrue(TEXT("Arbitrary orbit headings stay bounded"),FMath::Abs(Orientation.Yaw)<=180);
     Orientation.Drag(65536,0,20000);
-    TestEqual(TEXT("World tilt remains inside its terrain-safe inspection limit"),Orientation.Tilt,52.0);
-    Orientation.Reset();
-    TestTrue(TEXT("Home resets both orientation axes"),Orientation.Angles(32768).Equals(FVector2D(52,0),1e-8));
+    TestEqual(TEXT("Manual world tilt stays inside its terrain-safe limit"),Orientation.Tilt,52.0);
+    TestTrue(TEXT("Directly leaving inspection range also clears orbit"),Orientation.Angles(32767).IsNearlyZero());
+    Orientation.Drag(65536,100,100);Orientation.Reset();
+    TestTrue(TEXT("Home resets both orientation axes"),Orientation.Angles(65536).IsNearlyZero());
+    TestTrue(TEXT("Small pans continuously recenter the Equal Earth meridian"),WNTCameraMath::NeedsOriginRebase(.01,0));
+    TestFalse(TEXT("Equivalent wrapped meridians do not redo geography"),WNTCameraMath::NeedsOriginRebase(181,-179));
+    TestTrue(TEXT("Date-line crossing updates the geographic centre"),WNTCameraMath::NeedsOriginRebase(-179,179));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTWorldExtentFitTest,"WNT.Camera.WorldExtentFit",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTWorldExtentFitTest::RunTest(const FString& Parameters)
+{
+    for(const FIntPoint Pixels:{FIntPoint(1800,1000),FIntPoint(1920,1080),FIntPoint(3840,2160),FIntPoint(3440,1440),FIntPoint(5120,2160)})
+    for(const FVector4 Rect:{FVector4(.114,.12,.771,.832),FVector4(.2,.3,.55,.65),FVector4(0,0,1,1)})
+    {
+        FMinimalViewInfo View;WNTCameraMath::ConfigureProjection(View,Pixels,Rect);
+        const double Pole=WNTProjection::PoleNorthing();
+        WNTCameraMath::Orbit(View,FVector::ZeroVector,WNTCameraMath::WorldViewDistance(),0,0);
+        const auto North=WNTCameraMath::Project(View,FVector(Pole,0,0)),South=WNTCameraMath::Project(View,FVector(-Pole,0,0));
+        const double Margin=Rect.W*WNTCameraMath::WorldEdgeMargin;
+        TestTrue(TEXT("Maximum zoom-out places the north end below the unobscured top with a margin"),North.IsSet()&&FMath::Abs(North->Y-(Rect.Y+Margin))*Pixels.Y<.02);
+        TestTrue(TEXT("Maximum zoom-out places the south end above the unobscured bottom with a margin"),South.IsSet()&&FMath::Abs(South->Y-(Rect.Y+Rect.W-Margin))*Pixels.Y<.02);
+        for(double Target:{-Pole*.8,0.0,Pole*.8})
+        {
+            WNTCameraMath::Orbit(View,FVector(Target,0,0),WNTCameraMath::WorldViewDistance(),0,0);
+            TestTrue(TEXT("Full-world framing recentres latitude without clipping a pole"),FMath::Abs(WNTCameraMath::ConstrainWorldNorthing(View,Rect,Target))<Pole*1e-6);
+        }
+        WNTCameraMath::Orbit(View,FVector(Pole*.3,0,0),WNTCameraMath::WorldViewDistance()/4,0,0);
+        TestTrue(TEXT("Zoomed chart still permits smooth north-south panning"),FMath::Abs(WNTCameraMath::ConstrainWorldNorthing(View,Rect,Pole*.3)-Pole*.3)<.001);
+    }
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTFrameRateSamplingTest,"WNT.Camera.FrameRateSampling",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTFrameRateSamplingTest::RunTest(const FString& Parameters)
+{
+    WNTCameraMath::FFrameRateSampler Sample;TestFalse(TEXT("The first frame establishes the real-time interval"),Sample.Observe(100).IsSet());
+    int32 Updates=0;double Previous=100;
+    for(int32 I=1;I<=120;++I)
+    {
+        const double Now=100+I/60.0;const auto FPS=Sample.Observe(Now);
+        if(FPS.IsSet())
+        {
+            ++Updates;TestTrue(TEXT("Native FPS pushes never exceed two updates per second"),Now-Previous>=.5);
+            TestTrue(TEXT("Frame rate measures elapsed wall time rather than simulation speed"),FMath::Abs(FPS.GetValue()-60)<1e-8);Previous=Now;
+        }
+    }
+    TestEqual(TEXT("Two seconds at 60 FPS produces four telemetry packets"),Updates,4);
+    TestFalse(TEXT("A backwards clock starts a fresh sample"),Sample.Observe(50).IsSet());
+    const auto Slow=Sample.Observe(52);TestTrue(TEXT("A long frame is included honestly without catch-up traffic"),Slow.IsSet()&&FMath::Abs(Slow.GetValue()-.5)<1e-8);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTAnchorConstraintTest,"WNT.Camera.ConstrainedAnchorProgress",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTAnchorConstraintTest::RunTest(const FString& Parameters)
+{
+    FMinimalViewInfo View;const FVector4 Rect(.114,.12,.771,.832);
+    WNTCameraMath::ConfigureProjection(View,FIntPoint(1800,1000),Rect);
+    for(double Zoom:{1.0,4.0})
+    {
+        const double Pole=WNTProjection::PoleNorthing();
+        const double Requested=Zoom==1?Pole*.3:Pole;
+        WNTCameraMath::Orbit(View,FVector(Requested,0,0),WNTCameraMath::WorldViewDistance()/Zoom,0,0);
+        const double Clamped=WNTCameraMath::ConstrainWorldNorthing(View,Rect,Requested);
+        TestTrue(TEXT("A drag beyond the available north-south extent is constrained"),Clamped<Requested);
+        const auto Geo=WNTProjection::Inverse(FVector(Clamped,0,0));
+        TestTrue(TEXT("The constrained focus can be represented geographically"),Geo.IsSet());if(!Geo.IsSet())continue;
+        const FVector Focus(0,Geo->Y,0);
+        WNTCameraMath::FAnchorProgress Progress;
+        TestFalse(TEXT("The first anchor correction is always allowed"),Progress.Stalled(85,Focus));
+        TestTrue(TEXT("A second unchanged constrained focus stops the futile vertical iterations"),Progress.Stalled(85,Focus));
+        TestFalse(TEXT("Horizontal longitude/meridian movement remains valid even with unresolved vertical error"),Progress.Stalled(85,FVector(1,Geo->Y,1)));
+        TestFalse(TEXT("A decreasing screen error is allowed to converge"),Progress.Stalled(84,FVector(1,Geo->Y,1)));
+        TestTrue(TEXT("The converged horizontal movement stops if only the constrained error remains"),Progress.Stalled(84,FVector(1,Geo->Y,1)));
+    }
+    return true;
+}
+
 #endif

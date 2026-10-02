@@ -9,6 +9,23 @@ import { MAP_SYMBOLS } from './map-symbols.mjs';
 const finitePoint = point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite);
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
 
+// The simulation records strategic campaign corridors and progress, not troop
+// positions. Native terrain clips this progress cross-section to the listed
+// territories; island assaults outline only their actual campaign territory.
+export function campaignMapFronts(state) {
+  return (state.world?.fronts || []).filter(front => Number.isFinite(front.progress)
+    && front.progress > 0 && front.progress < 1 && front.status !== 'Ceasefire'
+    && finitePoint(front.from) && finitePoint(front.to)).map(front => ({
+      id: front.id, name: front.name, position: frontPosition(front),
+      from: [...front.from], to: [...front.to], progress: front.progress,
+      territories: [...new Set((front.territories || []).filter(id => typeof id === 'string'))],
+      attacker: front.attacker, defender: front.defender, island: !!front.island,
+      status: front.status || 'Contested',
+      representation: front.island ? 'campaign-assault-outline' : 'campaign-progress-line',
+      accuracy: 'Strategic campaign progress within the recorded territories; not individual troop positions.',
+  }));
+}
+
 function remainingOwnRoute(state, fleet) {
   const now = campaignMinutes(state);
   if (!fleet?.route?.length || now >= fleet.arriveAt) return [];
@@ -87,6 +104,22 @@ export function sampleObservedNavigation(force, minute) {
 // no camera settings and never examines another nation's ships or convoy truth.
 // Keep ownFormationScene() rows between calls (options.rows avoids duplicate
 // assembly when the caller also needs those rows for the next received state).
+function sceneSelection(state, rows, options) {
+  const selected = rows.find(row => row.fleet.id === options.selectedForceId && !row.docked && !row.unlocated);
+  const ownLocated = new Set(rows.filter(row => !row.unlocated).map(row => row.fleet.id));
+  const selectedForceIds = [...new Set(options.selectedForceIds || (options.selectedForceId ? [options.selectedForceId] : []))]
+    .filter(id => ownLocated.has(id));
+  const points = selected ? remainingOwnRoute(state, selected.fleet) : [];
+  return {selectedForceIds, route:points.length > 1 ? {forceId:selected.fleet.id, points} : null};
+}
+
+// Selection changes contain no fleet snapshots or animation timestamps. The
+// native renderer applies them only to the exact world revision that owns them.
+export function buildUnrealSelectionPacket(state, rows, options = {}) {
+  return {format:1, selectionOnly:true, campaign:state.campaignId, player:state.player,
+    at:campaignMinutes(state), ...sceneSelection(state, rows, options)};
+}
+
 export function buildUnrealScenePacket(state, content, previousRows = [], options = {}) {
   const rows = options.rows || ownFormationScene(state, content, previousRows, options);
   const previous = new Map(previousRows.map(row => [row.fleet.id, row]));
@@ -114,15 +147,9 @@ export function buildUnrealScenePacket(state, content, previousRows = [], option
   });
   const countries = Object.entries(MAP_CAPITALS).map(([id, capital]) => ({ id, name: capital.name,
     position: [...capital.point], color: POWERS[id]?.color || '#e5cf9d' }));
-  const fronts = (state.world?.fronts || []).filter(front => front.progress > 0 && front.progress < 1)
-    .map(front => ({ id: front.id, name: front.name, position: frontPosition(front) }));
-  const selected = rows.find(row => row.fleet.id === options.selectedForceId && !row.docked && !row.unlocated);
-  const ownLocated = new Set(rows.filter(row => !row.unlocated).map(row => row.fleet.id));
-  const selectedForceIds = [...new Set(options.selectedForceIds || (options.selectedForceId ? [options.selectedForceId] : []))]
-    .filter(id => ownLocated.has(id));
-  const points = selected ? remainingOwnRoute(state, selected.fleet) : [];
+  const fronts = campaignMapFronts(state);
   return { format: 1, campaign: state.campaignId, player: state.player, at: campaignMinutes(state), paused: !!state.paused, animate:options.animate !== false,
-    forces, contacts, ports, countries, fronts, selectedForceIds, chartSymbols: MAP_SYMBOLS,
-    battles:ongoingMapBattles(state), route: points.length > 1 ? { forceId: selected.fleet.id, points } : null,
+    forces, contacts, ports, countries, fronts, ...sceneSelection(state, rows, options), chartSymbols: MAP_SYMBOLS,
+    battles:ongoingMapBattles(state),
     control: { ...(state.world?.control || {}) } };
 }

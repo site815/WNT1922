@@ -11,6 +11,8 @@
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
 #include "Math/Float16.h"
+#include "Engine/World.h"
+#include "ProceduralMeshComponent.h"
 #if WITH_EDITOR
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionTextureBase.h"
@@ -281,8 +283,86 @@ bool FWNTTerrainPaletteTest::RunTest(const FString& Parameters)
     const FLinearColor Forest=WNTTerrainGeometry::TerrainColour(FVector2D(-65,-5),100,Neutral);
     TestTrue(TEXT("Illustrative dry and forest regions have visibly different colors"),Desert.R>Forest.R+.10&&Forest.G>Forest.R);
     const FLinearColor Dark=WNTTerrainGeometry::TerrainColour(Alps,1500,FLinearColor::Black),Bright=WNTTerrainGeometry::TerrainColour(Alps,1500,FLinearColor::White);
-    TestTrue(TEXT("Political ownership contributes only a restrained ten percent tint"),FMath::Abs(Bright.R-Dark.R-.10f)<1e-6f&&FMath::Abs(Bright.G-Dark.G-.10f)<1e-6f&&FMath::Abs(Bright.B-Dark.B-.10f)<1e-6f);
+    TestTrue(TEXT("Temperate political ownership is readable while retaining most physical terrain color"),FMath::Abs(Bright.R-Dark.R-.42f)<1e-6f&&FMath::Abs(Bright.G-Dark.G-.42f)<1e-6f&&FMath::Abs(Bright.B-Dark.B-.42f)<1e-6f);
     return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTCampaignLineTest,"WNT.Geography.StrategicCampaignFrontClipping",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTCampaignLineTest::RunTest(const FString& Parameters)
+{
+    const TArray<TArray<FVector2D>> Rings{{FVector2D(-5,-5),FVector2D(5,-5),FVector2D(5,5),FVector2D(-5,5)},
+        {FVector2D(-1,-1),FVector2D(-1,1),FVector2D(1,1),FVector2D(1,-1)}};
+    const auto Segments=WNTTerrainGeometry::CampaignFrontSegments(Rings,FVector2D(-10,0),FVector2D(10,0),.5);
+    TestEqual(TEXT("Campaign line respects the territory's inland-water hole"),Segments.Num(),2);
+    double Length=0;for(const auto& Segment:Segments)
+    {
+        TestTrue(TEXT("Front is at exactly the recorded progress cross-section"),FMath::Abs(Segment.Key.X)<1e-8&&FMath::Abs(Segment.Value.X)<1e-8);
+        TestTrue(TEXT("Both line pieces stop at geography boundaries"),FMath::Abs(Segment.Key.Y)>=1&&FMath::Abs(Segment.Value.Y)>=1);
+        Length+=FVector2D::Distance(Segment.Key,Segment.Value);
+    }
+    TestTrue(TEXT("No invented line crosses the excluded central lake"),FMath::IsNearlyEqual(Length,8.,1e-8));
+    const auto Advanced=WNTTerrainGeometry::CampaignFrontSegments(Rings,FVector2D(-10,0),FVector2D(10,0),.65);
+    TestEqual(TEXT("Progress moves to the next continuous land cross-section"),Advanced.Num(),1);
+    if(!Advanced.IsEmpty())TestTrue(TEXT("Advancing front follows progress rather than a fixed country border"),FMath::IsNearlyEqual(Advanced[0].Key.X,3.,1e-8));
+    const TArray<TArray<FVector2D>> Dateline{{FVector2D(179,-2),FVector2D(-179,-2),FVector2D(-179,2),FVector2D(179,2)}};
+    const auto Wrapped=WNTTerrainGeometry::CampaignFrontSegments(Dateline,FVector2D(178,0),FVector2D(-178,0),.5);
+    TestEqual(TEXT("Dateline front clips through one contiguous repeated territory"),Wrapped.Num(),1);
+    if(!Wrapped.IsEmpty())TestTrue(TEXT("Date line is not an artificial front endpoint"),FMath::IsNearlyEqual(FMath::Abs(Wrapped[0].Key.X),180.,1e-8)&&FMath::IsNearlyEqual(FVector2D::Distance(Wrapped[0].Key,Wrapped[0].Value),4.,1e-8));
+    for(double Progress:{0.,1.,-1.,2.})TestEqual(TEXT("Resolved/invalid progress cannot draw ongoing battle lines"),WNTTerrainGeometry::CampaignFrontSegments(Rings,FVector2D(-10,0),FVector2D(10,0),Progress).Num(),0);
+    TestEqual(TEXT("Missing direction cannot invent a troop boundary"),WNTTerrainGeometry::CampaignFrontSegments(Rings,FVector2D::ZeroVector,FVector2D::ZeroVector,.5).Num(),0);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTPoliticalLineIntegrationTest,"WNT.Geography.ActualPoliticalBordersAndCampaignFronts",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTPoliticalLineIntegrationTest::RunTest(const FString& Parameters)
+{
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("Political geography test world"),World))return false;
+    auto* Terrain=World->SpawnActor<AWNTTerrainActor>();
+    if(!TestNotNull(TEXT("Political geography actor"),Terrain)||!TestTrue(TEXT("Actual campaign terrain and prepared line materials load"),Terrain->Initialize(DataRoot())))
+    {World->DestroyWorld(false);return false;}
+    const auto Before=Terrain->GetMapStyleDiagnostics();
+    TestTrue(TEXT("Actual shared country boundaries are drawn"),Before->GetNumberField(TEXT("countryBorderSegments"))>500);
+    TestTrue(TEXT("Actual coastline has separate readable linework"),Before->GetNumberField(TEXT("coastlineSegments"))>1000);
+    TestTrue(TEXT("Thirty-degree batching stays within216 terrain components"),Before->GetNumberField(TEXT("terrainComponents"))>0&&Before->GetNumberField(TEXT("terrainComponents"))<=216);
+    TArray<UProceduralMeshComponent*> Tiles;Terrain->GetComponents(Tiles);
+    TMap<UProceduralMeshComponent*,const FProcMeshVertex*> LandBuffers;
+    for(auto* Tile:Tiles)if(const auto* Land=Tile->GetProcMeshSection(0))LandBuffers.Add(Tile,Land->ProcVertexBuffer.GetData());
+    auto CheckLand=[&]()
+    {
+        TArray<UProceduralMeshComponent*> Current;Terrain->GetComponents(Current);
+        TestEqual(TEXT("Front/control updates create no extra terrain components"),Current.Num(),Tiles.Num());
+        for(const auto& Pair:LandBuffers)
+        {
+            const auto* Land=Pair.Key->GetProcMeshSection(0);
+            TestTrue(TEXT("Front/control changes keep exact land vertex allocations"),Land&&Pair.Value==Land->ProcVertexBuffer.GetData());
+        }
+    };
+    TSharedPtr<FJsonObject> Front;
+    const FString Json=TEXT(R"({"id":"france","from":[8,50],"to":[-4,47],"progress":0.5,"territories":["c220","c210","c211","c212"],"island":false,"status":"Contested"})");
+    TestTrue(TEXT("Recorded campaign corridor fixture parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Front));
+    if(!Front){World->DestroyWorld(false);return false;}
+    const TArray<TSharedPtr<FJsonValue>> Fronts{MakeShared<FJsonValueObject>(Front)};
+    Terrain->ApplyCampaignFronts(Fronts);CheckLand();
+    TestTrue(TEXT("Real France geometry clips an active progress line"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("campaignFrontSegments"))>0);
+    TMap<UProceduralMeshComponent*,const FProcMeshVertex*> FrontBuffers;
+    for(auto* Tile:Tiles)if(const auto* Line=Tile->GetProcMeshSection(4))if(!Line->ProcVertexBuffer.IsEmpty())FrontBuffers.Add(Tile,Line->ProcVertexBuffer.GetData());
+    TestTrue(TEXT("Campaign lines have actual mesh sections"),!FrontBuffers.IsEmpty());
+    Terrain->ApplyCampaignFronts(Fronts);
+    for(double Meridian:{-179.9,35.,179.9})
+    {
+        Terrain->SetCentralMeridian(Meridian);
+        for(const auto& Pair:FrontBuffers)TestTrue(TEXT("Unchanged packets and longitude panning never rebuild front buffers"),Pair.Key->GetProcMeshSection(4)->ProcVertexBuffer.GetData()==Pair.Value);
+    }
+    Front->SetNumberField(TEXT("progress"),.65);Terrain->ApplyCampaignFronts(Fronts);CheckLand();
+    TMap<FString,FLinearColor> Control;Control.Add(TEXT("c220"),FLinearColor(FColor::FromHex(TEXT("#70b9ee"))));
+    Terrain->SetControl(Control);CheckLand();
+    Front->SetStringField(TEXT("status"),TEXT("Ceasefire"));Terrain->ApplyCampaignFronts(Fronts);CheckLand();
+    TestEqual(TEXT("A ceasefire clears its battle line immediately"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("campaignFrontSegments")),0.);
+    for(auto* Tile:Tiles)if(const auto* Line=Tile->GetProcMeshSection(4))TestTrue(TEXT("No stale campaign geometry remains after ceasefire"),Line->ProcVertexBuffer.IsEmpty());
+    World->DestroyWorld(false);return true;
 }
 
 #if WITH_EDITOR
@@ -308,6 +388,13 @@ bool FWNTGeometricMaterialTest::RunTest(const FString& Parameters)
         TestFalse(TEXT("Grid filtering does not load an image"),Expression->IsA<UMaterialExpressionTextureBase>());
     }
     TestTrue(TEXT("Both screen derivatives support constant-pixel line coverage"),HasDX&&HasDY);
+    for(const TCHAR* Path:{TEXT("/Game/Materials/M_MapBorder.M_MapBorder"),TEXT("/Game/Materials/M_CampaignFront.M_CampaignFront")})
+    {
+        auto* Line=LoadObject<UMaterial>(nullptr,Path);if(!TestNotNull(TEXT("Prepared political/front line material"),Line))continue;
+        TestTrue(TEXT("Political/front overlays remain depth-safe unlit filtered lines"),Line->BlendMode==BLEND_Translucent&&Line->bDisableDepthTest&&Line->GetShadingModels().HasShadingModel(MSM_Unlit)&&Line->TranslucencyPass==MTP_AfterMotionBlur);
+        TestTrue(TEXT("Political/front overlays retain packed Equal Earth displacement"),Line->HasVertexPositionOffsetConnected());
+        for(UMaterialExpression* Expression:Line->GetExpressions())TestFalse(TEXT("Political/front linework has no raster dependency"),Expression->IsA<UMaterialExpressionTextureBase>());
+    }
     FMaterialResource Resource;Resource.SetMaterial(Grid,nullptr,SP_PCD3D_SM6,EMaterialQualityLevel::High);
     FString HLSL;
     if(!TestTrue(TEXT("Translate the actual filtered overlay graph"),Resource.GetMaterialExpressionSource(HLSL)))return false;

@@ -6,7 +6,7 @@ import { fleetPosition, visibleContacts } from '../mechanics/task-forces.mjs';
 import { campaignMinutes, setCampaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { routeLength, distanceNm, interpolate, PORTS, NODES, PORT_LOCATIONS, MAP_CAPITALS } from '../mechanics/world.mjs';
 import { fleetCourse, ownFormationScene, geographicOffset, formationAt } from '../ui/fleet-formation.mjs';
-import { buildUnrealScenePacket, sampleObservedNavigation } from '../ui/unreal-scene-packet.mjs';
+import { buildUnrealScenePacket, buildUnrealSelectionPacket, sampleObservedNavigation, campaignMapFronts } from '../ui/unreal-scene-packet.mjs';
 import { battleMapHover } from '../ui/battle-map.mjs';
 
 const classes = { bb: { type: 'BB', dimensions: { length_m: 200, beam_m: 30 } },
@@ -40,6 +40,22 @@ test('native selection includes single and docked own forces, filters unknown ID
   rows[0].unlocated = true;
   assert.deepEqual(buildUnrealScenePacket(s,{classes},[],{rows,selectedForceIds:['fleet']}).selectedForceIds,[]);
   assert.equal(JSON.stringify(s),before);
+});
+
+test('selection-only packets retain full navigation and contain no replacement simulation snapshot', () => {
+  const state=fixture(force([[0,0],[4,0]]),85), previous=ownFormationScene(state,{classes});
+  setCampaignMinutes(state,100);const rows=ownFormationScene(state,{classes},previous);
+  const full=buildUnrealScenePacket(state,{classes},previous,{rows});
+  assert(full.forces[0].navigation?.segments.length);
+  const before=JSON.stringify(full), saved=JSON.stringify(state);
+  const selection=buildUnrealSelectionPacket(state,rows,{selectedForceId:'fleet',selectedForceIds:['fleet','unknown','fleet']});
+  assert.deepEqual(selection.selectedForceIds,['fleet']);assert.equal(selection.route.forceId,'fleet');
+  assert.equal(selection.selectionOnly,true);assert.equal(selection.at,100);
+  assert.equal(selection.campaign,full.campaign);assert.equal(selection.player,full.player);
+  for(const field of ['forces','contacts','ports','countries','control','fronts','paused','animate','chartSymbols'])assert.equal(field in selection,false);
+  assert.equal(JSON.stringify(full),before,'Selection never resets the retained observed-navigation frame');
+  assert.equal(JSON.stringify(state),saved,'Selection changes no game state or order');
+  assert(JSON.stringify(selection).length<JSON.stringify(full).length/10,'A click forwards only selection and route, not the complete catalog/chart packet');
 });
 
 test('ongoing battle markers expose only player reports and disappear on completion without changing combat state', () => {
@@ -167,13 +183,28 @@ test('public country/front picks and the selected own remaining route retain cur
     { id: 'finished', from: [0, 0], to: [2, 2], progress: 1 }];
   const packet = buildUnrealScenePacket(s, { classes }, [], { selectedForceId: 'fleet' });
   assert.equal(packet.countries.length, Object.keys(MAP_CAPITALS).length);
-  assert.deepEqual(packet.fronts, [{ id: 'active', name: 'Known front', position: [.5, .5] }]);
+  assert.deepEqual(packet.fronts.map(({id,name,position}) => ({id,name,position})), [{ id: 'active', name: 'Known front', position: [.5, .5] }]);
+  assert.equal(packet.fronts[0].representation,'campaign-progress-line');
   assert.equal(packet.route.forceId, 'fleet');
   assert.deepEqual(packet.route.points[0], fleetPosition(s, s.nations.USA.fleets[0]));
   assert.deepEqual(packet.route.points.at(-1), [-175, 25]);
   assert.equal(buildUnrealScenePacket(s, { classes }, [], { selectedForceId: 'hidden-enemy' }).route, null);
   setCampaignMinutes(s, s.nations.USA.fleets[0].arriveAt + 1);
   assert.equal(buildUnrealScenePacket(s, { classes }, [], { selectedForceId: 'fleet' }).route, null);
+});
+
+test('land front packets retain actual corridor, territory and progress while omitting ceased or completed fighting', () => {
+  const front={id:'france',name:'French campaign',from:[8,50],to:[-4,47],progress:.4,territories:['c220','c210','c220'],attacker:'DEU',defender:'GBR',status:'Contested'};
+  const state={world:{fronts:[front,{...front,id:'peace',status:'Ceasefire'},{...front,id:'won',progress:1},
+    {...front,id:'repulsed',progress:0},{...front,id:'bad',from:[NaN,0]},
+    {...front,id:'island',island:true,territories:['island-guam']}]}};
+  const before=JSON.stringify(state),rows=campaignMapFronts(state);
+  assert.deepEqual(rows.map(row=>row.id),['france','island']);
+  assert.deepEqual(rows[0].territories,['c220','c210']);
+  assert.deepEqual(rows[0].from,front.from);assert.deepEqual(rows[0].to,front.to);assert.equal(rows[0].progress,.4);
+  assert.equal(rows[0].representation,'campaign-progress-line');assert.match(rows[0].accuracy,/not individual troop positions/);
+  assert.equal(rows[1].representation,'campaign-assault-outline');
+  rows[0].from[0]=0;rows[0].territories.push('invented');assert.equal(JSON.stringify(state),before);
 });
 
 test('both campaigns produce finite, bounded, JSON-only native packets for every own navy', () => {

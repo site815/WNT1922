@@ -13,7 +13,7 @@ import {CATALOG} from '../worker/catalog-loader.mjs';
 import {contentFor} from '../mechanics/campaign-content.mjs';
 import {validateSave} from '../mechanics/state-io.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
-import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit} from './native-camera-gesture-checks.mjs';
+import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldExtentFit} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2),option=name=>args.find(a=>a.startsWith(name+'='))?.slice(name.length+1);
@@ -112,7 +112,14 @@ async function ministryMenus(size){
  await page.keyboard.press('Escape');assert.equal(await page.locator('.menu-popup').count(),0);
 }
 async function gestureCycle(){
- const surface=page.locator('.native-world-input');await surface.focus();await page.keyboard.press('Home');await until(()=>diagnostics(),d=>d.zoom===1,'Home');
+ const surface=page.locator('.native-world-input');await surface.focus();await page.keyboard.press('Home');verifyWorldExtentFit(await until(()=>diagnostics(),d=>d.zoom===1,'Home'));
+ const limitPoint=await clearPoint();
+ await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'right'});await page.mouse.move(limitPoint.x,limitPoint.y+60);await page.mouse.up({button:'right'});
+ const constrained=await diagnostics();verifyWorldExtentFit(constrained);
+ assert(constrained.lastAnchorConstrained&&constrained.lastAnchorIterations<=3,'A vertical drag at full-world fit stops when the latitude clamp prevents further progress');
+ await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'right'});await page.mouse.move(limitPoint.x+100,limitPoint.y);await page.mouse.up({button:'right'});
+ const horizontal=await diagnostics();assert(Math.abs(horizontal.longitude-constrained.longitude)>.01,'Horizontal right-drag still moves the map at full-world fit');
+ result.metrics.push({kind:'constrained-pan',verticalIterations:constrained.lastAnchorIterations,longitudeBefore:constrained.longitude,longitudeAfter:horizontal.longitude});
  const p=await clearPoint(),before=await cursor();await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-450);await until(()=>diagnostics(),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.00001,'smooth wheel zoom reaches its target');
  const zoomFrames=(await events(before)).filter(e=>e.event.type==='camera').map(e=>e.event.zoom);
  assert(zoomFrames.some(z=>z>1&&z<Math.exp(.675)-.001),'Wheel zoom renders intermediate camera positions');
@@ -150,7 +157,7 @@ try{
  const initial=await save(),packet=buildUnrealScenePacket(initial,contentFor(CATALOG,initial));
  const force=packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.length);assert(force,'An own fleet is needed for pointer alignment checks');
  for(const size of resolutions){
-  await resize(size,'world');await ministryMenus(size);const samples=[];for(let cycle=0;cycle<3;cycle++)samples.push(counts(await gestureCycle()));
+  await resize(size,'world');await verifyNativeFPS({page,metrics:result.metrics});await ministryMenus(size);const samples=[];for(let cycle=0;cycle<3;cycle++)samples.push(counts(await gestureCycle()));
   for(const key of ['primitiveComponentCount','terrainTileCount','shipActorCount']){assert(Number.isFinite(samples[2][key]),'Native diagnostics must expose '+key);assert.equal(samples[2][key],samples[1][key],key+' remains stable after repeated pan/zoom/return');}
   result.metrics.push({kind:'component-count-stability',...size,samples});
   await temporalSample('world-'+size.width+'x'+size.height,size);
@@ -159,7 +166,8 @@ try{
   await page.locator('.modal [data-action="close"]').first().click();await worldReady();await capture('fleet-'+size.width+'x'+size.height,size,true);
   assert.equal((await diagnostics()).tilt,0,'Fleet-scale view remains overhead');
   await input('focus',{kind:'fleet',id:force.id,longitude:force.position[0],latitude:force.position[1],zoom:40000});
-  const inspection=await until(()=>diagnostics(),d=>d.tilt>5&&d.tilt<=d.maxWorldTilt+.001,'automatic close ship inspection tilt');
+  const inspection=await until(()=>diagnostics(),d=>Math.abs(d.zoom-40000)<.01,'close ship zoom');
+  assert.equal(inspection.tilt,0,'Close ship zoom does not tilt automatically');
   await verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,label),metrics:result.metrics});
   await input('zoom',{delta:-100000});await until(()=>diagnostics(),d=>d.zoom===d.maxWorldZoom,'zoom clamps at useful ship scale');
   assert.equal((await diagnostics()).zoom,65536);
@@ -168,7 +176,7 @@ try{
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');
  for(const a of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'))for(const b of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'&&row.width>a.width&&row.height===a.height))assert(Math.abs(a.layout.popup.width-b.layout.popup.width)<2,'At the same height, ultrawide retains the 16:9 menu width');
  result.checks.push('All ten ministry menus stay left-aligned beside the sidebar and retain the native map and naval outliner at every size; wider screens preserve their 16:9-derived popup width and expose the world beside it.');
- result.checks.push('Every tested size rejects strategic middle dragging, permits close middle orbit without moving geographic focus, preserves requested orientation during right pan, and resets yaw/tilt after wheel zooming out and back.');
+ result.checks.push('Every tested size rejects strategic middle dragging, permits close middle orbit without moving geographic focus, preserves requested orientation during right pan, and resets yaw/tilt on even a small outward wheel step while still close, and stays overhead when zooming back in.');
  phase='continuous map wrapping';
  const widest=resolutions.reduce((a,b)=>b.width/b.height>a.width/a.height?b:a);await resize(widest,'world');
  for(const direction of [-1,1]){

@@ -22,7 +22,7 @@ export function battleVisualEvents(report, frame, index) {
   const append = (type, targetKey, sourceKey = '', weapon = 'surface') => {
     const identity = `${prefix}:${type}:${sourceKey}:${targetKey}`;
     events.push({key:identity,type,sourceKey,targetKey,weapon,
-      time:(type === 'salvo' ? 0 : type === 'hit' ? 2 : 4) + jitter(identity) * 3,
+      time:(type === 'salvo' ? .2 : type === 'hit' ? 2.2 : 4.4) + jitter(identity) * .6,
       duration:type === 'salvo' ? 1.5 : type === 'hit' ? 4 : 8});
   };
   const changed = side => rows(frame,side).filter(row => {

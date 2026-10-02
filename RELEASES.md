@@ -4,6 +4,17 @@
 
 The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
 
+## Native preview — 0.44.0-dev
+
+- The map stays overhead at every zoom until you deliberately orbit at close ship range with a middle-button drag. Any zoom-out input immediately restores overhead and north-up viewing. Right drag pans; left click selects and left drag boxes your fleets. Strategic framing includes margins around the polar limits.
+- The top control bar shows native FPS immediately before game speed, averaged over the latest half second. This measures rendered game frames separately from campaign speed.
+- Chart icons and selection brackets are drawn in a stable screen-space batch after the 3D scene, using the same editable symbols and colors as the legend. Country colors are clearer, country borders follow the real terrain boundaries, and active campaign fronts show their recorded strategic progress. These front lines are illustrative campaign boundaries, not individual troop positions.
+- **Play recorded movie** turns retained battle observations into a short **20–90-second** visual account with moving formations, salvos, impacts and sinking. Pause/Resume controls its own presentation clock; the campaign stays paused. Hulls, damage and losses come from the recording, while courses and salvo paths illustrate aggregate exchanges. Missing intervals are cut without invented attacks. Movies of ongoing battles stop at the latest retained observation.
+- Live **Play battle · 60×** and **Next tick · 15 min** remain separate controls. They advance the actual campaign, with every fifteen-minute tick retained. Starting a decisive player battle still pauses and raises an optional Watch alert.
+- Selection-only changes preserve fleet interpolation and the camera instead of rebuilding a full scene packet. Ocean and terrain rendering use fewer components; indexed chart drawing reuses vertices and one view projection per call. Battle effects keep four fixed instance pools across the complete movie.
+
+The final Shipping archive passes **489 selected JavaScript tests**, **39 native tests**, all **198 gallery loads/picks**, and **seven actual native resolutions** through 5120×2160. Normal on-screen interaction, map/front/movie GPU review and offline network observation also pass. In two local global-map samples at 1800×1000, indexed icon drawing fell from **7.49–8.34 ms to 2.41–2.76 ms**. Both versions reached the 60 FPS cap at that size; this is a bounded CPU comparison, not a hardware-independent frame-rate claim. The game remains windowed, resizable and maximizable, with a default/minimum **1800×1000** client area. Geographic detail remains strategic-scale and dense colocated symbols can overlap. See [verification evidence and limits](SYSTEMS-CHECK.md).
+
 ## Native preview — 0.43.0-dev
 
 - The 3D terrain chart now uses true Equal Earth geometry with continuous horizontal wrapping. Land, coastlines, longitude/latitude lines, routes and map symbols share the projection; country shapes change naturally as the chart's central longitude moves.

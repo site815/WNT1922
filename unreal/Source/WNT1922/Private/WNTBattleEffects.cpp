@@ -1,4 +1,5 @@
 #include "WNTBattleEffects.h"
+#include "WNTBattleTimeline.h"
 #include "WNTCameraActor.h"
 #include "WNTShipActor.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -23,18 +24,26 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
 {
     if(!Packet)return false;
     bool Animate=true;Packet->TryGetBoolField(TEXT("animate"),Animate);
+    bool Paused=false;Packet->TryGetBoolField(TEXT("playbackPaused"),Paused);
     bAnimate=Animate;
     FString NextKey=Text(Packet,TEXT("eventKey"));
     if(NextKey.IsEmpty())NextKey=Text(Packet,TEXT("id"))+FString::Printf(TEXT(":%.0f:%.0f"),Number(Packet,TEXT("at"),0),Number(Packet,TEXT("index"),0));
     if(NextKey==FrameKey)
     {
+        if(Paused!=bPlaybackPaused)
+        {
+            PausedElapsed=FMath::Clamp(Number(Packet,TEXT("elapsedSeconds"),Elapsed(Now)),0.,Duration);
+            StartedAt=Now-PausedElapsed;bPlaybackPaused=Paused;
+        }
         // Paused/reduced-motion demos settle this frame. Resuming the same
         // key cannot revive a wreck or replay already dismissed effects.
-        if(!bAnimate)StartedAt=Now-Duration;
+        if(!bAnimate){StartedAt=Now-Duration;PausedElapsed=Duration;}
         return false;
     }
-    FrameKey=NextKey;StartedAt=Now;Duration=FMath::Clamp(Number(Packet,TEXT("durationSeconds"),15),.1,30.);
-    if(!bAnimate)StartedAt=Now-Duration;
+    FrameKey=NextKey;Duration=FMath::Clamp(Number(Packet,TEXT("durationSeconds"),15),.1,90.);
+    PausedElapsed=FMath::Clamp(Number(Packet,TEXT("elapsedSeconds"),0),0.,Duration);bPlaybackPaused=Paused;
+    StartedAt=Now-PausedElapsed;
+    if(!bAnimate){StartedAt=Now-Duration;PausedElapsed=Duration;}
     Events.Reset();SinkTimes.Reset();TSet<FString> Identities;
     const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
     if(Packet->TryGetArrayField(TEXT("events"),Values))for(const auto& Value:*Values)
@@ -54,9 +63,10 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
 double FWNTBattleEffects::SinkProgress(const FString& Key,double Now) const
 {
     const auto* Time=SinkTimes.Find(Key);
-    return bAnimate&&Time?FMath::Clamp((Now-StartedAt-Time->X)/Time->Y,0.,1.):1.;
+    return bAnimate&&Time?FMath::Clamp((Elapsed(Now)-Time->X)/Time->Y,0.,1.):1.;
 }
-bool FWNTBattleEffects::IsAnimating(double Now) const {return bAnimate&&Events.Num()>0&&Now-StartedAt<Duration;}
+double FWNTBattleEffects::Elapsed(double Now) const {return FMath::Clamp(bPlaybackPaused?PausedElapsed:Now-StartedAt,0.,Duration);}
+bool FWNTBattleEffects::IsAnimating(double Now) const {return bAnimate&&!bPlaybackPaused&&Events.Num()>0&&Elapsed(Now)<Duration;}
 FTransform FWNTBattleEffects::SinkingTransform(const FTransform& Surface,double Progress)
 {
     const double Amount=FMath::Clamp(Progress,0.,1.);
@@ -105,7 +115,7 @@ void FWNTBattleEffects::EnsurePools(AActor* Owner)
 void FWNTBattleEffects::Update(AActor* Owner,const TMap<FString,FTransform>& Ships,double Now,bool bVisible,
     const TMap<FString,TWeakObjectPtr<AWNTShipActor>>* Actors)
 {
-    if(!bVisible||!bAnimate||Events.IsEmpty()||Now-StartedAt>=Duration){SetVisible(false);return;}
+    if(!bVisible||!bAnimate||Events.IsEmpty()||Elapsed(Now)>=Duration){SetVisible(false);return;}
     EnsurePools(Owner);
     const APlayerController* Player=Owner&&Owner->GetWorld()?Owner->GetWorld()->GetFirstPlayerController():nullptr;
     const AWNTCameraActor* Camera=Player?Cast<AWNTCameraActor>(Player->GetViewTarget()):nullptr;
@@ -145,7 +155,7 @@ void FWNTBattleEffects::Update(AActor* Owner,const TMap<FString,FTransform>& Shi
         }
         return Local;
     };
-    const double Elapsed=FMath::Max(0.,Now-StartedAt);
+    const double Elapsed=this->Elapsed(Now);
     for(const auto& Event:Events)
     {
         const double Age=Elapsed-Event.At;if(Age<0||Age>Event.Duration)continue;
@@ -248,6 +258,33 @@ bool FWNTRecordedBattleEffectsTest::RunTest(const FString& Parameters)
     Packet->SetBoolField(TEXT("animate"),true);Effects.SetPacket(Packet,109.1);
     TestFalse(TEXT("Resuming a settled frame never replays its effects"),Effects.IsAnimating(109.1));
     TestEqual(TEXT("Resuming does not resurrect a settled wreck"),Effects.SinkProgress(TEXT("B:b:0"),109.1),1.);
+    // The same observed loss must freeze in place when its recorded movie is
+    // paused, survive selection packets and resume without repeating a salvo.
+    Packet->SetStringField(TEXT("eventKey"),TEXT("movie:71:1"));Packet->SetNumberField(TEXT("durationSeconds"),60);
+    Packet->SetBoolField(TEXT("playbackPaused"),false);Packet->SetNumberField(TEXT("elapsedSeconds"),0);
+    Effects.SetPacket(Packet,200);
+    TestEqual(TEXT("Long movie clock is independent of campaign time"),Effects.Elapsed(208),8.);
+    Packet->SetBoolField(TEXT("playbackPaused"),true);Packet->SetNumberField(TEXT("elapsedSeconds"),8);
+    TestFalse(TEXT("Pause keeps the timeline identity"),Effects.SetPacket(Packet,208));
+    TestEqual(TEXT("Paused sink freezes half-way even after a long pause"),Effects.SinkProgress(TEXT("B:b:0"),500),.5);
+    TestFalse(TEXT("Paused effects do not require continuous animation ticks"),Effects.IsAnimating(500));
+    Effects.SetPacket(Packet,500);TestEqual(TEXT("Selection while paused preserves elapsed time"),Effects.Elapsed(501),8.);
+    Packet->SetBoolField(TEXT("playbackPaused"),false);Effects.SetPacket(Packet,502);
+    TestEqual(TEXT("Resume continues at its existing sink progress"),Effects.SinkProgress(TEXT("B:b:0"),504),.75);
+    Packet->SetNumberField(TEXT("elapsedSeconds"),0);Effects.SetPacket(Packet,505);
+    TestEqual(TEXT("Duplicate playing packet cannot rewind the movie"),Effects.Elapsed(505),11.);
+    TSharedPtr<FJsonObject> Unit;
+    FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(FString(TEXT(R"({"appearsAt":0,"lostAtSeconds":15,"trajectory":[{"time":0,"positionMetres":[0,0,0],"headingDegrees":170},{"time":20,"positionMetres":[200,400,0],"headingDegrees":-170}]})"))),Unit);
+    FWNTBattleTrack Track;Track.Read(Unit,60);
+    TestEqual(TEXT("Halfway track interpolates metres to Unreal centimetres"),Track.Sample(10).GetLocation(),FVector(10000,20000,0));
+    TestTrue(TEXT("Heading follows the short angular arc"),FMath::IsNearlyEqual(FMath::Abs(Track.Sample(10).Rotator().Yaw),180.,1e-6));
+    TestFalse(TEXT("Future observed loss stays afloat"),Track.IsLost(14.));
+    TestTrue(TEXT("Only the recorded loss time marks the hull lost"),Track.IsLost(15.));
+    TestTrue(TEXT("A sinking hull stops its course at the loss position"),Track.Sample(40).Equals(Track.Sample(15)));
+    Unit->RemoveField(TEXT("lostAtSeconds"));
+    Unit->GetArrayField(TEXT("trajectory"))[1]->AsObject()->SetBoolField(TEXT("cut"),true);Track.Read(Unit,60);
+    TestEqual(TEXT("An archive gap does not invent travel through missing observations"),Track.Sample(19).GetLocation(),FVector::ZeroVector);
+    TestEqual(TEXT("The next retained observation is reached exactly at the cut"),Track.Sample(20).GetLocation(),FVector(20000,40000,0));
     World->DestroyWorld(false);return true;
 }
 #endif

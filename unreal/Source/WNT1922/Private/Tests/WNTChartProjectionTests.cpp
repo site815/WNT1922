@@ -48,7 +48,7 @@ bool FWNTChartOceanRouteTest::RunTest(const FString& Parameters)
         }
         Samples.Add(MoveTemp(Sample));
     }
-    TestEqual(TEXT("All three ocean copies exist"),OceanCount,864);TestTrue(TEXT("Dateline route has populated strips"),RouteCount>=6);
+    TestEqual(TEXT("Three ocean copies retain complete coverage in coalesced tiles"),OceanCount,216);TestTrue(TEXT("Dateline route has populated strips"),RouteCount>=6);
     for(double Meridian:{72.5,179.99,-179.99,-65.0,0.0})
     {
         Scene->SetCentralMeridian(Meridian);
