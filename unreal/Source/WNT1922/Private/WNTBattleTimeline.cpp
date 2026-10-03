@@ -1,6 +1,29 @@
 #include "WNTBattleTimeline.h"
 #include "Dom/JsonObject.h"
 
+double FWNTRollingBattleClock::ObservedSeconds(double Elapsed) const
+{
+    // Effects may finish their visual tails while waiting for the next packet,
+    // but hulls cannot advance beyond the last observed simulation endpoint.
+    return FMath::Min(At,Origin+FMath::Max(0.,Elapsed)*Rate);
+}
+
+double FWNTRollingBattleClock::Rebase(const TSharedPtr<FJsonObject>& Packet,double PreviousElapsed,double RequestedElapsed,double Duration)
+{
+    FString NextSession;double NextOrigin=0,NextRate=0,NextAt=-1;bool Paused=false;
+    const bool Valid=Packet&&Packet->TryGetStringField(TEXT("tacticalSessionId"),NextSession)
+        &&Packet->TryGetNumberField(TEXT("timelineOriginSeconds"),NextOrigin)
+        &&Packet->TryGetNumberField(TEXT("secondsPerRealSecond"),NextRate)
+        &&Packet->TryGetNumberField(TEXT("at"),NextAt)&&FMath::IsFinite(NextOrigin)&&FMath::IsFinite(NextRate)&&NextRate>0
+        &&FMath::IsFinite(NextAt)&&NextAt>=NextOrigin;
+    if(Packet)Packet->TryGetBoolField(TEXT("playbackPaused"),Paused);
+    double Result=RequestedElapsed;
+    if(Valid&&!Session.IsEmpty()&&Session==NextSession&&!bPaused&&!Paused&&NextAt>At&&NextOrigin>=Origin&&FMath::IsNearlyEqual(Rate,NextRate))
+        Result=FMath::Max(Result,(ObservedSeconds(PreviousElapsed)-NextOrigin)/NextRate);
+    Session=Valid?NextSession:TEXT("");Origin=NextOrigin;Rate=NextRate;At=NextAt;bPaused=Paused;
+    return FMath::Clamp(Result,0.,Duration);
+}
+
 void FWNTBattleTrack::Read(const TSharedPtr<FJsonObject>& Unit,double Duration)
 {
     Points.Reset();AppearsAt=0;LostAt=DisappearsAt=-1;if(!Unit)return;

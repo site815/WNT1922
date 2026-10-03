@@ -287,6 +287,36 @@ bool FWNTTerrainPaletteTest::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTChartReliefAndRibbonTest,"WNT.Geography.ReliefAndRibbonShaderReference",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTChartReliefAndRibbonTest::RunTest(const FString& Parameters)
+{
+    double Previous=1.;
+    for(double Distance:{0.,100000.,10000000.,20000000.,50000000.,100000000.,5000000000.})
+    {
+        const double Scale=WNTTerrainGeometry::ReliefScaleForDistance(Distance);
+        TestTrue(TEXT("Relief smoothly increases within a restrained 1x to 6x range"),Scale>=Previous&&Scale<=6.);Previous=Scale;
+    }
+    TestEqual(TEXT("Ship-scale elevation retains actual metres"),WNTTerrainGeometry::ReliefScaleForDistance(200000.),1.);
+    TestEqual(TEXT("Strategic relief is explicitly emphasized"),WNTTerrainGeometry::ReliefScaleForDistance(100000000.),6.);
+    for(double Latitude:{-89.,-60.,0.,45.,89.})for(double Shift:{-720.,-179.,0.,179.,720.})
+        for(double Width:{400.,10000.,256000.})for(const FVector2D Side:{FVector2D(.5,0),FVector2D(0,1.25),FVector2D(.75,1.)})
+    {
+        const FVector Origin=WNTProjection::ForwardUnwrapped(FVector2D(15,Latitude*.9));
+        const FVector Centre=WNTProjection::ForwardUnwrapped(FVector2D(20,Latitude),2400.);
+        const auto Metadata=WNTProjection::ChartVertexMetadata(Centre,Origin);
+        const FVector Offset(Side.X*10000.,Side.Y*10000.,0);
+        const FVector A=Centre+Offset+WNTTerrainGeometry::RibbonDisplacement(Side,Metadata,Width,Shift);
+        const FVector B=Centre-Offset+WNTTerrainGeometry::RibbonDisplacement(-Side,Metadata,Width,Shift);
+        TestTrue(TEXT("Width changes preserve exact geographic centerline under arbitrary wrapping"),((A+B)*.5).Equals(Centre+FVector(0,Metadata.X*Shift,0),.0001));
+        const FVector2D Half=Side*Width*100.;
+        TestTrue(TEXT("Ribbon support follows the projection differential"),(A-B).Equals(FVector(Half.X*2.,(Half.Y+Shift*Metadata.Y*Half.X)*2.,0),.0001));
+        const FBox Bounds=WNTTerrainGeometry::ShearedLocalBounds(FBox(Centre-Origin, Centre-Origin),FVector2D(Metadata.X,Metadata.X),Shift)
+            .ExpandBy(FVector(Width*125.,Width*125.*(1.+.014*FMath::Abs(Shift)),0));
+        TestTrue(TEXT("Conservative bounds contain even the widest polar/front ribbon"),Bounds.IsInsideOrOn(A-Origin)&&Bounds.IsInsideOrOn(B-Origin));
+    }
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTCampaignLineTest,"WNT.Geography.StrategicCampaignFrontClipping",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTCampaignLineTest::RunTest(const FString& Parameters)
 {
@@ -351,9 +381,46 @@ bool FWNTPoliticalLineIntegrationTest::RunTest(const FString& Parameters)
     for(auto* Tile:Tiles)if(const auto* Line=Tile->GetProcMeshSection(4))if(!Line->ProcVertexBuffer.IsEmpty())FrontBuffers.Add(Tile,Line->ProcVertexBuffer.GetData());
     TestTrue(TEXT("Campaign lines have actual mesh sections"),!FrontBuffers.IsEmpty());
     Terrain->ApplyCampaignFronts(Fronts);
+    struct FImmutableRibbon{UProceduralMeshComponent* Tile;int32 Index;const FProcMeshVertex* Buffer;uint32 Fingerprint;};
+    TArray<FImmutableRibbon> Ribbons;
+    for(auto* Tile:Tiles)for(int32 Index:{2,3,4})if(const auto* Section=Tile->GetProcMeshSection(Index))
+        if(!Section->ProcVertexBuffer.IsEmpty())Ribbons.Add({Tile,Index,Section->ProcVertexBuffer.GetData(),
+            FCrc::MemCrc32(Section->ProcVertexBuffer.GetData(),Section->ProcVertexBuffer.Num()*sizeof(FProcMeshVertex))});
+    const FVector2D Mountain(87.125,31.875);Terrain->SetViewDistance(100000.);
+    const double RealHeight=Terrain->RenderHeightAt(Mountain);
+    Terrain->SetViewDistance(100000000.);
+    TestTrue(TEXT("Camera/picking terrain height matches shader relief exactly"),FMath::Abs(Terrain->RenderHeightAt(Mountain)-RealHeight*6.)<1e-7);
+    // Same real source mesh, forced original lookup versus the bounded face
+    // cache. The dense sweeps cross coastlines, political edges and the seam.
+    int32 CachedComparisons=0;double CacheDifference=0;
+    for(double TestMeridian:{0.,147.,-179.9})for(double Distance:{100000.,100000000.})
+    {
+        Terrain->SetCentralMeridian(TestMeridian);Terrain->SetViewDistance(Distance);
+        for(const FVector2D Centre:{FVector2D(7.5,46.),FVector2D(18.43,-33.93),FVector2D(135.19,34.65),
+            FVector2D(179.99,-16.5),FVector2D(-179.99,66.),FVector2D(87.125,31.875),FVector2D(37.,5.)})
+            for(int32 X=-4;X<=4;++X)for(int32 Y=-4;Y<=4;++Y)
+        {
+            const FVector2D Point(WNTProjection::WrapLongitude(Centre.X+X*.014),Centre.Y+Y*.014);
+            const double Expected=Terrain->RenderHeightAt(Point,false);
+            CacheDifference=FMath::Max(CacheDifference,FMath::Abs(Terrain->RenderHeightAt(Point)-Expected));
+            CacheDifference=FMath::Max(CacheDifference,FMath::Abs(Terrain->RenderHeightAt(Point)-Expected));
+            ++CachedComparisons;
+        }
+    }
+    TestTrue(TEXT("Cached ground queries preserve actual coast, shared-border, wrap and relief answers"),CachedComparisons>3000&&CacheDifference<.000001);
+    TestTrue(TEXT("Repeated real geographic queries exercise cached projected faces"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("heightCacheHits"))>100.);
     for(double Meridian:{-179.9,35.,179.9})
     {
         Terrain->SetCentralMeridian(Meridian);
+        Terrain->SetGraticulePixelSize((Meridian+180.)*100000.+10000.);
+        for(const auto& Ribbon:Ribbons)
+        {
+            const auto* Section=Ribbon.Tile->GetProcMeshSection(Ribbon.Index);
+            TestTrue(TEXT("Zoom and pan retain exact ribbon allocation and every vertex byte"),Section&&Section->ProcVertexBuffer.GetData()==Ribbon.Buffer
+                &&FCrc::MemCrc32(Section->ProcVertexBuffer.GetData(),Section->ProcVertexBuffer.Num()*sizeof(FProcMeshVertex))==Ribbon.Fingerprint);
+            const auto& CPD=Ribbon.Tile->GetCustomPrimitiveData().Data;
+            TestTrue(TEXT("Actual native primitive passes zoom width and relief to shader"),CPD.Num()>=3&&CPD[1]>0&&CPD[2]==6.);
+        }
         for(const auto& Pair:FrontBuffers)TestTrue(TEXT("Unchanged packets and longitude panning never rebuild front buffers"),Pair.Key->GetProcMeshSection(4)->ProcVertexBuffer.GetData()==Pair.Value);
     }
     Front->SetNumberField(TEXT("progress"),.65);Terrain->ApplyCampaignFronts(Fronts);CheckLand();

@@ -5,6 +5,7 @@ import { frontPosition, POWERS } from '../mechanics/land-war.mjs';
 import { fleetCourse, formationAt, ownFormationScene } from './fleet-formation.mjs';
 import { ongoingMapBattles } from './battle-map.mjs';
 import { MAP_SYMBOLS } from './map-symbols.mjs';
+import { portSpec } from '../mechanics/port-catalog.mjs';
 
 const finitePoint = point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite);
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
@@ -143,7 +144,10 @@ export function buildUnrealScenePacket(state, content, previousRows = [], option
   }));
   const ports = Object.entries(PORTS).flatMap(([id, port]) => {
     const position = PORT_LOCATIONS[id] || NODES[id];
-    return finitePoint(position) ? [{ id, name: port.name, position: [...position], owner: state.world?.portControl?.[id] || port.nation }] : [];
+    if (!finitePoint(position)) return [];
+    const infrastructure = portSpec(state, id);
+    return [{ id, name: port.name, position: [...position], owner: state.world?.portControl?.[id] || port.nation,
+      tier: infrastructure.tier, major: infrastructure.tier === 'dock', capacity: infrastructure.capacity }];
   });
   const countries = Object.entries(MAP_CAPITALS).map(([id, capital]) => ({ id, name: capital.name,
     position: [...capital.point], color: POWERS[id]?.color || '#e5cf9d' }));

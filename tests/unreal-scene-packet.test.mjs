@@ -8,6 +8,7 @@ import { routeLength, distanceNm, interpolate, PORTS, NODES, PORT_LOCATIONS, MAP
 import { fleetCourse, ownFormationScene, geographicOffset, formationAt } from '../ui/fleet-formation.mjs';
 import { buildUnrealScenePacket, buildUnrealSelectionPacket, sampleObservedNavigation, campaignMapFronts } from '../ui/unreal-scene-packet.mjs';
 import { battleMapHover } from '../ui/battle-map.mjs';
+import { portSpec } from '../mechanics/port-catalog.mjs';
 
 const classes = { bb: { type: 'BB', dimensions: { length_m: 200, beam_m: 30 } },
   dd: { type: 'DD', dimensions: { length_m: 100, beam_m: 12 } } };
@@ -25,6 +26,22 @@ const nearPoint = (a, b, epsilon = 1e-8) => {
   assert(Math.abs(((a[0] - b[0] + 540) % 360) - 180) < epsilon, `Longitude ${a[0]} != ${b[0]}`);
   assert(Math.abs(a[1] - b[1]) < epsilon, `Latitude ${a[1]} != ${b[1]}`);
 };
+
+test('port display priority follows public dated infrastructure without leaking garrisons or changing state', () => {
+  for (const campaign of Object.keys(CATALOG.campaigns)) {
+    const state = newGame(CATALOG, 'USA', 3902, campaign), before = JSON.stringify(state);
+    const ports = buildUnrealScenePacket(state, CATALOG).ports;
+    assert(ports.some(port => port.major)); assert(ports.some(port => !port.major));
+    for (const port of ports) {
+      const spec = portSpec(state, port.id);
+      assert.equal(port.major, spec.tier === 'dock'); assert.equal(port.capacity, spec.capacity);
+      assert.equal(port.tier, spec.tier);
+      assert.deepEqual(Object.keys(port).sort(), ['capacity','id','major','name','owner','position','tier']);
+      nearPoint(port.position, PORT_LOCATIONS[port.id] || NODES[port.id]);
+    }
+    assert.equal(JSON.stringify(state), before);
+  }
+});
 
 test('native selection includes single and docked own forces, filters unknown IDs and never changes orders', () => {
   const s = fixture(force([[0,0],[4,0]]),100), before = JSON.stringify(s);

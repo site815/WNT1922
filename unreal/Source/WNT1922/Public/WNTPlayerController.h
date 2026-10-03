@@ -19,6 +19,7 @@ namespace WNTCameraMath
     WNT1922_API bool Ray(const FMinimalViewInfo& View, const FVector2D& Pointer, FVector& Origin, FVector& Direction);
     WNT1922_API TOptional<FVector2D> Project(const FMinimalViewInfo& View, const FVector& Point);
     WNT1922_API TOptional<FVector> PlaneHit(const FMinimalViewInfo& View, const FVector2D& Pointer, double Height);
+    WNT1922_API FVector TerrainRayHit(const FVector& Origin, const FVector& Direction, double SeaDistance, double Ceiling, TFunctionRef<double(const FVector&)> Height);
     WNT1922_API void Orbit(FMinimalViewInfo& View, const FVector& Target, double Distance, double Tilt, double Yaw);
     WNT1922_API void EnsureClearance(FMinimalViewInfo& View, const FVector& Target, TFunctionRef<double(const FVector&)> SurfaceHeight);
     WNT1922_API FVector2D WrappedFocus(const FVector& MapPoint, double Meridian);
@@ -114,6 +115,8 @@ private:
     int32 LastAnchorIterations = 0;
     int32 LastAnchorRebases = 0;
     bool bLastAnchorConstrained = false;
+    mutable double LastSurfacePickMilliseconds = 0, MaximumSurfacePickMilliseconds = 0;
+    mutable int32 LastSurfaceHeightQueries = 0;
     double Meridian = 0, HostStarted = 0, CloseStarted = 0;
     bool bClosing = false, bHostFailed = false, bCameraDirty = true;
     bool bOwnsCloseOverride = false;

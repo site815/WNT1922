@@ -20,6 +20,7 @@ void FWNTBattleCameraDirector::SetPacket(const TSharedPtr<FJsonObject>& Packet,d
     if(NewBattle||TacticalSession!=NextSession)
     {
         TacticalSession=NextSession;NextLiveShotAt=Now+2.5;
+        LiveShotStartedAt=Now;LiveEventKey.Reset();
         LiveShot={0,TEXT("establish"),TEXT(""),TEXT("")};
     }
     const bool WasAvailable=bAvailable;
@@ -36,14 +37,18 @@ void FWNTBattleCameraDirector::SetPacket(const TSharedPtr<FJsonObject>& Packet,d
         }
         return; // A selected hull or UI refresh cannot restart a camera shot.
     }
+    const double PreviousElapsed=Elapsed(Now);
     BattleId=NextBattle;FrameKey=NextKey;Units.Reset();Shots.Reset();
     Duration=FMath::Clamp(Number(Packet,TEXT("durationSeconds"),15),.1,90.);
-    PausedElapsed=FMath::Clamp(Number(Packet,TEXT("elapsedSeconds"),0),0.,Duration);
+    PausedElapsed=RollingClock.Rebase(Packet,PreviousElapsed,Number(Packet,TEXT("elapsedSeconds"),0),Duration);
     StartedAt=Now-PausedElapsed;bPaused=Paused;
     if(!bAvailable)return;
     const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
     TArray<TSharedPtr<FJsonValue>> CameraUnits;TSet<FString> ShoreKeys;
     if(Packet->TryGetArrayField(TEXT("units"),Values))CameraUnits.Append(*Values);
+    // A close attack shot can follow its actual airborne group rather than
+    // jumping back to the remote launching carrier hundreds of kilometres away.
+    if(Packet->TryGetArrayField(TEXT("airstrikes"),Values))CameraUnits.Append(*Values);
     if(Packet->TryGetArrayField(TEXT("shoreBatteries"),Values))for(const auto& Value:*Values)
     {CameraUnits.Add(Value);if(const auto Battery=Value->AsObject())ShoreKeys.Add(Text(Battery,TEXT("key")));}
     for(const auto& Value:CameraUnits)
@@ -72,12 +77,14 @@ void FWNTBattleCameraDirector::SetPacket(const TSharedPtr<FJsonObject>& Packet,d
     {
         if(Events.Num()>=4096)break;
         const auto Event=Value->AsObject();if(!Event)continue;
-        const FString Type=Text(Event,TEXT("type")),Target=Text(Event,TEXT("targetKey")),Source=Text(Event,TEXT("sourceKey"));
+        const FString Type=Text(Event,TEXT("type")),Target=Text(Event,TEXT("targetKey"));
+        const bool Air=Text(Event,TEXT("weapon"))==TEXT("air");
+        const FString Source=Air?TEXT(""):Text(Event,TEXT("sourceKey"));
         const double At=Number(Event,TEXT("time"),-1);
         const int32 Priority=Type==TEXT("sink")?3:Type==TEXT("hit")?2:Type==TEXT("salvo")?1:0;
         if(!Priority||At<0||At>Duration||!Units.Contains(Target))continue;
         if(Type==TEXT("sink"))Units.FindChecked(Target).DisplayUntil=FMath::Min(Duration,At+FMath::Max(0.,Number(Event,TEXT("duration"),8.)));
-        Events.Add({At,Priority,Text(Event,TEXT("key")),Type,Source,Target});
+        Events.Add({At,Priority,Text(Event,TEXT("key")),Air&&Type==TEXT("salvo")?TEXT("air-attack"):Type,Source,Target});
     }
     Events.Sort([](const FEvent& A,const FEvent& B){return A.At!=B.At?A.At<B.At:A.Key<B.Key;});
     if(!TacticalSession.IsEmpty())
@@ -86,18 +93,28 @@ void FWNTBattleCameraDirector::SetPacket(const TSharedPtr<FJsonObject>& Packet,d
         // tracks must not reset camera holds or start an establishing shot on
         // every eventKey. Use real watch time for editing, simulation time only
         // for positioning the selected ship inside the latest slice.
-        if(!bPaused&&Now>=NextLiveShotAt&&!Events.IsEmpty())
+        if(!bPaused&&!Events.IsEmpty())
         {
             int32 Best=INDEX_NONE;const double CurrentElapsed=Elapsed(Now);
             for(int32 I=0;I<Events.Num();++I)
-                if(Events[I].At>=CurrentElapsed-.2&&(Best==INDEX_NONE||Events[I].Priority>Events[Best].Priority||
-                    (Events[I].Priority==Events[Best].Priority&&Events[I].At>Events[Best].At)))Best=I;
+            {
+                const auto& Event=Events[I];const bool Sinking=Event.Type==TEXT("sink");
+                // Routine cuts retain their longer hold, but a confirmed loss
+                // must not finish its animation unseen behind that hold. Give
+                // the current shot at least2.5s, then admit a still-visible sink.
+                const bool HoldExpired=Now>=NextLiveShotAt||(Sinking&&Now-LiveShotStartedAt>=2.5);
+                const bool Visible=Sinking?CurrentElapsed<Units.FindChecked(Event.Target).DisplayUntil:
+                    Event.At>=CurrentElapsed-(Event.Type==TEXT("air-attack")?2.4:.2);
+                if(HoldExpired&&Visible&&Event.Key!=LiveEventKey&&(Best==INDEX_NONE||Event.Priority>Events[Best].Priority||
+                    (Event.Priority==Events[Best].Priority&&Event.At>Events[Best].At)))Best=I;
+            }
             if(Best!=INDEX_NONE)
             {
                 const auto& Event=Events[Best];
                 const bool Firing=Event.Type==TEXT("salvo")&&Units.Contains(Event.Source);
                 LiveShot={0,Firing?TEXT("firing"):Event.Type,Firing?Event.Source:Event.Target,Firing?Event.Target:Event.Source};
-                NextLiveShotAt=Now+(Event.Type==TEXT("sink")?6.:4.5);
+                LiveShotStartedAt=Now;LiveEventKey=Event.Key;
+                NextLiveShotAt=Now+(Event.Type==TEXT("sink")?8.:7.5);
             }
         }
         return;

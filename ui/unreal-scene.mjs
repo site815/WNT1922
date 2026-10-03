@@ -361,14 +361,17 @@ export class UnrealTacticalScene extends NativeScene {
     if(this.combat!==state){this.combat=state;this.sessionId=`${this.instanceId}:tactical:${++this.sessionSerial}`;this.previous=null;this.current=null;this.packet=null;}
     if(this.current?.seconds!==state.seconds){this.previous=this.current;this.current=tacticalSceneSnapshot(state);}
     const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let candidate=unrealTacticalPacket(state,{...options,previous:this.previous,sessionId:this.sessionId,animate:!reduced});
+    const end=options.replaySeconds??state.seconds;
+    const samePosition=this.packet&&this.packet.at===end&&this.replay===options.replaySeconds;
+    let candidate;
     // Selection/pause/camera toggles must not reset the active interpolation.
     // Keep its key and clock origin until the simulation/replay position moves.
-    if(this.packet&&this.packet.at===candidate.at&&this.replay===options.replaySeconds){
-      const {playbackPaused,cameraDirector,units}=candidate;
-      candidate={...this.packet,playbackPaused,cameraDirector,units:this.packet.units.map((unit,index)=>({...unit,selected:units[index]?.selected||false}))};
+    if(samePosition){
+      const selected=options.selected;
+      candidate={...this.packet,playbackPaused:!!options.paused,cameraDirector:options.cinematic!==false,
+        units:this.packet.units.map(unit=>({...unit,selected:!!(selected?.key===unit.key||selected?.id===unit.key||selected?.side===unit.side&&String(selected.id)===unit.id&&(selected.hullIndex||0)===unit.hullIndex)}))};
       candidate.elapsedSeconds=Math.min(this.packet.durationSeconds,this.clockElapsed+(this.packet.playbackPaused?0:(performance.now()-this.clockStartedAt)/1000));
-    }
+    }else candidate=unrealTacticalPacket(state,{...options,previous:this.previous,sessionId:this.sessionId,animate:!reduced});
     const changed=!this.packet||candidate.eventKey!==this.packet.eventKey||candidate.playbackPaused!==this.packet.playbackPaused||
       JSON.stringify(options.selected)!==this.selectionKey||candidate.cameraDirector!==this.packet.cameraDirector;
     this.attach(canvas);this.activate();

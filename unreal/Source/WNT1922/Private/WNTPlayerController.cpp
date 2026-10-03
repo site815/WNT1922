@@ -77,6 +77,24 @@ TOptional<FVector> PlaneHit(const FMinimalViewInfo& View,const FVector2D& Pointe
     if(T<0||!FMath::IsFinite(T))return {};
     return Origin+Direction*T;
 }
+FVector TerrainRayHit(const FVector& Origin,const FVector& Direction,double SeaDistance,double Ceiling,TFunctionRef<double(const FVector&)> Height)
+{
+    const double Begin=FMath::Clamp((Ceiling-Origin.Z)/Direction.Z,0.,SeaDistance);
+    auto Above=[&](double Distance){const FVector P=Origin+Direction*Distance;return P.Z-Height(P);};
+    double Last=Begin;
+    for(int32 Step=1;Step<=64;++Step)
+    {
+        const double Next=FMath::Lerp(Begin,SeaDistance,double(Step)/64.);
+        if(Above(Next)<=0)
+        {
+            double Low=Last,High=Next;
+            for(int32 I=0;I<24;++I){const double Mid=(Low+High)*.5;if(Above(Mid)>0)Low=Mid;else High=Mid;}
+            return Origin+Direction*((Low+High)*.5);
+        }
+        Last=Next;
+    }
+    return Origin+Direction*SeaDistance;
+}
 void Orbit(FMinimalViewInfo& View,const FVector& Target,double Distance,double Tilt,double Yaw)
 {
     View.Rotation=FRotator(-90+Tilt,Yaw,0);
@@ -570,6 +588,7 @@ void AWNTPlayerController::UpdateCamera(bool bNotify)
     FVector Target = BattleTarget;
     if (!Battle)
     {
+        if(WorldScene->GetTerrain())WorldScene->GetTerrain()->SetViewDistance(Distance);
         const double HeightMetres = WorldScene->GetTerrain() ? WorldScene->GetTerrain()->RenderHeightAt(FocusGeo) : 0;
         Target = WNTProjection::Forward(FocusGeo, Meridian, FMath::Max(0., HeightMetres));
     }
@@ -613,30 +632,19 @@ TOptional<FVector> AWNTPlayerController::SurfacePoint(const FVector2D& Pointer,b
     if(!SceneCamera||!WorldScene)return {};
     FVector OriginPoint,Direction;
     if(!WNTCameraMath::Ray(SceneCamera->View,Pointer,OriginPoint,Direction))return {};
+    const double PickStarted=FPlatformTime::Seconds();LastSurfaceHeightQueries=0;
     auto Surface=WNTCameraMath::PlaneHit(SceneCamera->View,Pointer,0);
     if(Surface.IsSet()&&Mode!=TEXT("battle")&&WorldScene->GetTerrain()&&Direction.Z< -1e-9)
     {
         const AWNTTerrainActor* Terrain=WorldScene->GetTerrain();
         const double End=FVector::DotProduct(Surface.GetValue()-OriginPoint,Direction);
-        const double Ceiling=(Terrain->LandBaseMetres+10000)*100;
-        const double Begin=FMath::Clamp((Ceiling-OriginPoint.Z)/Direction.Z,0.0,End);
-        auto Above=[&](double Distance)
+        const double Ceiling=(Terrain->LandBaseMetres+10000)*100*Terrain->GetReliefScale();
+        Surface=WNTCameraMath::TerrainRayHit(OriginPoint,Direction,End,Ceiling,[&](const FVector& Point)
         {
-            const FVector Point=OriginPoint+Direction*Distance;const auto Geo=WNTProjection::Inverse(Point,Meridian);
-            return Point.Z-(Geo.IsSet()?Terrain->RenderHeightAt(Geo.GetValue())*100.0:0.0);
-        };
-        double Last=Begin;
-        for(int32 Step=1;Step<=64;++Step)
-        {
-            const double Next=FMath::Lerp(Begin,End,double(Step)/64);
-            if(Above(Next)<=0)
-            {
-                double Low=Last,High=Next;
-                for(int32 I=0;I<24;++I){const double Mid=(Low+High)*.5;if(Above(Mid)>0)Low=Mid;else High=Mid;}
-                Surface=OriginPoint+Direction*((Low+High)*.5);break;
-            }
-            Last=Next;
-        }
+            ++LastSurfaceHeightQueries;
+            const auto Geo=WNTProjection::Inverse(Point,Meridian);
+            return Geo.IsSet()?Terrain->RenderHeightAt(Geo.GetValue())*100.0:0.0;
+        });
     }
     if(bIncludeActors)
     {
@@ -646,6 +654,8 @@ TOptional<FVector> AWNTPlayerController::SurfacePoint(const FVector2D& Pointer,b
         if(GetWorld()->LineTraceSingleByChannel(Hit,OriginPoint,OriginPoint+Direction*Limit,ECC_Visibility,Params)&&WorldScene->GetSelection(Hit.GetActor()).IsValid())
             Surface=Hit.ImpactPoint;
     }
+    LastSurfacePickMilliseconds=(FPlatformTime::Seconds()-PickStarted)*1000.;
+    MaximumSurfacePickMilliseconds=FMath::Max(MaximumSurfacePickMilliseconds,LastSurfacePickMilliseconds);
     return Surface;
 }
 
@@ -849,6 +859,7 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
         }
         return;
     }
+    const double DiagnosticsStarted=FPlatformTime::Seconds();
     if (bCameraDirty) UpdateCamera(false);
     auto Event = MakeShared<FJsonObject>();
     Event->SetStringField(TEXT("type"), TEXT("diagnostics"));
@@ -889,6 +900,9 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetNumberField(TEXT("worldOrbitZoom"),WNTCameraMath::WorldOrbitZoom);
     Event->SetNumberField(TEXT("lastAnchorIterations"),LastAnchorIterations);
     Event->SetNumberField(TEXT("lastAnchorRebases"),LastAnchorRebases);
+    Event->SetNumberField(TEXT("lastSurfacePickMilliseconds"),LastSurfacePickMilliseconds);
+    Event->SetNumberField(TEXT("maximumSurfacePickMilliseconds"),MaximumSurfacePickMilliseconds);
+    Event->SetNumberField(TEXT("lastSurfaceHeightQueries"),LastSurfaceHeightQueries);
     Event->SetNumberField(TEXT("wheelZoomPerPixel"),Mode==TEXT("battle")?WNTCameraMath::BattleZoomPerPixel:WNTCameraMath::WorldZoomPerPixel);
     Event->SetBoolField(TEXT("lastAnchorConstrained"),bLastAnchorConstrained);
     Event->SetBoolField(TEXT("zoomOutResetsOrbit"),true);
@@ -901,9 +915,13 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     Event->SetNumberField(TEXT("centralMeridian"),Meridian);
     if(!FrameSamples.IsEmpty())
     {
-        auto Sorted=FrameSamples;Sorted.Sort();double Total=0;for(double Sample:Sorted)Total+=Sample;
+        auto Sorted=FrameSamples;Sorted.Sort();double Total=0;int32 Hitches=0;
+        for(double Sample:Sorted){Total+=Sample;if(Sample>50.)++Hitches;}
         Event->SetNumberField(TEXT("frameMeanMs"),Total/Sorted.Num());
         Event->SetNumberField(TEXT("frameP95Ms"),Sorted[FMath::Min(Sorted.Num()-1,FMath::FloorToInt(Sorted.Num()*.95))]);
+        Event->SetNumberField(TEXT("frameMaxMs"),Sorted.Last());
+        Event->SetNumberField(TEXT("frameHitchCount"),Hitches);
+        Event->SetNumberField(TEXT("frameHitchThresholdMs"),50.);
         Event->SetNumberField(TEXT("frameSampleCount"),Sorted.Num());
     }
     int32 PrimitiveCount=0,VisiblePrimitives=0,ShadowPrimitives=0;
@@ -939,6 +957,7 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
     TArray<UProceduralMeshComponent*> Tiles;
     if (WorldScene->GetTerrain()) WorldScene->GetTerrain()->GetComponents(Tiles);
     Event->SetNumberField(TEXT("terrainTileCount"), Tiles.Num());
+    const double TargetSearchStarted=FPlatformTime::Seconds();
     TArray<TSharedPtr<FJsonValue>> Targets;
     for (TActorIterator<AActor> It(GetWorld()); It && Targets.Num() < 24; ++It)
     {
@@ -970,6 +989,8 @@ void AWNTPlayerController::AutomationRequest(const TSharedPtr<FJsonObject>& Pack
         }
     }
     Event->SetArrayField(TEXT("targets"), Targets);
+    Event->SetNumberField(TEXT("diagnosticTargetMilliseconds"),(FPlatformTime::Seconds()-TargetSearchStarted)*1000.);
+    Event->SetNumberField(TEXT("diagnosticBuildMilliseconds"),(FPlatformTime::Seconds()-DiagnosticsStarted)*1000.);
     Send(Event);
 }
 

@@ -6,6 +6,7 @@
 #include "WNTVisualAssets.h"
 #include "WNTOceanDetailActor.h"
 #include "WNTBattleEffects.h"
+#include "WNTBattleAircraft.h"
 #include "WNTBattleTimeline.h"
 #include "WNTPlayerController.h"
 
@@ -217,15 +218,17 @@ namespace
         auto Disc=[&](FVector2D P,double Radius,FLinearColor Color)
         {
             const int32 Base=Vertices.Num();AddVertex(P,Color);
-            for(int32 I=0;I<12;++I)AddVertex(P+FVector2D(FMath::Cos(I*UE_DOUBLE_PI/6),FMath::Sin(I*UE_DOUBLE_PI/6))*Radius,Color);
-            for(int32 I=0;I<12;++I)Indices.Append({Base,Base+1+I,Base+1+(I+1)%12});
+            // At the maximum chart width these rounded joints are only a few
+            // physical pixels across. Eight sides stay within a quarter pixel.
+            for(int32 I=0;I<8;++I)AddVertex(P+FVector2D(FMath::Cos(I*UE_DOUBLE_PI/4),FMath::Sin(I*UE_DOUBLE_PI/4))*Radius,Color);
+            for(int32 I=0;I<8;++I)Indices.Append({Base,Base+1+I,Base+1+(I+1)%8});
         };
-        auto Stroke=[&](FVector2D A,FVector2D B,double Width,FLinearColor Color)
+        auto Stroke=[&](FVector2D A,FVector2D B,double Width,FLinearColor Color,bool Caps=true)
         {
             const FVector2D Delta=(B-A).GetSafeNormal(),Side(-Delta.Y*Width*.5,Delta.X*Width*.5);const int32 Base=Vertices.Num();
             for(const FVector2D P:{A-Side,B-Side,B+Side,A+Side})AddVertex(P,Color);
             Indices.Append({Base,Base+1,Base+2,Base,Base+2,Base+3});
-            Disc(A,Width*.5,Color);Disc(B,Width*.5,Color);
+            if(Caps){Disc(A,Width*.5,Color);Disc(B,Width*.5,Color);}
         };
         auto Points=[](const TSharedPtr<FJsonObject>& Row)
         {
@@ -248,7 +251,8 @@ namespace
                 FVector2D Centre=FVector2D::ZeroVector;for(const auto& Point:P)Centre+=Point;Centre/=P.Num();
                 const int32 Base=Vertices.Num();AddVertex(Centre,Color);for(const auto& Point:P)AddVertex(Point,Color);
                 for(int32 I=0;I<P.Num();++I)Indices.Append({Base,Base+1+I,Base+1+(I+1)%P.Num()});
-                for(int32 I=0;I<P.Num();++I)Stroke(P[I],P[(I+1)%P.Num()],Number(Spec,TEXT("casingWidth"),4),Backing);
+                const double Casing=Number(Spec,TEXT("casingWidth"),4);
+                for(int32 I=0;I<P.Num();++I){Stroke(P[I],P[(I+1)%P.Num()],Casing,Backing,false);Disc(P[I],Casing*.5,Backing);}
             }
             for(const auto& Value:Array(Shape,TEXT("strokes")))
             {
@@ -256,8 +260,13 @@ namespace
                 const int32 Segments=P.Num()-1+(Boolean(Row,TEXT("closed"))?1:0);
                 const double Width=FMath::Clamp(Number(Row,TEXT("width"),6),1.,12.);
                 const FLinearColor Color=Row->HasField(TEXT("color"))?Colour(String(Row,TEXT("color"))):Main;
-                for(int32 Layer=0;Layer<2;++Layer)for(int32 I=0;I<Segments;++I)
-                    Stroke(P[I],P[(I+1)%P.Num()],Width+(Layer==0?Number(Spec,TEXT("casingWidth"),4):0),Layer==0?Backing:Color);
+                for(int32 Layer=0;Layer<2;++Layer)
+                {
+                    const double LayerWidth=Width+(Layer==0?Number(Spec,TEXT("casingWidth"),4):0);
+                    const FLinearColor Ink=Layer==0?Backing:Color;
+                    for(int32 I=0;I<Segments;++I)Stroke(P[I],P[(I+1)%P.Num()],LayerWidth,Ink,false);
+                    for(const auto& Point:P)Disc(Point,LayerWidth*.5,Ink);
+                }
             }
         };
         auto SaveSection=[&](int32 Index)
@@ -317,10 +326,16 @@ struct FWNTWorldRuntime
     TMap<FString, TWeakObjectPtr<AWNTShipActor>> Ships, BattleShips;
     TMap<FString, TWeakObjectPtr<AActor>> Markers;
     TArray<FString> MarkerDrawOrder;
+    struct FPortLabel{TWeakObjectPtr<AActor> Actor;FString Key,Label;bool Major=false;double Capacity=0;};
+    TArray<FPortLabel> PortLabels;
     int32 DrawnChartMarkers = 0;
+    int32 DrawnPortLabels = 0;
     int32 ChartVertices = 0, ChartTriangles = 0;
     double ChartDrawMilliseconds = 0, ChartProjectionMilliseconds = 0, ChartBatchMilliseconds = 0;
+    double ChartPortLabelsMilliseconds = 0;
     double MapRepositionMilliseconds = 0;
+    double MapShipUpdateMilliseconds = 0;
+    double PortReliefScale = 1;
     TMap<TWeakObjectPtr<AActor>, TSharedPtr<FJsonObject>> Selections;
     TMap<FString, FVector2D> PortPositions;
     TMap<FString, FVector2D> PublicPositions;
@@ -366,12 +381,15 @@ struct FWNTWorldRuntime
     int32 VisibleShoreBatteries=0;
     int32 VisibleBattleShipMarkers=0;
     FWNTBattleEffects BattleEffects;
+    FWNTBattleAircraft BattleAircraft;
     FString BattleId;
     double BattleAt = 0;
     bool bBattleEffectsWereAnimating = false;
     bool bBattleMovie = false;
     double ReceivedAt = 0, Duration = 0, BattleReceivedAt = 0, BattleDuration = 0;
     double LastWorldFraction = -1, LastBattleFraction = -1;
+    double BattlePacketApplyMilliseconds=0,BattlePacketApplyPeakMilliseconds=0;
+    double BattleTimelineOriginSeconds=0,BattleSecondsPerRealSecond=0;
     double NextModelRefresh = 0, RouteWidth = 10000, BattleSymbolTime = 0;
     bool bGridVisible = true;
     FVector LastMarkerCamera = FVector(TNumericLimits<double>::Max());
@@ -610,6 +628,9 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         const auto Port = Value->AsObject(); FVector2D Geo; if (!Point(Port, TEXT("position"), Geo)) continue;
         const FString PortId = Id(Port, TEXT("id")); KeepPorts.Add(PortId); Runtime->PortPositions.Add(PortId, Geo);
         auto PortPick = Selection(TEXT("port"), PortId, String(Port, TEXT("name")));
+        PortPick->SetBoolField(TEXT("major"),Boolean(Port,TEXT("major"),true));
+        PortPick->SetStringField(TEXT("tier"),String(Port,TEXT("tier"),TEXT("dock")));
+        PortPick->SetNumberField(TEXT("capacity"),Number(Port,TEXT("capacity")));
         PortPick->SetStringField(TEXT("visualStatus"),TEXT("navigation-symbol")); PortPick->SetBoolField(TEXT("pendingScenery"),true);
         Marker(TEXT("port:") + PortId, PortPick);
     }
@@ -640,6 +661,14 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
     };
     Runtime->MarkerDrawOrder.Sort([&](const FString& A,const FString& B)
     {const int32 AR=Rank(A),BR=Rank(B);return AR==BR?A<B:AR<BR;});
+    Runtime->PortLabels.Reset();
+    for(const auto& Key:Runtime->MarkerDrawOrder)if(auto* Actor=Runtime->Markers.FindRef(Key).Get())
+    {
+        const auto Pick=Runtime->Selections.FindRef(Actor);if(String(Pick,TEXT("kind"))!=TEXT("port"))continue;
+        Runtime->PortLabels.Add({Actor,Key,String(Pick,TEXT("label")),Boolean(Pick,TEXT("major"),true),Number(Pick,TEXT("capacity"))});
+    }
+    Runtime->PortLabels.Sort([](const FWNTWorldRuntime::FPortLabel& A,const FWNTWorldRuntime::FPortLabel& B)
+    {if(A.Major!=B.Major)return A.Major;return A.Capacity==B.Capacity?A.Key<B.Key:A.Capacity>B.Capacity;});
     for (auto It = Runtime->LoadedWorldModels.CreateIterator(); It; ++It) if (!KeepShips.Contains(It.Key())) It.RemoveCurrent();
     for (auto It = Runtime->PortPositions.CreateIterator(); It; ++It) if (!KeepPorts.Contains(It.Key())) It.RemoveCurrent();
     if (Terrain)
@@ -721,6 +750,7 @@ void AWNTWorldActor::UpdateWorld(double Fraction)
 
 void AWNTWorldActor::RepositionPorts()
 {
+    Runtime->PortReliefScale=Terrain?Terrain->GetReliefScale():1.;
     for (const auto& Pair : Runtime->PortPositions)
     {
         const double Height=GroundHeight(Pair.Value);
@@ -856,6 +886,9 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
     const FString Report = Id(Packet, TEXT("id")); const bool SameBattle = Runtime->BattleId == Report;
     const double Now=FPlatformTime::Seconds(),At=Number(Packet,TEXT("at"));
     const bool NewFrame=Runtime->BattleEffects.SetPacket(Packet,Now);
+    Runtime->BattleTimelineOriginSeconds=Number(Packet,TEXT("timelineOriginSeconds"));
+    Runtime->BattleSecondsPerRealSecond=Number(Packet,TEXT("secondsPerRealSecond"));
+    if(NewFrame)Runtime->BattleAircraft.SetPacket(Packet,DataDirectory);
     Runtime->bBattleMovie=Boolean(Packet,TEXT("movie"));
     const bool Forward=SameBattle&&At>Runtime->BattleAt;
     if(NewFrame)
@@ -939,7 +972,11 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
     // Viewport messages own scene activation. A delayed demo packet must not
     // reactivate a hidden/title scene after the user has entered the campaign.
     const double Fraction=Runtime->BattleDuration>0?FMath::Clamp(Runtime->BattleEffects.Elapsed(Now)/Runtime->BattleDuration,0.,1.):1.;
-    UpdateBattle(Fraction); UpdateVisibility();
+    // All campaign actors/terrain are already hidden by SetSceneMode. A live
+    // ten-second slice must not sweep hundreds of unrelated world actors.
+    UpdateBattle(Fraction);
+    Runtime->BattlePacketApplyMilliseconds=(FPlatformTime::Seconds()-Now)*1000.;
+    Runtime->BattlePacketApplyPeakMilliseconds=FMath::Max(Runtime->BattlePacketApplyPeakMilliseconds,Runtime->BattlePacketApplyMilliseconds);
 }
 
 void AWNTWorldActor::UpdateBattle(double Fraction)
@@ -1001,6 +1038,7 @@ void AWNTWorldActor::UpdateVisibility()
         Actor->SetActorHiddenInGame(!Visible); Actor->SetActorEnableCollision(Visible);
     }
     Runtime->BattleEffects.SetVisible(!bSceneHidden&&bBattleMode);
+    Runtime->BattleAircraft.SetVisible(!bSceneHidden&&bBattleMode);
 }
 
 void AWNTWorldActor::UpdateChartMarkers()
@@ -1016,7 +1054,10 @@ void AWNTWorldActor::UpdateChartMarkers()
         const FVector Ground=Actor->GetActorLocation();
         const double Distance=Camera?FVector::Distance(Camera->GetCameraLocation(),Ground):0;
         const bool Ahead=!Camera||FVector::DotProduct(Ground-Camera->GetCameraLocation(),Camera->GetCameraRotation().Vector())>1;
-        const bool Glyph=WorldVisible&&Ahead&&!Boolean(Pick,TEXT("docked"))&&(Kind==TEXT("port")||Kind==TEXT("battle")
+        const double MapZoom=Camera?WNTCameraMath::WorldViewDistance()/FMath::Max(1.,FMath::Abs(Camera->GetCameraLocation().Z)):1.;
+        const bool PortVisible=Kind!=TEXT("port")||Boolean(Pick,TEXT("major"),true)
+            ||MapZoom>=(String(Pick,TEXT("tier"))==TEXT("base")?4.:16.);
+        const bool Glyph=WorldVisible&&Ahead&&PortVisible&&!Boolean(Pick,TEXT("docked"))&&(Kind==TEXT("port")||Kind==TEXT("battle")
             ||Distance>2000000.);
         const bool Highlight=WorldVisible&&Ahead&&Selected;
         Actor->SetActorHiddenInGame(!Glyph&&!Highlight);
@@ -1038,8 +1079,8 @@ void AWNTWorldActor::UpdateChartMarkers()
 void AWNTWorldActor::DrawChart(UCanvas* Canvas)
 {
     const int32 PreviousVertices=Runtime->ChartVertices;
-    Runtime->DrawnChartMarkers=Runtime->ChartVertices=Runtime->ChartTriangles=0;
-    Runtime->ChartDrawMilliseconds=Runtime->ChartProjectionMilliseconds=Runtime->ChartBatchMilliseconds=0;
+    Runtime->DrawnChartMarkers=Runtime->ChartVertices=Runtime->ChartTriangles=Runtime->DrawnPortLabels=0;
+    Runtime->ChartDrawMilliseconds=Runtime->ChartProjectionMilliseconds=Runtime->ChartBatchMilliseconds=Runtime->ChartPortLabelsMilliseconds=0;
     Runtime->VisibleAirWings=Runtime->VisibleShoreBatteries=Runtime->VisibleBattleShipMarkers=0;
     if(!Canvas||!Canvas->Canvas||bSceneHidden)return;
     const double Started=FPlatformTime::Seconds();
@@ -1208,6 +1249,27 @@ void AWNTWorldActor::DrawChart(UCanvas* Canvas)
         Runtime->ChartBatchMilliseconds=(FPlatformTime::Seconds()-BatchStarted)*1000.;
     };
     FChartCanvasItem Ink(DrawIndexed);Canvas->DrawItem(Ink);
+    Runtime->DrawnPortLabels=0;
+    // Names are chart ink at the same exact anchor as the recognizable port
+    // glyph. Major docks get first choice of label space, then regional bases.
+    const double LabelsStarted=FPlatformTime::Seconds();
+    TArray<FBox2D> LabelBounds;
+    if(GEngine&&GEngine->GetSmallFont())for(const auto& Port:Runtime->PortLabels)
+    {
+        auto* Actor=Port.Actor.Get();if(!Actor||Actor->IsHidden())continue;
+        FVector2D At;if(!Projection.Project(Actor->GetActorLocation(),At)||At.X<0||At.Y<0||At.X>Canvas->SizeX||At.Y>Canvas->SizeY)continue;
+        const FString& Label=Port.Label;
+        const double Pixels=GetChartPixelSize(Actor,Canvas->SizeY);
+        At=FVector2D(FMath::RoundToDouble(At.X+Pixels*.65),FMath::RoundToDouble(At.Y-7.*UIScale));
+        float TextWidth=0,TextHeight=0;Canvas->StrLen(GEngine->GetSmallFont(),Label,TextWidth,TextHeight);
+        const FBox2D Bounds(At-FVector2D(2,2)*UIScale,At+FVector2D(TextWidth+3,TextHeight+2)*UIScale);
+        bool Overlap=false;for(const auto& Other:LabelBounds)if(Other.Intersect(Bounds)){Overlap=true;break;}
+        if(Overlap||Bounds.Max.X>Canvas->SizeX)continue;
+        FCanvasTextItem Text(At,FText::FromString(Label),GEngine->GetSmallFont(),FLinearColor(.86f,.89f,.79f));
+        Text.Scale=FVector2D(UIScale,UIScale);Text.bOutlined=true;Text.OutlineColor=FLinearColor(.015f,.025f,.035f);
+        Canvas->DrawItem(Text);LabelBounds.Add(Bounds);++Runtime->DrawnPortLabels;
+    }
+    Runtime->ChartPortLabelsMilliseconds=(FPlatformTime::Seconds()-LabelsStarted)*1000.;
     Runtime->ChartDrawMilliseconds=(FPlatformTime::Seconds()-Started)*1000.;
 }
 
@@ -1286,14 +1348,23 @@ TSharedPtr<FJsonObject> AWNTWorldActor::GetChartDiagnostics() const
     }
     Result->SetArrayField(TEXT("selectedForceIds"),Ids);Result->SetArrayField(TEXT("selectedMarkers"),Markers);
     Result->SetNumberField(TEXT("visibleSelectedMarkerCount"),VisibleSelected);Result->SetNumberField(TEXT("markerCount"),Runtime->Markers.Num());
+    Result->SetNumberField(TEXT("drawnPortLabels"),Runtime->DrawnPortLabels);
     Result->SetStringField(TEXT("renderer"),TEXT("screen-vector"));Result->SetNumberField(TEXT("drawnMarkers"),Runtime->DrawnChartMarkers);
     Result->SetNumberField(TEXT("drawMilliseconds"),Runtime->ChartDrawMilliseconds);
     Result->SetNumberField(TEXT("projectionSetupMilliseconds"),Runtime->ChartProjectionMilliseconds);
     Result->SetNumberField(TEXT("indexedBatchMilliseconds"),Runtime->ChartBatchMilliseconds);
+    Result->SetNumberField(TEXT("portLabelsMilliseconds"),Runtime->ChartPortLabelsMilliseconds);
     Result->SetNumberField(TEXT("submittedVertices"),Runtime->ChartVertices);
     Result->SetNumberField(TEXT("submittedTriangles"),Runtime->ChartTriangles);
     Result->SetNumberField(TEXT("mapRepositionMilliseconds"),Runtime->MapRepositionMilliseconds);
+    Result->SetNumberField(TEXT("mapShipUpdateMilliseconds"),Runtime->MapShipUpdateMilliseconds);
     Result->SetNumberField(TEXT("tacticalAirWingCount"),Runtime->BattleAirWings.Num());Result->SetNumberField(TEXT("visibleAirWingCount"),Runtime->VisibleAirWings);
+    Result->SetNumberField(TEXT("visibleAircraftModelCount"),Runtime->BattleAircraft.VisibleCount());
+    Result->SetNumberField(TEXT("aircraftModelPoolCount"),Runtime->BattleAircraft.LoadedPoolCount());
+    Result->SetNumberField(TEXT("recordedAircraftAttackRuns"),Runtime->BattleAircraft.AttackRunCount());
+    Result->SetNumberField(TEXT("battlePacketApplyMilliseconds"),Runtime->BattlePacketApplyMilliseconds);
+    Result->SetNumberField(TEXT("battlePacketApplyPeakMilliseconds"),Runtime->BattlePacketApplyPeakMilliseconds);
+    Result->SetNumberField(TEXT("battlePresentationSeconds"),FMath::Min(Runtime->BattleAt,Runtime->BattleTimelineOriginSeconds+Runtime->BattleEffects.Elapsed(FPlatformTime::Seconds())*Runtime->BattleSecondsPerRealSecond));
     TArray<TSharedPtr<FJsonValue>> Wings;const double AirElapsed=Runtime->BattleEffects.Elapsed(FPlatformTime::Seconds());
     for(const auto& Wing:Runtime->BattleAirWings)
     {
@@ -1327,6 +1398,7 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
         if (Fraction != Runtime->LastBattleFraction||Animating||Runtime->bBattleEffectsWereAnimating) UpdateBattle(Fraction);
         Runtime->bBattleEffectsWereAnimating=Animating;
         Runtime->BattleEffects.Update(this,Runtime->BattleSurfaceTransforms,Now,true,&Runtime->BattleShips);
+        Runtime->BattleAircraft.Update(this,Runtime->BattleEffects.Elapsed(Now),true);
         if(const auto* Player=GetWorld()->GetFirstPlayerController())if(const auto* Camera=Player->PlayerCameraManager.Get())
             for(const auto& Pair:Runtime->BattleShips)if(auto* Ship=Pair.Value.Get())
             {
@@ -1341,6 +1413,20 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
     }
     else
     {
+        const double Relief=Terrain?Terrain->GetReliefScale():1.;
+        if(!FMath::IsNearlyEqual(Relief,Runtime->PortReliefScale,1e-9))
+        {
+            // The geographic surface samples are already known. Match shader
+            // relief without repeating polygon/triangle queries during zoom.
+            const double Ratio=Relief/Runtime->PortReliefScale;
+            for(const auto& Pair:Runtime->Markers)if(auto* Actor=Pair.Value.Get())
+            {
+                const FString Kind=String(Runtime->Selections.FindRef(Actor),TEXT("kind"));
+                if(Kind!=TEXT("port")&&Kind!=TEXT("country")&&Kind!=TEXT("front")&&Kind!=TEXT("battle"))continue;
+                FVector Position=Actor->GetActorLocation();Position.Z*=Ratio;Actor->SetActorLocation(Position);
+            }
+            Runtime->PortReliefScale=Relief;Runtime->LastMarkerCamera=FVector(TNumericLimits<double>::Max());
+        }
         if(!Boolean(Runtime->Packet,TEXT("paused"))&&Boolean(Runtime->Packet,TEXT("animate"),true))Runtime->BattleSymbolTime+=DeltaSeconds;
         const double Fraction = Runtime->Duration > 0 ? FMath::Clamp((Now - Runtime->ReceivedAt) / Runtime->Duration, 0.0, 1.0) : 1.0;
         if (Fraction != Runtime->LastWorldFraction) UpdateWorld(Fraction);
@@ -1348,16 +1434,24 @@ void AWNTWorldActor::Tick(float DeltaSeconds)
         // remain explicit navigation symbols until real scenery exists.
         if (const auto* Player = GetWorld()->GetFirstPlayerController()) if (const APlayerCameraManager* Camera = Player->PlayerCameraManager)
         {
+            int32 PixelWidth,PixelHeight;Player->GetViewportSize(PixelWidth,PixelHeight);
+            const bool SameView=Camera->GetCameraLocation().Equals(Runtime->LastMarkerCamera, .01)
+                && Camera->GetCameraRotation().Quaternion().Equals(Runtime->LastMarkerCameraRotation, .000001)
+                &&Runtime->LastMarkerViewport==FIntPoint(PixelWidth,PixelHeight)
+                &&FMath::IsNearlyEqual(Runtime->LastMarkerFOV,Camera->GetFOVAngle());
+            // Every hull is outside the 60 km residency radius from this
+            // altitude. Once a changed view has released them, a paused
+            // strategic view has no streaming or symbol work to repeat.
+            Runtime->MapShipUpdateMilliseconds=0;
+            if(SameView&&FMath::Abs(Camera->GetCameraLocation().Z)>6000000.)return;
+            const double ShipStarted=FPlatformTime::Seconds();
             for(const auto& Pair:Runtime->Ships)if(auto* Ship=Pair.Value.Get())
             {
                 Ship->RefreshModelForCamera(Camera->GetCameraLocation(),RefreshModels);
                 Ship->UpdateSymbolForCamera(Camera->GetCameraLocation(),Camera->GetCameraRotation());
             }
-            int32 PixelWidth,PixelHeight;Player->GetViewportSize(PixelWidth,PixelHeight);
-            if (Camera->GetCameraLocation().Equals(Runtime->LastMarkerCamera, .01)
-                && Camera->GetCameraRotation().Quaternion().Equals(Runtime->LastMarkerCameraRotation, .000001)
-                &&Runtime->LastMarkerViewport==FIntPoint(PixelWidth,PixelHeight)
-                &&FMath::IsNearlyEqual(Runtime->LastMarkerFOV,Camera->GetFOVAngle())) return;
+            Runtime->MapShipUpdateMilliseconds=(FPlatformTime::Seconds()-ShipStarted)*1000.;
+            if(SameView)return;
             Runtime->LastMarkerCamera = Camera->GetCameraLocation();
             Runtime->LastMarkerCameraRotation = Camera->GetCameraRotation().Quaternion();
             Runtime->LastMarkerViewport=FIntPoint(PixelWidth,PixelHeight);
@@ -1659,8 +1753,11 @@ bool FWNTWorldBootstrapTest::RunTest(const FString& Parameters)
                 const FVector AfterQ=(Grid->ProcVertexBuffer[2].Position+Grid->ProcVertexBuffer[5].Position)*.5;
                 TestTrue(TEXT("Grid width changes preserve geographic endpoints and vertex allocation"),
                     VertexAllocation==Grid->ProcVertexBuffer.GetData()&&BeforeP.Equals(AfterP,.001)&&BeforeQ.Equals(AfterQ,.001));
-                const double RibbonWidth=FVector::Distance(Grid->ProcVertexBuffer[0].Position,Grid->ProcVertexBuffer[1].Position);
-                TestTrue(TEXT("Grid support ribbon spans four pixels for derivative antialiasing"),RibbonWidth>=3200000.0*4&&RibbonWidth<=3200000.0*4*FMath::Sqrt(2.0)+.01);
+                const double CPUWidth=FVector::Distance(Grid->ProcVertexBuffer[0].Position,Grid->ProcVertexBuffer[1].Position);
+                TestTrue(TEXT("CPU grid support remains immutable at100 metres"),FMath::Abs(CPUWidth-10000.)<.01);
+                const auto& PrimitiveParameters=GridSample->GetCustomPrimitiveData().Data;
+                const double RibbonWidth=PrimitiveParameters.IsValidIndex(1)?PrimitiveParameters[1]*FVector2D::Distance(Grid->ProcVertexBuffer[0].UV3,Grid->ProcVertexBuffer[1].UV3):0.;
+                TestTrue(TEXT("Actual GPU extrusion spans four pixels for derivative antialiasing"),RibbonWidth>=3200000.0*4&&RibbonWidth<=3200000.0*4*FMath::Sqrt(2.0)+.01);
             }
             TArray<const FProcMeshSection*> Sections;
             TArray<FVector> BeforeLocations;

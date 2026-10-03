@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WNTBattleTimeline.h"
 
 class AActor;
 class AWNTShipActor;
@@ -33,6 +34,7 @@ private:
     {
         FString Key, Type, Source, Target, Weapon;
         double At=0, Duration=1;
+        int32 Planes=0,PlanesLost=0;
         TOptional<FVector> SourcePosition, TargetPosition;
     };
     TArray<FEvent> Events;
@@ -43,5 +45,6 @@ private:
     FString FrameKey;
     double StartedAt = 0, Duration = 15, PausedElapsed = 0;
     bool bAnimate = false, bPlaybackPaused = false;
+    FWNTRollingBattleClock RollingClock;
     void EnsurePools(AActor* Owner);
 };

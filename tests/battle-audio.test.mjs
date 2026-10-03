@@ -45,22 +45,22 @@ test('clock fires, hits and misses once at their own recorded moments',()=>{
   const c=clock();const p=packet([{key:'salvo',type:'salvo',time:.2,duration:.7,hits:0},
     {key:'hit',type:'hit',time:.5,damage:4}]);
   c.audio.update(p);c.advance(250);assert.deepEqual(c.played.map(v=>v.kind),['gun']);
-  c.audio.update(p);c.advance(300);assert.deepEqual(c.played.map(v=>v.kind),['gun','impact']);
-  c.advance(400);assert.deepEqual(c.played.map(v=>v.kind),['gun','impact','splash']);
-  c.audio.update(p);c.advance(900);assert.equal(c.played.length,3);
+  c.audio.update(p);c.advance(300);assert.deepEqual(c.played.map(v=>v.kind),['gun','shell-flight','impact']);
+  c.advance(400);assert.deepEqual(c.played.map(v=>v.kind),['gun','shell-flight','impact','splash']);
+  c.audio.update(p);c.advance(900);assert.equal(c.played.length,4);
   c.audio.destroy();assert.equal(c.jobs.size,0);
 });
 
 test('negative launch time preserves a future miss without replaying a launch',()=>{
   const c=clock();c.audio.update(packet([{key:'old',type:'salvo',time:-100,duration:101,hits:0}]));
-  c.advance(1100);assert.deepEqual(c.played.map(v=>v.kind),['splash']);c.audio.destroy();
+  c.advance(1100);assert.deepEqual(c.played.map(v=>v.kind),['shell-flight','splash']);c.audio.destroy();
 });
 
 test('rolling live windows deduplicate stable event identities and keep future arrival',()=>{
   const c=clock();c.audio.update(packet([{key:'shot',type:'salvo',time:.1,duration:1,hits:0}]));
   c.advance(200);assert.equal(c.played.length,1);
   c.audio.update(packet([{key:'shot',type:'salvo',time:-.1,duration:1,hits:0}],{eventKey:'window-2'}));
-  c.advance(950);assert.deepEqual(c.played.map(v=>v.kind),['gun','splash']);c.audio.destroy();
+  c.advance(950);assert.deepEqual(c.played.map(v=>v.kind),['gun','shell-flight','splash']);c.audio.destroy();
 });
 
 test('paused preparation, quick resolution and explicit seek never play a backlog',()=>{
@@ -88,7 +88,7 @@ test('dense accelerated combat has bounded voices and prioritizes real damage',(
   c.audio.update(packet(events));c.advance(200);
   assert.deepEqual(c.played.map(v=>v.kind),['sinking','impact','gun']);
   c.advance(500);assert.equal(c.played.length,3);
-  assert.equal(c.audio.diagnostics().dropped,99);c.audio.destroy();
+  assert.equal(c.audio.diagnostics().dropped,199);c.audio.destroy();
 });
 
 test('muted/locked devices never schedule a timer or replay old sounds when unlocked',()=>{
@@ -148,7 +148,7 @@ class Param {
   exponentialRampToValueAtTime(...args){this.events.push(['exponential',...args]);}
 }
 class Node {
-  constructor(kind){this.kind=kind;this.gain=new Param();this.frequency=new Param();this.Q=new Param();this.pan=new Param();this.disconnected=false;}
+  constructor(kind){this.kind=kind;for(const field of ['gain','frequency','Q','pan','playbackRate','threshold','knee','ratio','attack','release'])this[field]=new Param();this.disconnected=false;}
   connect(){}disconnect(){this.disconnected=true;}start(at){this.startAt=at;}stop(at){this.stopAt=at;if(at===undefined)this.onended?.();}
 }
 class Audio {
@@ -156,8 +156,9 @@ class Audio {
   node(kind){const node=new Node(kind);this.nodes.push(node);return node;}
   createGain(){return this.node('gain');}createBufferSource(){return this.node('noise');}
   createOscillator(){return this.node('tone');}createBiquadFilter(){return this.node('filter');}
+  createDynamicsCompressor(){return this.node('compressor');}createWaveShaper(){return this.node('ceiling');}
   createStereoPanner(){return this.node('pan');}
-  createBuffer(channels,length){return{getChannelData:()=>new Float32Array(length)};}
+  createBuffer(channels,length){const data=Array.from({length:channels},()=>new Float32Array(length));return{length,numberOfChannels:channels,getChannelData:channel=>data[channel]};}
 }
 
 test('shared SFX volume, explicit unlock, polyphony and owner cleanup apply to actual voice graphs',async t=>{
@@ -169,26 +170,60 @@ test('shared SFX volume, explicit unlock, polyphony and owner cleanup apply to a
   sound.unlockSound();assert.equal(made,1);
   sound.soundSettings(true,.4);assert.deepEqual(sound.soundPreferences(),{enabled:true,volume:.4});
   assert.equal(last.nodes[0].gain.value,.4*.45);
-  for(let i=0;i<8;i++)assert.equal(sound.playBattleSound('gun',{owner:i%2}),true);
-  assert.equal(sound.playBattleSound('impact'),false);assert.equal(sound.soundStatus().battleVoiceCount,8);
-  sound.stopBattleSounds(0);assert.equal(sound.soundStatus().battleVoiceCount,4);
+  for(let i=0;i<12;i++)assert.equal(sound.playBattleSound('gun',{owner:i%2}),true);
+  assert.equal(sound.playBattleSound('shell-flight'),false);assert.equal(sound.soundStatus().battleVoiceCount,12);
+  assert.equal(sound.playBattleSound('impact'),true,'Real damage replaces a lower-priority tail when the mix is full');
+  assert.equal(sound.soundStatus().battleCuesStolen,1);assert.equal(sound.soundStatus().battleVoiceCount,12);
+  sound.stopBattleSounds(0);assert.equal(sound.soundStatus().battleVoiceCount,7);
   sound.soundSettings(false,.4);assert.equal(last.nodes[0].gain.value,0);assert.equal(sound.soundStatus().battleVoiceCount,0);
   assert.equal(sound.playBattleSound('gun'),false);
   sound.soundSettings(true,0);assert.equal(sound.playBattleSound('gun'),false);
-  const effects=last.nodes.slice(1);assert.ok(effects.every(node=>node.disconnected));
+  const effects=last.nodes.slice(6);assert.ok(effects.every(node=>node.disconnected));
+  assert.equal(last.nodes[5].gain.value,0,'The battle bus shares the SFX mute');
 });
 
-test('procedural sounds have distinct spectra/envelopes and bounded source lifetimes',async()=>{
-  const {synthesizeBattleSound}=await import('../ui/sound.mjs');
+test('layered stereo sounds have distinct PCM and one bounded cached source per voice',async()=>{
+  const {synthesizeBattleSound,BATTLE_SOUND_PROFILES}=await import('../ui/sound.mjs');
   const profiles=[];
-  for(const kind of ['gun','impact','splash','torpedo','air','sinking','depth-charge']){
+  for(const kind of Object.keys(BATTLE_SOUND_PROFILES)){
     const audio=new Audio();let ended=0;
     const voice=synthesizeBattleSound(audio,audio.destination,kind,{onended:()=>ended++});
-    assert.ok(voice.duration>0&&voice.duration<=1.8);
+    assert.ok(voice.duration>=1&&voice.duration<=7.2);
     const sources=audio.nodes.filter(node=>['noise','tone'].includes(node.kind));
-    assert.ok(sources.length<=2);assert.ok(sources.every(source=>source.stopAt<=1.8));
-    const filter=audio.nodes.find(node=>node.kind==='filter');profiles.push(JSON.stringify([filter.type,filter.frequency.events]));
+    assert.equal(sources.length,1);assert.equal(sources[0].stopAt,voice.duration);
+    const buffer=sources[0].buffer;assert.equal(buffer.numberOfChannels,2);
+    const left=buffer.getChannelData(0),right=buffer.getChannelData(1);
+    assert.ok(left.some(value=>Math.abs(value)>.1));assert.ok(left.some((value,i)=>value!==right[i]));
+    assert.ok(left.every(Number.isFinite));assert.ok(left.every(value=>Math.abs(value)<=.901));
+    profiles.push(left.slice(500,600).join(','));
     voice.stop();voice.stop();assert.equal(ended,1);assert.ok(audio.nodes.every(node=>node.disconnected));
+    const again=synthesizeBattleSound(audio,audio.destination,kind);
+    assert.equal(audio.nodes.findLast(node=>node.kind==='noise').buffer,buffer,'Repeated kind/variant reuses cached PCM');again.stop();
   }
-  assert.equal(new Set(profiles).size,7);
+  assert.equal(new Set(profiles).size,8);
+});
+
+test('audio uses recorded position and weapon size without guessing damage',()=>{
+  const units=[{key:'a',positionMetres:[-1000,0,0]},{key:'b',positionMetres:[1000,0,0]}];
+  const cues=battleAudioCues([{key:'shot',type:'salvo',time:1,duration:3,sourceKey:'a',targetKey:'b',caliberMm:406},
+    {key:'hit',type:'hit',time:4,targetKey:'b',damage:.15,weaponType:'shell'},
+    {key:'depth',type:'hit',time:5,targetKey:'a',damage:.1,weaponType:'depth charge'}],{units});
+  const launch=cues.find(c=>c.key==='shot:launch'),flight=cues.find(c=>c.key==='shot:flight');
+  assert.ok(launch.pan<0&&launch.pitch<1);assert.ok(flight.pan<0&&flight.endPan>0);
+  assert.ok(Math.abs(flight.time-3.2)<1e-10);assert.ok(Math.abs(flight.time+flight.duration-4)<1e-10);assert.ok(cues.find(c=>c.key==='hit:impact').pan>0);
+  assert.equal(cues.find(c=>c.key==='depth:impact').kind,'depth-charge');
+  assert.equal(cues.filter(c=>c.kind==='impact').length,1);
+});
+
+test('air egress animation does not delay a recorded miss or invent a shell flight',()=>{
+  const cues=battleAudioCues([{key:'raid',type:'salvo',weapon:'air',time:2,duration:2.4,hits:0,planes:28}]);
+  assert.deepEqual(cues.map(cue=>[cue.kind,cue.time]),[['air',2],['splash',2]]);
+  assert.ok(cues[0].intensity>.75);
+});
+
+test('cosmetic sound variants are deterministic and independent of global randomness',async t=>{
+  const original=Math.random;Math.random=()=>{throw new Error('Gameplay randomness is unavailable');};t.after(()=>{Math.random=original;});
+  const {synthesizeBattleSound}=await import('../ui/sound.mjs');
+  const a=new Audio(),b=new Audio();synthesizeBattleSound(a,a.destination,'gun',{key:'same'});synthesizeBattleSound(b,b.destination,'gun',{key:'same'});
+  assert.deepEqual(a.nodes[0].buffer.getChannelData(0),b.nodes[0].buffer.getChannelData(0));
 });

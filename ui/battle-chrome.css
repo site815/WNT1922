@@ -1,0 +1,53 @@
+/* The same compact tiles, panel widths, type and controls as naval command. */
+.battle-command-shell,.battle-report-backdrop {--battle-panel:rgba(15,28,38,.97);--battle-border:#42545d;--battle-gap:8px;--battle-side:206px;}
+.battle-command-shell {padding:8px;gap:8px;background:var(--bg);}
+.battle-command-shell[data-tactical-page="watch"] {grid-template-rows:46px auto minmax(0,1fr) auto;}
+.battle-command-shell .tactical-header,.battle-command-shell .tactical-watch-toolbar,.battle-command-shell .tactical-rosters,.battle-command-shell .tactical-information,.battle-command-shell .tactical-camera-bar,.battle-command-shell .tactical-battle-events,.battle-command-shell .tactical-watch-footer {background:var(--battle-panel);border:1px solid var(--battle-border);border-radius:7px;box-shadow:0 4px 14px #0005;}
+.battle-command-shell .tactical-header {padding:6px 12px;min-height:46px;gap:12px;}
+.battle-brand {display:flex;align-items:center;gap:22px;}
+.battle-brand>.wordmark {font-size:26px;white-space:nowrap;}
+.battle-brand .wordmark span {color:var(--gold);}
+.battle-brand h1 {font:600 16px/1.25 "Segoe UI",sans-serif;margin:0;}
+.battle-brand .eyebrow {font-size:9px;color:var(--muted);}
+.battle-command-shell .tactical-header>div:last-child {gap:12px;}
+.battle-command-shell .tactical-header [data-tactical="close"] {font-size:22px;min-height:28px;padding:1px 8px;}
+.battle-command-shell .tactical-watch-toolbar {padding:6px 10px;gap:5px 12px;}
+.battle-command-shell .tactical-watch-toolbar button,.battle-command-shell .tactical-watch-toolbar select {font-size:11px;min-height:28px;padding:4px 7px;}
+.battle-command-shell .tactical-watch-body {grid-template-columns:var(--battle-side) minmax(200px,1fr) var(--battle-side);gap:var(--battle-gap);}
+.battle-command-shell .tactical-rosters,.battle-command-shell .tactical-information {padding:10px;}
+.battle-command-shell .tactical-battle-view {gap:8px;grid-template-rows:auto minmax(100px,1fr) minmax(72px,16%);}
+.battle-command-shell .tactical-stage {border:1px solid var(--battle-border);border-radius:7px;}
+.battle-command-shell .tactical-camera-bar {padding:4px 8px;}
+.battle-command-shell .tactical-camera-bar button {min-height:26px;font-size:11px;}
+.battle-command-shell .tactical-roster-ship {display:block;position:relative;background:#172a37;border-color:#344b5b;padding:7px 8px;}
+.battle-command-shell .tactical-roster-ship>span {display:block;width:100%;}
+.battle-command-shell .tactical-roster-ship small {padding-right:42px;line-height:1.35;}
+.battle-command-shell .tactical-roster-ship>strong {position:absolute;right:8px;bottom:7px;line-height:1.35;}
+.battle-command-shell .tactical-roster-ship.selected {border-color:var(--gold);background:#34433f;}
+.battle-command-shell .tactical-watch-footer {padding:5px 10px;font-size:10px;}
+.battle-audio-controls {display:flex;align-items:center;gap:9px;}
+.battle-audio-controls>label {display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);white-space:nowrap;}
+.battle-audio-controls input[type="range"] {width:64px;min-height:18px;accent-color:var(--gold);}
+.battle-audio-controls input[type="checkbox"] {accent-color:var(--gold);min-height:0;}
+.battle-report-tabs {display:flex;gap:6px;align-items:center;padding:6px 14px;border-bottom:1px solid var(--battle-border);flex-shrink:0;}
+.battle-report-tabs button {font-size:12px;padding:6px 10px;min-height:30px;}
+.battle-report-tabs .current {border-color:var(--gold);color:var(--gold);background:#34433f;}
+.battle-report-backdrop .modal {border-color:var(--battle-border);background:var(--battle-panel);}
+.battle-report-backdrop .modal:is([data-dialog-type="report"],[data-dialog-type="battle-watch"]) {width:calc(100vw - var(--dialog-left,0px) - var(--dialog-right,0px) - 24px);max-width:none;height:calc(100dvh - var(--dialog-top,0px) - var(--dialog-bottom,0px) - 24px);}
+.battle-report-backdrop .modal[data-dialog-type="battle-watch"]>.modal-body {flex:1;}
+.battle-report-backdrop .modal[data-dialog-type="battle-watch"]>footer {display:none;}
+.battle-report-backdrop .battle-watch {grid-template-columns:minmax(200px,1fr) var(--battle-side);gap:8px;}
+.battle-report-backdrop .battle-watch-information {padding:8px;border:1px solid var(--battle-border);border-radius:7px;background:var(--battle-panel);}
+.battle-report-backdrop .battle-rosters button {display:grid;grid-template-columns:minmax(0,1fr);gap:3px;}
+.battle-report-backdrop .battle-rosters button>span:first-child {font-weight:600;}
+.battle-report-backdrop .battle-rosters button>span:last-child {text-align:left;line-height:1.35;}
+.battle-report-backdrop .battle-air-roster li {display:grid;grid-template-columns:minmax(0,1fr);gap:3px;}
+.battle-report-backdrop .battle-air-roster strong {text-align:left;font-size:11px;}
+.battle-report-backdrop .battle-watch-controls {gap:5px;padding:6px 0;background:transparent;}
+.battle-report-backdrop .battle-watch-controls button {font-size:11px;min-height:28px;padding:4px 7px;}
+.battle-report-backdrop .battle-watch-controls .native-fps {margin-left:auto;font-size:11px;white-space:nowrap;color:var(--muted);}
+.battle-report-backdrop .battle-watch-heading h3 {font:600 15px/1.3 "Segoe UI",sans-serif;}
+.battle-report-backdrop .battle-stage {border-color:var(--battle-border);border-radius:7px;}
+@media(max-width:1200px){.battle-command-shell,.battle-report-backdrop {--battle-side:180px;}.battle-brand {gap:12px;}.battle-brand>.wordmark {font-size:21px;}}
+@media(max-width:850px){.battle-command-shell,.battle-report-backdrop {--battle-side:160px;}.battle-command-shell .tactical-watch-toolbar>div:first-child {gap:7px;}.battle-brand>.wordmark {display:none;}.battle-command-shell .tactical-rosters,.battle-command-shell .tactical-information {padding:7px;}}
+@media(max-height:650px){.battle-command-shell {padding:6px;gap:6px;}.battle-command-shell[data-tactical-page="watch"] {grid-template-rows:40px auto minmax(0,1fr) auto;}.battle-command-shell .tactical-header {min-height:40px;}.battle-command-shell .tactical-watch-footer {font-size:9px;padding:3px 7px;}}

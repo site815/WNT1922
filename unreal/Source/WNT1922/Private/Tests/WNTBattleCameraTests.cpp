@@ -71,7 +71,7 @@ bool FWNTBattleCameraLiveTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("New10-second simulation slices do not restart or prematurely replace the establishing shot"),Director.ActiveShot(101),FString(TEXT("establish")));
     Packet->SetStringField(TEXT("eventKey"),TEXT("slice-3"));Director.SetPacket(Packet,102.6);
     TestEqual(TEXT("A real live salvo chooses a firing shot after the minimum establishing hold"),Director.ActiveShot(102.6),FString(TEXT("firing")));
-    Event->SetStringField(TEXT("type"),TEXT("sink"));Packet->SetStringField(TEXT("eventKey"),TEXT("slice-4"));Director.SetPacket(Packet,102.8);
+    Event->SetStringField(TEXT("key"),TEXT("live-loss"));Event->SetStringField(TEXT("type"),TEXT("sink"));Packet->SetStringField(TEXT("eventKey"),TEXT("slice-4"));Director.SetPacket(Packet,102.8);
     TestEqual(TEXT("Rapid new event keys cannot cause camera whiplash"),Director.ActiveShot(102.8),FString(TEXT("firing")));
     Packet->SetStringField(TEXT("eventKey"),TEXT("slice-5"));Director.SetPacket(Packet,107.2);
     TestEqual(TEXT("A later actual sinking receives focus after the hold expires"),Director.ActiveShot(107.2),FString(TEXT("sink")));
@@ -82,6 +82,18 @@ bool FWNTBattleCameraLiveTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("A shot transition moves gradually rather than teleporting"),Smooth.Target.X>0&&Smooth.Target.X<10000);
     TestTrue(TEXT("Yaw interpolation takes the short path through the180-degree boundary"),FMath::Abs(FMath::FindDeltaAngleDegrees(179.,Smooth.Yaw))<1.);
     TestTrue(TEXT("Camera range eases in log space without crossing through the hull"),Smooth.Distance>After.Distance&&Smooth.Distance<Before.Distance);
+    const auto CriticalPacket=CameraPacket();CriticalPacket->SetStringField(TEXT("tacticalSessionId"),TEXT("critical-test"));
+    CriticalPacket->SetNumberField(TEXT("durationSeconds"),20);CriticalPacket->SetNumberField(TEXT("elapsedSeconds"),0);
+    Event->SetStringField(TEXT("key"),TEXT("routine-fire"));Event->SetStringField(TEXT("type"),TEXT("salvo"));Event->SetNumberField(TEXT("time"),2.6);
+    CriticalPacket->SetArrayField(TEXT("events"),{MakeShared<FJsonValueObject>(Event)});
+    FWNTBattleCameraDirector Critical;Critical.SetPacket(CriticalPacket,100);
+    CriticalPacket->SetStringField(TEXT("eventKey"),TEXT("critical-2"));CriticalPacket->SetNumberField(TEXT("elapsedSeconds"),2.6);Critical.SetPacket(CriticalPacket,102.6);
+    TestEqual(TEXT("The critical sequence begins with routine firing"),Critical.ActiveShot(102.6),FString(TEXT("firing")));
+    Event->SetStringField(TEXT("key"),TEXT("confirmed-loss"));Event->SetStringField(TEXT("type"),TEXT("sink"));Event->SetNumberField(TEXT("time"),2.8);Event->SetNumberField(TEXT("duration"),5);
+    CriticalPacket->SetStringField(TEXT("eventKey"),TEXT("critical-3"));CriticalPacket->SetNumberField(TEXT("elapsedSeconds"),2.8);Critical.SetPacket(CriticalPacket,102.8);
+    TestEqual(TEXT("An immediate loss cannot cause a0.2-second camera cut"),Critical.ActiveShot(102.8),FString(TEXT("firing")));
+    CriticalPacket->SetStringField(TEXT("eventKey"),TEXT("critical-4"));CriticalPacket->SetNumberField(TEXT("elapsedSeconds"),5.2);Critical.SetPacket(CriticalPacket,105.2);
+    TestEqual(TEXT("A still-visible loss preempts a routine7.5-second hold after2.5s, even when its event is no longer new"),Critical.ActiveShot(105.2),FString(TEXT("sink")));
     return true;
 }
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTBattleCameraCutsTest,"WNT.Camera.RemoteActionCutsAndLocalTracking",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
@@ -108,6 +120,33 @@ bool FWNTBattleCameraCutsTest::RunTest(const FString& Parameters)
     const auto Wide=Director.Evaluate(100,1.7),Attack=Director.Evaluate(110,1.7);
     TestTrue(TEXT("Above20km the establishing pose stays near overhead and north-up"),Wide.IsSet()&&Wide->Distance>2000000.&&Wide->Tilt==25.&&Wide->Yaw==0.);
     TestTrue(TEXT("A remote impact still uses the close oblique cinematic pose at the real victim"),Attack.IsSet()&&Attack->Tilt==58.&&Attack->Distance==105000.&&Attack->Target.X==22000000.);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRollingClockTest,"WNT.Camera.RollingTacticalClock",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTRollingClockTest::RunTest(const FString&)
+{
+    FWNTRollingBattleClock Clock;const auto P=MakeShared<FJsonObject>();
+    P->SetStringField(TEXT("tacticalSessionId"),TEXT("live"));P->SetNumberField(TEXT("timelineOriginSeconds"),0);
+    P->SetNumberField(TEXT("secondsPerRealSecond"),60);P->SetNumberField(TEXT("at"),10);P->SetBoolField(TEXT("playbackPaused"),false);
+    TestEqual(TEXT("First frame uses its requested clock"),Clock.Rebase(P,0,0,20),0.);
+    TestEqual(TEXT("A delayed packet holds at its last actual ten-second observation"),Clock.ObservedSeconds(.4),10.);
+    P->SetNumberField(TEXT("at"),20);
+    const double Recovered=Clock.Rebase(P,.4,1./6.,20);
+    TestEqual(TEXT("Overload recovery does not carry an unobserved 24 seconds into a 20-second packet"),Recovered,1./6.);
+    TestEqual(TEXT("The known simulation instant stays monotonic across delayed delivery"),Clock.ObservedSeconds(Recovered),10.);
+    TestTrue(TEXT("New observations interpolate after recovery instead of immediately jumping to the endpoint"),FMath::IsNearlyEqual(Clock.ObservedSeconds(Recovered+.05),13.));
+    TestEqual(TEXT("A repeated stall still stops at the newly known endpoint"),Clock.ObservedSeconds(.8),20.);
+    P->SetNumberField(TEXT("timelineOriginSeconds"),10);P->SetNumberField(TEXT("at"),30);
+    const double Shifted=Clock.Rebase(P,.8,1./6.,20);
+    TestTrue(TEXT("Changing rolling origin preserves the same last observed instant"),FMath::IsNearlyEqual(Shifted,1./6.)&&FMath::IsNearlyEqual(Clock.ObservedSeconds(Shifted),20.));
+    P->SetNumberField(TEXT("at"),10);P->SetNumberField(TEXT("timelineOriginSeconds"),0);
+    TestEqual(TEXT("An explicit backwards replay seek resets precisely"),Clock.Rebase(P,4,0,20),0.);
+    P->SetNumberField(TEXT("at"),20);P->SetBoolField(TEXT("playbackPaused"),true);
+    TestEqual(TEXT("A paused step uses its precise requested observation"),Clock.Rebase(P,4,.3,20),.3);
+    FWNTRollingBattleClock WithinBounds;
+    P->SetBoolField(TEXT("playbackPaused"),false);WithinBounds.Rebase(P,0,0,20);
+    P->SetNumberField(TEXT("at"),30);
+    TestEqual(TEXT("Already observed progress is preserved when a rolling window overlaps"),WithinBounds.Rebase(P,.2,1./6.,20),.2);
     return true;
 }
 #endif

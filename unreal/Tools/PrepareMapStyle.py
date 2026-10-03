@@ -6,7 +6,7 @@ no raster imagery and add no per-territory components.
 """
 import unreal
 
-SCHEMA = "1-political-lines-equal-earth"
+SCHEMA = "2-political-lines-gpu-ribbons"
 
 
 def prepare_map_style(context):
@@ -58,7 +58,7 @@ def prepare_map_style(context):
                 raise RuntimeError("Cannot wire map line alpha")
             if not edit.connect_material_property(custom, "", prop):
                 raise RuntimeError("Cannot wire map line coverage")
-        projection.add_projection(mat)
+        projection.add_projection(mat, ribbon=True, relief=True)
         errors = edit.recompile_material(mat)
         if errors:
             raise RuntimeError("Map line material compilation: " + str(errors))

@@ -36,6 +36,8 @@ export class TacticalSession {
   play() {
     if (!this.canAdvance() || !this.paused) return;
     this.paused = false; this.quick = false; const token = ++this.generation;
+    const interval = 10000 / this.speed;
+    let deadline = this.now() + interval;
     this.emit();
     const tick = () => {
       if (token !== this.generation || this.paused) return;
@@ -43,10 +45,18 @@ export class TacticalSession {
         const from = this.currentSeconds(); this.advanceClock();
         if (!this.canAdvance()) this.paused = true;
         this.emit(from);
-        if (!this.paused) this.timer = this.schedule(tick,10000 / this.speed);
+        if (!this.paused) {
+          // Serialization and UI work consume this interval, not an additional
+          // interval. If overloaded, slow down without skipping physics steps
+          // or queuing an unbounded burst of catch-up work.
+          deadline += interval;
+          const now = this.now();
+          if (deadline < now) deadline = now;
+          this.timer = this.schedule(tick,Math.max(0,deadline-now));
+        }
       } catch (error) {this.pause(); this.onError(error);}
     };
-    this.timer = this.schedule(tick,10000 / this.speed);
+    this.timer = this.schedule(tick,Math.max(0,deadline-this.now()));
   }
   setSpeed(speed) {
     if (this.quick || ![10,30,60,120].includes(Number(speed))) return;

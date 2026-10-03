@@ -2,6 +2,7 @@
 #include "Misc/AutomationTest.h"
 #include "WNTPlayerController.h"
 #include "WNTProjection.h"
+#include "WNTTerrainActor.h"
 #include "WNTWorldActor.h"
 #include "WNTCameraActor.h"
 #include "Camera/PlayerCameraManager.h"
@@ -12,6 +13,28 @@
 #include "Engine/World.h"
 #include "Misc/ScopeExit.h"
 #include "Slate/SceneViewport.h"
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTTerrainPickReliefTest,"WNT.Camera.TerrainRayIncludesStrategicRelief",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTTerrainPickReliefTest::RunTest(const FString& Parameters)
+{
+    for(double Distance:{100000.,50000000.,100000000.})
+    {
+        const double Relief=WNTTerrainGeometry::ReliefScaleForDistance(Distance);
+        const FVector Origin(0,0,20000000.);
+        for(FVector Direction:{FVector(0,0,-1),FVector(.2,.3,-1)})
+        {
+            Direction.Normalize();const double End=-Origin.Z/Direction.Z;
+            const double Height=7108.*100.*Relief;
+            const FVector Hit=WNTCameraMath::TerrainRayHit(Origin,Direction,End,(AWNTTerrainActor::LandBaseMetres+10000.)*100.*Relief,
+                [&](const FVector&){return Height;});
+            TestTrue(TEXT("Ray starts above and selects even the highest visually emphasized terrain"),FMath::Abs(Hit.Z-Height)<.01);
+            const FVector Sea=WNTCameraMath::TerrainRayHit(Origin,Direction,End,(AWNTTerrainActor::LandBaseMetres+10000.)*100.*Relief,
+                [](const FVector&){return 0.;});
+            TestTrue(TEXT("Expanded search ceiling preserves sea-level anchors"),FMath::Abs(Sea.Z)<.01);
+        }
+    }
+    return true;
+}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTRebaseHistoryTest,"WNT.Camera.RebaseResetsTemporalHistory",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
 bool FWNTRebaseHistoryTest::RunTest(const FString& Parameters)

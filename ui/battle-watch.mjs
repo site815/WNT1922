@@ -1,6 +1,8 @@
 import { PROFILES, REGIONS, TYPES } from '../mechanics/catalog.mjs';
 import { NATIVE_ART_LEGEND, nativeArtNotice } from './native-art-status.mjs';
 import { tacticalPoseAt, tacticalSceneSnapshot } from './tactical-scene-packet.mjs';
+import {battleAudioControls} from './battle-chrome.mjs';
+import {nativeFPSLabel} from './native-performance.mjs';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num = value => Math.round(Number(value) || 0).toLocaleString('en-US');
@@ -84,7 +86,7 @@ export function battleWatchView(report, campaign, { frameIndex = null, selected 
       <button class="primary" data-action="battle-next" ${!canAdvance || busy ? 'disabled' : ''}>${busy ? 'Advancing…' : atEdge && report.status === 'ongoing' ? 'Next tick · 15 min' : 'Next recorded tick →'}</button>
       <button data-action="battle-latest" ${!recorded || atEdge || busy ? 'disabled' : ''}>Latest</button>
       <button data-action="battle-fit">Fit fleets</button>
-      <button data-action="battle-report" data-id="${report.id}">Full report</button>
+      <span class="native-fps" data-native-fps aria-label="Rendered frames per second">${nativeFPSLabel()}</span>${battleAudioControls('report')}
     </div>
     <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Left-click a ship to inspect its recorded condition; wheel to zoom, right-drag to pan, middle-drag or Shift plus right-drag to orbit."></canvas></div>
     <div class="battle-watch-legend"><span>Wheel: zoom · Right-drag: pan · Middle / Shift+right-drag: orbit · Left-click: inspect</span><span>${tactical?'Simulated courses, salvos and damage · 10-second combat steps':'Illustrated formations and salvos · recorded damage and losses'}</span></div>

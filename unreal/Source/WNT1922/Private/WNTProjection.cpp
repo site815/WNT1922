@@ -28,7 +28,8 @@ FVector WNTProjection::ForwardUnwrapped(const FVector2D& Point, double HeightMet
 {
     // Equal Earth (Savric, Patterson and Jenny, 2018), spherical form.
     // Longitude is intentionally unbounded for a continuous repeated chart.
-    return FVector(North(Theta(Point.Y))*EqualEarthUnitScale,Point.X*EastUnitsPerDegree(Point.Y),HeightMetres*WorldUnitsPerMetre);
+    const double T=Theta(Point.Y);
+    return FVector(North(T)*EqualEarthUnitScale,Point.X*EqualEarthUnitScale*Radians*std::cos(T)/(M*Derivative(T)),HeightMetres*WorldUnitsPerMetre);
 }
 double WNTProjection::EastUnitsPerDegree(double Latitude)
 {const double T=Theta(Latitude);return EqualEarthUnitScale*Radians*std::cos(T)/(M*Derivative(T));}
@@ -53,7 +54,8 @@ TOptional<FVector2D> WNTProjection::Inverse(const FVector& World, double Central
     for(int32 I=0;I<12;++I)
     {const double Delta=(North(T)-Target)/Derivative(T);T-=Delta;if(FMath::Abs(Delta)<1e-13)break;}
     const double Latitude=std::asin(FMath::Clamp(std::sin(T)/M,-1.0,1.0))/Radians;
-    return FVector2D(WrapLongitude(World.Y/EastUnitsPerDegree(Latitude)+CentralMeridian),Latitude);
+    const double East=EqualEarthUnitScale*Radians*std::cos(T)/(M*Derivative(T));
+    return FVector2D(WrapLongitude(World.Y/East+CentralMeridian),Latitude);
 }
 FVector WNTProjection::ReprojectBetweenMeridians(const FVector& World,double FromMeridian,double ToMeridian)
 {

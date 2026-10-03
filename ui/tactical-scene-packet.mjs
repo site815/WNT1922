@@ -53,6 +53,7 @@ export function unrealTacticalPacket(state, options={}) {
   const animate=options.animate!==false;
   const packet={format:1,campaign:options.campaign||state.metadata?.campaign||'campaign_1922',id:sessionId,
     tacticalSessionId:sessionId,at:end,index:0,movie:true,tactical:true,animate,
+    timelineOriginSeconds:start,secondsPerRealSecond:rate,
     cameraDirector:options.cinematic!==false,eventKey:`${sessionId}:${from}:${end}:${rate}`,
     durationSeconds,elapsedSeconds:time(options.paused?end:from),playbackPaused:!!options.paused,
     historyTruncated:!!state.history?.truncated,events:[],units:[],airstrikes:[],shoreBatteries:[]};
@@ -62,6 +63,7 @@ export function unrealTacticalPacket(state, options={}) {
   const retained=frames.filter((f,i)=>f.seconds<=end&&(f.seconds>=start||frames[i+1]?.seconds>start));
   const records=state.ships||frames.at(-1)?.ships||[];
   const events=state.history?.events||[];
+  const shipRecords=new Map(records.map(ship=>[keyOf(ship),ship]));
   const sinks=new Map(events.filter(e=>e.kind==='sink').map(e=>[e.targetId,e.seconds]));
   const departures=new Map(events.filter(e=>e.kind==='withdraw'&&e.status==='escaped').map(e=>[e.targetId,e.seconds]));
   const selected=options.selected;
@@ -92,27 +94,38 @@ export function unrealTacticalPacket(state, options={}) {
     // their attack. Retain the confirmed underwater impact without gunfire FX.
     if(event.kind==='salvo'&&event.weapon==='depth charge')continue;
     const type={salvo:'salvo',torpedo:'salvo',impact:'hit',sink:'sink','air-attack':'salvo'}[event.kind];if(!type)continue;
-    const at=time(event.seconds),base=type==='sink'?5:type==='hit'?2.4:Math.max(.15,(finite(event.arrivalAt,event.seconds+10)-event.seconds)/rate);
+    const at=time(event.seconds),base=type==='sink'?5:type==='hit'?2.4:event.kind==='air-attack'?2.4:Math.max(.15,(finite(event.arrivalAt,event.seconds+10)-event.seconds)/rate);
     if(at<0&&type!=='salvo'||at>=durationSeconds||at+base<packet.elapsedSeconds-1)continue;
     const targetKey=event.targetId;if(!targetKey)continue;
     packet.events.push({key:String(event.id),type,sourceKey:event.attackerId||'',targetKey,
-      weapon:event.kind==='torpedo'||event.weapon==='torpedo'?'submarine':event.kind==='air-attack'||String(event.weapon).includes('air')?'air':'surface',
+      weapon:event.weapon==='depth charge'?'depth-charge':event.kind==='torpedo'||event.weapon==='torpedo'?'submarine':event.kind==='air-attack'||String(event.weapon).includes('air')?'air':'surface',
       time:at,duration:type==='salvo'?Math.min(base,21600):Math.min(base,durationSeconds-at),hits:event.hits,damage:event.damage,
+      ...(event.strikeId?{strikeId:event.strikeId}:{}),...(Number.isFinite(event.planes)?{planes:event.planes}:{}),
+      ...(Number.isFinite(event.planesLost)?{planesLost:event.planesLost}:{}),
+      ...(Number.isFinite(shipRecords.get(event.attackerId)?.stats?.caliber)?{caliberMm:shipRecords.get(event.attackerId).stats.caliber}:{}),
       ...(event.position?{sourcePositionMetres:position(event.position,event.kind==='air-attack'?450:event.kind==='torpedo'?1:20)}:{}),
       ...(event.targetPosition?{targetPositionMetres:position(event.targetPosition,type==='hit'?15:0)}:{})});
   }
-  // One aggregate wing marker travels on its actual route, labelled with the
-  // remaining aircraft count; it is never presented as an individual plane.
+  // Real aggregate routes support bounded 3D formations. Only the altitude and
+  // formation offsets are illustrative; no extra aircraft or damage is simulated.
   const flights=new Map(retained.flatMap(frame=>(frame.airstrikes||[]).map(f=>[keyOf(f),f])));
   for(const [key,flight] of flights){
     const now=tacticalPoseAt(frames,end,key,'airstrikes',interval);if(!now)continue;
     const observed=frames.filter(f=>frameUnit(f,key,'airstrikes'));
     const first=observed[0].seconds,last=observed.at(-1).seconds;
     const gone=frames.find(f=>f.seconds>last&&!frameUnit(f,key,'airstrikes'))?.seconds;
-    const points=[];for(const frame of retained){const f=frameUnit(frame,key,'airstrikes');if(f)points.push({time:Math.max(0,time(frame.seconds)),positionMetres:position([f.x,f.y],800),headingDegrees:yaw(f),planes:f.planes,fighters:f.fighters||0});}
-    packet.airstrikes.push({key,side:flight.side,planes:now.planes,fighters:now.fighters||0,phase:now.phase,
+    const attack=events.find(e=>e.kind==='air-attack'&&e.strikeId===key);
+    const launch=events.find(e=>e.kind==='air-launch'&&e.strikeId===key);
+    const aircraftType=/torpedo|VT-8/i.test(attack?.historicalLabel||launch?.historicalLabel||flight.scripted?.label||'')?'torpedo-bomber':'dive-bomber';
+    const height=(f,seconds)=>{const target=tacticalPoseAt(frames,seconds,f.targetId||flight.targetId,'ships',interval);return target?80+720*clamp(Math.hypot(f.x-target.x,f.y-target.y)/2,0,1):800;};
+    const points=[];for(const frame of retained){const f=frameUnit(frame,key,'airstrikes');if(f)points.push({time:Math.max(0,time(frame.seconds)),positionMetres:position([f.x,f.y],height(f,frame.seconds)),headingDegrees:yaw(f),planes:f.planes,fighters:f.fighters||0});}
+    // A whole wing destroyed at contact disappears before the next history
+    // snapshot. Add its factual arrival to avoid freezing it short of the ship.
+    if(attack&&attack.seconds<=end&&attack.seconds>last&&attack.position){points.push({time:Math.max(0,time(attack.seconds)),positionMetres:position(attack.position,80),headingDegrees:yaw(now),planes:0,fighters:0});}
+    packet.airstrikes.push({key,side:flight.side,sourceKey:flight.sourceId,targetKey:flight.targetId,aircraftType,
+      representativeAircraft:true,planes:now.planes,fighters:now.fighters||0,phase:now.phase,
       appearsAt:Math.max(0,time(first)),...(gone!=null?{disappearsAt:Math.max(0,time(gone))}:{}),
-      positionMetres:position([now.x,now.y],800),headingDegrees:yaw(now),trajectory:points.slice(-128)});
+      positionMetres:position([now.x,now.y],height(now,end)),headingDegrees:yaw(now),trajectory:points.slice(-128)});
   }
   packet.events=packet.events.slice(-4096);
   return packet;

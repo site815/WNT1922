@@ -35,6 +35,10 @@ namespace WNTTerrainGeometry
         const FVector2D& From,const FVector2D& To,double Progress);
     /** Padded support ribbon for the material's antialiased, constant-pixel chart line. */
     WNT1922_API double GraticuleWidthForPixelSize(double CentimetresPerPixel);
+    /** CPU reference for immutable ribbon WPO, used by precision/bounds tests. */
+    WNT1922_API FVector RibbonDisplacement(const FVector2D& Extrusion, const FVector2D& CentreMetadata, double WidthMetres, double LongitudeShift);
+    /** Display-only relief, real height at ship range and smoothly emphasized at map range. */
+    WNT1922_API double ReliefScaleForDistance(double Centimetres);
 }
 
 /** Runtime geographic terrain; local tile vertices retain precision under UE large-world coordinates. */
@@ -48,7 +52,7 @@ public:
     bool Initialize(const FString& DataRoot);
     void SetCentralMeridian(double Degrees);
     double HeightAt(const FVector2D& LongitudeLatitude) const;
-    double RenderHeightAt(const FVector2D& LongitudeLatitude) const;
+    double RenderHeightAt(const FVector2D& LongitudeLatitude, bool UseCache = true) const;
     bool IsLandAt(const FVector2D& LongitudeLatitude) const;
     FString TerritoryAt(const FVector2D& LongitudeLatitude) const;
     void SetControl(const TMap<FString, FLinearColor>& TerritoryColours);
@@ -56,6 +60,8 @@ public:
     TSharedPtr<FJsonObject> GetMapStyleDiagnostics() const;
     void SetGraticuleVisible(bool Visible);
     void SetGraticulePixelSize(double CentimetresPerPixel);
+    void SetViewDistance(double Centimetres);
+    double GetReliefScale() const { return ReliefScale; }
     double GetCentralMeridian() const { return CentralMeridian; }
     const FString& GetLoadError() const { return LoadError; }
 
@@ -80,9 +86,13 @@ private:
     TUniquePtr<FWNTTerrainData, FWNTTerrainDataDeleter> Data;
     UPROPERTY(Transient) TArray<TObjectPtr<UProceduralMeshComponent>> TerrainTiles;
     TArray<FVector> TileOrigins;
+    TArray<FVector2D> TileOriginGeography;
     TArray<FBox> TileLocalBounds;
     TArray<FVector2D> TileShearLimits;
     double CentralMeridian = 0.0;
     FString LoadError;
     bool bGraticuleVisible = true;
+    double RibbonUpdateMilliseconds = 0;
+    uint64 RibbonParameterUpdates = 0;
+    double ReliefScale = 1;
 };

@@ -48,8 +48,9 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
         if(!bAnimate){StartedAt=Now-Duration;PausedElapsed=Duration;}
         return false;
     }
+    const double PreviousElapsed=Elapsed(Now);
     FrameKey=NextKey;Duration=FMath::Clamp(Number(Packet,TEXT("durationSeconds"),15),.1,90.);
-    PausedElapsed=FMath::Clamp(Number(Packet,TEXT("elapsedSeconds"),0),0.,Duration);bPlaybackPaused=Paused;
+    PausedElapsed=RollingClock.Rebase(Packet,PreviousElapsed,Number(Packet,TEXT("elapsedSeconds"),0),Duration);bPlaybackPaused=Paused;
     StartedAt=Now-PausedElapsed;
     if(!bAnimate){StartedAt=Now-Duration;PausedElapsed=Duration;}
     Events.Reset();SinkTimes.Reset();TSet<FString> Identities;
@@ -72,6 +73,8 @@ bool FWNTBattleEffects::SetPacket(const TSharedPtr<FJsonObject>& Packet,double N
         if(Event.Type==TEXT("sink")&&ShoreKeys.Contains(Event.Target))continue;
         Event.SourcePosition=RecordedPosition(Object,TEXT("sourcePositionMetres"));
         Event.TargetPosition=RecordedPosition(Object,TEXT("targetPositionMetres"));
+        Event.Planes=FMath::Clamp(int32(Number(Object,TEXT("planes"),0)),0,10000);
+        Event.PlanesLost=FMath::Clamp(int32(Number(Object,TEXT("planesLost"),0)),0,10000);
         Identities.Add(Event.Key);Events.Add(Event);
         if(Event.Type==TEXT("sink"))SinkTimes.Add(Event.Target,FVector2D(Event.At,Event.Duration));
     }
@@ -182,6 +185,19 @@ void FWNTBattleEffects::Update(AActor* Owner,const TMap<FString,FTransform>& Shi
         const FVector Impact=Event.TargetPosition.IsSet()?Event.TargetPosition.GetValue():Target->TransformPosition(Anchor(Event.Target,false));
         if(Event.Type==TEXT("salvo"))
         {
+            if(Event.Weapon==TEXT("air"))
+            {
+                // Individual runs are a bounded illustration of this one
+                // aggregate event. Only the separate confirmed hit emits damage.
+                for(int32 I=0;I<FMath::Min(3,Event.Planes);++I)
+                {
+                    const double Fall=FMath::Clamp((Age-I*.06)/.45,0.,1.);
+                    if(Fall<1)Draw(Tracer,Impact+FVector(-1800.*(1-Fall),I*450.,26000.*(1-Fall)),FVector(.5,.35,2.5));
+                }
+                if(Event.PlanesLost>0)for(int32 I=0;I<3;++I)
+                    Draw(Smoke,Impact+FVector(-5000.+I*4300.,(I-1)*5200.,17000.+I*4500.),FVector(9.+Age*3.)*(1.-Alpha*.65));
+                continue;
+            }
             const auto* Source=Ships.Find(Event.Source);
             const FVector Start=Event.SourcePosition.IsSet()?Event.SourcePosition.GetValue():Source?Source->TransformPosition(Anchor(Event.Source,true)):Impact+FVector(-18000,0,Event.Weapon==TEXT("air")?24000:1000);
             const double Arc=Event.Weapon==TEXT("submarine")?0.:FMath::Min(12000.,FVector::Distance(Start,Impact)*.12);

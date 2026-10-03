@@ -1,32 +1,39 @@
-let context, gain, noise;
+import {BATTLE_SOUND_PROFILES,renderBattlePCM,variantSeed} from './battle-synthesis.mjs';
+export {BATTLE_SOUND_PROFILES} from './battle-synthesis.mjs';
+let context, gain, battleMix;
 let enabled = true,
   volume = 0.5,
   lastAlert = -Infinity,
   lastBattle = -Infinity;
 const battleVoices = new Set();
-const battleNoise = new WeakMap();
-let battleCuesPlayed = 0, battleCuesDropped = 0;
+const battleBuffers = new WeakMap();
+let battleCuesPlayed = 0, battleCuesDropped = 0, battleCuesStolen = 0;
+const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+const finite=(value,fallback)=>Number.isFinite(value)?value:fallback;
 export function soundSettings(on, level = 0.5) {
   enabled = !!on;
-  volume = Math.max(0, Math.min(1, Number.isFinite(level) ? level : 0.5));
+  volume = clamp(finite(level,0.5),0,1);
   if (gain) gain.gain.value = enabled ? volume * 0.45 : 0;
+  if (battleMix) battleMix.output.gain.value = enabled ? volume * .95 : 0;
   if (!enabled || !volume) stopBattleSounds();
 }
 export function soundPreferences() { return {enabled, volume}; }
 export function soundStatus() {
   return {enabled, volume, available:!!(globalThis.AudioContext || globalThis.webkitAudioContext),
     unlocked:context?.state === "running", contextState:context?.state || "uninitialized",
-    battleVoiceCount:battleVoices.size, battleCuesPlayed, battleCuesDropped};
+    battleVoiceCount:battleVoices.size, battleCuesPlayed, battleCuesDropped, battleCuesStolen,
+    battleCachedVariants:context?battleBuffers.get(context)?.size||0:0};
 }
 export function unlockSound() {
   if (!enabled) return;
   try {
-    context ??= new (globalThis.AudioContext ||
-      globalThis.webkitAudioContext)();
+    context ??= new (globalThis.AudioContext || globalThis.webkitAudioContext)();
     if (!gain) {
       gain = context.createGain();
       gain.gain.value = volume * 0.45;
       gain.connect(context.destination);
+      battleMix=createBattleMix(context,context.destination,{level:volume*.95});
+      void prewarmBattleSounds(context);
     }
     if (context.state === "suspended") context.resume().catch(() => {});
   } catch {
@@ -34,91 +41,109 @@ export function unlockSound() {
   }
 }
 
-// Every voice is local synthesis. The renderer is also usable with an
-// OfflineAudioContext to verify its actual PCM output without an audio device.
-// Cosmetic noise never uses or advances the combat simulation's RNG.
-const battleTimbres = Object.freeze({
-  gun: {duration:.78, filter:"lowpass", from:1050, to:85, noise:.62, tone:95, endTone:32, body:.38, attack:.006},
-  impact: {duration:.66, filter:"bandpass", from:1900, to:180, noise:.58, tone:125, endTone:43, body:.26, attack:.003},
-  splash: {duration:.88, filter:"bandpass", from:2100, to:380, noise:.43, attack:.035},
-  torpedo: {duration:.46, filter:"lowpass", from:390, to:75, noise:.32, tone:70, endTone:38, body:.1, attack:.025},
-  air: {duration:.95, filter:"bandpass", from:950, to:280, noise:.22, tone:210, endTone:95, body:.07, attack:.10},
-  sinking: {duration:1.8, filter:"lowpass", from:240, to:38, noise:.43, tone:65, endTone:28, body:.21, attack:.08},
-  "depth-charge": {duration:.85, filter:"lowpass", from:260, to:40, noise:.48, tone:72, endTone:25, body:.32, attack:.01},
-});
-
-export function synthesizeBattleSound(audioContext, destination, kind, options={}) {
-  const spec=battleTimbres[kind];
-  if (!spec || !audioContext || !destination) return null;
-  const at=Math.max(audioContext.currentTime, Number.isFinite(options.at) ? options.at : audioContext.currentTime);
-  const intensity=Math.max(0,Math.min(1,Number.isFinite(options.intensity)?options.intensity:.75));
-  const nodes=[], sources=[];
-  let finished=false, ended=0;
-  const clean=()=>{
-    if(finished)return; finished=true;
-    for(const node of nodes){try{node.disconnect();}catch{}}
-    options.onended?.();
-  };
-  const voice={duration:spec.duration, stop(){
-    if(finished)return;
-    for(const source of sources){try{source.stop();}catch{}}
-    clean();
-  }};
-  try {
-    let buffer=battleNoise.get(audioContext);
-    if(!buffer){
-      buffer=audioContext.createBuffer(1,Math.ceil(audioContext.sampleRate*2),audioContext.sampleRate);
-      const samples=buffer.getChannelData(0);
-      for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;
-      battleNoise.set(audioContext,buffer);
-    }
-    const bus=audioContext.createGain(); nodes.push(bus);
-    bus.gain.value=intensity;
-    let output=bus;
-    if(audioContext.createStereoPanner){
-      const panner=audioContext.createStereoPanner(); nodes.push(panner);
-      panner.pan.value=Math.max(-1,Math.min(1,Number.isFinite(options.pan)?options.pan:0));
-      bus.connect(panner);output=panner;
-    }
-    output.connect(destination);
-    const source=audioContext.createBufferSource(),filter=audioContext.createBiquadFilter(),envelope=audioContext.createGain();
-    nodes.push(source,filter,envelope);sources.push(source);
-    source.buffer=buffer;filter.type=spec.filter;
-    filter.Q.value=spec.filter==='bandpass'?.7: .5;
-    filter.frequency.setValueAtTime(spec.from,at);
-    filter.frequency.exponentialRampToValueAtTime(spec.to,at+spec.duration);
-    envelope.gain.setValueAtTime(.0001,at);
-    envelope.gain.linearRampToValueAtTime(spec.noise,at+spec.attack);
-    envelope.gain.exponentialRampToValueAtTime(.0001,at+spec.duration);
-    source.connect(filter);filter.connect(envelope);envelope.connect(bus);
-    if(spec.tone){
-      const oscillator=audioContext.createOscillator(),body=audioContext.createGain();
-      nodes.push(oscillator,body);sources.push(oscillator);
-      oscillator.type='sine';oscillator.frequency.setValueAtTime(spec.tone,at);
-      oscillator.frequency.exponentialRampToValueAtTime(spec.endTone,at+spec.duration*.7);
-      body.gain.setValueAtTime(.0001,at);
-      body.gain.linearRampToValueAtTime(spec.body,at+spec.attack);
-      body.gain.exponentialRampToValueAtTime(.0001,at+spec.duration*.8);
-      oscillator.connect(body);body.connect(bus);
-    }
-    for(const node of sources){
-      node.onended=()=>{if(++ended===sources.length)clean();};
-      node.start(at);node.stop(at+spec.duration);
-    }
-    return voice;
-  } catch {
-    voice.stop(); return null;
-  }
+// Original local synthesis: no recording downloads, network or simulation RNG.
+// Long decays belong to the voice buffer, so pause/mute/scene exit can stop the
+// complete sound, including its reverberation, without leaving orphaned tails.
+// The mix has more headroom than the UI beeps: a fast compressor controls
+// simultaneous broadsides, then a soft ceiling prevents digital clipping.
+// This factory also runs unchanged in OfflineAudioContext verification.
+export function createBattleMix(audioContext,destination,{level=.95}={}) {
+  const input=audioContext.createGain(),highpass=audioContext.createBiquadFilter();
+  const compressor=audioContext.createDynamicsCompressor(),ceiling=audioContext.createWaveShaper(),output=audioContext.createGain();
+  highpass.type='highpass';highpass.frequency.value=28;highpass.Q.value=.65;
+  compressor.threshold.value=-12;compressor.knee.value=16;compressor.ratio.value=5;
+  compressor.attack.value=.003;compressor.release.value=.28;
+  const curve=new Float32Array(4097);
+  for(let i=0;i<curve.length;i++)curve[i]=.96*Math.tanh((i/(curve.length-1)*2-1)*1.5);
+  ceiling.curve=curve;ceiling.oversample='2x';output.gain.value=clamp(finite(level,.95),0,1);
+  input.connect(highpass);highpass.connect(compressor);compressor.connect(ceiling);ceiling.connect(output);output.connect(destination);
+  return {input,output,disconnect(){for(const node of [input,highpass,compressor,ceiling,output])node.disconnect();}};
 }
 
-// Battle playback does not unlock audio: only the UI's existing user-gesture
-// path may do that. Muted/unsupported cues are consumed rather than queued.
+function bufferFromPCM(audioContext,pcm) {
+  const buffer=audioContext.createBuffer(2,pcm.channels[0].length,pcm.sampleRate);
+  for(let i=0;i<2;i++)buffer.getChannelData(i).set(pcm.channels[i]);
+  return buffer;
+}
+const warming=new WeakMap();
+// Precompute on a local worker after the existing user gesture unlock. Normal
+// playback only references cached buffers in a one-source voice graph.
+export function prewarmBattleSounds(audioContext) {
+  if(!audioContext||typeof globalThis.Worker!=='function')return Promise.resolve(false);
+  if(warming.has(audioContext))return warming.get(audioContext);
+  let cache=battleBuffers.get(audioContext);if(!cache){cache=new Map();battleBuffers.set(audioContext,cache);}
+  const promise=new Promise(resolve=>{
+    let worker,remaining=0,finished=false;
+    const done=success=>{if(finished)return;finished=true;clearTimeout(watchdog);worker?.terminate();resolve(success);};
+    const watchdog=setTimeout(()=>done(false),15000);
+    try {
+      worker=new Worker(new URL('./battle-synthesis-worker.mjs',import.meta.url),{type:'module'});
+      worker.onerror=event=>{event.preventDefault();done(false);};
+      worker.onmessage=({data})=>{
+        if(finished)return;
+        if(data.error){done(false);return;}
+        try{
+          if(!cache.has(data.key))cache.set(data.key,bufferFromPCM(audioContext,data));
+          if(--remaining===0)done(true);
+        }catch{done(false);}
+      };
+      for(let variant=0;variant<3;variant++)for(const kind of Object.keys(BATTLE_SOUND_PROFILES)){
+        const key=kind+':'+variant;if(cache.has(key))continue;remaining++;
+        worker.postMessage({key,kind,variant,sampleRate:Math.min(24000,audioContext.sampleRate)});
+      }
+      if(!remaining)done(true);
+    }catch{done(false);}
+  });
+  warming.set(audioContext,promise);return promise;
+}
+
+export function synthesizeBattleSound(audioContext, destination, kind, options={}) {
+  const spec=BATTLE_SOUND_PROFILES[kind];
+  if (!spec || !audioContext || !destination) return null;
+  const at=Math.max(audioContext.currentTime,finite(options.at,audioContext.currentTime));
+  const intensity=clamp(finite(options.intensity,.85),0,1),nodes=[];
+  const variant=variantSeed(options.variant??options.key??0)%3;
+  let finished=false,source;
+  const clean=()=>{if(finished)return;finished=true;for(const node of nodes){try{node.disconnect();}catch{}}options.onended?.();};
+  const speed=clamp(finite(options.pitch,1),.78,1.25);
+  const duration=Math.min(spec.duration/speed,Math.max(.08,finite(options.duration,Infinity)));
+  const voice={duration,stop(){if(finished)return;try{source?.stop();}catch{}clean();}};
+  try {
+    let cache=battleBuffers.get(audioContext);if(!cache){cache=new Map();battleBuffers.set(audioContext,cache);}
+    const key=kind+':'+variant;
+    if(!cache.has(key))cache.set(key,bufferFromPCM(audioContext,renderBattlePCM(kind,variant,Math.min(24000,audioContext.sampleRate))));
+    source=audioContext.createBufferSource();source.buffer=cache.get(key);source.playbackRate.value=speed;
+    const envelope=audioContext.createGain();envelope.gain.value=intensity;nodes.push(source,envelope);source.connect(envelope);
+    if(duration<spec.duration/speed){
+      envelope.gain.setValueAtTime(intensity,at+Math.max(0,duration-.035));
+      envelope.gain.linearRampToValueAtTime(0,at+duration);
+    }
+    let output=envelope;
+    if(audioContext.createStereoPanner){
+      const panner=audioContext.createStereoPanner();nodes.push(panner);
+      panner.pan.setValueAtTime(clamp(finite(options.pan,0),-1,1),at);
+      if(Number.isFinite(options.endPan))panner.pan.linearRampToValueAtTime(clamp(options.endPan,-1,1),at+voice.duration*.8);
+      output.connect(panner);output=panner;
+    }
+    output.connect(destination);source.onended=clean;source.start(at);source.stop(at+voice.duration);
+    return voice;
+  } catch {voice.stop();return null;}
+}
+
+// Playback never unlocks audio. New high-priority damage may replace the oldest
+// lower-priority tail; low-priority chatter cannot evict a sinking/explosion.
 export function playBattleSound(kind, options={}) {
-  if(!enabled || !volume || !gain || context?.state!=='running' || battleVoices.size>=8){
+  if(!enabled || !volume || !battleMix || context?.state!=='running' || !BATTLE_SOUND_PROFILES[kind]){
     battleCuesDropped++;return false;
   }
-  const entry={owner:options.owner,voice:null};
-  entry.voice=synthesizeBattleSound(context,gain,kind,{...options,onended:()=>battleVoices.delete(entry)});
+  const priority=finite(options.priority,BATTLE_SOUND_PROFILES[kind].priority);
+  if(battleVoices.size>=12){
+    const victim=[...battleVoices].filter(entry=>entry.priority<=priority).sort((a,b)=>a.priority-b.priority||a.started-b.started)[0];
+    if(!victim){battleCuesDropped++;return false;}
+    victim.voice.stop();battleVoices.delete(victim);battleCuesStolen++;
+  }
+  const entry={owner:options.owner,priority,started:context.currentTime,voice:null};
+  entry.voice=synthesizeBattleSound(context,battleMix.input,kind,{...options,onended:()=>battleVoices.delete(entry)});
   if(!entry.voice){battleCuesDropped++;return false;}
   battleVoices.add(entry);battleCuesPlayed++;return true;
 }
@@ -174,51 +199,7 @@ export function createSoundTracker() {
   };
 }
 function cannon(delay) {
-  const at = context.currentTime + delay,
-    duration = 0.65;
-  if (!noise) {
-    noise = context.createBuffer(
-      1,
-      Math.ceil(context.sampleRate * 0.7),
-      context.sampleRate,
-    );
-    const values = noise.getChannelData(0);
-    for (let i = 0; i < values.length; i++) values[i] = Math.random() * 2 - 1;
-  }
-  const source = context.createBufferSource(),
-    filter = context.createBiquadFilter(),
-    envelope = context.createGain();
-  source.buffer = noise;
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(750, at);
-  filter.frequency.exponentialRampToValueAtTime(90, at + duration);
-  envelope.gain.setValueAtTime(0.001, at);
-  envelope.gain.linearRampToValueAtTime(0.85, at + 0.01);
-  envelope.gain.exponentialRampToValueAtTime(0.001, at + duration);
-  source.connect(filter);
-  filter.connect(envelope);
-  envelope.connect(gain);
-  source.start(at);
-  source.stop(at + duration);
-  source.onended = () => {
-    source.disconnect();
-    filter.disconnect();
-    envelope.disconnect();
-  };
-  const low = context.createOscillator(),
-    body = context.createGain();
-  low.frequency.setValueAtTime(95, at);
-  low.frequency.exponentialRampToValueAtTime(32, at + 0.35);
-  body.gain.setValueAtTime(0.7, at);
-  body.gain.exponentialRampToValueAtTime(0.001, at + 0.45);
-  low.connect(body);
-  body.connect(gain);
-  low.start(at);
-  low.stop(at + 0.46);
-  low.onended = () => {
-    low.disconnect();
-    body.disconnect();
-  };
+  playBattleSound('gun',{at:context.currentTime+delay,intensity:.72,pan:delay?.15:-.15,key:'campaign-notice-'+delay});
 }
 export function playSound(kind = "click") {
   if (!enabled) return;

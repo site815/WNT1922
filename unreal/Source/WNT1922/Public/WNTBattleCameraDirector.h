@@ -34,6 +34,9 @@ private:
     FString TacticalSession;
     double StartedAt=0,PausedElapsed=0,Duration=0;
     double NextLiveShotAt=0;
+    double LiveShotStartedAt=0;
+    FString LiveEventKey;
     bool bAvailable=false,bEnabled=false,bPaused=false;
+    FWNTRollingBattleClock RollingClock;
     FView Establish(double At,double Aspect) const;
 };

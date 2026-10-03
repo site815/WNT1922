@@ -243,7 +243,7 @@ try {
  await page.evaluate(()=>{globalThis.__runtimeWorldCanvas=document.querySelector('.native-world-input');globalThis.__runtimeOutliner=document.querySelector('.command-side-panel');});
  const cameraFields=nativeCameraFields;
  const menuBaseline=await diagnostics('world'),menuGeometry=await page.locator('.command-side-panel').boundingBox();
- for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports','review']) {
+ for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports']) {
   await page.locator('.nav-item[data-view="'+menu+'"]').click();await page.locator('.menu-popup.view-'+menu).waitFor();
   const menuNative=await diagnostics('world');
   assert.deepEqual(cameraFields(menuNative),cameraFields(menuBaseline),'Opening '+menu+' preserves native scene and camera');
@@ -256,7 +256,7 @@ try {
  }
  await nativeCapture('native-ministry-popup',true);
  await page.keyboard.press('Escape');assert.equal(await page.locator('.menu-popup').count(),0);
- result.checks.push('Menus 02–11 preserve the native world instance, camera, loaded terrain/ship actors and naval outliner; Escape restores the unobstructed command map.');
+ result.checks.push('Menus 02–10 preserve the native world instance, camera, loaded terrain/ship actors and naval outliner; Escape restores the unobstructed command map.');
 
  phase='world camera and hull picking';
  const selectState=await save();

@@ -175,6 +175,8 @@ async function pendingChecks(page,offer) {
  await page.locator('[data-offer="'+offer.id+'"]').waitFor();
  await page.locator('.workspace-close').click();
  await page.locator('.time-bar .decisive-alert [data-action="watch-battle"]').click();await page.locator('.modal .battle-canvas').waitFor();
+ await page.locator('.battle-report-tabs [data-action="report-summary"]').click();await page.locator('.modal[data-dialog-type="report"]').waitFor();
+ await page.locator('.battle-report-tabs [data-action="watch-battle"]').click();await page.locator('.modal .battle-canvas').waitFor();
  await page.locator('.modal [data-action="close"]').first().click();
 }
 async function campaignChecks(war) {
@@ -183,7 +185,8 @@ async function campaignChecks(war) {
  const selection=page.locator('.fleet-command-row').first();await selection.click();
  const fleetId=await page.locator('.fleet-command-row.selected').getAttribute('data-id');assert(fleetId);
  const views=await page.locator('.sidebar .nav-item').evaluateAll(nodes=>nodes.map(n=>n.dataset.view).filter(v=>v!=='command'&&v!=='tactical'));
- assert.equal(views.length,10);
+ assert.equal(views.length,9);
+ assert.equal(await page.locator('.sidebar .nav-item').count(),10,'Campaign has only menus 01–10; battles are in reports');
  const before=clockState(await saveSnapshot(record));
  if(!war) {
   // Exercise this before the layout sweep: unattended news deliberately records
@@ -220,7 +223,7 @@ async function campaignChecks(war) {
   if(war)assert.equal(saved.diplomaticOffers[0].status,'pending','Opening an offer does not accept it');
   await page.screenshot({path:path.join(output,name+'-chrome-'+width+'.png')});
  }
- checks.push(name+': compact two-row chrome, all16 resource breakdowns and all10 menu close controls at five widths; date, pause, RNG and fleet selection unchanged.');
+ checks.push(name+': compact two-row chrome, all16 resource breakdowns and all9 ministry close controls at five widths; date, pause, RNG and fleet selection unchanged.');
  if(war) {
   checks.push('Pending trade and decisive-battle controls stay clickable inside the condensed news rail at every width; opening them neither accepts a trade nor advances time.');
  }

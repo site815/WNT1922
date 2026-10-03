@@ -61,4 +61,3 @@ export function createDemoReport(battle) {
   };
   return {id:'title-demo-' + battle.id,a:battle.a,b:battle.b,startedAt:-240,status:'completed',replay:{frames:battle.stages.map(frame)}};
 }
-

@@ -119,3 +119,15 @@ test('pause, inspection and history replay do not advance combat; restart reuses
   session.stopReplay();assert.equal(session.replaySeconds,null);assert.deepEqual(session.combat,final);
   session.restart();assert.deepEqual(session.combat,initial);assert(session.paused);session.destroy();
 });
+
+test('playback render work consumes its deadline instead of adding recurring pauses, without skipping steps',()=>{
+  let time=0,serial=0,work=40;const pending=new Map(),starts=[];
+  const session=new TacticalSession({now:()=>time,schedule:(fn,ms)=>{pending.set(++serial,{fn,at:time+ms});return serial;},cancel:id=>pending.delete(id),
+    create:()=>({seconds:0,status:'active'}),advance:combat=>{starts.push(time);combat.seconds+=10;},onChange:change=>{if(!change.paused)time+=work;}});
+  const run=()=>{const [id,job]=pending.entries().next().value;pending.delete(id);time=job.at;job.fn();};
+  session.start({});session.play();run();run();run();
+  for(let i=1;i<starts.length;i++)assert(Math.abs(starts[i]-starts[i-1]-10000/60)<1e-8,'rendering cannot add forty milliseconds to each interval');
+  work=350;run();assert.equal(session.combat.seconds,40);assert.equal(pending.size,1,'overload leaves one callback, not a catch-up backlog');
+  run();assert.equal(session.combat.seconds,50,'every callback still advances one complete step');
+  session.pause();assert.equal(pending.size,0);
+});

@@ -98,7 +98,7 @@ async function ministryMenus(size){
  const before=await diagnostics('world'),camera=nativeCameraFields;
  await page.evaluate(()=>{globalThis.__resolutionMap=document.querySelector('.native-world-input');globalThis.__resolutionOutliner=document.querySelector('.command-side-panel');});
  const outliner=await page.locator('.command-side-panel').boundingBox();
- for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports','review']){
+ for(const menu of ['land','airwar','yards','aircraft','fleet','programs','diplomacy','economy','reports']){
   await page.locator('.nav-item[data-view="'+menu+'"]').click();await page.locator('.menu-popup.view-'+menu).waitFor();
   const layout=await page.evaluate(()=>{
    const popup=document.querySelector('.menu-popup'),body=popup.querySelector('.workspace-inner'),panel=document.querySelector('.command-side-panel');
@@ -203,7 +203,7 @@ try{
  }
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');
  for(const a of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'))for(const b of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'&&row.width>a.width&&row.height===a.height))assert(Math.abs(a.layout.popup.width-b.layout.popup.width)<2,'At the same height, ultrawide retains the 16:9 menu width');
- result.checks.push('All ten ministry menus stay left-aligned beside the sidebar and retain the native map and naval outliner at every size; wider screens preserve their 16:9-derived popup width and expose the world beside it.');
+ result.checks.push('All nine ministry menus stay left-aligned beside the sidebar and retain the native map and naval outliner at every size; wider screens preserve their 16:9-derived popup width and expose the world beside it.');
  result.checks.push('Every tested size rejects strategic middle dragging, permits close middle orbit without moving geographic focus, preserves requested orientation during right pan, and resets yaw/tilt on even a small outward wheel step while still close, and stays overhead when zooming back in.');
  phase='continuous map wrapping';
  const widest=resolutions.reduce((a,b)=>b.width/b.height>a.width/a.height?b:a);await resize(widest,'world');

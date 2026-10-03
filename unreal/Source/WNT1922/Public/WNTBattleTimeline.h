@@ -14,3 +14,13 @@ struct WNT1922_API FWNTBattleTrack
     bool HasDeparted(double Elapsed) const { return DisappearsAt>=0&&Elapsed>=DisappearsAt; }
     bool IsLost(double Elapsed) const { return LostAt>=0&&Elapsed>=LostAt; }
 };
+
+/** Preserve observed progress across forward rolling packets, never across seeks. */
+struct WNT1922_API FWNTRollingBattleClock
+{
+    FString Session;
+    double Origin=0,Rate=0,At=-1;
+    bool bPaused=true;
+    double ObservedSeconds(double Elapsed) const;
+    double Rebase(const TSharedPtr<FJsonObject>& Packet,double PreviousElapsed,double RequestedElapsed,double Duration);
+};

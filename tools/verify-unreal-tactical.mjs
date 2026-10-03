@@ -131,7 +131,9 @@ try {
   });hooked=true;
   initial=await diagnostics('world');assert(Math.abs(initial.tilt)<.01&&Math.abs(initial.yaw)<.01,'Begin in an overhead world view for exact return verification');
   before=await save();await fs.writeFile(path.join(output,'campaign-before.json'),JSON.stringify(before,null,2));
-  phase='real tactical setup';await page.locator('.nav-item[data-view="tactical"]').click();
+  phase='real tactical setup';assert.equal(await page.locator('.sidebar .nav-item').count(),10);
+  await page.locator('.sidebar [data-action="menu"]').click();await page.locator('[data-action="title-screen"]').click();
+  await page.locator('.start-screen [data-action="tactical"][data-preset="denmark-strait"]').click();
   openingAudio=await page.evaluate(async()=>{const {soundPreferences}=await import('/ui/sound.mjs');return soundPreferences();});
   await host().locator('[data-tactical-sfx]').check();
   await setSoundVolume(.5);
@@ -187,12 +189,43 @@ try {
   await control('play').click();
   await nativeCapture('midway-establishing-airstrikes');
   const establishing=await diagnostics('battle');
+  assert.equal(establishing.chart.aircraftModelPoolCount,6,'All six stored aircraft meshes are warmed in reusable instance pools');
+  assert(establishing.chart.visibleAircraftModelCount>=0&&establishing.chart.visibleAircraftModelCount<=96,'Strategic wing markers do not require an unbounded aircraft actor fleet');
   await control('play').click();
   await until(async()=>{const o=await observed();return o.combat.history.events.some(e=>e.kind==='air-attack');},Boolean,'first actual Midway air attack',90000);
-  const attackShot=await until(()=>diagnostics('battle'),d=>d.cinematicEnabled&&d.cameraShot!=='establish'&&d.cameraShot!=='manual'&&d.cinematicCutCount>establishing.cinematicCutCount,'cinematic cut to the remote attack',8000);
+  const attackShot=await until(()=>diagnostics('battle'),d=>d.cinematicEnabled&&d.cameraShot==='air-attack'&&d.cinematicCutCount>establishing.cinematicCutCount&&d.chart.visibleAircraftModelCount>0,'cinematic air attack with visible instanced aircraft',8000);
   assert(attackShot.targets.some(t=>t.kind==='battle-ship'&&t.visible),'A remote cinematic cut must immediately land on a visible, ray-tested hull');
+  assert(attackShot.chart.visibleAircraftModelCount<=96&&attackShot.chart.aircraftModelPoolCount===6,'Close attack aircraft remain inside fixed geometry/instance budgets');
+  assert(attackShot.chart.recordedAircraftAttackRuns>0,'The visible attack corresponds to recorded air-attack data');
+  const actualAirAttack=(await observed()).packet.events.find(event=>event.weapon==='air'&&event.strikeId);
+  assert(actualAirAttack&&Number.isFinite(actualAirAttack.planes)&&Number.isFinite(actualAirAttack.planesLost),'Representative attack aircraft carry factual surviving/lost wing counts');
   result.metrics.push({kind:'midway-first-air-attack-camera',diagnostics:attackShot});
-  await nativeCapture('midway-first-air-attack');await control('play').click();await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','Midway quick resolution',30000);
+  await control('play').click();
+  const aircraftPaused=await diagnostics('battle');await delay(250);const aircraftStill=await diagnostics('battle');
+  assert.equal(aircraftStill.chart.visibleAircraftModelCount,aircraftPaused.chart.visibleAircraftModelCount,'Pause freezes the actual aircraft/attack instance count');
+  result.metrics.push({kind:'actual-aircraft-attack',representative:true,recordedAttack:actualAirAttack,diagnostics:aircraftStill});
+  await nativeCapture('midway-first-air-attack');
+  phase='bounded live Midway presentation sample';
+  await control('play').click();
+  const watchStart=performance.now(),samples=[];
+  while(performance.now()-watchStart<20000){
+    await delay(200);const live=await diagnostics('battle');
+    assert(Number.isFinite(live.frameMaxMs)&&Number.isInteger(live.frameHitchCount)&&live.frameHitchThresholdMs===50,'Native diagnostics must expose peak frame time and the count above50ms');
+    samples.push({atMilliseconds:performance.now()-watchStart,presentationSeconds:live.chart.battlePresentationSeconds,
+      frameMeanMs:live.frameMeanMs,frameP95Ms:live.frameP95Ms,frameMaxMs:live.frameMaxMs,frameHitchCount:live.frameHitchCount,frameSamples:live.frameSampleCount,
+      packetApplyMs:live.chart.battlePacketApplyMilliseconds,packetPeakMs:live.chart.battlePacketApplyPeakMilliseconds,
+      cameraShot:live.cameraShot,cuts:live.cinematicCutCount,aircraft:live.chart.visibleAircraftModelCount,pools:live.chart.aircraftModelPoolCount});
+    assert(live.chart.visibleAircraftModelCount>=0&&live.chart.visibleAircraftModelCount<=96);
+    if(samples.length>1)assert(samples.at(-1).presentationSeconds+.001>=samples.at(-2).presentationSeconds,'Forward rolling packets cannot rewind the native battle clock');
+  }
+  await control('play').click();
+  assert(samples.length>=40,'The live20-second sample requires enough separately requested observations');
+  result.metrics.push({kind:'twenty-second-midway-presentation',samples,
+    measuredSeconds:(performance.now()-watchStart)/1000,maximumReportedFrameP95Ms:Math.max(...samples.map(s=>s.frameP95Ms)),
+    maximumReportedFrameMaxMs:Math.max(...samples.map(s=>s.frameMaxMs)),maximumRollingHitchCount:Math.max(...samples.map(s=>s.frameHitchCount)),
+    maximumPacketApplyMs:Math.max(...samples.map(s=>s.packetApplyMs)),cameraCuts:samples.at(-1).cuts-samples[0].cuts,
+    interpretation:'Reported frame windows overlap; this bounded live sample distinguishes packet cost and deliberate cuts, and is not a sustained60fps or hardware benchmark.'});
+  await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','Midway quick resolution',30000);
   const midway=await observed();assert(midway.combat.history.events.some(e=>e.kind==='air-attack'));result.metrics.push({kind:'midway-simulation',winner:midway.combat.winner,seconds:midway.combat.seconds,events:midway.combat.history.events.length,sunk:midway.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name)});
   assert.equal(midway.combat.winner,'A');assert.deepEqual(midway.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name).sort(),['Akagi','Hiryu','Kaga','Soryu','USS Yorktown'].sort(),'Scripted Midway retains the dated later sinking of Yorktown');
   phase='North Cape';await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption('north-cape');await control('prepare').click();await ready(4);await control('step').click();await nativeCapture('north-cape-prepared');
@@ -207,7 +240,7 @@ try {
   await control('step').click();await nativeCapture('custom-five-ships');
   await control('resolve').click();const closingStatus=(await observed()).combat.status;
   await host().locator('[data-tactical-sfx]').setChecked(openingAudio.enabled);await setSoundVolume(openingAudio.volume);
-  await control('close').click();await until(()=>diagnostics('world'),d=>d.mode==='world','campaign restoration');
+  await control('close').click();await page.locator('.start-screen [data-action="continue"]').click();await until(()=>diagnostics('world'),d=>d.mode==='world','campaign restoration');
   result.metrics.push({kind:'close-after-quick-resolve',statusBeforeClose:closingStatus});
   result.checks.push('Packaged Denmark Strait, Midway, North Cape and custom fleets use real detailed hull models, actual simulator state and grouped airstrikes. Closing returns to the unchanged campaign.');
   const after=await save();assert.deepEqual(payload(after),payload(before),'The complete campaign including random state must be unchanged');await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(after,null,2));
@@ -217,6 +250,7 @@ finally {
   deadline=Date.now()+15000;
   if(page&&initial)try {
     if(await host().count()){if(openingAudio){await host().locator('[data-tactical-sfx]').setChecked(openingAudio.enabled);await setSoundVolume(openingAudio.volume);}await control('close').click();}
+    if(await page.locator('.start-screen [data-action="continue"]').count())await page.locator('.start-screen [data-action="continue"]').click();
     await page.locator('.native-world-input').waitFor();await diagnostics('world');await input('focus',{longitude:initial.longitude,latitude:initial.latitude,zoom:initial.zoom});
     const restored=await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-initial.zoom)<.001&&Math.abs(((d.longitude-initial.longitude+540)%360)-180)<.001&&Math.abs(d.latitude-initial.latitude)<.001,'original world camera');
     if(before){const after=await save();assert.deepEqual(payload(after),payload(before));await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(after,null,2));}

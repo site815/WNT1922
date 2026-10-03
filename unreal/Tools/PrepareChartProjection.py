@@ -7,10 +7,10 @@ CPU tile transforms carry the centre shift. No engine modification is required.
 """
 import unreal
 
-SCHEMA = "1-equal-earth-packed-longitude-shear"
+SCHEMA = "2-equal-earth-relief-and-gpu-ribbons"
 
 
-def add_projection(mat, correct_normals=False):
+def add_projection(mat, correct_normals=False, ribbon=False, relief=False):
     edit = unreal.MaterialEditingLibrary
 
     def node(cls):
@@ -47,17 +47,48 @@ def add_projection(mat, correct_normals=False):
     shift.set_editor_property("default_value", 0.0)
     shift.set_editor_property("use_custom_primitive_data", True)
     shift.set_editor_property("primitive_data_index", 0)
-    offset = custom("Equal Earth tile-local longitude shear",
-                    "float k=(Geo.x*4096.0+Geo.y*4.0)+Fine.x*4.0; return float3(0,k*Shift,0);",
-                    {"Geo": uv, "Fine": fine, "Shift": shift})
+    inputs = {"Geo": uv, "Fine": fine, "Shift": shift}
+    height_code = "0"
+    if relief:
+        scale = node(unreal.MaterialExpressionScalarParameter)
+        scale.set_editor_property("parameter_name", "ChartReliefScale")
+        scale.set_editor_property("default_value", 1.0)
+        scale.set_editor_property("use_custom_primitive_data", True)
+        scale.set_editor_property("primitive_data_index", 2)
+        position = node(unreal.MaterialExpressionWorldPosition)
+        position.set_editor_property("world_position_shader_offset", unreal.WorldPositionIncludedOffsets.WPT_EXCLUDE_ALL_SHADER_OFFSETS)
+        inputs.update({"Relief": scale, "Position": position})
+        height_code = "max(0,Position.z)*(Relief-1)"
+    code = f"float k=(Geo.x*4096.0+Geo.y*4.0)+Fine.x*4.0; return float3(0,k*Shift,{height_code});"
+    if ribbon:
+        extrusion = node(unreal.MaterialExpressionTextureCoordinate)
+        extrusion.set_editor_property("coordinate_index", 3)
+        width = node(unreal.MaterialExpressionScalarParameter)
+        width.set_editor_property("parameter_name", "ChartRibbonWidthCentimetres")
+        width.set_editor_property("default_value", 9600000.0)
+        width.set_editor_property("use_custom_primitive_data", True)
+        width.set_editor_property("primitive_data_index", 1)
+        inputs.update({"Extrusion": extrusion, "Width": width})
+        # Immutable vertices use a 100 m support. Longitude metadata belongs
+        # to its centreline, not the support edge. Expand only in the shader;
+        # no map-wide procedural vertex uploads during a wheel gesture.
+        code = ("float k=(Geo.x*4096.0+Geo.y*4.0)+Fine.x*4.0; "
+                "float2 d=Extrusion*(Width-10000.0); "
+                f"return float3(d.x,d.y+Shift*(k+Fine.y/1024.0*Extrusion.x*Width),{height_code});")
+    offset = custom("Equal Earth tile-local longitude shear", code, inputs)
     if not edit.connect_material_property(offset, "", unreal.MaterialProperty.MP_WORLD_POSITION_OFFSET):
         raise RuntimeError("Cannot connect Equal Earth displacement")
     if correct_normals:
         mat.set_editor_property("tangent_space_normal", False)
         normal = node(unreal.MaterialExpressionVertexNormalWS)
+        normal_inputs = {"N": normal, "Fine": fine, "Shift": shift}
+        normal_z = "N.z"
+        if relief:
+            normal_inputs["Relief"] = scale
+            normal_z = "N.z/max(1,Relief)"
         transformed = custom("Equal Earth inverse-transpose geometric normal",
-                             "return normalize(float3(N.x-Shift*(Fine.y/1024.0)*N.y,N.y,N.z));",
-                             {"N": normal, "Fine": fine, "Shift": shift})
+                             f"return normalize(float3(N.x-Shift*(Fine.y/1024.0)*N.y,N.y,{normal_z}));",
+                             normal_inputs)
         interpolator = node(unreal.MaterialExpressionVertexInterpolator)
         wire(transformed, interpolator, "VS")
         if not edit.connect_material_property(interpolator, "", unreal.MaterialProperty.MP_NORMAL):

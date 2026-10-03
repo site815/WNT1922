@@ -7,28 +7,46 @@ const weaponKind=weapon=>/depth/i.test(weapon)?'depth-charge':/air/i.test(weapon
 // Both native presentation packets and raw combat records can be audited here.
 // A launch's predicted hit count never creates a hit sound: only an observed
 // damage event does. A miss splashes at its recorded arrival, not at launch.
-export function battleAudioCues(events, {tactical=true}={}) {
+export function battleAudioCues(events, {tactical=true,units=[],listener}={}) {
   const cues=[];
+  const positions=new Map(units.map(unit=>[String(unit.key??unit.id),unit.positionMetres]));
+  const recorded=units.map(unit=>unit.positionMetres).filter(p=>Array.isArray(p)&&Number.isFinite(p[0]));
+  if(!recorded.length)for(const event of events||[])for(const key of ['sourcePositionMetres','targetPositionMetres'])if(Array.isArray(event[key]))recorded.push(event[key]);
+  const centre=listener?.positionMetres||[recorded.length?recorded.reduce((sum,p)=>sum+p[0],0)/recorded.length:0,recorded.length?recorded.reduce((sum,p)=>sum+p[1],0)/recorded.length:0];
+  const right=listener?.right||[1,0],projection=p=>Array.isArray(p)?(p[0]-centre[0])*right[0]+(p[1]-centre[1])*right[1]:0;
+  const radius=Math.max(800,...recorded.map(p=>Math.abs(projection(p))));
+  const pan=p=>clamp(projection(p)/radius*.78,-.85,.85);
   for(const event of (events||[]).slice(-4096)){
     const type=event.type||event.kind, time=finite(event.time,finite(event.seconds,NaN));
     if(!Number.isFinite(time))continue;
     const identity=String(event.key??event.id??`${type}:${time}:${event.sourceKey??event.attackerId}:${event.targetKey??event.targetId}`);
-    const add=(suffix,kind,at,priority,intensity=.75)=>{
-      if(Number.isFinite(at))cues.push({key:`${identity}:${suffix}`,kind,time:at,priority,intensity});
+    const source=event.sourcePositionMetres||positions.get(String(event.sourceKey??event.attackerId));
+    const target=event.targetPositionMetres||positions.get(String(event.targetKey??event.targetId));
+    const weapon=event.weaponType||event.weapon||'';
+    const caliber=finite(event.caliberMm,356),pitch=clamp(1.03-(caliber-203)/1500,.85,1.16);
+    const add=(suffix,kind,at,priority,intensity=.85,position=target,extra={})=>{
+      if(Number.isFinite(at))cues.push({key:`${identity}:${suffix}`,kind,time:at,priority,intensity,pan:pan(position),pitch:kind==='gun'?pitch:1,...extra});
     };
     if(['salvo','torpedo','air-attack'].includes(type)){
-      const kind=type==='torpedo'?'torpedo':type==='air-attack'?'air':weaponKind(event.weapon||'');
-      add('launch',kind,time,2,kind==='air'?.55:.75);
+      const kind=type==='torpedo'?'torpedo':type==='air-attack'?'air':weaponKind(weapon);
+      const airIntensity=clamp(.62+Math.log2(1+Math.max(0,finite(event.planes,1)))*.035,.65,.87);
+      add('launch',kind,time,2,kind==='air'?airIntensity:.9,source,kind==='air'?{endPan:pan(target)}:{});
+      // Air damage/misses are observed at the recorded attack time. Its native
+      // duration is only a representative attack/egress animation window.
+      const arrival=kind==='air'?time:Number.isFinite(event.arrivalAt)?event.arrivalAt:
+        Number.isFinite(event.duration)?time+Math.max(0,event.duration):type==='air-attack'?time:NaN;
+      if(kind==='gun'&&arrival-time>=.35){
+        const flightAt=Math.max(time+.08,arrival-.8);
+        add('flight','shell-flight',flightAt,1,.46,source,{endPan:pan(target),duration:arrival-flightAt});
+      }
       if(event.hits===0){
-        const arrival=Number.isFinite(event.arrivalAt)?event.arrivalAt:
-          Number.isFinite(event.duration)?time+Math.max(0,event.duration):type==='air-attack'?time:NaN;
-        add('miss',kind==='depth-charge'?'depth-charge':'splash',arrival,1,.55);
+        add('miss',kind==='depth-charge'?'depth-charge':'splash',arrival,1,.7);
       }
     } else if(type==='hit'||type==='impact'){
       if(event.damage>0 || !tactical&&event.damage===undefined)
-        add('impact',/depth/i.test(event.weapon||'')?'depth-charge':'impact',time,4);
-    } else if(type==='sink')add('sink','sinking',time,5,.85);
-    else if(type==='air-launch')add('launch','air',time,2,.45);
+        add('impact',/depth/i.test(weapon)?'depth-charge':'impact',time,4,.8+.18*Math.sqrt(clamp(finite(event.damage,.2),0,1)));
+    } else if(type==='sink')add('sink','sinking',time,5,.92);
+    else if(type==='air-launch')add('launch','air',time,2,.65,source,{endPan:pan(target)});
   }
   return cues.sort((a,b)=>a.time-b.time||b.priority-a.priority);
 }
@@ -65,9 +83,9 @@ export class BattleAudioController {
     this.tokens=Math.min(3,this.tokens+Math.max(0,wall-this.tokenWall)*.004);this.tokenWall=wall;
     for(const cue of candidates.sort((a,b)=>b.priority-a.priority||a.time-b.time)){
       this.crossed++;
-      if(this.tokens<1){this.dropped++;continue;}
+      if(this.tokens<(cue.priority<=1?1.6:1)){this.dropped++;continue;}
       this.tokens--;
-      if(this.play(cue.kind,{owner:this.owner,intensity:cue.intensity})!==false)this.played++;
+      if(this.play(cue.kind,{owner:this.owner,intensity:cue.intensity,priority:cue.priority,pan:cue.pan,endPan:cue.endPan,pitch:cue.pitch,key:cue.key,duration:cue.duration})!==false)this.played++;
       else this.dropped++;
     }
   }
@@ -110,7 +128,7 @@ export class BattleAudioController {
     } else if(!active)this.#stop();
     const wasActive=this.active;
     this.session=session;this.frame=frame;this.duration=duration;
-    this.cues=battleAudioCues(packet.events,{tactical:!!packet.tactical});
+    this.cues=battleAudioCues(packet.events,{tactical:!!packet.tactical,units:[...(packet.units||[]),...(packet.shoreBatteries||[])],listener:packet.audioListener});
     this.active=active;
     if(changed||seek||newFrame||!active||!wasActive){
       if(singleStep&&!silent&&!changed&&!seek&&this.canPlay()&&!this.hidden()){

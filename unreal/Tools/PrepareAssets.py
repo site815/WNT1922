@@ -144,7 +144,7 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
     if name == "M_Ocean":
         ocean_normal(mat)
     if projected:
-        projection.add_projection(mat, correct_normals=not unlit)
+        projection.add_projection(mat, correct_normals=not unlit, relief=name == "M_Terrain")
         assets.set_metadata_tag(mat, "WNTChartProjectionSchema", projection.SCHEMA)
     compile_errors = editing.recompile_material(mat)
     if compile_errors:
@@ -157,7 +157,7 @@ def material(name, roughness, metallic, unlit=False, color=None, parameter="Tint
 def terrain_surface():
     """Lit geometric relief with CPU-authored elevation/climate vertex colors."""
     asset_path = "/Game/Materials/M_TerrainSurface"
-    shader_schema = "6-equal-earth-geometric"
+    shader_schema = "7-equal-earth-geometric-relief"
     existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
     if existing and not force and assets.get_metadata_tag(existing, "WNTTerrainShaderSchema") == shader_schema:
         preserved.append(asset_path)
@@ -176,7 +176,7 @@ def terrain_surface():
     scalar(mat, "Roughness", 1.0, unreal.MaterialProperty.MP_ROUGHNESS, 150)
     scalar(mat, "Metallic", 0.0, unreal.MaterialProperty.MP_METALLIC, 300)
     scalar(mat, "Specular", .12, unreal.MaterialProperty.MP_SPECULAR, 450)
-    projection.add_projection(mat, correct_normals=True)
+    projection.add_projection(mat, correct_normals=True, relief=True)
     errors = editing.recompile_material(mat)
     if errors:
         raise RuntimeError("Geometric terrain compilation: " + str(errors))
@@ -189,7 +189,7 @@ def terrain_surface():
 def graticule_material():
     """A screen-filtered overlay on the existing fixed geographic ribbons."""
     asset_path = "/Game/Materials/M_Graticule"
-    shader_schema = "3-equal-earth-filtered"
+    shader_schema = "4-equal-earth-gpu-ribbons"
     existing = assets.load_asset(asset_path) if assets.does_asset_exist(asset_path) else None
     if existing and not force and assets.get_metadata_tag(existing, "WNTGraticuleShaderSchema") == shader_schema:
         preserved.append(asset_path)
@@ -251,7 +251,7 @@ def graticule_material():
     connect(inverse, opacity, "A")
     if not editing.connect_material_property(opacity, "", unreal.MaterialProperty.MP_OPACITY):
         raise RuntimeError("Cannot connect filtered graticule opacity")
-    projection.add_projection(mat)
+    projection.add_projection(mat, ribbon=True, relief=True)
     errors = editing.recompile_material(mat)
     if errors:
         raise RuntimeError("Graticule compilation: " + str(errors))

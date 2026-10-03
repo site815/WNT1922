@@ -55,7 +55,7 @@ try {
   for(const [width,height] of [[900,500],[1280,720],[1800,1000],[1920,1080],[2560,1080],[3440,1440]]) {
     await page.setViewportSize({width,height});
     await page.waitForFunction(()=>{
-      const r=document.querySelector('.tactical-stage').getBoundingClientRect(),p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
+      const r=document.querySelector('.tactical-stage canvas').getBoundingClientRect(),p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
       return p&&Math.abs(p.x-r.left/innerWidth)<1e-6&&Math.abs(p.height-r.height/innerHeight)<1e-6;
     });
     const geometry=await page.locator('.tactical-engagements').evaluate(host=>{
@@ -141,8 +141,11 @@ try {
   await page.locator('[data-action="continue"]').click();await page.locator('.native-world-input').waitFor();
   const save=async()=>{const response=page.waitForResponse(r=>r.url().endsWith('/api/save')&&r.request().method()==='POST');await page.locator('.sidebar [data-action="save"]').click();assert((await response).ok());return JSON.parse(await fs.readFile(path.join(saveDir,'campaign.json'),'utf8'));};
   const before=await save();
-  await page.locator('.nav-item[data-view="tactical"]').click();await page.locator('[data-tactical="prepare"]').click();
+  assert.equal(await page.locator('.sidebar .nav-item').count(),10);
+  await page.locator('.sidebar [data-action="menu"]').click();await page.locator('[data-action="title-screen"]').click();
+  await page.locator('.start-screen [data-action="tactical"]').first().click();await page.locator('[data-tactical="prepare"]').click();
   await page.locator('[data-tactical="step"]').click();await page.keyboard.press('Escape');
+  await page.locator('.start-screen [data-action="continue"]').click();
   await page.locator('.native-world-input').waitFor();const after=await save();delete before.savedAt;delete after.savedAt;
   assert.deepEqual(after,before,'Campaign snapshot including RNG is unchanged by tactical play and return');assert(after.paused);
   assert.deepEqual(errors,[]);result.passed=true;
