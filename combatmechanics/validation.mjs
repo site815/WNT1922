@@ -1,5 +1,6 @@
 import { COMBAT_RULES as R } from './rules.mjs';
 import { DOCTRINES, FORMATIONS } from './ship-ai.mjs';
+import { HISTORICAL_SCRIPTS } from './historical-scripts.mjs';
 
 export function validateCombatState(state, classes = null) {
   const fail = () => { throw Error('Invalid tactical combat state in save.'); };
@@ -43,15 +44,39 @@ export function validateCombatState(state, classes = null) {
       || !ship.stats.aircraft || !number(ship.stats.aircraft.fighter) || !number(ship.stats.aircraft.strike)
       || !['nextGunAt','nextTorpedoAt','nextAirAt'].every(k => number(ship[k]))) fail();
   }
-  for (const projectile of state.projectiles)
+  if ((state.metadata?.mode==='historical')!==Boolean(state.historical)) fail();
+  if (state.historical) {
+    const script=HISTORICAL_SCRIPTS[state.historical.id];
+    if(!script || state.metadata?.id!==state.historical.id || state.metadata?.mode!=='historical' || state.metadata?.origin==='campaign'
+      || state.maxDurationSeconds!==script.durationSeconds || !Number.isInteger(state.historical.nextEvent)
+      || state.historical.nextEvent!==script.events.filter(event=>event.at<=state.seconds).length || !state.historical.orders) fail();
+    for(const [id,orders] of Object.entries(state.historical.orders)) if(!ids.has(id) || !number(orders.course,0,360)
+      || !number(orders.speed,0,60) || (orders.targetId!==null&&!ids.has(orders.targetId)))fail();
+  }
+  const scriptedEffect = effect => {
+    if (!state.historical || !effect || !unit(effect.healthAfter)) fail();
+    for(const key of ['machinery','fireControl','fire','flooding'])if(effect[key]!==undefined&&!unit(effect[key]))fail();
+  };
+  for (const projectile of state.projectiles) {
     if (!ids.has(projectile.attackerId) || !ids.has(projectile.targetId) || !['shell', 'torpedo','depth charge'].includes(projectile.kind)
       || !number(projectile.arrivalAt, state.seconds, 1000000) || !number(projectile.damage) || !number(projectile.hits)) fail();
+    if(projectile.scripted){scriptedEffect(projectile.scripted);if(!text(projectile.scripted.label,500)||!text(projectile.scripted.time,200))fail();}
+  }
   const air = strike => {
     if (!text(strike.id, 100) || !['A', 'B'].includes(strike.side) || !text(strike.sourceId, 250) || !ids.has(strike.targetId)
       || !number(strike.x, -20000, 20000) || !number(strike.y, -20000, 20000) || !number(strike.heading, 0, 360)
       || !number(strike.planes) || !number(strike.fighters) || !['outbound', 'returning', 'landed', 'lost'].includes(strike.phase)) fail();
   };
-  for (const strike of state.airstrikes) { air(strike); if (!number(strike.crewQuality, .1, 3)) fail(); }
+  for (const strike of state.airstrikes) {
+    air(strike); if (!number(strike.crewQuality, .1, 3)) fail();
+    if(strike.scripted){
+      const detail=strike.scripted;scriptedEffect({healthAfter:detail.healthAfter,...detail.effects});
+      if(!ids.has(strike.sourceId)||!text(detail.label,500)||!text(detail.time,200)
+        ||!number(detail.attackAt,0,state.maxDurationSeconds)||!number(detail.returnSeconds,10,3600)
+        ||!detail.losses||!number(detail.losses.planes)||!number(detail.losses.fighters)
+        ||(detail.returnAt!==undefined&&!number(detail.returnAt,0,state.maxDurationSeconds+3600)))fail();
+    }
+  }
   const h = state.history;
   if (!h || h.version !== 1 || !Array.isArray(h.frames) || h.frames.length > R.historyFrames || !Array.isArray(h.events)
     || h.events.length > R.historyEvents || typeof h.truncated !== 'boolean' || !number(h.sampledIntervalSeconds, 10, 86400)
@@ -66,7 +91,7 @@ export function validateCombatState(state, classes = null) {
   }
   for (const event of h.events) {
     if (!text(event.id, 100) || !number(event.seconds, 0, state.seconds)
-      || !['salvo','impact','torpedo','air-launch','air-attack','air-loss','sink','withdraw','end'].includes(event.kind)) fail();
+      || !['salvo','impact','torpedo','air-launch','air-attack','air-loss','sink','withdraw','end','milestone'].includes(event.kind)) fail();
     for (const key of ['position', 'targetPosition']) if (event[key] !== undefined && (!Array.isArray(event[key]) || event[key].length !== 2 || !event[key].every(v => number(v, -20000, 20000)))) fail();
     for (const key of ['damage','health','hits','rounds','planes','planesLost','capLosses','fighters','arrivalAt']) if (event[key] !== undefined && !number(event[key])) fail();
   }

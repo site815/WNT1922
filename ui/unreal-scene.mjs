@@ -5,6 +5,7 @@ import { watchFrame, battleInstances } from './battle-watch.mjs';
 import { battleVisualEvents } from './battle-events.mjs';
 import { receiveNativePerformance } from './native-performance.mjs';
 import { unrealTacticalPacket, tacticalSceneSnapshot } from './tactical-scene-packet.mjs';
+import { BattleAudioController } from './battle-audio.mjs';
 export { unrealTacticalPacket } from './tactical-scene-packet.mjs';
 
 export const UNREAL_MODE = globalThis.location?.search != null && new URLSearchParams(globalThis.location.search).get('unreal') === '1';
@@ -36,6 +37,14 @@ function send(method, packet) {
     if (typeof native[method] !== 'function') throw new Error('The native game does not support ' + method);
     return native[method](JSON.stringify(packet));
   }).catch(error => reportError(error.message));
+}
+
+// The title is a static mode chooser. Hide the native viewport even before a
+// scene has ever been activated, so no boot-time battle/world remains behind it.
+export function hideNativePresentation() {
+  activeScene?.suspend();
+  document.documentElement.dataset.unrealScene='hidden';
+  return send('viewport',{instanceId:'title-menu',mode:'hidden',x:0,y:0,width:1,height:1});
 }
 
 if (UNREAL_MODE) {
@@ -314,7 +323,7 @@ export function unrealBattlePacket(report, campaign, frameIndex, selected, anima
 }
 
 export class UnrealBattleScene extends NativeScene {
-  constructor(options) {super(options); this.mode = 'battle';}
+  constructor(options) {super(options); this.mode = 'battle';this.audio=new BattleAudioController();}
   refresh(report, campaign, frameIndex = null, selected = null, animationEnabled = true, playback = null) {
     const canvas = this.root.querySelector('.battle-canvas');
     if (!canvas || !report) {this.clear(); return;}
@@ -326,8 +335,12 @@ export class UnrealBattleScene extends NativeScene {
     this.attach(canvas); this.activate();
     if (changed) {
       this.started = performance.now();
-      this.battleReady = send('battle', unrealBattlePacket(report,campaign,frameIndex,selected,animate,playback));
+      const packet=unrealBattlePacket(report,campaign,frameIndex,selected,animate,playback);
+      this.audioPacket=packet;
+      this.battleReady = send('battle',packet);
     }
+    if(this.audioPacket)this.audio.update({...this.audioPacket,tacticalSessionId:playback?.key||`static:${report.id}`,
+      ...(playback?{elapsedSeconds:playback.elapsedSeconds,playbackPaused:playback.paused}:{})},{silent:!playback});
     this.view = {native:true};
     // Callers that fit a newly selected model must wait for the native packet:
     // receiving a new report also resets the native battle camera.
@@ -336,10 +349,13 @@ export class UnrealBattleScene extends NativeScene {
   draw() {if (this.canvas?.isConnected && this.frame) this.activate();}
   fit() {this.zoom = 1; this.input('home');}
   focus(side, id, hullIndex = 0) {this.input('focus', {side,id,hullIndex});}
+  suspend(){this.audio?.pause();super.suspend();}
+  clear(){this.audio?.reset();this.audioPacket=null;super.clear();}
+  destroy(){this.audio?.destroy();super.destroy();}
 }
 
 export class UnrealTacticalScene extends NativeScene {
-  constructor(options){super(options);this.mode='battle';this.onCameraChange=options.onCameraChange;this.sessionSerial=0;}
+  constructor(options){super(options);this.mode='battle';this.onCameraChange=options.onCameraChange;this.sessionSerial=0;this.audio=new BattleAudioController();}
   refresh(state,options={}){
     const canvas=this.root.querySelector('.battle-canvas');if(!canvas||!state){this.clear();return Promise.resolve();}
     if(this.combat!==state){this.combat=state;this.sessionId=`${this.instanceId}:tactical:${++this.sessionSerial}`;this.previous=null;this.current=null;this.packet=null;}
@@ -360,12 +376,16 @@ export class UnrealTacticalScene extends NativeScene {
       if(!this.packet||candidate.eventKey!==this.packet.eventKey||candidate.playbackPaused!==this.packet.playbackPaused){this.clockStartedAt=performance.now();this.clockElapsed=candidate.elapsedSeconds;}
       this.packet=candidate;this.replay=options.replaySeconds;this.selectionKey=JSON.stringify(options.selected);this.battleReady=send('battle',candidate);
     }
+    this.audio.update(candidate,{silent:!!options.silent});
     return this.battleReady||Promise.resolve();
   }
   cameraChanged(event){super.cameraChanged(event);this.onCameraChange?.(event);}
   fit(){this.input('home');}
   focus(side,id,hullIndex=0){this.input('focus',{side,id,hullIndex});}
   setCinematic(enabled){this.input('cinematic',{enabled});}
+  resetAudio(){this.audio?.reset();}
+  suspend(){this.audio?.pause();super.suspend();}
   draw(){if(this.canvas?.isConnected)this.activate();}
-  clear(){super.clear();this.combat=null;this.previous=null;this.current=null;this.packet=null;}
+  clear(){this.audio?.reset();super.clear();this.combat=null;this.previous=null;this.current=null;this.packet=null;}
+  destroy(){this.audio?.destroy();super.destroy();}
 }

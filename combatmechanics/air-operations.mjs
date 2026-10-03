@@ -2,6 +2,21 @@ import { COMBAT_RULES as R, clamp, distance, bearing, binomial } from './rules.m
 import { applyImpact } from './weapons.mjs';
 
 // Each strike is one moving tactical unit. Plane counts govern CAP, AA and payload.
+export function launchStrikeGroup(state, carrier, target, counts, emit, extras = {}) {
+  if (!carrier || !target || ['sunk','escaped'].includes(carrier.status)) return null;
+  const planes = Math.min(carrier.aircraft.strike, counts.planes), fighters = Math.min(carrier.aircraft.fighter, counts.fighters);
+  if (!planes && !fighters) return null;
+  carrier.aircraft.strike -= planes; carrier.aircraft.fighter -= fighters;
+  carrier.nextAirAt = state.seconds + R.air.rearmSeconds;
+  const strike = { id: `air-${state.nextId++}`, side: carrier.side, sourceId: carrier.id, targetId: target.id,
+    x: carrier.x, y: carrier.y, heading: bearing(carrier, target), planes, fighters, launchedPlanes: planes + fighters,
+    phase: 'outbound', attacks: 0, lost: 0, crewQuality: carrier.stats.crewQuality, ...extras };
+  state.airstrikes.push(strike);
+  emit({ kind: 'air-launch', attackerId: carrier.id, targetId: target.id, strikeId: strike.id,
+    position: [carrier.x, carrier.y], targetPosition: [target.x, target.y], planes, fighters });
+  state.lastContactAt = state.seconds;
+  return strike;
+}
 export function launchStrikes(state, active, emit) {
   for (const carrier of active) {
     if (carrier.aircraft.strike <= 0 || carrier.nextAirAt > state.seconds || carrier.health < .15) continue;
@@ -12,15 +27,7 @@ export function launchStrikes(state, active, emit) {
     })[0];
     if (!target || distance(carrier, target) > R.air.rangeKm) continue;
     const planes = carrier.aircraft.strike, fighters = Math.floor(carrier.aircraft.fighter * (1 - R.air.capFraction));
-    carrier.aircraft.strike -= planes; carrier.aircraft.fighter -= fighters;
-    carrier.nextAirAt = state.seconds + R.air.rearmSeconds;
-    const strike = { id: `air-${state.nextId++}`, side: carrier.side, sourceId: carrier.id, targetId: target.id,
-      x: carrier.x, y: carrier.y, heading: bearing(carrier, target), planes, fighters, launchedPlanes: planes + fighters,
-      phase: 'outbound', attacks: 0, lost: 0, crewQuality: carrier.stats.crewQuality };
-    state.airstrikes.push(strike);
-    emit({ kind: 'air-launch', attackerId: carrier.id, targetId: target.id, strikeId: strike.id,
-      position: [carrier.x, carrier.y], targetPosition: [target.x, target.y], planes, fighters });
-    state.lastContactAt = state.seconds;
+    launchStrikeGroup(state, carrier, target, { planes, fighters }, emit);
   }
 }
 export function advanceStrikes(state, active, emit) {
@@ -46,9 +53,11 @@ export function advanceStrikes(state, active, emit) {
       target = landing;
     }
     if (!target) continue;
-    const range = distance(strike, target), move = R.air.cruiseKmh / 3600 * R.stepSeconds;
+    const range = distance(strike, target), deadline = strike.phase === 'outbound' ? strike.scripted?.attackAt : strike.scripted?.returnAt;
+    const move = strike.scripted ? range * R.stepSeconds / Math.max(R.stepSeconds, (deadline ?? state.seconds) - state.seconds + R.stepSeconds)
+      : R.air.cruiseKmh / 3600 * R.stepSeconds;
     strike.heading = bearing(strike, target);
-    if (range > move + 1) {
+    if (strike.scripted ? state.seconds < deadline : range > move + 1) {
       const h = strike.heading * Math.PI / 180;
       strike.x += Math.sin(h) * move; strike.y += Math.cos(h) * move; continue;
     }
@@ -64,12 +73,12 @@ export function advanceStrikes(state, active, emit) {
     const cap = defenders.reduce((n, s) => n + s.aircraft.fighter, 0) + (external?.cap || 0);
     const aa = defenders.reduce((n, s) => n + s.stats.aa * s.fireControl, 0) + (external?.aa || 0);
     const capLossProbability = clamp(cap / Math.max(1, strike.planes + strike.fighters * 2) * .12, 0, .65);
-    const shotDown = binomial(state, strike.planes, clamp(capLossProbability + aa / (aa + 350) * .25, 0, .8));
-    const fighterLost = binomial(state, strike.fighters, clamp(capLossProbability * .65 + .015, 0, .5));
+    const shotDown = strike.scripted ? Math.min(strike.planes, strike.scripted.losses.planes) : binomial(state, strike.planes, clamp(capLossProbability + aa / (aa + 350) * .25, 0, .8));
+    const fighterLost = strike.scripted ? Math.min(strike.fighters, strike.scripted.losses.fighters) : binomial(state, strike.fighters, clamp(capLossProbability * .65 + .015, 0, .5));
     strike.planes -= shotDown; strike.fighters -= fighterLost; strike.lost += shotDown + fighterLost;
     if (source) source.aircraftLost += shotDown + fighterLost;
     else state.externalAirLosses = (state.externalAirLosses || 0) + shotDown + fighterLost;
-    const capLosses = binomial(state, Math.min(cap, strike.launchedPlanes), clamp(.025 + strike.fighters / Math.max(1, cap) * .05, .025, .25));
+    const capLosses = strike.scripted ? 0 : binomial(state, Math.min(cap, strike.launchedPlanes), clamp(.025 + strike.fighters / Math.max(1, cap) * .05, .025, .25));
     let remaining = capLosses;
     for (const defender of defenders) {
       const lost = Math.min(remaining, defender.aircraft.fighter); defender.aircraft.fighter -= lost;
@@ -80,12 +89,17 @@ export function advanceStrikes(state, active, emit) {
       state.externalCapLosses = (state.externalCapLosses || 0) + lost;
     }
     const probability = R.air.hitChance * strike.crewQuality * (1 - state.environment.seaState * .045) * (state.environment.night ? .4 : 1);
-    const hits = binomial(state, strike.planes, probability);
-    emit({ kind: 'air-attack', attackerId: source?.id || strike.sourceId, targetId: target.id, strikeId: strike.id,
+    const hits = strike.scripted ? Number(strike.planes > 0 && strike.scripted.healthAfter < target.health) : binomial(state, strike.planes, probability);
+    const attackEmit = row => emit({ ...row, ...(strike.scripted ? { scripted: true, historicalLabel: strike.scripted.label, historicalTime: strike.scripted.time } : {}) });
+    attackEmit({ kind: 'air-attack', attackerId: source?.id || strike.sourceId, targetId: target.id, strikeId: strike.id,
       position: [strike.x, strike.y], targetPosition: [target.x, target.y], planes: strike.planes, hits,
       planesLost: shotDown + fighterLost, capLosses });
-    applyImpact(state, target, hits * R.air.damageScale / Math.sqrt(target.stats.tons / 10000), 'air strike', source, emit);
+    applyImpact(state, target, strike.scripted ? Math.max(0, target.health - strike.scripted.healthAfter)
+      : hits * R.air.damageScale / Math.sqrt(target.stats.tons / 10000), 'air strike', source, attackEmit,
+    strike.scripted ? { healthAfter: strike.scripted.healthAfter, ...strike.scripted.effects } : null);
+    if (strike.scripted) strike.scripted.returnAt = state.seconds + strike.scripted.returnSeconds;
     strike.attacks++; strike.phase = state.metadata.externalAirRaid?'landed':'returning'; state.lastContactAt = state.seconds;
+    if (strike.scripted && !strike.planes && !strike.fighters) strike.phase = 'lost';
   }
   // Finished flights have no live tactical presence. Their identities remain in events.
   state.airstrikes = state.airstrikes.filter(s => !['landed', 'lost'].includes(s.phase));

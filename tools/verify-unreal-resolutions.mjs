@@ -147,17 +147,36 @@ try{
  assert(existing===404||args.includes('--allow-existing-test-save'),'Use a fresh isolated profile or explicitly allow an existing disposable test save.');
  if(await page.locator('.native-world-input').count())await save();
  await page.addInitScript(instrument);await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>globalThis.ue?.wnt?.sceneinput&&globalThis.__wntResolutionEvidence);
- await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
- if(await page.locator('.start-demo').getAttribute('data-demo-playing')==='true')await page.locator('.start-demo [data-demo-action="toggle"]').click();
+ await page.locator('.start-screen').waitFor();
+ await until(()=>diagnostics(),d=>d.mode==='hidden','static main menu hides the native scene');
  result.metrics.push({kind:'CEF',url:page.url(),version:browser.version()});
  phase='minimum native window size';
  await input('resize',{width:1280,height:720});
  const minimum=await until(()=>diagnostics(),d=>d.viewportWidth===1800&&d.viewportHeight===1000,'undersized request clamped to actual native minimum');
  assert.equal(minimum.configuredWindowMode,2);if(!minimum.renderingOffscreen)assert.equal(minimum.windowMode,2);result.metrics.push({kind:'minimum-window-clamp',width:minimum.viewportWidth,height:minimum.viewportHeight,windowMode:minimum.windowMode,configuredWindowMode:minimum.configuredWindowMode,renderingOffscreen:minimum.renderingOffscreen});
  result.checks.push('A native 1280x720 resize request is clamped to a true 1800x1000 windowed render target.');
- phase='title battle resolutions';
- for(const size of resolutions){await resize(size,'battle');await page.locator('.start-screen').evaluate(n=>n.scrollTop=0);await pick('battle-ship');await capture('title-'+size.width+'x'+size.height,size,true);}
- result.checks.push('Title battle geometry is clickable with exact identities at every actual native resolution; native scene PNGs match requested dimensions and CEF-only UI images are recorded separately.');
+ phase='main menu resolutions';
+ for(const size of resolutions){
+  await resize(size,'hidden');
+  const layout=await page.locator('.start-screen').evaluate(root=>{
+   const campaign=root.querySelector('.start-setup').getBoundingClientRect(),tactical=root.querySelector('.start-tactical').getBoundingClientRect(),footer=root.querySelector('.start-screen-footer').getBoundingClientRect();
+   return {campaign:campaign.toJSON(),tactical:tactical.toJSON(),footer:footer.toJSON(),width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight};
+  });
+  assert(layout.campaign.right<layout.tactical.left,'Campaign is a separate left panel');
+  assert(layout.footer.bottom<=layout.height+1&&layout.scrollHeight<=layout.height+1&&layout.scrollWidth<=layout.width+1,'Static title has no outer scrollbar');
+  assert.equal(await page.locator('.start-screen canvas').count(),0,'Title has no demonstration renderer');
+  assert.equal(await page.locator('.start-battle-choice').count(),4);
+  const presetId=['denmark-strait','midway','north-cape','custom'][resolutions.indexOf(size)%4];
+  await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
+  await page.locator('.tactical-engagements').waitFor();
+  assert.equal(await page.locator('[data-setup="presetId"]').inputValue(),presetId);
+  await page.locator('[data-tactical="close"]').click();await page.locator('.start-screen').waitFor();
+  await until(()=>diagnostics(),d=>d.mode==='hidden','title remains hidden after tactical setup');
+  const name='title-'+size.width+'x'+size.height+'-cef-html-only',file=path.join(output,name+'.png');
+  await page.screenshot({path:file});result.captures.push({name,file,kind:'CEF-HTML-only-not-native-render'});
+  result.metrics.push({kind:'main-menu-layout',...size,presetId,layout});
+ }
+ result.checks.push('At every actual native resolution, the static title keeps separate Campaign and Tactical Battles panels without an outer scrollbar; direct preset/custom setup choices return without an old demo viewport. Title screenshots are explicitly HTML-only.');
  phase='campaign resolutions';
  if(existing===200){await page.locator('[data-action="continue"]').click();}
  else{await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();await page.locator('[data-action="select-nation"][data-id="USA"]').click();await page.locator('[data-action="new"]').click();if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();}

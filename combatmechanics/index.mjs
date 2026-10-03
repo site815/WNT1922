@@ -2,3 +2,4 @@ export { createCombat, advanceCombat, resolveCombat, combatSnapshot, combatSumma
 export { buildScenario, buildCustomScenario, SCENARIOS } from './scenarios.mjs';
 export { COMBAT_RULES } from './rules.mjs';
 export { DOCTRINES, FORMATIONS } from './ship-ai.mjs';
+export { historicalClock } from './historical-scripts.mjs';

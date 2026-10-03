@@ -3,10 +3,20 @@ let enabled = true,
   volume = 0.5,
   lastAlert = -Infinity,
   lastBattle = -Infinity;
+const battleVoices = new Set();
+const battleNoise = new WeakMap();
+let battleCuesPlayed = 0, battleCuesDropped = 0;
 export function soundSettings(on, level = 0.5) {
-  enabled = on;
-  volume = Math.max(0, Math.min(1, level));
-  if (gain) gain.gain.value = volume * 0.45;
+  enabled = !!on;
+  volume = Math.max(0, Math.min(1, Number.isFinite(level) ? level : 0.5));
+  if (gain) gain.gain.value = enabled ? volume * 0.45 : 0;
+  if (!enabled || !volume) stopBattleSounds();
+}
+export function soundPreferences() { return {enabled, volume}; }
+export function soundStatus() {
+  return {enabled, volume, available:!!(globalThis.AudioContext || globalThis.webkitAudioContext),
+    unlocked:context?.state === "running", contextState:context?.state || "uninitialized",
+    battleVoiceCount:battleVoices.size, battleCuesPlayed, battleCuesDropped};
 }
 export function unlockSound() {
   if (!enabled) return;
@@ -21,6 +31,101 @@ export function unlockSound() {
     if (context.state === "suspended") context.resume().catch(() => {});
   } catch {
     /* Audio is optional on computers without an audio device. */
+  }
+}
+
+// Every voice is local synthesis. The renderer is also usable with an
+// OfflineAudioContext to verify its actual PCM output without an audio device.
+// Cosmetic noise never uses or advances the combat simulation's RNG.
+const battleTimbres = Object.freeze({
+  gun: {duration:.78, filter:"lowpass", from:1050, to:85, noise:.62, tone:95, endTone:32, body:.38, attack:.006},
+  impact: {duration:.66, filter:"bandpass", from:1900, to:180, noise:.58, tone:125, endTone:43, body:.26, attack:.003},
+  splash: {duration:.88, filter:"bandpass", from:2100, to:380, noise:.43, attack:.035},
+  torpedo: {duration:.46, filter:"lowpass", from:390, to:75, noise:.32, tone:70, endTone:38, body:.1, attack:.025},
+  air: {duration:.95, filter:"bandpass", from:950, to:280, noise:.22, tone:210, endTone:95, body:.07, attack:.10},
+  sinking: {duration:1.8, filter:"lowpass", from:240, to:38, noise:.43, tone:65, endTone:28, body:.21, attack:.08},
+  "depth-charge": {duration:.85, filter:"lowpass", from:260, to:40, noise:.48, tone:72, endTone:25, body:.32, attack:.01},
+});
+
+export function synthesizeBattleSound(audioContext, destination, kind, options={}) {
+  const spec=battleTimbres[kind];
+  if (!spec || !audioContext || !destination) return null;
+  const at=Math.max(audioContext.currentTime, Number.isFinite(options.at) ? options.at : audioContext.currentTime);
+  const intensity=Math.max(0,Math.min(1,Number.isFinite(options.intensity)?options.intensity:.75));
+  const nodes=[], sources=[];
+  let finished=false, ended=0;
+  const clean=()=>{
+    if(finished)return; finished=true;
+    for(const node of nodes){try{node.disconnect();}catch{}}
+    options.onended?.();
+  };
+  const voice={duration:spec.duration, stop(){
+    if(finished)return;
+    for(const source of sources){try{source.stop();}catch{}}
+    clean();
+  }};
+  try {
+    let buffer=battleNoise.get(audioContext);
+    if(!buffer){
+      buffer=audioContext.createBuffer(1,Math.ceil(audioContext.sampleRate*2),audioContext.sampleRate);
+      const samples=buffer.getChannelData(0);
+      for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;
+      battleNoise.set(audioContext,buffer);
+    }
+    const bus=audioContext.createGain(); nodes.push(bus);
+    bus.gain.value=intensity;
+    let output=bus;
+    if(audioContext.createStereoPanner){
+      const panner=audioContext.createStereoPanner(); nodes.push(panner);
+      panner.pan.value=Math.max(-1,Math.min(1,Number.isFinite(options.pan)?options.pan:0));
+      bus.connect(panner);output=panner;
+    }
+    output.connect(destination);
+    const source=audioContext.createBufferSource(),filter=audioContext.createBiquadFilter(),envelope=audioContext.createGain();
+    nodes.push(source,filter,envelope);sources.push(source);
+    source.buffer=buffer;filter.type=spec.filter;
+    filter.Q.value=spec.filter==='bandpass'?.7: .5;
+    filter.frequency.setValueAtTime(spec.from,at);
+    filter.frequency.exponentialRampToValueAtTime(spec.to,at+spec.duration);
+    envelope.gain.setValueAtTime(.0001,at);
+    envelope.gain.linearRampToValueAtTime(spec.noise,at+spec.attack);
+    envelope.gain.exponentialRampToValueAtTime(.0001,at+spec.duration);
+    source.connect(filter);filter.connect(envelope);envelope.connect(bus);
+    if(spec.tone){
+      const oscillator=audioContext.createOscillator(),body=audioContext.createGain();
+      nodes.push(oscillator,body);sources.push(oscillator);
+      oscillator.type='sine';oscillator.frequency.setValueAtTime(spec.tone,at);
+      oscillator.frequency.exponentialRampToValueAtTime(spec.endTone,at+spec.duration*.7);
+      body.gain.setValueAtTime(.0001,at);
+      body.gain.linearRampToValueAtTime(spec.body,at+spec.attack);
+      body.gain.exponentialRampToValueAtTime(.0001,at+spec.duration*.8);
+      oscillator.connect(body);body.connect(bus);
+    }
+    for(const node of sources){
+      node.onended=()=>{if(++ended===sources.length)clean();};
+      node.start(at);node.stop(at+spec.duration);
+    }
+    return voice;
+  } catch {
+    voice.stop(); return null;
+  }
+}
+
+// Battle playback does not unlock audio: only the UI's existing user-gesture
+// path may do that. Muted/unsupported cues are consumed rather than queued.
+export function playBattleSound(kind, options={}) {
+  if(!enabled || !volume || !gain || context?.state!=='running' || battleVoices.size>=8){
+    battleCuesDropped++;return false;
+  }
+  const entry={owner:options.owner,voice:null};
+  entry.voice=synthesizeBattleSound(context,gain,kind,{...options,onended:()=>battleVoices.delete(entry)});
+  if(!entry.voice){battleCuesDropped++;return false;}
+  battleVoices.add(entry);battleCuesPlayed++;return true;
+}
+export function stopBattleSounds(owner) {
+  for(const entry of [...battleVoices]){
+    if(owner!==undefined && entry.owner!==owner)continue;
+    entry.voice.stop();battleVoices.delete(entry);
   }
 }
 // A newer industry alert must not hide a battle that happened in this snapshot.

@@ -28,7 +28,15 @@ try {
   });
   const page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>errors.push(error.message));
   await page.goto('http://127.0.0.1:'+server.address().port+'/?unreal=1');
-  await page.locator('[data-action="tactical"]').click();
+  await page.locator('.start-screen').waitFor();
+  assert.equal(await page.locator('.start-demo,.start-demo-host,.start-screen canvas').count(),0,'The old opening demonstration is removed');
+  assert.equal(await page.locator('[data-action="tactical"][data-preset]').count(),4,'Tactical battles is a primary menu section with all presets and custom');
+  await page.locator('[data-action="tactical"][data-preset="denmark-strait"]').click();
+  assert.equal(await page.locator('[data-setup="mode"]').inputValue(),'historical');
+  assert(await page.locator('[data-setup="seed"]').isDisabled());
+  await page.locator('[data-setup="mode"]').selectOption('simulation');
+  assert(await page.locator('[data-setup="seed"]').isEnabled());
+  await page.locator('[data-setup="mode"]').selectOption('historical');
   assert(await page.locator('#app').evaluate(n=>n.hidden&&n.inert),'Title controls are suspended while tactical owns input');
   for(const [width,height] of [[900,500],[1280,720],[1800,1000],[1920,1080],[2560,1080],[3440,1440]]) {
     await page.setViewportSize({width,height});
@@ -89,6 +97,8 @@ try {
   await page.locator('[data-tactical="resolve"]').click();
   await page.locator('.tactical-engagements[data-tactical-status="completed"]').waitFor();
   assert(await page.locator('.tactical-result').isVisible());
+  assert.match(await page.locator('.tactical-result').innerText(),/HISTORICAL OUTCOME/);
+  assert.equal(await page.locator('.tactical-roster-ship.tactical-sunk').count(),1,'Denmark Strait ends with Hood sunk');
   const quickPackets=await page.evaluate(start=>window.__nativeCalls.slice(start).filter(c=>c.method==='battle').map(c=>c.packet),beforeQuickCalls);
   assert(quickPackets.length&&quickPackets.every(p=>p.cameraDirector&&p.playbackPaused),'Quick resolution displays paused observations and preserves cinematic preference');
   assert(await page.locator('[data-tactical-camera]').isChecked());

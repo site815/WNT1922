@@ -1,5 +1,5 @@
-// An isolated title-screen illustration, not a campaign, reconstruction or
-// historical damage model. Reports deliberately use the real replay schema.
+// Legacy aggregate-report fixtures for replay and model regression tests.
+// The main menu never imports these illustrative, non-simulated reports.
 const ship = (id, name, type, classId, modelNote) => ({id, name, type, classId, modelNote});
 const generic = type => `Detailed ${type} exterior reconstructed from historical references. Undocumented hull sections and small fittings are inferred; see the ship gallery's Art info for sources and fit limits.`;
 const freeze = value => { if (value && typeof value === 'object') {Object.values(value).forEach(freeze); Object.freeze(value);} return value; };
@@ -62,6 +62,3 @@ export function createDemoReport(battle) {
   return {id:'title-demo-' + battle.id,a:battle.a,b:battle.b,startedAt:-240,status:'completed',replay:{frames:battle.stages.map(frame)}};
 }
 
-export function demoCanPlay({active,connected,hidden,reducedMotion,paused,modal}) {
-  return Boolean(active && connected && !hidden && !reducedMotion && !paused && !modal);
-}

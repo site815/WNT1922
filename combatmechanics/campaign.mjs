@@ -25,7 +25,7 @@ export function createCampaignCombat({ seed, classes, groupsA, groupsB, nationA,
   const isSubmarineAction = [...groupsA, ...groupsB].every(g => ['SS', 'SM'].includes(classes[g.classId].type));
   const combat = createCombat({ seed, separationKm: isSubmarineAction ? 5 : 23,
     environment: { visibilityKm: 28, seaState: 2, night: false },
-    metadata: { id: 'campaign', title: 'Campaign fleet engagement', accuracy: 'Tactical game model; local encounter conditions are assumed.' },
+    metadata: { id: 'campaign', origin: 'campaign', mode: 'simulation', title: 'Campaign fleet engagement', accuracy: 'Tactical game model; local encounter conditions are assumed.' },
     sides: { A: side('A', groupsA, nationA, nameA, aggressiveA,supplyA), B: side('B', groupsB, nationB, nameB, aggressiveB,supplyB) } });
   combat.campaignApplied = Object.fromEntries(combat.ships.map(ship => [ship.id, { health: ship.health, sunk: false, aircraftLost: 0 }]));
   return combat;

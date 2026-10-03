@@ -4,6 +4,17 @@
 
 The last published stable download is **WNT1922-0.38.0-portable-win-x64.exe**. Its one-file Electron distribution and historical release notes are preserved below. Native Unreal previews use a versioned **WNT1922-v<version>-Unreal-Windows.zip** instead: extract the entire archive, then open `Windows/WNT1922.exe`. Keep its `WNT1922/GameData` folder, engine files and licenses together. A native preview does not replace the stable download automatically.
 
+## Native preview — 0.46.0-dev
+
+- The opening screen is split into **Campaign** and **Tactical Battles**. The old automatic battle demo is removed. Denmark Strait, Midway, North Cape and Custom battle open the actual tactical setup directly.
+- Historical presets default to **Historical playback**: sourced orders and key damage, sinking and withdrawal events run through the shared combat engine. Historical phase labels, source links, omitted forces and time compression are shown in the viewer. Midway includes Yorktown's later submarine attack and sinking as a separately identified aftermath.
+- **Free simulation** remains available for alternative results and editable doctrine/conditions. Custom fleets and campaign encounters always use unforced combat. Historical playback, watching, quick resolution and replay share the same state, weapon events, aircraft accounting and loss paths.
+- Firing, impacts, sea splashes, torpedoes, air attacks, sinking and depth charges have locally generated battle sounds. Tactical watching and recorded campaign movies follow their presentation clocks. SFX/volume controls, pause, mute, seek, quick resolve and scene closure prevent queued or repeated bursts; concurrent voices are bounded.
+
+Verified in the extracted Shipping build: all three historical outcomes, custom fleets, actual audio scheduling, unchanged campaign state, 198 gallery model loads/picks, and seven native resolutions from 1800×1000 to 5120×2160 covering 70 ministry layouts. All 48 native tests passed; 537 selected JavaScript checks are covered across the main run and one permitted integration-test rerun. A normal maximized cursor test and both offline-process checks also passed. Known visual limitations include an ocean shading seam in some close views and crowded overview labels.
+
+Historical playback reconstructs selected milestones with existing models. Exact tracks, intermediate salvos and numerical damage are illustrative; some supporting forces remain named off-map events. See [combat rules and historical sources](combatmechanics/README.md) and [verification evidence](SYSTEMS-CHECK.md).
+
 ## Native preview — 0.45.0-dev
 
 - **Tactical Engagements** opens from the title screen or menu 12. Choose Denmark Strait, Midway or North Cape, or create opposing fleets from both campaign catalogs. Set formations, doctrine, weather and a reproducible seed, then watch the AI, advance one step, or resolve quickly. Custom fleets support up to 120 hulls per side. The campaign stays paused and unchanged while this separate mode is open.

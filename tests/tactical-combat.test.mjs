@@ -19,7 +19,7 @@ const campaign=role=>{const s=newGame(CATALOG,'USA',12345,'in_good_faith_1936');
 
 test('watched, quick and save-resumed tactical combat have identical outcomes and RNG',()=>{
   for(const presetId of ['denmark-strait','midway','north-cape']){
-    const setup=buildScenario(null,{presetId,seed:9001}),a=createCombat(setup),b=createCombat(setup);
+    const setup=buildScenario(null,{presetId,mode:'simulation',seed:9001}),a=createCombat(setup),b=createCombat(setup);
     resolveCombat(a);while(b.status==='ongoing')advanceCombat(b,10);
     assert.deepEqual(physical(a),physical(b));assert.deepEqual(a.history,b.history);
     const mid=createCombat(setup);advanceCombat(mid,900);const resumed=JSON.parse(JSON.stringify(mid));validateCombatState(resumed);resolveCombat(mid);resolveCombat(resumed);
@@ -44,7 +44,7 @@ test('large line-ahead formations stay on their own side and fixed steps never s
 });
 test('carrier flights conserve every aircraft through CAP, sinking, recovery and time limits',()=>{
   for(const seed of [1,7,29]){
-    const state=createCombat(buildScenario(null,{presetId:'midway',seed})),initial=state.ships.reduce((n,s)=>n+s.aircraft.fighter+s.aircraft.strike,0);
+    const state=createCombat(buildScenario(null,{presetId:'midway',mode:'simulation',seed})),initial=state.ships.reduce((n,s)=>n+s.aircraft.fighter+s.aircraft.strike,0);
     while(state.status==='ongoing'){
       advanceCombat(state,900);
       const total=state.ships.reduce((n,s)=>n+s.aircraft.fighter+s.aircraft.strike+s.aircraftLost,0)+state.airstrikes.reduce((n,a)=>n+a.planes+a.fighters,0);

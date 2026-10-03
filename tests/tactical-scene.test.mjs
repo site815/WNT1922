@@ -17,7 +17,7 @@ test('native tactical inspection packets preserve the moving clock origin throug
   t.after(()=>{for(const [key,descriptor] of old){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];}});
   const canvas={isConnected:true},scene=new UnrealTacticalScene({root:{querySelector:()=>canvas}});
   scene.attach=()=>{};scene.activate=()=>{};
-  const state=createCombat(buildScenario(null,{seed:42}));await scene.refresh(state,{paused:true});
+  const state=createCombat(buildScenario(null,{mode:'simulation',seed:42}));await scene.refresh(state,{paused:true});
   advanceCombat(state,10);await scene.refresh(state,{fromSeconds:0,speed:20,paused:false});
   const key=packets.at(-1).eventKey,track=structuredClone(packets.at(-1).units[0].trajectory);
   now=1100;await scene.refresh(state,{selected:{id:state.ships[0].id},paused:false});
@@ -29,7 +29,7 @@ test('native tactical inspection packets preserve the moving clock origin throug
 });
 
 test('tactical rendering preserves individual observed positions, damage and headings without simulation writes',()=>{
-  const state=createCombat(buildScenario(null,{presetId:'denmark-strait',seed:42}));
+  const state=createCombat(buildScenario(null,{mode:'simulation',presetId:'denmark-strait',seed:42}));
   const previous=tacticalSceneSnapshot(state);advanceCombat(state,10);const before=structuredClone(state);
   const selected=state.ships[1];
   const packet=unrealTacticalPacket(state,{previous,fromSeconds:0,durationSeconds:.5,selected:{id:selected.id}});
@@ -45,7 +45,7 @@ test('tactical rendering preserves individual observed positions, damage and hea
 });
 
 test('tactical effects keep actual shot endpoints, misses and long torpedo travel across presentation windows',()=>{
-  const state=createCombat(buildScenario(null,{seed:42}));advanceCombat(state,100);
+  const state=createCombat(buildScenario(null,{mode:'simulation',seed:42}));advanceCombat(state,100);
   const [a,b]=state.ships;state.history.events=[
     {id:'launch',seconds:90,kind:'torpedo',attackerId:a.id,targetId:b.id,position:[1,2],targetPosition:[4,6],arrivalAt:690,hits:0},
     {id:'hit',seconds:100,kind:'impact',attackerId:a.id,targetId:b.id,position:[1,2],targetPosition:[4,6],weapon:'torpedo',damage:.2},
@@ -69,7 +69,7 @@ test('retained archive gaps cut rather than invent ship motion, and retained sam
 });
 
 test('a real carrier battle movie retains airborne group lifetimes and all actual sinks without rerolling',()=>{
-  const state=createCombat(buildScenario(null,{presetId:'midway',seed:19420604}));resolveCombat(state);
+  const state=createCombat(buildScenario(null,{mode:'simulation',presetId:'midway',seed:19420604}));resolveCombat(state);
   const before=structuredClone(state),report={id:24,startedAt:0,minute:state.seconds/60,completedAt:state.seconds/60,status:'completed',tactical:state,
     replay:{frames:[{at:0,tacticalSeconds:0},{at:state.seconds/60,tacticalSeconds:state.seconds}]}};
   const plan=buildTacticalMovie(report);
@@ -92,7 +92,7 @@ test('port selection keeps command map and fleets present while opening an intel
 });
 
 test('campaign movies inherit the campaign model catalog and honor explicit mixed-catalog hulls',()=>{
-  const state=createCombat(buildScenario(null,{seed:42}));advanceCombat(state,60);
+  const state=createCombat(buildScenario(null,{mode:'simulation',seed:42}));advanceCombat(state,60);
   const report={id:25,startedAt:0,minute:1,status:'ongoing',tactical:state,replay:{frames:[{at:0,tacticalSeconds:0},{at:1,tacticalSeconds:60}]}};
   delete state.metadata.campaign;delete state.metadata.modelCampaigns;
   let plan=buildBattleMovie(report);
@@ -105,7 +105,7 @@ test('campaign movies inherit the campaign model catalog and honor explicit mixe
 });
 
 test('an oversized combat without retained frames shows actual current positions and cannot invent a movie',()=>{
-  const state=createCombat(buildScenario(null,{seed:42}));advanceCombat(state,60);
+  const state=createCombat(buildScenario(null,{mode:'simulation',seed:42}));advanceCombat(state,60);
   state.history.frames=[];state.history.truncated=true;
   const report={id:26,startedAt:0,minute:1,status:'ongoing',tactical:state,replay:{frames:[{at:0,tacticalSeconds:0},{at:1,tacticalSeconds:60}]}};
   assert.equal(buildBattleMovie(report),null);
@@ -114,7 +114,7 @@ test('an oversized combat without retained frames shows actual current positions
 });
 
 test('ASW drops do not become gunfire and completed static scenes settle terminal sinking effects',()=>{
-  const state=createCombat(buildScenario(null,{seed:42}));advanceCombat(state,60);
+  const state=createCombat(buildScenario(null,{mode:'simulation',seed:42}));advanceCombat(state,60);
   const [a,b]=state.ships;state.history.events=[{id:'asw',seconds:50,kind:'salvo',weapon:'depth charge',attackerId:a.id,targetId:b.id,position:[a.x,a.y],targetPosition:[b.x,b.y],arrivalAt:60}];
   assert(!unrealTacticalPacket(state,{fromSeconds:50,speed:10}).events.some(e=>e.key==='asw'));
   b.status='sunk';b.health=0;b.sunkAt=60;state.status='completed';

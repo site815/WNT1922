@@ -57,11 +57,7 @@ async function capture(view){
 }
 try{
  await page.waitForFunction(()=>!!globalThis.WNTUnreal?.receive&&!!globalThis.ue?.wnt);
- if(await page.locator('.start-screen').count()){
-  await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
-  if(await page.locator('.start-demo').getAttribute('data-demo-playing')==='true')
-   await page.locator('[data-demo-action="toggle"]').click();
- }
+ if(await page.locator('.start-screen').count())await page.locator('.start-screen').waitFor();
  await page.evaluate(()=>{
   globalThis.__wntArtEvents=[];
   const receive=WNTUnreal.receive;

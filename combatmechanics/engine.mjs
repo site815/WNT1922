@@ -2,6 +2,7 @@ import { COMBAT_RULES as R, clamp, distance } from './rules.mjs';
 import { DOCTRINES, FORMATIONS, chooseTarget, manoeuvre } from './ship-ai.mjs';
 import { weaponStats, fireWeapons, applyImpact, sink } from './weapons.mjs';
 import { launchStrikes, advanceStrikes } from './air-operations.mjs';
+import { initializeHistoricalCombat, advanceHistoricalTimeline, fireHistoricalSupportingSalvo } from './historical-scripts.mjs';
 
 const activeShip = ship => !['sunk', 'escaped'].includes(ship.status);
 const historySizes = new WeakMap();
@@ -19,6 +20,8 @@ function trimHistory(history) {
 const finite = (value, fallback, lo, hi) => Number.isFinite(Number(value)) ? clamp(Number(value), lo, hi) : fallback;
 export function createCombat(config) {
   if (!config?.sides?.A || !config?.sides?.B) throw Error('Combat requires two fleets.');
+  if ((config.metadata?.mode === 'historical') !== Boolean(config.historicalScript))
+    throw Error('Historical reconstruction requires its matching scenario script.');
   const seed = Number(config.seed) >>> 0 || 1;
   const state = { version: R.version, seed, rng: seed, seconds: 0, remainderSeconds: 0, nextId: 1,
     status: 'ongoing', winner: null, reason: '', maxDurationSeconds: finite(config.maxDurationSeconds, R.maximumSeconds, 60, 21600),
@@ -57,6 +60,10 @@ export function createCombat(config) {
     });
   }
   state.history.sampledIntervalSeconds = Math.max(R.historyIntervalSeconds,Math.ceil(state.ships.length/60)*R.historyIntervalSeconds);
+  if (config.historicalScript) {
+    initializeHistoricalCombat(state, config.historicalScript);
+    advanceHistoricalTimeline(state, event => emitEvent(state, event));
+  }
   recordFrame(state, true); return state;
 }
 export function combatSnapshot(state) {
@@ -114,28 +121,34 @@ function complete(state, reason) {
 function step(state) {
   const emit = event => emitEvent(state, event);
   state.seconds += R.stepSeconds; state.recentEvents = [];
+  if (state.historical) advanceHistoricalTimeline(state, emit);
   const active = state.ships.filter(activeShip), sides = { A: active.filter(s => s.side === 'A'), B: active.filter(s => s.side === 'B') };
   const activeById=new Map(active.map(ship=>[ship.id,ship]));
   const targets = new Map();
   for (const ship of active) {
     const enemy = sides[ship.side === 'A' ? 'B' : 'A'];
-    const orderedId=state.sides[ship.side].orders.targetId,ordered=orderedId?activeById.get(orderedId):null;
-    const target = ordered || chooseTarget(state, ship, enemy,activeById); ship.targetId = target?.id || null; targets.set(ship.id, target);
+    const orderedId=state.historical ? state.historical.orders[ship.id]?.targetId : state.sides[ship.side].orders.targetId,
+      ordered=orderedId?activeById.get(orderedId):null;
+    const target = state.historical ? ordered : ordered || chooseTarget(state, ship, enemy,activeById); ship.targetId = target?.id || null; targets.set(ship.id, target);
   }
   // Both sides move before either side fires: no first-side positional advantage.
   for (const ship of active) {
     const prior = ship.status; manoeuvre(state, ship, targets.get(ship.id));
     if (ship.status !== prior && ['withdrawing', 'escaped'].includes(ship.status)) emit({ kind: 'withdraw', targetId: ship.id, position: [ship.x, ship.y], status: ship.status });
   }
-  for (const ship of active) fireWeapons(state, ship, targets.get(ship.id), emit);
+  for (const ship of active) (state.historical ? fireHistoricalSupportingSalvo : fireWeapons)(state, ship, targets.get(ship.id), emit);
   const arriving = state.projectiles.filter(p => p.arrivalAt <= state.seconds);
   state.projectiles = state.projectiles.filter(p => p.arrivalAt > state.seconds);
   const byId = new Map(state.ships.map(s => [s.id, s]));
-  for (const projectile of arriving) if (projectile.hits > 0)
-    applyImpact(state, byId.get(projectile.targetId), projectile.damage, projectile.kind, byId.get(projectile.attackerId), emit);
+  for (const projectile of arriving) if (projectile.hits > 0) {
+    const impactEmit = projectile.scripted ? event => emit({ ...event, scripted: true,
+      historicalLabel: projectile.scripted.label, historicalTime: projectile.scripted.time }) : emit;
+    applyImpact(state, byId.get(projectile.targetId), projectile.damage, projectile.kind, byId.get(projectile.attackerId), impactEmit, projectile.scripted);
+  }
   const afloat = state.ships.filter(activeShip);
-  launchStrikes(state, afloat, emit); advanceStrikes(state, afloat, emit);
-  for (const ship of state.ships.filter(activeShip)) {
+  if (!state.historical) launchStrikes(state, afloat, emit);
+  advanceStrikes(state, afloat, emit);
+  for (const ship of state.historical ? [] : state.ships.filter(activeShip)) {
     const ongoingDamage = (ship.flooding * R.damage.floodingPerSecond + ship.fire * R.damage.firePerSecond) * R.stepSeconds;
     ship.health = clamp(ship.health - ongoingDamage, 0, 1);
     const repair = R.damage.repairPerSecond * R.stepSeconds * ship.stats.crewQuality * ship.stats.damageControl;
@@ -143,7 +156,9 @@ function step(state) {
     if (ship.health <= R.damage.sinkingHealth) sink(state, ship, 'progressive flooding and fire', emit);
   }
   const remainingA = state.ships.some(s => s.side === 'A' && activeShip(s)), remainingB = state.ships.some(s => s.side === 'B' && activeShip(s));
-  if ((!remainingA || !remainingB) && !state.projectiles.length && !state.airstrikes.length) complete(state, 'One fleet has sunk or disengaged.');
+  if (state.historical) {
+    if (state.seconds >= state.maxDurationSeconds) complete(state, 'Historical reconstruction complete; selected historical milestones have concluded.');
+  } else if ((!remainingA || !remainingB) && !state.projectiles.length && !state.airstrikes.length) complete(state, 'One fleet has sunk or disengaged.');
   else if (state.seconds >= state.maxDurationSeconds) complete(state, 'The scenario time limit has been reached.');
   else if (state.seconds >= R.minimumSeconds && state.seconds - state.lastContactAt >= R.sea.noContactSeconds && !state.airstrikes.length) {
     const canContact = state.ships.filter(activeShip).some(s => {
@@ -168,6 +183,7 @@ export function resolveCombat(state) {
   return state;
 }
 export function setCombatOrders(state, side, orders) {
+  if (state.historical) throw Error('Historical reconstruction follows its recorded orders; choose Free simulation to change doctrine.');
   if (!state.sides[side]) throw Error('Unknown combat side.');
   if (orders.doctrine !== undefined) {
     if (!DOCTRINES[orders.doctrine]) throw Error('Unknown doctrine.'); state.sides[side].doctrine = orders.doctrine;

@@ -38,8 +38,6 @@ const result={passed:false,endpoint,startedAt:new Date().toISOString(),checks:[]
 const contexts=[];
 let browser,page,origin,phase='connect',eventCursor=0;
 const surface=()=>page.locator('.native-world-input');
-const control=action=>page.locator('.start-demo [data-demo-action="'+action+'"]');
-const demoState=()=>page.locator('.start-demo').evaluate(node=>({...node.dataset}));
 
 // These wrappers only observe calls; the original receiver and Canvas API retain
 // their arguments, receiver, return value and production behavior.
@@ -172,29 +170,28 @@ try {
  // Reload only after initial startup completes; otherwise the driver itself
  // aborts in-flight catalog reads and produces a false startup failure.
  await page.locator('.start-screen, .native-world-input').first().waitFor();
- if(await page.locator('.start-screen').count()) await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
  await page.addInitScript(instrument);await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>typeof globalThis.ue?.wnt?.sceneinput==='function'&&globalThis.__wntRuntimeEvidence&&globalThis.WNTUnreal?.receive.__wntObserved);
  await page.locator('.start-screen').waitFor();
  result.metrics.push({kind:'CEF',url:page.url(),version:browser.version(),viewport:await page.evaluate(()=>({width:innerWidth,height:innerHeight,dpr:devicePixelRatio}))});
 
- phase='opening demonstrations';
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoReady==='true');
- if((await demoState()).demoPlaying==='true')await control('toggle').click();
- const demonstrationIds=[];
- for(let i=0;i<3;i++) {
-  await page.locator('.start-screen').evaluate(n=>{n.scrollTop=0;});
-  const state=await demoState();demonstrationIds.push(state.demoBattle);
-  const d=await diagnostics('battle');assert(d.shipActorCount>0&&d.visibleShipCount>0);
-  await delay(1100);await nativeCapture('native-title-'+state.demoBattle);
-  const selected=await pick('battle-ship');
-  await page.waitForFunction(s=>{const n=document.querySelector('.start-demo-inspection');return n?.dataset.demoId===s.id&&n.dataset.demoSide===s.side;},selected);
-  await control('next').click();assert.notEqual((await demoState()).demoFrame,state.demoFrame);
-  await control('next-battle').click();
+ phase='main menu tactical choices';
+ assert.equal(await page.locator('.start-screen canvas').count(),0,'Main menu contains no old demo viewport');
+ const presetIds=await page.locator('.start-battle-choice').evaluateAll(rows=>rows.map(row=>row.dataset.preset));
+ assert.deepEqual(presetIds,['denmark-strait','midway','north-cape','custom']);
+ for(const presetId of presetIds) {
+  await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
+  const tactical=page.locator('.tactical-engagements');await tactical.waitFor();
+  assert.equal(await tactical.locator('[data-setup="presetId"]').inputValue(),presetId,'Main menu opens the selected actual tactical scenario');
+  assert.equal(await tactical.locator('canvas').count(),0,'Choosing a scenario opens setup before rendering a battle');
+  await tactical.locator('[data-tactical="close"]').click();await page.locator('.start-screen').waitFor();
+  assert.equal(await page.locator('.start-screen canvas').count(),0,'Returning from tactical setup keeps the title static');
  }
- assert.equal(new Set(demonstrationIds).size,3);
- assert.equal((await page.evaluate(async()=>(await fetch('/api/save')).status)),existing.status,'Demo playback does not create a campaign save');
- result.checks.push('Opening battles retain exact hull identities with detailed models where available and explicit pending-art symbols elsewhere; native clicks, Next stage and Next battle work.');
+ await until(()=>diagnostics(),d=>d.mode==='hidden',{label:'static main menu native scene hidden'});
+ await page.screenshot({path:path.join(output,'main-menu-cef-html-only.png')});
+ result.captures.push({kind:'CEF-HTML-only-not-native-render',name:'main-menu-cef-html-only',file:path.join(output,'main-menu-cef-html-only.png')});
+ assert.equal((await page.evaluate(async()=>(await fetch('/api/save')).status)),existing.status,'Tactical setup choices do not create a campaign save');
+ result.checks.push('The static main menu separates Campaign and Tactical Battles. All three presets and Custom open their matching actual setup and return without a demo canvas, active native viewport or campaign-save change.');
 
  phase='detailed model gallery';
  const registry=JSON.parse(await fs.readFile(path.join(root,'assets/models/ships/index.json'),'utf8'));
@@ -220,10 +217,12 @@ try {
  assert(Number.isFinite(firstGalleryZoom)&&firstGalleryZoom>0);
  await until(()=>diagnostics('battle'),d=>Math.abs(d.zoom-firstGalleryZoom)<=Math.max(.0001,firstGalleryZoom*.001),{label:'gallery interface camera reaches fitted zoom'});
  await nativeCapture('native-gallery-interface',true);
- await gallery.locator('[data-gallery="close"]').click();await page.locator('.start-demo[data-demo-ready="true"]').waitFor();
+ await gallery.locator('[data-gallery="close"]').click();await page.locator('.start-screen').waitFor();
+ await until(()=>diagnostics(),d=>d.mode==='hidden',{label:'gallery close restores static title'});
+ assert.equal(await page.locator('.start-screen canvas').count(),0);
  assert.equal(await page.locator('#app').evaluate(el=>!el.hidden&&!el.inert),true);
  assert.equal((await page.evaluate(async()=>(await fetch('/api/save')).status)),existing.status);
- result.checks.push('Every gallery entry loads its exact detailed model and responds to a real native surface click; closing restores the title demo without creating or modifying a campaign.');
+ result.checks.push('Every gallery entry loads its exact detailed model and responds to a real native surface click; closing restores the static main menu without creating or modifying a campaign.');
 
  phase='new campaign';
  await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();
@@ -237,7 +236,7 @@ try {
  const d=await diagnostics('world');assert(d.shipActorCount>=packet.forces.reduce((sum,f)=>sum+f.hulls.length,0));
  result.metrics.push({kind:'native-world',...d,targets:undefined,ownForceCount:packet.forces.length,ownHullCount:packet.forces.reduce((sum,f)=>sum+f.hulls.length,0)});
  await nativeCapture('native-world');
- assert.equal(d.pendingModelCount,0,'Every starting campaign ship and opening-demo combatant must have a registered detailed model');
+ assert.equal(d.pendingModelCount,0,'Every starting campaign ship must have a registered detailed model');
  result.checks.push('USA1936 starts paused; every own hull retains its identity and position, with pending artwork counted separately from detailed models and loading errors.');
 
  phase='persistent command map and ministry menus';
@@ -368,7 +367,7 @@ try {
 
  phase='save and CEF reload';
  await page.locator('.sidebar [data-view="command"]').click();
- const saved=await save();assert.equal(campaignMinutes(saved),campaignMinutes(initial),'Camera/demo/inspection actions do not advance simulation');assert.equal(saved.paused,true);
+ const saved=await save();assert.equal(campaignMinutes(saved),campaignMinutes(initial),'Menu/camera/inspection actions do not advance simulation');assert.equal(saved.paused,true);
  await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(saved));
  await collectEvidence();
  await page.reload({waitUntil:'domcontentloaded'});eventCursor=0;
@@ -383,7 +382,7 @@ try {
  result.checks.push('Normal Save, a full CEF document reload and Continue preserve the complete paused campaign, RNG, resources and hull state; native terrain and fleets remount.');
  phase='campaign decisive battle watch';
  // This fixture is a real engine engagement in the disposable test profile,
- // distinct from the historical opening illustrations. No player save is used.
+ // distinct from standalone tactical scenarios. No player save is used.
  const battleState=newGame(CATALOG,'USA',360036,'in_good_faith_1936');
  battleState.decisions=[];battleState.autoPause=false;battleState.paused=true;
  Object.assign(battleState.relations['JPN-USA'],{war:true,allied:false,warSince:battleState.day});

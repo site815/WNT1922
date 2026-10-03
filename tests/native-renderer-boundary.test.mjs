@@ -37,5 +37,7 @@ test('the native HUD dependency graph contains no alternate world or battle grap
   };
   await visit(path.join(root,'ui/app.mjs'));
   assert(seen.has(path.join(root,'ui/unreal-scene.mjs')));
-  assert(seen.has(path.join(root,'ui/start-battle-demo.mjs')));
+  assert(seen.has(path.join(root,'ui/tactical-engagements.mjs')));
+  assert(!seen.has(path.join(root,'ui/start-battle-demo.mjs')),'The removed title player is outside the application graph');
+  assert(!seen.has(path.join(root,'ui/start-battle-data.mjs')),'Legacy scripted fixtures are not loaded by the application');
 });

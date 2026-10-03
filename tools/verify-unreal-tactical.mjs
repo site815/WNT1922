@@ -41,13 +41,19 @@ const result={format:1,kind:'native-tactical-engagements-verification',passed:fa
   packageReport:reportPath,archiveSha256:report.archiveSha256,processId:processes[0].ProcessId,endpoint:'http://127.0.0.1:'+port,
   checks:[],metrics:[],captures:[],errors:[],limitations:[
     'Native GPU captures contain the rendered scene without UI. CEF-only UI images are separate and clearly labelled; they do not capture native graphics. Human image review is required; diagnostics alone do not certify artistic quality or continuous motion.',
-    'Historical starting situations are selected approximations. This verifier runs the same actual simulator and never forces historical losses.',
+    'Historical playback scripts sourced milestones through the shared engine; courses, numeric damage and intermediate salvos remain illustrative. Free/custom simulation remains unforced.',
     'Quick resolution and replay operate only on the standalone combat. Normal campaign Save is used before and after; only savedAt may differ.',
     'Native model counts, projected ray-tested targets and cinematic camera diagnostics verify the renderer contract. This is not an FPS benchmark.',
   ]};
 await fs.mkdir(output,{recursive:true});
-let page,browser,initial,before,hooked=false,phase='connect',deadline=Date.now()+240000;
+let page,browser,initial,before,openingAudio,hooked=false,phase='connect',deadline=Date.now()+240000;
 const host=()=>page.locator('.tactical-engagements'),control=action=>host().locator('[data-tactical="'+action+'"]');
+async function setSoundVolume(volume){
+  const slider=host().locator('[data-tactical-volume]'),steps=Math.round(volume*20);
+  assert(Math.abs(steps/20-volume)<1e-6,'The disposable campaign volume must be representable by the visible slider');
+  await slider.focus();await slider.press('Home');
+  for(let i=0;i<steps;i++)await slider.press('ArrowRight');
+}
 async function until(read,accept,label,timeout=12000){let last;const end=Math.min(deadline,Date.now()+timeout);do{last=await read();if(accept(last))return last;await delay(80);}while(Date.now()<end);throw Error('Timed out '+label+' in '+phase+': '+JSON.stringify(last).slice(0,700));}
 async function input(action,values={}){await page.evaluate(({action,values})=>ue.wnt.sceneinput(JSON.stringify({instanceId:__wntTacticalEvidence.latest?.instanceId||'',action,...values})),{action,values});}
 async function diagnostics(mode){
@@ -125,7 +131,11 @@ try {
   });hooked=true;
   initial=await diagnostics('world');assert(Math.abs(initial.tilt)<.01&&Math.abs(initial.yaw)<.01,'Begin in an overhead world view for exact return verification');
   before=await save();await fs.writeFile(path.join(output,'campaign-before.json'),JSON.stringify(before,null,2));
-  phase='real tactical setup';await page.locator('.nav-item[data-view="tactical"]').click();await control('prepare').click();
+  phase='real tactical setup';await page.locator('.nav-item[data-view="tactical"]').click();
+  openingAudio=await page.evaluate(async()=>{const {soundPreferences}=await import('/ui/sound.mjs');return soundPreferences();});
+  await host().locator('[data-tactical-sfx]').check();
+  await setSoundVolume(.5);
+  await control('prepare').click();
   await until(()=>host().getAttribute('data-tactical-page'),v=>v==='watch','prepared watch view');
   let d=await ready(4);assert(d.cinematicAvailable);assert(await page.locator('[data-tactical-camera]').isChecked());
   await overviewTargets(['A','B'],'initial Denmark Strait fit');
@@ -152,10 +162,19 @@ try {
   await until(()=>host().getAttribute('data-tactical-seconds'),v=>Number(v)>=120,'live tactical combat progression');
   d=await diagnostics('battle');assert(d.cinematicEnabled&&d.cameraShotCount>0);result.metrics.push({kind:'active-cinematic',diagnostics:d});
   await nativeCapture('denmark-strait-live-cinematic');
+  const audioRunning=await page.evaluate(async()=>{const {soundStatus}=await import('/ui/sound.mjs');return{...soundStatus(),controller:__wntTacticalEvidence.scene.audio.diagnostics()};});
+  assert(audioRunning.available&&audioRunning.unlocked&&audioRunning.battleCuesPlayed>0,'The actual CEF audio context plays battle events after user gestures');
+  result.metrics.push({kind:'live-battle-audio',...audioRunning});
   await control('play').click();const paused=await observed();await delay(450);const pausedAgain=await observed();assert.equal(pausedAgain.combat.seconds,paused.combat.seconds);assert.equal(pausedAgain.combat.rng,paused.combat.rng);
-  await control('step').click();const stepped=await observed();assert.equal(stepped.combat.seconds,paused.combat.seconds+10);
+  const pausedAudio=await page.evaluate(async()=>{const {soundStatus}=await import('/ui/sound.mjs');return soundStatus();});assert.equal(pausedAudio.battleVoiceCount,0,'Pause cancels all battle voices');
+  await host().locator('[data-tactical-sfx]').uncheck();await control('play').click();await delay(650);await control('play').click();
+  const mutedAudio=await page.evaluate(async()=>{const {soundStatus}=await import('/ui/sound.mjs');return soundStatus();});assert.equal(mutedAudio.battleCuesPlayed,pausedAudio.battleCuesPlayed,'Muted playback consumes events without playing them');
+  await host().locator('[data-tactical-sfx]').check();
+  const beforeStep=await observed();
+  await control('step').click();const stepped=await observed();assert.equal(stepped.combat.seconds,beforeStep.combat.seconds+10);
   phase='quick resolve and replay';await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','exact quick resolution',30000);
-  const terminal=await observed();await page.locator('[data-tactical-camera]').uncheck();await control('replay').click();await overviewTargets(['A','B'],'Replay reset');await control('step').click();assert.deepEqual((await observed()).combat,terminal.combat,'Replaying retained observations cannot change outcome/RNG');
+  const terminal=await observed();assert.equal(terminal.combat.winner,'B');assert.deepEqual(terminal.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name),['HMS Hood']);
+  await page.locator('[data-tactical-camera]').uncheck();await control('replay').click();await overviewTargets(['A','B'],'Replay reset');await control('step').click();assert.deepEqual((await observed()).combat,terminal.combat,'Replaying retained observations cannot change outcome/RNG');
   await control('replay').click();
   await overviewTargets(['A','B'].filter(side=>terminal.combat.ships.some(ship=>ship.side===side&&!['sunk','escaped'].includes(ship.status))),'Return to result');
   await control('restart').click();assert.deepEqual((await observed()).combat,setup.combat,'Restart reproduces the initial seeded setup');await overviewTargets(['A','B'],'Restart');
@@ -164,16 +183,21 @@ try {
   await overviewTargets(['A','B'],'Midway 220 km separation');
   await page.locator('[data-tactical-camera]').check();await page.locator('[data-tactical-speed]').selectOption('120');await control('play').click();
   await until(async()=>{const o=await observed();return o.packet.airstrikes?.length||0;},n=>n>0,'actual carrier-launched grouped airstrikes',15000);
-  await until(()=>host().getAttribute('data-tactical-seconds'),v=>Number(v)>=600,'Midway establishing shot',15000);
+  await until(()=>host().getAttribute('data-tactical-seconds'),v=>Number(v)>=60,'Midway establishing shot',15000);
+  await control('play').click();
   await nativeCapture('midway-establishing-airstrikes');
   const establishing=await diagnostics('battle');
+  await control('play').click();
   await until(async()=>{const o=await observed();return o.combat.history.events.some(e=>e.kind==='air-attack');},Boolean,'first actual Midway air attack',90000);
   const attackShot=await until(()=>diagnostics('battle'),d=>d.cinematicEnabled&&d.cameraShot!=='establish'&&d.cameraShot!=='manual'&&d.cinematicCutCount>establishing.cinematicCutCount,'cinematic cut to the remote attack',8000);
   assert(attackShot.targets.some(t=>t.kind==='battle-ship'&&t.visible),'A remote cinematic cut must immediately land on a visible, ray-tested hull');
   result.metrics.push({kind:'midway-first-air-attack-camera',diagnostics:attackShot});
   await nativeCapture('midway-first-air-attack');await control('play').click();await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','Midway quick resolution',30000);
   const midway=await observed();assert(midway.combat.history.events.some(e=>e.kind==='air-attack'));result.metrics.push({kind:'midway-simulation',winner:midway.combat.winner,seconds:midway.combat.seconds,events:midway.combat.history.events.length,sunk:midway.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name)});
+  assert.equal(midway.combat.winner,'A');assert.deepEqual(midway.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name).sort(),['Akagi','Hiryu','Kaga','Soryu','USS Yorktown'].sort(),'Scripted Midway retains the dated later sinking of Yorktown');
   phase='North Cape';await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption('north-cape');await control('prepare').click();await ready(4);await control('step').click();await nativeCapture('north-cape-prepared');
+  await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','North Cape historical result',30000);
+  const northCape=await observed();assert.equal(northCape.combat.winner,'A');assert.deepEqual(northCape.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name),['Scharnhorst']);
   phase='custom fleet match';await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption('custom');
   const legacyClass=await page.evaluate(async()=>{const {CATALOG}=await import('/worker/catalog-loader.mjs');return Object.keys(CATALOG.campaigns.campaign_1922.classes).find(id=>!CATALOG.campaigns.in_good_faith_1936.classes[id]);});assert(legacyClass,'A campaign_1922-only catalog class must exist');
   await page.locator('[data-setup="class-A-0"]').selectOption('ecole_pt32');await page.locator('[data-setup="class-B-0"]').selectOption(legacyClass);
@@ -181,7 +205,9 @@ try {
   const mixed=await observed();assert(mixed.packet.units.filter(u=>u.side==='A').every(u=>u.classId==='ecole_pt32'&&u.campaign==='in_good_faith_1936'));assert(mixed.packet.units.filter(u=>u.side==='B').every(u=>u.classId===legacyClass&&u.campaign==='campaign_1922'));
   await verifyEveryNativeModel();
   await control('step').click();await nativeCapture('custom-five-ships');
-  await control('resolve').click();const closingStatus=(await observed()).combat.status;await control('close').click();await until(()=>diagnostics('world'),d=>d.mode==='world','campaign restoration');
+  await control('resolve').click();const closingStatus=(await observed()).combat.status;
+  await host().locator('[data-tactical-sfx]').setChecked(openingAudio.enabled);await setSoundVolume(openingAudio.volume);
+  await control('close').click();await until(()=>diagnostics('world'),d=>d.mode==='world','campaign restoration');
   result.metrics.push({kind:'close-after-quick-resolve',statusBeforeClose:closingStatus});
   result.checks.push('Packaged Denmark Strait, Midway, North Cape and custom fleets use real detailed hull models, actual simulator state and grouped airstrikes. Closing returns to the unchanged campaign.');
   const after=await save();assert.deepEqual(payload(after),payload(before),'The complete campaign including random state must be unchanged');await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(after,null,2));
@@ -190,7 +216,7 @@ try {
 finally {
   deadline=Date.now()+15000;
   if(page&&initial)try {
-    if(await host().count())await control('close').click();
+    if(await host().count()){if(openingAudio){await host().locator('[data-tactical-sfx]').setChecked(openingAudio.enabled);await setSoundVolume(openingAudio.volume);}await control('close').click();}
     await page.locator('.native-world-input').waitFor();await diagnostics('world');await input('focus',{longitude:initial.longitude,latitude:initial.latitude,zoom:initial.zoom});
     const restored=await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-initial.zoom)<.001&&Math.abs(((d.longitude-initial.longitude+540)%360)-180)<.001&&Math.abs(d.latitude-initial.latitude)<.001,'original world camera');
     if(before){const after=await save();assert.deepEqual(payload(after),payload(before));await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(after,null,2));}

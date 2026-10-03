@@ -14,7 +14,7 @@ export function initialTacticalSetup(content) {
   const classes = Object.values(content.classes).filter(ship => ship.type === 'BB');
   const first = classes.find(ship => ship.nation === 'GBR') || classes[0] || Object.values(content.classes)[0];
   const second = classes.find(ship => ship.nation === 'DEU') || classes[1] || first;
-  return {presetId:'denmark-strait', seed:19410524, doctrineA:'balanced', doctrineB:'balanced',
+  return {presetId:'denmark-strait', mode:'historical', seed:19410524, doctrineA:'balanced', doctrineB:'balanced',
     formationA:'line-ahead', formationB:'line-ahead', environment:{visibilityKm:28, seaState:3, night:false},
     separationKm:24, shipsA:[{classId:first?.id || '', count:1}], shipsB:[{classId:second?.id || '', count:1}]};
 }
@@ -22,6 +22,7 @@ export function initialTacticalSetup(content) {
 export function validateTacticalSetup(setup, content, scenarioIds = ['denmark-strait','midway','north-cape']) {
   const errors = [];
   if (!['custom', ...scenarioIds].includes(setup.presetId)) errors.push('Choose a listed battle or Custom fleets.');
+  if (setup.mode != null && !['historical','simulation'].includes(setup.mode)) errors.push('Choose Historical playback or Free simulation.');
   if (!Number.isInteger(Number(setup.seed)) || Number(setup.seed) < 1 || Number(setup.seed) > 4294967295)
     errors.push('Seed must be a whole number from 1 to 4,294,967,295.');
   for (const side of ['A','B']) {
@@ -52,7 +53,7 @@ export function validateTacticalSetup(setup, content, scenarioIds = ['denmark-st
 export function tacticalSetupConfig(setup, content, scenarioIds) {
   const errors = validateTacticalSetup(setup, content, scenarioIds);
   if (errors.length) throw Error(errors.join(' '));
-  return {...structuredClone(setup), seed:Number(setup.seed), separationKm:setup.presetId==='custom'?Number(setup.separationKm):undefined,
+  return {...structuredClone(setup), mode:setup.presetId==='custom'?'simulation':setup.mode||'historical', seed:Number(setup.seed), separationKm:setup.presetId==='custom'?Number(setup.separationKm):undefined,
     environment:{visibilityKm:Number(setup.environment.visibilityKm), seaState:Number(setup.environment.seaState), night:!!setup.environment.night},
     shipsA:setup.shipsA.map(row => ({classId:row.classId, count:Number(row.count)})),
     shipsB:setup.shipsB.map(row => ({classId:row.classId, count:Number(row.count)}))};

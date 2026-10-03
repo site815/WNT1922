@@ -35,48 +35,30 @@ try {
   const page = await context.newPage();
   page.on('request',request=>{if(!request.url().startsWith(origin)&&!request.url().startsWith('data:')&&!request.url().startsWith('blob:'))external.push(request.url());});
   await page.goto(origin+'/?unreal=1');
-  await page.waitForFunction(()=>window.__nativeCalls.some(c=>c.method==='battle'));
+  await page.locator('.start-screen').waitFor();
   assert.equal(await page.evaluate(()=>window.__webglCalls),0);
-  assert.equal(await page.locator('.unreal-scene-mask').count(),1);
-  // Native pixels can be twice CEF's logical CSS size under Windows DPI scaling.
-  // Fit the title to the viewport; only the optional information areas scroll.
-  for(const [width,height] of [[900,500],[1280,540],[1920,730],[1800,1000],[1920,1080],[2560,1080],[3440,1440]]){
+  assert.equal(await page.locator('.unreal-scene-mask').count(),0);
+  for(const [width,height] of [[900,500],[1280,540],[1920,730],[1800,1000],[1920,1080],[2560,1080],[3440,1440],[3840,2160],[5120,2160]]){
     await page.setViewportSize({width,height});
     const layout=await page.evaluate(()=>{
-      const root=document.querySelector('.start-screen'),button=root.querySelector('[data-action="new"]'),footer=root.querySelector('.start-screen-footer'),stage=root.querySelector('.start-demo-stage');
-      return {viewport:{width:innerWidth,height:innerHeight},root:{clientHeight:root.clientHeight,scrollHeight:root.scrollHeight,clientWidth:root.clientWidth,scrollWidth:root.scrollWidth},button:button.getBoundingClientRect().toJSON(),footer:footer.getBoundingClientRect().toJSON(),stage:stage.getBoundingClientRect().toJSON(),document:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}};
+      const root=document.querySelector('.start-screen'),button=root.querySelector('[data-action="new"]'),footer=root.querySelector('.start-screen-footer'),tactical=root.querySelector('.start-tactical');
+      return {root:{clientHeight:root.clientHeight,scrollHeight:root.scrollHeight,clientWidth:root.clientWidth,scrollWidth:root.scrollWidth},button:button.getBoundingClientRect().toJSON(),footer:footer.getBoundingClientRect().toJSON(),tactical:tactical.getBoundingClientRect().toJSON(),document:{width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}};
     });
     assert(layout.root.scrollHeight<=layout.root.clientHeight+1&&layout.root.scrollWidth<=layout.root.clientWidth+1,'No outer title scrollbar at '+width+'×'+height);
     assert(layout.document.width<=width&&layout.document.height<=height,'No document scrollbar at '+width+'×'+height);
-    assert(layout.button.top>=0&&layout.button.bottom<=layout.footer.top,'Take command remains above the fixed footer');
-    assert(layout.footer.bottom<=height+1&&layout.stage.height>=100,'Footer and battle viewer remain usable');
+    assert(layout.button.top>=0&&layout.button.bottom<=layout.footer.top,'Take command stays reachable');
+    assert(layout.footer.bottom<=height+1&&layout.tactical.height>=200,'Footer and tactical choices remain usable');
+    assert.equal(await page.locator('.start-screen canvas').count(),0);
   }
   await page.setViewportSize({width:900,height:500});
   await page.locator('.start-campaign-description summary').click();
-  await page.locator('.start-demo-disclaimer summary').click();
-  assert(await page.locator('.start-screen').evaluate(n=>n.scrollHeight<=n.clientHeight+1),'Expanded optional information stays inside its own scroll region');
-  await page.waitForFunction(()=>{
-    const rect=document.querySelector('.battle-canvas').getBoundingClientRect();
-    const p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
-    return p&&Math.abs(p.y-rect.top/innerHeight)<1e-6;
-  });
+  assert(await page.locator('.start-screen').evaluate(n=>n.scrollHeight<=n.clientHeight+1),'Expanded campaign details scroll internally');
   await page.locator('.start-setup-scroll').evaluate(n=>{n.scrollTop=n.scrollHeight;});
-  await page.locator('.start-demo-information').evaluate(n=>{n.scrollTop=n.scrollHeight;});
-  await page.waitForFunction(()=>{
-    const rect=document.querySelector('.battle-canvas').getBoundingClientRect();
-    const p=window.__nativeCalls.filter(c=>c.method==='viewport'&&c.packet.mode==='battle').at(-1)?.packet;
-    return p&&Math.abs(p.y-rect.top/innerHeight)<1e-6;
-  });
   await page.locator('.start-campaign-description').evaluate(n=>n.open=false);
-  await page.locator('.start-demo-disclaimer details').evaluate(n=>n.open=false);
-  await page.locator('.start-setup-scroll,.start-demo-information').evaluateAll(nodes=>nodes.forEach(n=>n.scrollTop=0));
-  await page.setViewportSize({width:1440,height:1000});
-  const battle = await page.evaluate(()=>window.__nativeCalls.find(c=>c.method==='battle').packet);
-  assert(battle.units.length>1); assert.equal(battle.animate,false);
-  const parentsTransparent = await page.locator('.battle-canvas').evaluate(canvas=>{
-    const result=[]; for(let node=canvas;node;node=node.parentElement) result.push({tag:node.tagName,class:node.className,color:getComputedStyle(node).backgroundColor,image:getComputedStyle(node).backgroundImage});return result;
-  });
-  for(const node of parentsTransparent) {assert.equal(node.color,'rgba(0, 0, 0, 0)',JSON.stringify(node));assert.equal(node.image,'none',JSON.stringify(node));}
+  await page.locator('.start-setup-scroll').evaluate(n=>n.scrollTop=0);
+  await page.setViewportSize({width:1800,height:1000});
+  assert.equal(await page.evaluate(()=>window.__nativeCalls.filter(c=>c.method==='battle').length),0,'Title does not start an old scripted battle');
+  assert(await page.evaluate(()=>window.__nativeCalls.some(c=>c.method==='viewport'&&c.packet.mode==='hidden')));
   await page.screenshot({path:path.join(output,'native-title-hud.png')});
   await page.locator('[data-action="new"]').click();
   await page.waitForFunction(()=>window.__nativeCalls.some(c=>c.method==='world'));

@@ -29,10 +29,10 @@ export function chooseTarget(state, ship, enemies, activeById) {
 export function manoeuvre(state, ship, target) {
   if (ship.status === 'sunk' || ship.status === 'escaped') return;
   const doctrine = DOCTRINES[state.sides[ship.side].doctrine];
-  const orders = state.sides[ship.side].orders || {};
-  if (orders.withdraw || ['AK', 'AM', 'AO'].includes(ship.type) || ship.health < doctrine.withdrawHealth) ship.status = 'withdrawing';
+  const orders = state.historical ? state.historical.orders[ship.id] || {} : state.sides[ship.side].orders || {};
+  if (!state.historical && (orders.withdraw || ['AK', 'AM', 'AO'].includes(ship.type) || ship.health < doctrine.withdrawHealth)) ship.status = 'withdrawing';
   let desired = ship.heading;
-  if (target) {
+  if (target && !state.historical) {
     const toEnemy = bearing(ship, target), range = distance(ship, target);
     const carrier = ship.stats.aircraft.strike + ship.stats.aircraft.fighter > 0;
     const submarine = ['SS','SM'].includes(ship.type), targetSubmarine = ['SS','SM'].includes(target.type);
@@ -43,13 +43,14 @@ export function manoeuvre(state, ship, target) {
     else if (range < preferred * .8) desired = toEnemy + 155;
     else desired = toEnemy + (ship.side === 'A' ? 75 : -75); // present broadside
   }
-  if (Number.isFinite(orders.course) && ship.status !== 'withdrawing') desired = orders.course;
+  if (Number.isFinite(orders.course) && (state.historical || ship.status !== 'withdrawing')) desired = orders.course;
   const maxTurn = (ship.stats.tons > 15000 ? 1 : 2.8) * R.stepSeconds;
   ship.heading = (ship.heading + clamp(angleDifference(desired, ship.heading), -maxTurn, maxTurn) + 360) % 360;
   const machinery = ship.machinery < R.damage.deadInWaterMachinery ? 0 : Math.sqrt(ship.machinery);
-  ship.speed = ship.stats.speed * doctrine.speedFraction * machinery * clamp(1 - ship.flooding * .65, .05, 1);
+  ship.speed = state.historical ? Math.min(ship.stats.speed, orders.speed ?? ship.stats.speed * .8) * (ship.machinery > 0 ? 1 : 0)
+    : ship.stats.speed * doctrine.speedFraction * machinery * clamp(1 - ship.flooding * .65, .05, 1);
   const travelled = ship.speed * R.knotsToKmSecond * R.stepSeconds;
   const h = ship.heading * Math.PI / 180;
   ship.x += Math.sin(h) * travelled; ship.y += Math.cos(h) * travelled;
-  if (ship.status === 'withdrawing' && target && distance(ship, target) > R.sea.escapeKm) { ship.status = 'escaped'; ship.escapedAt = state.seconds; }
+  if (!state.historical && ship.status === 'withdrawing' && target && distance(ship, target) > R.sea.escapeKm) { ship.status = 'escaped'; ship.escapedAt = state.seconds; }
 }

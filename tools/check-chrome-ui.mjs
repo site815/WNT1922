@@ -21,7 +21,7 @@ await fs.mkdir(output,{recursive:true});
 const run=await fs.mkdtemp(path.join(output,'fixtures-'));
 const widths=[1920,1366,1100,900,768];
 const checks=[],metrics=[],errors=[],sessions=[];
-const result={passed:false,checks,metrics,errors};
+const result={passed:false,checks,metrics,errors,limitations:["Headless HTML and native-bridge protocol verification only; no native rendered appearance is certified."]};
 const browser=await playwright.chromium.launch({channel:'msedge',headless:true});
 let current;
 
@@ -48,7 +48,12 @@ async function session(name,state,{reducedMotion='no-preference'}={}) {
  const record={name,page,context,server,savePath,posts:0};sessions.push(record);current=record;
  page.on('pageerror',error=>errors.push({name,message:error.message,stack:error.stack}));
  page.on('request',request=>{if(new URL(request.url()).pathname==='/api/save'&&request.method()==='POST')record.posts++;});
- await page.goto('http://127.0.0.1:'+server.address().port);
+ await context.addInitScript(()=>{
+  window.__chromeNativeCalls=[];
+  const record=method=>async json=>{const packet=JSON.parse(json);window.__chromeNativeCalls.push({method,packet});if(method==='viewport'&&packet.mode==='world')queueMicrotask(()=>window.WNTUnreal?.receive({instanceId:packet.instanceId,type:'camera',zoom:1,longitude:0,latitude:0,tilt:0}));};
+  window.ue={wnt:{world:record('world'),battle:record('battle'),sceneinput:record('sceneinput'),viewport:record('viewport'),closeapproved:async x=>x}};
+ });
+ await page.goto('http://127.0.0.1:'+server.address().port+'/?unreal=1');
  await page.locator('.start-screen').waitFor();
  return record;
 }
@@ -57,14 +62,6 @@ async function noOverflow(page,label) {
  const geometry=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,body:document.body.scrollWidth}));
  assert(geometry.scrollWidth<=geometry.width+1&&geometry.body<=geometry.width+1,label+' has horizontal overflow');
  assert(!/\b(?:NaN|undefined|Infinity)\b/.test(await page.locator('#app').innerText()),label+' has invalid display values');
-}
-const demo = page => page.locator('.start-demo');
-const demoControl = (page,action) => page.locator('.start-demo [data-demo-action="'+action+'"]');
-const demoState = async page => demo(page).evaluate(node=>({...node.dataset}));
-async function readyDemo(page) {await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoReady==='true');}
-async function pauseDemo(page) {
- if((await demoState(page)).demoPlaying==='true')await demoControl(page,'toggle').click();
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='false');
 }
 async function storage(page) {return page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));}
 async function saveSnapshot(record) {
@@ -86,31 +83,25 @@ async function acknowledge(page) {
 async function titleChecks() {
  const original=fixture(),record=await session('title',original),page=record.page;
  const originalFile=await fs.readFile(record.savePath,'utf8'),originalStorage=await storage(page);
- await readyDemo(page);
- for(const [i,width] of widths.entries()) {
-  await viewport(page,width);await readyDemo(page);await pauseDemo(page);
-  const campaign=i%2?'campaign_1922':'in_good_faith_1936',nation=['USA','GBR','DEU','FRA','JPN'][i];
+ const sizes=[[1800,1000],[1920,1080],[2560,1440],[3840,2160],[2560,1080],[3440,1440],[5120,2160]];
+ for(const [i,[width,height]] of sizes.entries()) {
+  await page.setViewportSize({width,height});
+  const campaign=i%2?'campaign_1922':'in_good_faith_1936',nation=['USA','GBR','DEU','FRA','JPN','ITA','SOV'][i];
   await page.locator('[data-action="select-campaign"][data-id="'+campaign+'"]').click();
   await page.locator('[data-action="select-nation"][data-id="'+nation+'"]').click();
-  assert(await page.locator('[data-action="select-campaign"][data-id="'+campaign+'"]').evaluate(node=>node.classList.contains('selected')));
-  assert(await page.locator('[data-action="select-nation"][data-id="'+nation+'"]').evaluate(node=>node.classList.contains('selected')));
+  assert.equal(await page.locator('[data-action="select-nation"][aria-pressed="true"]').getAttribute('data-id'),nation);
+  assert.equal(await page.locator('[data-action="select-campaign"][aria-pressed="true"]').getAttribute('data-id'),campaign);
   assert.equal(await page.locator('[data-action="select-nation"]').count(),7);
+  assert.equal(await page.locator('.start-screen canvas').count(),0);
+  assert.equal(await page.locator('.start-battle-choice').count(),4);
   await noOverflow(page,'Title '+width);
+  const geometry=await page.locator('.start-screen').evaluate(root=>({height:innerHeight,scrollHeight:document.documentElement.scrollHeight,campaign:root.querySelector('.start-setup').getBoundingClientRect().toJSON(),tactical:root.querySelector('.start-tactical').getBoundingClientRect().toJSON(),footer:root.querySelector('.start-screen-footer').getBoundingClientRect().toJSON()}));
+  assert(geometry.scrollHeight<=height+1&&geometry.footer.bottom<=height+1,'Main menu has no root scrollbar');
+  assert(geometry.campaign.right<geometry.tactical.left,'Main menu has two separate primary areas');
   await page.locator('[data-action="new"]').click();await page.locator('[data-dialog-type="new"]').waitFor();
-  assert.equal((await demoState(page)).demoPlaying,'false','New-campaign confirmation suspends the demo');
   await page.locator('.modal [data-action="close"]').first().click();
-  const bounds=await page.locator('.start-screen').evaluate(node=>({height:node.getBoundingClientRect().height,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight,overflowY:getComputedStyle(node).overflowY}));
-  if(bounds.scrollHeight>bounds.clientHeight+1) {
-   assert(['auto','scroll'].includes(bounds.overflowY),'Opening screen permits real vertical scrolling');
-   await page.locator('.start-screen').evaluate(node=>{node.scrollTop=0;});
-   await page.mouse.move(width/2,Math.min(650,bounds.height-30));await page.mouse.wheel(0,1600);
-   await page.waitForFunction(()=>document.querySelector('.start-screen').scrollTop>0);
-   const footer=await page.locator('.start-screen-footer').boundingBox();assert(footer.y>=0&&footer.y+footer.height<=page.viewportSize().height+1,'Opening footer can be reached with a real wheel scroll');
-   if(width===768)await page.screenshot({path:path.join(output,'title-footer-768.png')});
-   await page.locator('.start-screen').evaluate(node=>{node.scrollTop=0;});
-  }
-  metrics.push({kind:'title',width,campaign,nation,...bounds});
-  await page.screenshot({path:path.join(output,'title-'+width+'.png'),fullPage:true});
+  metrics.push({kind:'title',width,height,campaign,nation,...geometry});
+  await page.screenshot({path:path.join(output,'title-'+width+'x'+height+'.png')});
  }
  await page.locator('[data-action="select-campaign"][data-id="campaign_1922"]').click();
  for(const nation of ['USA','JPN','ITA']) {
@@ -118,82 +109,27 @@ async function titleChecks() {
   const expectedState=newGame(CATALOG,nation,19221936,'campaign_1922');
   const expected=fleetSummary(expectedState,contentFor(CATALOG,expectedState),nation).building;
   const shown=Number((await page.locator('.start-nation-stats > span').filter({hasText:'warships building'}).locator('strong').innerText()).replaceAll(',',''));
-  assert.equal(shown,expected,nation+' preview honors the selected human navy’s opening treaty choices');
-  metrics.push({kind:'opening-preview',nation,campaign:'campaign_1922',building:shown});
+  assert.equal(shown,expected,nation+' opening treaty choices');
  }
- await viewport(page,1366);await pauseDemo(page);
- await demoControl(page,'toggle').click();
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='true');
- await page.locator('[data-action="new"]').click();await page.locator('[data-dialog-type="new"]').waitFor();
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='false');
- const obscured=await demoState(page);await page.waitForTimeout(400);
- assert.equal((await demoState(page)).demoFrame,obscured.demoFrame,'An obscuring dialog stops the running demo');
- await page.locator('.modal [data-action="close"]').first().click();
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='true');
- await pauseDemo(page);
- const before=await demoState(page);
- await demoControl(page,'next').click();
- await page.waitForFunction(old=>{const n=document.querySelector('.start-demo');return n.dataset.demoFrame!==old.demoFrame||n.dataset.demoBattle!==old.demoBattle;},before);
- const paused=await demoState(page);await page.waitForTimeout(400);
- assert.equal((await demoState(page)).demoFrame,paused.demoFrame,'Paused demo does not advance itself');
- await page.waitForFunction(()=>[...document.querySelectorAll('.start-demo [data-demo-action="select-ship"]')].some(n=>n.dataset.demoVisible==='true'));
- const hit=await page.locator('.start-demo [data-demo-action="select-ship"][data-demo-visible="true"]').first().evaluate(node=>({id:node.dataset.demoId,side:node.dataset.demoSide,x:Number(node.dataset.demoX),y:Number(node.dataset.demoY)}));
- const canvas=await page.locator('.start-demo .battle-canvas').boundingBox();
- assert.equal(await page.locator('.start-demo-inspection').count(),0,'No inspection is shown before selecting a hull');
- await page.mouse.click(canvas.x+hit.x,canvas.y+hit.y);
- await page.locator('.start-demo-inspection').waitFor();
- assert.equal(await page.locator('.start-demo-inspection').getAttribute('data-demo-side'),hit.side);
- assert.equal(await page.locator('.start-demo-inspection').getAttribute('data-demo-id'),hit.id);
- assert.match(await page.locator('.start-demo-inspection').innerText(),/illustrat|condition|damage/i);
- metrics.push({kind:'demo-pointer-inspection',...hit});
- await demoControl(page,'next-battle').click();
- assert.notEqual((await demoState(page)).demoBattle,paused.demoBattle,'Next battle switches the demonstration');
- await demoControl(page,'previous-battle').click();
- assert.equal((await demoState(page)).demoBattle,paused.demoBattle,'Previous battle returns to the prior demonstration');
- // Move to the final authored frame through real controls, then let the timer
- // cross the cycle boundary rather than waiting for an entire demonstration.
- let state=await demoState(page),count=Number(state.demoFrames);
- assert(Number.isInteger(count)&&count>1&&count<100,'Demo publishes a bounded authored frame count');
- while(Number((await demoState(page)).demoFrame)<count-1)await demoControl(page,'next').click();
- const last=await demoState(page);await demoControl(page,'toggle').click();
- await page.waitForFunction(id=>document.querySelector('.start-demo')?.dataset.demoBattle!==id,last.demoBattle,{timeout:7000});
- assert.equal((await demoState(page)).demoPlaying,'true');
- const resumeFrame=await demoState(page);
- await page.waitForFunction(old=>document.querySelector('.start-demo')?.dataset.demoFrame!==old,resumeFrame.demoFrame,{timeout:7000});
- // Drive the production visibility handler deterministically: headless browsers
- // do not reliably mark another tab as hidden. Restore the native property after.
- await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='false');
- const hidden=await demoState(page);await page.waitForTimeout(400);
- assert.equal((await demoState(page)).demoFrame,hidden.demoFrame,'Hidden-document lifecycle stops the demo timer');
- await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
- await page.waitForFunction(()=>document.querySelector('.start-demo')?.dataset.demoPlaying==='true');
- await pauseDemo(page);
- await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
- assert.equal((await demoState(page)).demoPlaying,'false','Visibility restoration respects a user pause');
- assert.equal(record.posts,0,'Opening demo and selection never post a campaign save');
- assert.equal(await fs.readFile(record.savePath,'utf8'),originalFile,'Opening demo never changes disk campaign data');
- assert.deepEqual(await storage(page),originalStorage,'Opening demo never changes the recovery journal');
- checks.push('Title layout and campaign/nation selection at five widths; New confirmation remains usable and suspends the demo.');
- checks.push('US, Japanese and Italian 1922 construction previews match their own selected-player campaign state.');
- checks.push('Actual canvas hull click, pause/manual tick, previous/next battle, timed advance/cycle and simulated document-visibility lifecycle; disk save and localStorage unchanged.');
+ for(const presetId of ['denmark-strait','midway','north-cape','custom']) {
+  await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
+  await page.locator('.tactical-engagements').waitFor();
+  assert.equal(await page.locator('[data-setup="presetId"]').inputValue(),presetId);
+  await page.locator('[data-tactical="close"]').click();await page.locator('.start-screen').waitFor();
+ }
+ assert.equal(await page.locator('.start-screen canvas').count(),0);
+ assert.equal(await page.evaluate(()=>__chromeNativeCalls.filter(c=>c.method==='battle').length),0,'Static title and setup send no old demo battle packets');
+ assert.equal(record.posts,0);assert.equal(await fs.readFile(record.savePath,'utf8'),originalFile);assert.deepEqual(await storage(page),originalStorage);
+ checks.push('Main menu separates Campaign and Tactical Battles at seven supported sizes, has no outer scrollbar or demo viewport, opens all four matching tactical setups, preserves campaign/navy previews, and changes neither saved campaign nor recovery journal.');
  await page.locator('[data-action="continue"]').click();await page.locator('.workspace.view-command').waitFor();
- assert.equal(await page.locator('.start-demo-host').count(),0,'Campaign entry unmounts the demo');
- assert.deepEqual(clockState(await saveSnapshot(record)),clockState(original),'Continue loads the existing campaign instead of the selected new-game setup');
- checks.push('Continue preserves the saved country, campaign, clock, RNG and pause state; the demo is unmounted.');
- const reduced=await session('reduced-motion',fixture(),{reducedMotion:'reduce'});await readyDemo(reduced.page);
- const reducedBefore=await demoState(reduced.page);assert.equal(reducedBefore.demoPlaying,'false');
- await reduced.page.waitForTimeout(400);assert.equal((await demoState(reduced.page)).demoFrame,reducedBefore.demoFrame);
- await demoControl(reduced.page,'next').click();
- assert.notEqual((await demoState(reduced.page)).demoFrame,reducedBefore.demoFrame,'Reduced motion still permits explicit frame navigation');
- assert.equal(reduced.posts,0);checks.push('Reduced-motion mode starts paused and retains manual demonstration controls without saving campaign data.');
+ assert.deepEqual(clockState(await saveSnapshot(record)),clockState(original));
+ checks.push('Continue preserves saved country, campaign, clock, RNG and pause state.');
  const fresh=await session('new-campaign',null),freshPage=fresh.page;
  await freshPage.locator('[data-action="select-campaign"][data-id="campaign_1922"]').click();
  await freshPage.locator('[data-action="select-nation"][data-id="FRA"]').click();
  await freshPage.locator('[data-action="new"]').click();await freshPage.locator('.workspace').waitFor();await acknowledge(freshPage);
  const created=await saveSnapshot(fresh);assert.equal(created.player,'FRA');assert.equal(created.campaignId,'campaign_1922');
- assert.equal(await freshPage.locator('.start-demo-host').count(),0);
- checks.push('New campaign starts the selected French 1922 campaign and persists a valid isolated save.');
+ checks.push('New campaign starts the selected French1922 campaign and persists a valid isolated save.');
 }
 
 async function chromeGeometry(page,name,width) {
@@ -246,7 +182,7 @@ async function campaignChecks(war) {
  await page.locator('[data-action="continue"]').click();await page.locator('.workspace.view-command').waitFor();
  const selection=page.locator('.fleet-command-row').first();await selection.click();
  const fleetId=await page.locator('.fleet-command-row.selected').getAttribute('data-id');assert(fleetId);
- const views=await page.locator('.sidebar .nav-item').evaluateAll(nodes=>nodes.map(n=>n.dataset.view).filter(v=>v!=='command'));
+ const views=await page.locator('.sidebar .nav-item').evaluateAll(nodes=>nodes.map(n=>n.dataset.view).filter(v=>v!=='command'&&v!=='tactical'));
  assert.equal(views.length,10);
  const before=clockState(await saveSnapshot(record));
  if(!war) {
@@ -270,7 +206,7 @@ async function campaignChecks(war) {
    assert(await close.getAttribute('aria-label'),'Panel close has an accessible label');
    await noOverflow(page,name+' '+view+' '+width);
    if((width===1920||width===768)&&['fleet','diplomacy'].includes(view)) {
-    await page.locator('.workspace-inner').evaluate(node=>{node.scrollTop=node.scrollHeight;});
+    await page.locator('.workspace.view-'+view+' .workspace-inner').evaluate(node=>{node.scrollTop=node.scrollHeight;});
     const position=await close.boundingBox();assert(position.y>=0&&position.y+position.height<=(width>=1600?1000:768),'Close remains visible after scrolling the panel');
     await page.screenshot({path:path.join(output,name+'-'+view+'-close-'+width+'.png')});
    }

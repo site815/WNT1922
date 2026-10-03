@@ -10,7 +10,7 @@ import {battleProgress} from '../ui/battle-progress.mjs';
 
 const content = tacticalCatalog(CATALOG,CATALOG);
 test('campaign tactical progress reports actual elapsed combat time and individual hull losses',()=>{
-  const tactical=createCombat(buildScenario(content,{presetId:'denmark-strait'}));
+  const tactical=createCombat(buildScenario(content,{presetId:'denmark-strait',mode:'simulation'}));
   tactical.seconds=70;tactical.ships[0].status='sunk';tactical.ships[1].status='escaped';
   const report={tactical,status:'ongoing',a:'GBR',b:'DEU',minute:900,nextStageAt:1200,round:7};
   const html=battleProgress(report,1100);
@@ -73,7 +73,12 @@ test('mixed-campaign custom hulls retain the matching native model campaign for 
 test('setup exposes historical scope and independently labeled custom hull quantities',()=>{
   const setup=initialTacticalSetup(content);
   const historical=tacticalSetupView(setup,content);
-  assert.match(historical,/Historical source/);assert.match(historical,/historical losses are not scripted/);
+  assert.match(historical,/Historical source/);assert.match(historical,/Historical milestones and outcomes are fixed/);
+  assert.match(historical,/data-setup="doctrineA"[^>]*disabled/);
+  assert.match(historical,/data-setup="seed"[^>]*disabled/);
+  const free=tacticalSetupView({...setup,mode:'simulation'},content);
+  assert.doesNotMatch(free,/data-setup="doctrineA"[^>]*disabled/);
+  assert.match(free,/develop freely/);
   const custom=tacticalSetupView({...setup,presetId:'custom'},content,SCENARIOS,'Invalid <ship>');
   for(const side of ['A','B'])assert(custom.includes(`aria-label="Fleet ${side}, quantity 1"`));
   assert.match(custom,/Invalid &lt;ship&gt;/);assert.match(custom,/10-second combat steps/);
@@ -81,7 +86,7 @@ test('setup exposes historical scope and independently labeled custom hull quant
 });
 
 test('watching and bounded quick resolution reach exactly the same combat and RNG state',()=>{
-  const config=buildScenario(content,{presetId:'denmark-strait',seed:914,maxDurationSeconds:600});
+  const config=buildScenario(content,{presetId:'denmark-strait',mode:'simulation',seed:914,maxDurationSeconds:600});
   const expected=resolveCombat(createCombat(config));
   for(const mode of ['play','quickResolve']) {
     const clock=scheduler(),session=new TacticalSession({...clock,now:()=>0});session.start(config);session[mode]();
@@ -93,7 +98,7 @@ test('watching and bounded quick resolution reach exactly the same combat and RN
 
 test('quick resolution yields after bounded work; leaving cancels every pending simulation callback',()=>{
   const clock=scheduler(),session=new TacticalSession({...clock,now:()=>0});
-  session.start(buildScenario(content,{seed:12,maxDurationSeconds:3600}));session.quickResolve();
+  session.start(buildScenario(content,{mode:'simulation',seed:12,maxDurationSeconds:3600}));session.quickResolve();
   session.setSpeed(120);assert(session.quick);assert.equal(session.speed,60,'Playback speed cannot interrupt an active quick resolution');
   clock.tick();assert.equal(session.combat.seconds,80,'One async batch contains at most eight 10-second steps');
   const canceled=[...clock.queue.values()][0],state=session.combat,before=structuredClone(state);
@@ -103,7 +108,7 @@ test('quick resolution yields after bounded work; leaving cancels every pending 
 
 test('pause, inspection and history replay do not advance combat; restart reuses the seed',()=>{
   const clock=scheduler(),session=new TacticalSession({...clock,now:()=>0});
-  const config=buildScenario(content,{seed:24,maxDurationSeconds:120});session.start(config);
+  const config=buildScenario(content,{mode:'simulation',seed:24,maxDurationSeconds:120});session.start(config);
   const initial=structuredClone(session.combat);session.play();session.pause();
   assert.equal(clock.queue.size,0);assert.deepEqual(session.combat,initial);
   session.step();assert.equal(session.combat.seconds,10);assert(session.paused);

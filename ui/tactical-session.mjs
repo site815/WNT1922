@@ -15,8 +15,8 @@ export class TacticalSession {
     this.replaySeconds = null;
     this.emit(0); return this.combat;
   }
-  emit(fromSeconds = this.currentSeconds()) {
-    this.onChange({combat:this.combat, fromSeconds, paused:this.paused, quick:this.quick, speed:this.speed, replaySeconds:this.replaySeconds});
+  emit(fromSeconds = this.currentSeconds(), details = {}) {
+    this.onChange({combat:this.combat, fromSeconds, paused:this.paused, quick:this.quick, speed:this.speed, replaySeconds:this.replaySeconds,...details});
   }
   pause(notify = true) {
     this.generation++; this.cancel(this.timer); this.timer = null; this.paused = true; this.quick = false;
@@ -67,7 +67,9 @@ export class TacticalSession {
           this.advance(this.combat,10); if (this.now() - start >= 12) break;
         }
         if (!tacticalRunning(this.combat)) {this.paused = true; this.quick = false;}
-        this.emit(from);
+        // The final batch is still a quick-resolution jump even after quick
+        // turns off. It must not produce an accumulated blast of battle audio.
+        this.emit(from,{silent:true});
         if (!this.paused) this.timer = this.schedule(batch,0);
       } catch (error) {this.pause(); this.onError(error);}
     };

@@ -3,7 +3,7 @@ html.unreal-mode, .unreal-mode body, .unreal-mode #app,
 .unreal-mode .map-stage, .unreal-mode .world-command,
 .unreal-mode .map-background { background:transparent!important; }
 .unreal-mode .unreal-input { background:transparent!important; touch-action:none; }
-.unreal-mode .battle-stage, .unreal-mode .start-demo-stage { background:transparent!important; }
+.unreal-mode .battle-stage { background:transparent!important; }
 .unreal-mode[data-unreal-scene="battle"] .modal-backdrop { background:transparent; backdrop-filter:none; }
 .unreal-mode .battle-watch { background:transparent; }
 .unreal-mode .modal[data-dialog-type="battle-watch"],
@@ -19,8 +19,8 @@ html.unreal-mode, .unreal-mode body, .unreal-mode #app,
 @media(max-height:650px) {
   .unreal-mode[data-unreal-scene="battle"] .game-shell { visibility:hidden; }
 }
-.unreal-mode .start-screen, .unreal-mode .start, .unreal-mode .start-demo, .unreal-mode .start-demo-host { background:transparent!important; }
-.unreal-mode .start > :not(.start-grid), .unreal-mode .start-demo > :not(.start-demo-stage) { background:#111f2b; }
+.unreal-mode:has(#app:not([hidden]) > .start-screen) body, .unreal-mode .start-screen { background:#12222d!important; }
+
 .unreal-mode .unreal-input:focus-visible {outline:2px solid #d9bd80; outline-offset:-2px;}
 .unreal-mode #app {position:relative; z-index:1;}
 .unreal-mode #app[hidden] {display:none!important;}

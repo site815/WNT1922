@@ -36,16 +36,19 @@ export function armourMultiplier(attacker, target, range) {
   const penetration = attacker.stats.caliber * R.gun.penetrationScale * (1 - plunging * .42);
   return clamp(penetration / Math.max(20, effectiveArmour), R.gun.armourFloor, 1.6);
 }
-export function applyImpact(state, target, damage, kind, source, emit) {
+export function applyImpact(state, target, damage, kind, source, emit, scripted = null) {
   if (!target || ['sunk', 'escaped'].includes(target.status) || damage <= 0) return;
   const before = target.health;
   const hit = clamp(damage, 0, 1);
-  target.health = clamp(target.health - hit, 0, 1);
-  target.machinery = clamp(target.machinery - hit * (.45 + random(state) * .65), 0, 1);
-  target.fireControl = clamp(target.fireControl - hit * random(state) * .6, .1, 1);
+  target.health = clamp(scripted ? Math.min(target.health, scripted.healthAfter) : target.health - hit, 0, 1);
+  target.machinery = clamp(target.machinery - hit * (scripted ? .75 : .45 + random(state) * .65), 0, 1);
+  target.fireControl = clamp(target.fireControl - hit * (scripted ? .3 : random(state) * .6), .1, 1);
   target.fire = clamp(target.fire + hit * (kind === 'torpedo' ? .2 : 1.4), 0, 1);
   target.flooding = clamp(target.flooding + hit * (kind === 'torpedo' ? 2 : .32), 0, 1);
-  if (hit > .015 && random(state) < R.gun.magazineChance * hit * 5) { target.health = 0; target.lossCause = 'magazine explosion'; }
+  if (scripted) {
+    for (const key of ['machinery','fireControl','fire','flooding']) if (Number.isFinite(scripted[key])) target[key] = clamp(scripted[key], 0, 1);
+    if (scripted.cause) target.lossCause = scripted.cause;
+  } else if (hit > .015 && random(state) < R.gun.magazineChance * hit * 5) { target.health = 0; target.lossCause = 'magazine explosion'; }
   emit({ kind: 'impact', weapon: kind, attackerId: source?.id || source || null, targetId: target.id,
     position: source && typeof source === 'object' ? [source.x, source.y] : [target.x, target.y],
     targetPosition: [target.x, target.y], damage: before - target.health, health: target.health });
