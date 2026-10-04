@@ -298,6 +298,7 @@ struct FWNTTerrainData
     struct FTriangle{FWNTGeographicTriangle Geo;int32 Polygon=0;};
     struct FEdge{FVector2D A,B;int32 Polygon=0;bool bCoast=true;int32 OtherPolygon=INDEX_NONE;bool bFirstShared=true;};
     struct FHeightFace{FWNTGeographicTriangle Geo;FVector A,B,C;};
+    struct FOccupation{FVector2D From,To;double Progress=0;FLinearColor Attacker,Restored;bool HasRestored=false;};
     TArray<FHeightFace> HeightFaces;
     uint64 HeightQueries=0,HeightCacheHits=0;
     FWNTElevationGrid Elevation;
@@ -307,9 +308,13 @@ struct FWNTTerrainData
     TArray<TArray<int32>> Bins;
     TArray<TArray<int32>> TriangleBins;
     TMap<FString,FLinearColor> Control,OwnerColours;
+    TMap<FString,FOccupation> Occupations;
+    FString OccupationSignature;
+    uint64 OccupationUpdates=0;
     TArray<TSharedPtr<FJsonValue>> Fronts;
     FString FrontSignature;
     TArray<TArray<int32>> TileLandPolygons;
+    TArray<TSet<FString>> TileTerritories;
     int32 CountryBorderSegments=0,CoastlineSegments=0,CampaignFrontSegments=0;
     const TArray<int32>& TrianglesAt(FVector2D P)const
     {
@@ -523,6 +528,15 @@ double WNTTerrainGeometry::ReliefScaleForDistance(double Centimetres)
     const double T=FMath::Clamp((Centimetres-10000000.)/90000000.,0.,1.);
     return 1.+5.*T*T*(3.-2.*T);
 }
+bool WNTTerrainGeometry::BehindCampaignFront(const FVector2D& Point,const FVector2D& From,const FVector2D& To,double Progress)
+{
+    if(!FMath::IsFinite(Progress)||Point.ContainsNaN()||From.ContainsNaN()||To.ContainsNaN())return false;
+    if(Progress<=0)return false;if(Progress>=1)return true;
+    const FVector2D Direction(WNTProjection::WrapLongitude(To.X-From.X),To.Y-From.Y);
+    if(Direction.SizeSquared()<1e-12)return false;
+    const FVector2D Relative(WNTProjection::WrapLongitude(Point.X-From.X),Point.Y-From.Y);
+    return FVector2D::DotProduct(Relative-Direction*Progress,Direction)<=0;
+}
 void AWNTTerrainActor::SetViewDistance(double Centimetres)
 {
     const double Next=WNTTerrainGeometry::ReliefScaleForDistance(Centimetres);
@@ -612,13 +626,25 @@ void AWNTTerrainActor::SetControl(const TMap<FString,FLinearColor>& Colours)
     if(!Changed)for(const auto& Pair:Colours)
     {const FLinearColor* Existing=Data->Control.Find(Pair.Key);if(!Existing||*Existing!=Pair.Value){Changed=true;break;}}
     if(!Changed)return;
+    TSet<FString> ChangedTerritories;
+    for(const auto& Pair:Data->Control)if(!Colours.Contains(Pair.Key)||Colours[Pair.Key]!=Pair.Value)ChangedTerritories.Add(Pair.Key);
+    for(const auto& Pair:Colours)if(!Data->Control.Contains(Pair.Key)||Data->Control[Pair.Key]!=Pair.Value)ChangedTerritories.Add(Pair.Key);
     Data->Control=Colours;
+    RefreshLandColours(ChangedTerritories);
+    RebuildMapOverlays(true,false);
+}
+void AWNTTerrainActor::RefreshLandColours(const TSet<FString>& ChangedTerritories)
+{
+    if(!Data||ChangedTerritories.IsEmpty())return;
     // Ownership changes recolor existing land buffers; they never retriangulate
     // coastlines or allocate new terrain components. Stable vertex-to-polygon
     // attribution keeps boundary colors on the correct side of each border.
     const int32 TileCount=TileRows*TileColumns;
-    for(int32 I=0;I<TerrainTiles.Num();++I)if(auto* Mesh=TerrainTiles[I].Get())
+    for(int32 I=0;I<TileCount;++I)if(TerrainTiles.IsValidIndex(I))if(auto* Mesh=TerrainTiles[I].Get())
     {
+        if(!Data->TileTerritories.IsValidIndex(I))continue;
+        bool Affected=false;for(const auto& Id:ChangedTerritories)if(Data->TileTerritories[I].Contains(Id)){Affected=true;break;}
+        if(!Affected)continue;
         const auto* Section=Mesh->GetProcMeshSection(0);if(!Section)continue;
         if(!Data->TileLandPolygons.IsValidIndex(I%TileCount))continue;
         const auto& Polygons=Data->TileLandPolygons[I%TileCount];
@@ -630,11 +656,41 @@ void AWNTTerrainActor::SetControl(const TMap<FString,FLinearColor>& Colours)
             const FVector Local=Section->ProcVertexBuffer[V].Position;Positions.Add(Local);
             const auto& Polygon=Data->Polygons[Polygons[V]];const auto* Override=Data->Control.Find(Polygon.Id);
             const FVector P=Local+TileOrigins[I];const auto Geo=WNTProjection::Inverse(P,0);
-            VertexColours.Add(WNTTerrainGeometry::TerrainColour(Geo.IsSet()?Geo.GetValue():FVector2D::ZeroVector,P.Z*.01,Override?*Override:Polygon.Colour));
+            FLinearColor Tint=Override?*Override:Polygon.Colour;
+            if(const auto* Occupation=Data->Occupations.Find(Polygon.Id))
+                Tint=Geo.IsSet()&&WNTTerrainGeometry::BehindCampaignFront(Geo.GetValue(),Occupation->From,Occupation->To,Occupation->Progress)
+                    ?Occupation->Attacker:(Occupation->HasRestored?Occupation->Restored:Polygon.Colour);
+            VertexColours.Add(WNTTerrainGeometry::TerrainColour(Geo.IsSet()?Geo.GetValue():FVector2D::ZeroVector,P.Z*.01,Tint));
         }
-        Mesh->UpdateMeshSection_LinearColor(0,Positions,TArray<FVector>(),TArray<FVector2D>(),VertexColours,TArray<FProcMeshTangent>(),false);
+        // All three wrap copies share immutable local geography. Calculate
+        // colors once; a changed daily front never creates actors or triangles.
+        for(int32 Copy=0;Copy<3;++Copy)if(TerrainTiles.IsValidIndex(I+Copy*TileCount))
+            if(auto* Target=TerrainTiles[I+Copy*TileCount].Get())
+                Target->UpdateMeshSection_LinearColor(0,Positions,TArray<FVector>(),TArray<FVector2D>(),VertexColours,TArray<FProcMeshTangent>(),false);
     }
-    RebuildMapOverlays(true,false);
+}
+void AWNTTerrainActor::ApplyCampaignOccupations(const TArray<TSharedPtr<FJsonValue>>& Occupations)
+{
+    if(!Data)return;FString Signature;FJsonSerializer::Serialize(Occupations,TJsonWriterFactory<>::Create(&Signature));
+    if(Data->OccupationSignature==Signature)return;
+    TSet<FString> Changed;for(const auto& Pair:Data->Occupations)Changed.Add(Pair.Key);
+    Data->Occupations.Reset();Data->OccupationSignature=Signature;
+    for(const auto& Value:Occupations)
+    {
+        const auto Item=Value->AsObject();if(!Item)continue;
+        const TArray<TSharedPtr<FJsonValue>> *From=nullptr,*To=nullptr,*Territories=nullptr;
+        double Progress=0;FString Colour,Restored;
+        if(!Item->TryGetNumberField(TEXT("progress"),Progress)||!FMath::IsFinite(Progress)||Progress<=0||Progress>=1
+            ||!Item->TryGetArrayField(TEXT("from"),From)||From->Num()!=2||!Item->TryGetArrayField(TEXT("to"),To)||To->Num()!=2
+            ||!Item->TryGetArrayField(TEXT("territories"),Territories)||!Item->TryGetStringField(TEXT("color"),Colour))continue;
+        FWNTTerrainData::FOccupation Entry;
+        Entry.From=FVector2D((*From)[0]->AsNumber(),(*From)[1]->AsNumber());Entry.To=FVector2D((*To)[0]->AsNumber(),(*To)[1]->AsNumber());
+        if(Entry.From.ContainsNaN()||Entry.To.ContainsNaN())continue;
+        Entry.Progress=Progress;Entry.Attacker=FLinearColor(FColor::FromHex(Colour));
+        Entry.HasRestored=Item->TryGetStringField(TEXT("restoredColor"),Restored);if(Entry.HasRestored)Entry.Restored=FLinearColor(FColor::FromHex(Restored));
+        for(const auto& Territory:*Territories){const FString Id=Territory->AsString();Data->Occupations.Add(Id,Entry);Changed.Add(Id);}
+    }
+    ++Data->OccupationUpdates;RefreshLandColours(Changed);
 }
 void AWNTTerrainActor::SetGraticuleVisible(bool Visible)
 {
@@ -737,6 +793,7 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
     constexpr double MeshMeridian=0;
     TArray<FTileBuild> Tiles;Tiles.SetNum(TileRows*TileColumns);
     Data->TileLandPolygons.SetNum(Tiles.Num());for(auto& Indices:Data->TileLandPolygons)Indices.Reset();
+    Data->TileTerritories.SetNum(Tiles.Num());for(auto& Ids:Data->TileTerritories)Ids.Reset();
     for(int32 I=0;I<Tiles.Num();++I)Tiles[I].Origin=WNTProjection::ForwardUnwrapped(FVector2D(-180+TileDegrees*.5+(I%TileColumns)*TileDegrees,-90+TileDegrees*.5+(I/TileColumns)*TileDegrees));
     auto Height=[&](const FVector2D& Relative){return LandBaseMetres+FMath::Max(0.0,HeightAt(FVector2D(Relative.X+MeshMeridian,Relative.Y)));};
     for(const FWNTTerrainData::FTriangle& Source:Data->Triangles)
@@ -747,6 +804,7 @@ void AWNTTerrainActor::RebuildProjectedMeshes()
         {
             const FVector2D Centre=(T.A+T.B+T.C)/3.0;const int32 TileIndex=TileAt(Centre.X,Centre.Y);FTileBuild& Tile=Tiles[TileIndex];
             const int32 PreviousVertices=Tile.Land.Vertices.Num();
+            Data->TileTerritories[TileIndex].Add(Polygon.Id);
             const double HA=Height(T.A),HB=Height(T.B),HC=Height(T.C);
             // Actual height and face normals provide relief; stable geographic
             // vertex colors supply restrained biomes and political ownership.
@@ -929,7 +987,8 @@ void AWNTTerrainActor::RebuildMapOverlays(bool Borders,bool Fronts)
             ||!FMath::IsFinite(AX)||!FMath::IsFinite(AY)||!FMath::IsFinite(BX)||!FMath::IsFinite(BY))continue;
         const FVector2D A(AX,AY),B(BX,BY);
         TSet<FString> Ids;for(const auto& Id:*Territories)Ids.Add(Id->AsString());
-        const FLinearColor Colour(FColor::FromHex(TEXT("#e68e70")));
+        FString FrontColour;Front->TryGetStringField(TEXT("color"),FrontColour);
+        const FLinearColor Colour(FColor::FromHex(FrontColour.IsEmpty()?TEXT("#e68e70"):FrontColour));
         for(const auto& Polygon:Data->Polygons)if(Ids.Contains(Polygon.Id))
         {
             if(Island)
@@ -976,6 +1035,8 @@ TSharedPtr<FJsonObject> AWNTTerrainActor::GetMapStyleDiagnostics() const
     Result->SetNumberField(TEXT("countryBorderSegments"),Data?Data->CountryBorderSegments:0);
     Result->SetNumberField(TEXT("coastlineSegments"),Data?Data->CoastlineSegments:0);
     Result->SetNumberField(TEXT("campaignFrontSegments"),Data?Data->CampaignFrontSegments:0);
+    Result->SetNumberField(TEXT("partiallyOccupiedTerritories"),Data?Data->Occupations.Num():0);
+    Result->SetNumberField(TEXT("occupationColourUpdates"),Data?double(Data->OccupationUpdates):0);
     Result->SetNumberField(TEXT("surfaceSampleDegrees"),SurfaceSampleDegrees);
     Result->SetStringField(TEXT("ribbonResizeMode"),TEXT("immutable-geometry-gpu-extrusion"));
     Result->SetNumberField(TEXT("ribbonParameterUpdates"),double(RibbonParameterUpdates));

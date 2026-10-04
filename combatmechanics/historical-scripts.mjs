@@ -12,6 +12,9 @@ const RN_DIARY = 'https://cd.royalnavy.mod.uk/-/media/rnweb/locations-and-operat
 const NHHC_MIDWAY = 'https://www.history.navy.mil/browse-by-topic/wars-conflicts-and-operations/world-war-ii/1942/midway.html';
 const NHHC_VT8 = 'https://www.history.navy.mil/about-us/leadership/director/directors-corner/h-grams/h-gram-072/h-072-1.html';
 const NHHC_VICTORY = 'https://www.history.navy.mil/about-us/leadership/director/directors-corner/h-grams/h-gram-006/h-006-4.html';
+const TOVEY_REPORT = 'https://hmshood.org.uk/reference/official/adm234/adm234-509tovey.htm';
+const ONI_BISMARCK = 'https://www.history.navy.mil/content/history/nhhc/research/library/online-reading-room/title-list-alphabetically/s/sinking-of-the-bismarck/the-cruise-of-the-bismarck.html';
+const RENOWN_REPORT = 'https://www.naval-history.net/xDKWD-HF1940BCS1.htm';
 const id = value => `demo-${value}`;
 const order = (at, target, course, speed, fireTarget = null) => ({ at, op: 'order', target: id(target), course, speed, fireTarget: fireTarget && id(fireTarget) });
 const shot = (at, source, target, healthAfter, label, time, effects = {}) => ({ at: at - 20, op: 'attack', impactAt: at,
@@ -26,6 +29,55 @@ const flight = (at, attackAt, source, target, planes, healthAfter, label, time, 
 const clock = (seconds, label, phase) => ({ seconds, label, phase });
 
 export const HISTORICAL_SCRIPTS = Object.freeze({
+  'bismarck-last-battle': {
+    durationSeconds: 1500, start: '27 May 1941 · about 08:47', end: '27 May 1941 · about 10:37', compressed: true,
+    compression: 'The final morning action is compressed into twenty-five simulator minutes. Clock labels mark selected reported phases; courses, salvo spacing and damage values are illustrative.',
+    omissions: 'Five principal surface ships. Earlier carrier and destroyer attacks are context, not replayed. The cause of final loss combines gunfire, torpedoes and scuttling; no exclusive cause is asserted. Ship models include disclosed sister-ship and fit substitutions.',
+    sourceUrls: [TOVEY_REPORT, ONI_BISMARCK],
+    clock: [clock(0,'27 May · about 08:47','Battleships open fire'),clock(240,'27 May · around 09:00','Cruisers join'),
+      clock(480,'27 May · after 09:15','Bismarck’s resistance weakens'),clock(960,'27 May · about 10:15','Gunfire ends'),
+      clock(1200,'27 May · closing minutes','Dorsetshire torpedo attacks'),clock(1440,'27 May · about 10:37','Bismarck sinks')],
+    events: [
+      notice(0,'Bismarck begins with prior damage and impaired steering. The night action is outside this episode.','27 May · opening conditions'),
+      {at:0,op:'repair',target:id('bismarck'),effects:{machinery:.4},label:'Prior steering damage limits Bismarck’s maneuvering; the numerical machinery value is illustrative.',time:'27 May · opening conditions'},
+      order(0,'rodney',0,10,'bismarck'),order(10,'king-george-v',0,10,'bismarck'),order(20,'bismarck',0,10,'rodney'),
+      order(0,'norfolk',0,10),order(0,'dorsetshire',0,10),
+      shot(160,'rodney','bismarck',.8,'Heavy gunfire strikes Bismarck.','27 May · opening exchanges',{fire:.25}),
+      order(240,'norfolk',0,10,'bismarck'),order(240,'dorsetshire',0,10,'bismarck'),
+      shot(380,'king-george-v','bismarck',.6,'Repeated hits impair Bismarck’s fire control.','27 May · main gun action',{fireControl:.35,fire:.55}),
+      shot(600,'rodney','bismarck',.35,'Bismarck burns as her remaining guns fight on.','27 May · main gun action',{fireControl:.12,fire:.8}),
+      order(620,'bismarck',0,10),
+      shot(820,'norfolk','bismarck',.2,'The cruisers contribute to the bombardment.','27 May · closing gun action',{fire:.9}),
+      shot(940,'rodney','bismarck',.12,'Bismarck’s main armament is silenced.','27 May · about 10:15',{fireControl:0,machinery:.05}),
+      ...['rodney','king-george-v','norfolk','dorsetshire'].map(name=>order(1000,name,0,10)),
+      {at:1140,op:'attack',source:id('dorsetshire'),target:id('bismarck'),weapon:'torpedo',rounds:2,impactAt:1200,healthAfter:.06,effects:{flooding:.8},label:'Dorsetshire torpedoes the crippled Bismarck.',time:'27 May · closing minutes'},
+      {at:1260,op:'attack',source:id('dorsetshire'),target:id('bismarck'),weapon:'torpedo',rounds:1,impactAt:1320,healthAfter:.02,effects:{flooding:.98},label:'Dorsetshire makes a further torpedo attack.',time:'27 May · closing minutes'},
+      loss(1440,'bismarck','Bismarck sinks; the British capital ships survive.','27 May · about 10:37','combined gunfire, torpedo damage and scuttling'),
+    ],
+  },
+  lofoten: {
+    durationSeconds: 1200, start: '9 April 1940 · about 04:05', end: '9 April 1940 · after 06:15', compressed: true,
+    compression: 'The running action is compressed into twenty simulator minutes. British report clock labels are approximate; weather gaps are represented by pauses in supporting gunfire.',
+    omissions: 'Three principal ships; British destroyer contributions are off-map. The contemporary report misidentified German ships. This reconstruction uses corrected names and represents reported damage without claiming exact hit attribution, totals or subsystem values. All three survive.',
+    sourceUrls: [RENOWN_REPORT],
+    clock: [clock(0,'9 April · about 04:05','Renown opens fire'),clock(180,'9 April · early exchanges','Damage and German turn-away'),
+      clock(480,'9 April · running engagement','Snow squalls interrupt contact'),clock(900,'9 April · after 05:57','Gunfire ceases'),clock(1140,'9 April · after 06:15','German ships escape')],
+    events: [
+      notice(0,'The ships exchange gunfire in heavy seas. German identities are corrected from the contemporary British report.','9 April · about 04:05'),
+      order(0,'renown1940',310,25,'gneisenau1940'),order(0,'gneisenau1940',310,25,'renown1940'),order(0,'scharnhorst',310,25,'renown1940'),
+      shot(100,'gneisenau1940','renown1940',.94,'Renown sustains limited damage in the opening exchange.','9 April · opening exchange',{flooding:.08}),
+      shot(180,'renown1940','gneisenau1940',.88,'The leading German ship takes hits; damage is represented on Gneisenau.','9 April · early exchange',{fireControl:.55}),
+      order(260,'gneisenau1940',310,27),order(260,'scharnhorst',310,27,'renown1940'),
+      notice(480,'Snow squalls interrupt the running fight.','9 April · running engagement'),
+      order(480,'renown1940',310,25),order(480,'scharnhorst',310,27),
+      order(660,'renown1940',310,25,'scharnhorst'),order(660,'scharnhorst',310,27,'renown1940'),
+      order(900,'renown1940',310,25),order(900,'scharnhorst',310,27),
+      {at:1000,op:'withdraw',target:id('gneisenau1940'),course:310,speed:27,label:'German forces continue disengaging.',time:'9 April · closing phase'},
+      {at:1000,op:'withdraw',target:id('scharnhorst'),course:310,speed:27,label:'Scharnhorst follows the withdrawal.',time:'9 April · closing phase'},
+      {at:1140,op:'escape',target:id('gneisenau1940'),label:'Gneisenau escapes beyond effective contact.',time:'9 April · after 06:15'},
+      {at:1140,op:'escape',target:id('scharnhorst'),label:'Scharnhorst escapes; no capital ship is sunk.',time:'9 April · after 06:15'},
+    ],
+  },
   'denmark-strait': {
     durationSeconds: 960, start: '24 May 1941 · about 05:55', end: '24 May 1941 · about 06:11', compressed: false,
     compression: 'About sixteen minutes of action in sixteen simulator minutes. Individual salvo timing and movement are illustrative.',
@@ -144,12 +196,15 @@ export function advanceHistoricalTimeline(state, emit) {
     if (!target) throw Error(`Historical script missing model: ${event.target}`);
     if (event.op === 'attack') {
       if (!source) throw Error(`Historical script missing source: ${event.source}`);
-      const rounds = Math.min(source.ammunition, Math.max(1, source.stats.barrels)); source.ammunition -= rounds;
+      const torpedo=event.weapon==='torpedo';
+      const rounds = torpedo?Math.min(source.torpedoes,event.rounds||1):Math.min(source.ammunition, Math.max(1, source.stats.barrels));
+      if(torpedo)source.torpedoes-=rounds;else source.ammunition-=rounds;
+      if(!rounds)throw Error(`Historical attack has no ammunition: ${event.source}`);
       state.projectiles.push({ attackerId: source.id, targetId: target.id, kind: event.weapon, arrivalAt: event.impactAt,
         damage: Math.max(0, target.health - event.healthAfter), hits: 1, position: [source.x, source.y], targetPosition: [target.x, target.y],
         scripted: { healthAfter: event.healthAfter, ...event.effects, label: event.label, time: event.time } });
-      annotate({ kind: 'salvo', attackerId: source.id, targetId: target.id, position: [source.x, source.y], targetPosition: [target.x, target.y], rounds, hits: 1, arrivalAt: event.impactAt,
-        historicalLabel: `${source.name} fires a selected salvo toward ${target.name}; impact follows.`, historicalTime: historicalClock(state).label });
+      annotate({ kind: torpedo?'torpedo':'salvo', weapon:event.weapon, attackerId: source.id, targetId: target.id, position: [source.x, source.y], targetPosition: [target.x, target.y], rounds, hits: 1, arrivalAt: event.impactAt,
+        historicalLabel: `${source.name} ${torpedo?'launches selected torpedoes':'fires a selected salvo'} toward ${target.name}; impact follows.`, historicalTime: historicalClock(state).label });
     } else if (event.op === 'flight') {
       launchStrikeGroup(state, source, target, event, row => annotate({ ...row, historicalLabel: `${source.name} launches a selected strike toward ${target.name}.`,
         historicalTime: historicalClock(state).label }), { scripted: { attackAt: event.attackAt, returnSeconds: event.returnSeconds,

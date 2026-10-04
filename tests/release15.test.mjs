@@ -33,7 +33,7 @@ const start = (id = "JPN", campaign = "in_good_faith_1936") => {
 };
 const day = (date) => Date.parse(date + "T00:00:00Z") / 86400000;
 
-test("all fourteen openings have affordable operating plans and staffed hulls at 50% funding", () => {
+test("all openings have affordable operating plans and staffed operational hulls at 50% funding", () => {
   for (const campaign of Object.keys(bundle.campaigns))
     for (const id of Object.keys(bundle.campaigns[campaign].nations)) {
       const [s, c] = start(id, campaign),
@@ -55,7 +55,11 @@ test("all fourteen openings have affordable operating plans and staffed hulls at
           n.aviatorsYear * n.aviatorFunding > 0,
       );
       assert.ok(aircraftSummary(s, c).aviatorBalance >= 0);
-      assert.ok(fleetPower(s, c).supply > 0.5, id + " opening supply collapse");
+      if(campaign==='eve_pacific_war_1941'&&id==='FRA'){
+        assert.equal(fleetPower(s,c).total,0,'French armistice fleet is not ready for sea');
+        assert.equal(fleetPower(s,c).supply,0,'empty operational-force aggregate');
+        assert(n.groups.filter(g=>g.service==='warship').every(g=>['reserve','repair','building'].includes(g.status)));
+      }else assert.ok(fleetPower(s, c).supply > 0.5, campaign+' '+id + " opening supply collapse");
     }
 });
 test("automatic opening stations disperse large navies and preserve authored deployments", () => {

@@ -120,7 +120,7 @@ const due = (s, c, n) => {
   minuteAirOperations(s, c, (id, o, pos) => resolveAirAttack(s, c, id, o, pos));
   return op;
 };
-test("all 14 catalogs have strict three-year fits, preserved Japan program and compatible opening inventories", () => {
+test("legacy catalogs retain three-year fits and historical catalogs use service dates with compatible inventories", () => {
   for (const campaign of Object.keys(bundle.campaigns))
     for (const id of Object.keys(bundle.campaigns[campaign].nations)) {
       const [s, c, n] = start(id, campaign),
@@ -131,9 +131,13 @@ test("all 14 catalogs have strict three-year fits, preserved Japan program and c
           models.map((a) => a.id),
           ["hibari_t33", "raiden_t39", "shinden_t44"],
         );
-      else
+      else if(!c.scenario.historicalOpening)
         for (let i = 1; i < years.length; i++)
           assert.equal(years[i] - years[i - 1], 3);
+      else for(const a of models){
+        assert.equal(a.type_year,a.service_year,'historical availability follows service year');
+        assert(Number.isInteger(a.service_year)&&a.service_year>=1930&&a.service_year<=1941);
+      }
       const government = c.nations[id].armyAircraft;
       assert.ok(government.length >= 10);
       assert.ok(

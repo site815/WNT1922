@@ -44,7 +44,7 @@ export function scriptedDecisions(s, c, { opening = false } = {}) {
   if (s.campaignId === "campaign_1922") historical1922Decisions(s, c);
   const definitions = [
     ...common,
-    ...(s.campaignId === "campaign_1922" ? early : hindsight),
+    ...(s.campaignId === "campaign_1922" ? early : c.scenario.category === 'historical' ? [] : hindsight),
   ];
   const date = new Date(s.day * 86400000),
     year = date.getUTCFullYear(),

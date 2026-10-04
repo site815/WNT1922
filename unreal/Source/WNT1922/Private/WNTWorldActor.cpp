@@ -195,10 +195,14 @@ namespace
     }
     // Same 100-unit, y-down paths as assets/ui/map-symbols.json and the SVG legend.
     UProceduralMeshComponent* ChartSymbol(AActor* Owner, const TSharedPtr<FJsonObject>& Spec,
-        const FString& Kind, UMaterialInterface* Material)
+        const FString& Kind, UMaterialInterface* Material, const FString& Variant=FString(), const FString& NationColor=FString())
     {
-        const auto Symbol=Object(Object(Spec,TEXT("symbols")),*Kind);
-        if(!Symbol.IsValid())return nullptr;
+        const auto BaseSymbol=Object(Object(Spec,TEXT("symbols")),*Kind);
+        if(!BaseSymbol.IsValid())return nullptr;
+        const auto Symbol=MakeShared<FJsonObject>(*BaseSymbol);
+        if(Kind==TEXT("fleet"))if(const auto Shape=Object(Object(Spec,TEXT("fleetVariants")),*Variant))
+            for(const auto& Pair:Shape->Values)Symbol->SetField(Pair.Key,Pair.Value);
+        if(NationColor.Len()==7&&NationColor[0]==TEXT('#'))Symbol->SetStringField(TEXT("color"),NationColor);
         auto* Mesh=NewObject<UProceduralMeshComponent>(Owner);
         Owner->AddInstanceComponent(Mesh);Mesh->SetupAttachment(Owner->GetRootComponent());
         Mesh->SetMobility(EComponentMobility::Movable);Mesh->SetCastShadow(false);
@@ -271,7 +275,9 @@ namespace
         };
         auto SaveSection=[&](int32 Index)
         {
-            Mesh->CreateMeshSection_LinearColor(Index,Vertices,Indices,Normals,UVs,Colors,Tangents,false,false);
+            // Store exact sRGB bytes, then decode for Canvas below. Quantizing
+            // linear colors into eight bits visibly shifts dark national ink.
+            Mesh->CreateMeshSection_LinearColor(Index,Vertices,Indices,Normals,UVs,Colors,Tangents,false,true);
             if(Material)Mesh->SetMaterial(Index,Material);
             Vertices.Reset();Indices.Reset();Normals.Reset();UVs.Reset();Colors.Reset();Tangents.Reset();
         };
@@ -557,7 +563,9 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
     const FString NextCampaign = String(Packet, TEXT("campaign"));
     if (Campaign != NextCampaign && Terrain)
     {
-        Campaign = NextCampaign; Terrain->CampaignId = Campaign == TEXT("campaign_1922") ? TEXT("1922") : TEXT("1936hindsight");
+        Campaign = NextCampaign;
+        const FString BaseMap=String(Packet,TEXT("baseMap"));
+        Terrain->CampaignId = BaseMap==TEXT("1922")||BaseMap==TEXT("1936hindsight") ? BaseMap : Campaign==TEXT("campaign_1922") ? TEXT("1922") : TEXT("1936hindsight");
         if (!Terrain->Initialize(DataDirectory)) UE_LOG(LogWNTWorld, Error, TEXT("%s"), *Terrain->GetLoadError());
         Terrain->SetCentralMeridian(CentralMeridian);
     }
@@ -574,10 +582,15 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         {
             const FString KeyCopy=MarkerKey(Key,Copy);
             KeepMarkers.Add(KeyCopy);AActor* Actor=Runtime->Markers.FindRef(KeyCopy).Get();
+            const FName Style(*(String(Pick,TEXT("kind"))+TEXT(":")+String(Pick,TEXT("symbolVariant"))+TEXT(":")+String(Pick,TEXT("color"))));
+            // Geometry is immutable between campaign packets. Recreate only
+            // when casualties change the flagship role or ownership changes.
+            if(Actor&&!Actor->Tags.Contains(Style)){Runtime->Selections.Remove(Actor);Actor->Destroy();Actor=nullptr;}
             if(!Actor)
             {
                 Actor=PlainActor(GetWorld(),this);if(!Actor)continue;
-                if(!ChartSymbol(Actor,Runtime->ChartSymbols,String(Pick,TEXT("kind")),MarkerMaterial)){Actor->Destroy();continue;}
+                if(!ChartSymbol(Actor,Runtime->ChartSymbols,String(Pick,TEXT("kind")),MarkerMaterial,String(Pick,TEXT("symbolVariant")),String(Pick,TEXT("color")))){Actor->Destroy();continue;}
+                Actor->Tags.Add(Style);
                 Runtime->Markers.Add(KeyCopy,Actor);
             }
             auto CopyPick=MakeShared<FJsonObject>(*Pick);CopyPick->SetNumberField(TEXT("worldCopy"),Copy);
@@ -592,6 +605,9 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         if (!Located) continue; // Explicitly unlocated, never placed at (0,0).
         auto FleetPick = Selection(Merchant ? TEXT("convoy") : TEXT("fleet"), ForceId, String(Force, TEXT("name")));
         FleetPick->SetStringField(TEXT("forceId"), ForceId);
+        FleetPick->SetStringField(TEXT("nation"),String(Force,TEXT("nation"),String(Packet,TEXT("player"))));
+        FleetPick->SetStringField(TEXT("color"),String(Force,TEXT("color")));
+        FleetPick->SetStringField(TEXT("symbolVariant"),String(Force,TEXT("symbolVariant")));
         FleetPick->SetBoolField(TEXT("docked"),Boolean(Force,TEXT("docked")));
         FleetPick->SetBoolField(TEXT("selected"),Runtime->SelectedForceIds.Contains(ForceId));
         Marker(TEXT("force:")+ForceId,FleetPick);
@@ -601,7 +617,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
             AWNTShipActor* Ship = Runtime->Ships.FindRef(Key).Get();
             if (!Ship) { Ship = GetWorld()->SpawnActor<AWNTShipActor>(); if (!Ship) continue; Ship->SetOwner(this); Runtime->Ships.Add(Key, Ship); }
             Ship->SetModelCullDistance(2000000.0f);
-            const FString Path = ModelPath(String(Hull, TEXT("classId")), Campaign, String(Hull, TEXT("type")));
+            const FString Path = ModelPath(String(Hull,TEXT("modelClassId"),String(Hull,TEXT("classId"))),String(Hull,TEXT("modelCampaign"),Campaign),String(Hull,TEXT("type")));
             if (Path.IsEmpty()) { Ship->SetPendingModel(); Runtime->LoadedWorldModels.Remove(Key); }
             else
             {
@@ -613,6 +629,9 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
             Pick->SetStringField(TEXT("key"), Key); Pick->SetStringField(TEXT("forceId"), ForceId); Pick->SetStringField(TEXT("classId"), String(Hull, TEXT("classId")));
             Pick->SetNumberField(TEXT("hullIndex"), Number(Hull, TEXT("hullIndex")));
             Pick->SetBoolField(TEXT("representativeDesign"), !Path.IsEmpty() && String(Hull, TEXT("classId")).StartsWith(TEXT("draft-")));
+            Pick->SetBoolField(TEXT("representativeModel"),Boolean(Hull,TEXT("representativeModel")));
+            Pick->SetStringField(TEXT("modelClassId"),String(Hull,TEXT("modelClassId"),String(Hull,TEXT("classId"))));
+            Pick->SetStringField(TEXT("modelCampaign"),String(Hull,TEXT("modelCampaign"),Campaign));
             if (Packet->HasField(TEXT("instanceId"))) Pick->SetField(TEXT("instanceId"), Packet->TryGetField(TEXT("instanceId")));
             Pick->SetStringField(Merchant ? TEXT("convoyId") : TEXT("fleetId"), ForceId); Runtime->Selections.Add(Ship, Pick);
         }
@@ -621,6 +640,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
     {
         const auto Contact = Value->AsObject(); FVector2D Geo; if (!Point(Contact, TEXT("position"), Geo)) continue;
         const FString ContactId = Id(Contact, TEXT("id")); auto Pick = Selection(TEXT("contact"), ContactId, String(Contact, TEXT("nation")) + TEXT(" · ") + String(Contact, TEXT("stage")) + TEXT(" report"));
+        Pick->SetStringField(TEXT("nation"),String(Contact,TEXT("nation")));Pick->SetStringField(TEXT("color"),String(Contact,TEXT("color")));
         if (auto* Actor = Marker(TEXT("contact:") + ContactId, Pick)) Actor->SetActorLocation(WNTProjection::Forward(Geo, CentralMeridian));
     }
     for (const auto& Value : Array(Packet, TEXT("ports")))
@@ -628,6 +648,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         const auto Port = Value->AsObject(); FVector2D Geo; if (!Point(Port, TEXT("position"), Geo)) continue;
         const FString PortId = Id(Port, TEXT("id")); KeepPorts.Add(PortId); Runtime->PortPositions.Add(PortId, Geo);
         auto PortPick = Selection(TEXT("port"), PortId, String(Port, TEXT("name")));
+        PortPick->SetStringField(TEXT("nation"),String(Port,TEXT("owner")));PortPick->SetStringField(TEXT("color"),String(Port,TEXT("color")));
         PortPick->SetBoolField(TEXT("major"),Boolean(Port,TEXT("major"),true));
         PortPick->SetStringField(TEXT("tier"),String(Port,TEXT("tier"),TEXT("dock")));
         PortPick->SetNumberField(TEXT("capacity"),Number(Port,TEXT("capacity")));
@@ -642,6 +663,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
         const FString Kind = Country ? TEXT("country") : Battle ? TEXT("battle") : TEXT("front"), Identity = Id(Entry, TEXT("id")), Key = Kind + TEXT(":") + Identity;
         Runtime->PublicPositions.Add(Key, Geo);
         auto Pick=Selection(Kind, Identity, String(Entry, Battle?TEXT("label"):TEXT("name")));
+        if(Country){Pick->SetStringField(TEXT("nation"),Identity);Pick->SetStringField(TEXT("color"),String(Entry,TEXT("color")));}
         if(Battle)Pick->SetNumberField(TEXT("stage"),Number(Entry,TEXT("stage")));
         Marker(Key, Pick);
     }
@@ -678,6 +700,7 @@ void AWNTWorldActor::ApplyWorldPacket(const TSharedPtr<FJsonObject>& Packet)
             Controls.Add(FString(*Pair.Key), Runtime->Colours.Contains(Pair.Value->AsString()) ? Runtime->Colours[Pair.Value->AsString()] : FLinearColor(.2f, .24f, .27f));
         Terrain->SetControl(Controls);
         Terrain->ApplyCampaignFronts(Array(Packet,TEXT("fronts")));
+        Terrain->ApplyCampaignOccupations(Array(Packet,TEXT("occupations")));
     }
     Runtime->LastMarkerCamera = FVector(TNumericLimits<double>::Max());
     RepositionPorts(); RebuildRoute(Runtime->RouteWidth); UpdateWorld(Runtime->Duration > 0 ? 0 : 1); UpdateVisibility();
@@ -912,7 +935,7 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
         // Custom engagements can deliberately mix catalog vintages. Preserve
         // each chosen class's explicit catalog identity; never search another
         // campaign for a conveniently available but different hull variant.
-        const FString Path = ModelPath(String(Unit, TEXT("classId")), String(Unit,TEXT("campaign"),String(Packet,TEXT("campaign"),Campaign)), String(Unit, TEXT("type")));
+        const FString Path = ModelPath(String(Unit,TEXT("modelClassId"),String(Unit,TEXT("classId"))),String(Unit,TEXT("modelCampaign"),String(Unit,TEXT("campaign"),String(Packet,TEXT("campaign"),Campaign))),String(Unit,TEXT("type")));
         if (Path.IsEmpty()) { Ship->SetPendingModel(); Runtime->LoadedBattleModels.Remove(Key); }
         else
         {
@@ -931,6 +954,9 @@ void AWNTWorldActor::ApplyBattlePacket(const TSharedPtr<FJsonObject>& Packet)
         auto Pick = Selection(TEXT("battle-ship"), Id(Unit, TEXT("id")), String(Unit, TEXT("label")));
         Pick->SetStringField(TEXT("key"), Key); Pick->SetStringField(TEXT("side"), String(Unit, TEXT("side"))); Pick->SetStringField(TEXT("classId"), String(Unit, TEXT("classId")));
         Pick->SetBoolField(TEXT("representativeDesign"), !Path.IsEmpty() && String(Unit, TEXT("classId")).StartsWith(TEXT("draft-")));
+        Pick->SetBoolField(TEXT("representativeModel"),Boolean(Unit,TEXT("representativeModel")));
+        Pick->SetStringField(TEXT("modelClassId"),String(Unit,TEXT("modelClassId"),String(Unit,TEXT("classId"))));
+        Pick->SetStringField(TEXT("modelCampaign"),String(Unit,TEXT("modelCampaign"),String(Unit,TEXT("campaign"),Campaign)));
         Pick->SetBoolField(TEXT("selected"),Boolean(Unit,TEXT("selected")));
         Pick->SetNumberField(TEXT("hullIndex"), Number(Unit, TEXT("hullIndex"))); Runtime->Selections.Add(Ship, Pick);
         if (Packet->HasField(TEXT("instanceId"))) Pick->SetField(TEXT("instanceId"), Packet->TryGetField(TEXT("instanceId")));
@@ -1237,7 +1263,7 @@ void AWNTWorldActor::DrawChart(UCanvas* Canvas)
                 {
                     const FVector2D Pixel=At+FVector2D(-Vertex.Position.Y,-Vertex.Position.Z)*(Pixels/100000.);
                     const int32 Added=Batch->AddVertexf(FVector4f(float(Pixel.X),float(Pixel.Y),0,1),FVector2f::ZeroVector,
-                        Vertex.Color.ReinterpretAsLinear()*Tint,HitProxy);
+                        FLinearColor(Vertex.Color)*Tint,HitProxy);
                     if(Base==INDEX_NONE)Base=Added;
                 }
                 for(int32 I=0;I+2<Section->ProcIndexBuffer.Num();I+=3)
@@ -1329,11 +1355,18 @@ AActor* AWNTWorldActor::HitChart(const FVector2D& NormalizedPointer,const FVecto
 
 TSharedPtr<FJsonObject> AWNTWorldActor::GetChartDiagnostics() const
 {
-    auto Result=MakeShared<FJsonObject>();TArray<TSharedPtr<FJsonValue>> Ids,Markers;int32 VisibleSelected=0;
+    auto Result=MakeShared<FJsonObject>();TArray<TSharedPtr<FJsonValue>> Ids,Markers,Styles;int32 VisibleSelected=0;
     for(const auto& ForceId:Runtime->SelectedForceIds)Ids.Add(MakeShared<FJsonValueString>(ForceId));
     for(const auto& Pair:Runtime->Markers)if(auto* Actor=Pair.Value.Get())
     {
-        const auto Pick=Runtime->Selections.FindRef(Actor);if(!Boolean(Pick,TEXT("selected")))continue;
+        const auto Pick=Runtime->Selections.FindRef(Actor);
+        if(Number(Pick,TEXT("worldCopy"))==0)
+        {
+            auto Style=MakeShared<FJsonObject>();
+            for(const TCHAR* Field:{TEXT("kind"),TEXT("id"),TEXT("nation"),TEXT("color"),TEXT("symbolVariant")})Style->SetStringField(Field,String(Pick,Field));
+            Styles.Add(MakeShared<FJsonValueObject>(Style));
+        }
+        if(!Boolean(Pick,TEXT("selected")))continue;
         auto Row=MakeShared<FJsonObject>();auto* Mesh=Actor->FindComponentByClass<UProceduralMeshComponent>();
         const bool Highlight=Mesh&&Mesh->IsMeshSectionVisible(3)&&!Actor->IsHidden();
         Row->SetStringField(TEXT("forceId"),Id(Pick,TEXT("forceId")));Row->SetNumberField(TEXT("worldCopy"),Number(Pick,TEXT("worldCopy")));
@@ -1347,6 +1380,7 @@ TSharedPtr<FJsonObject> AWNTWorldActor::GetChartDiagnostics() const
         Markers.Add(MakeShared<FJsonValueObject>(Row));if(Highlight)++VisibleSelected;
     }
     Result->SetArrayField(TEXT("selectedForceIds"),Ids);Result->SetArrayField(TEXT("selectedMarkers"),Markers);
+    Result->SetArrayField(TEXT("markerStyles"),Styles);
     Result->SetNumberField(TEXT("visibleSelectedMarkerCount"),VisibleSelected);Result->SetNumberField(TEXT("markerCount"),Runtime->Markers.Num());
     Result->SetNumberField(TEXT("drawnPortLabels"),Runtime->DrawnPortLabels);
     Result->SetStringField(TEXT("renderer"),TEXT("screen-vector"));Result->SetNumberField(TEXT("drawnMarkers"),Runtime->DrawnChartMarkers);
@@ -1510,7 +1544,7 @@ FBox AWNTWorldActor::GetForceBounds(const FString& ForceId) const
     for(const auto& Pair:Runtime->Ships)if(auto* Ship=Pair.Value.Get())
     {
         const auto Pick=Runtime->Selections.FindRef(Ship);
-        if(!Pick.IsValid()||String(Pick,TEXT("fleetId"))!=ForceId)continue;
+        if(!Pick.IsValid()||String(Pick,TEXT("forceId"),String(Pick,TEXT("fleetId")))!=ForceId)continue;
         // Deferred models retain their observed formation positions. Include a
         // conservative hull envelope before the detailed GLBs stream in.
         const FVector Position=Ship->GetActorLocation();
@@ -1981,6 +2015,68 @@ bool FWNTChartSelectionTest::RunTest(const FString& Parameters)
     Packet->SetArrayField(TEXT("selectedForceIds"),{});Scene->ApplyWorldPacket(Packet);Diagnostics=Scene->GetChartDiagnostics();
     TestEqual(TEXT("Deselect removes every selection highlight immediately"),Number(Diagnostics,TEXT("visibleSelectedMarkerCount")),0.);
     TestEqual(TEXT("Selection changes reuse the same marker actors"),Number(Diagnostics,TEXT("markerCount")),MarkerCount);
+    World->DestroyWorld(false);return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTChartNationalStylesTest,"WNT.World.NationalInkAndFleetRoles",
+    EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTChartNationalStylesTest::RunTest(const FString& Parameters)
+{
+    const auto Spec=ChartTestSpec();if(!TestNotNull(TEXT("Shared native/legend specification"),Spec.Get()))return false;
+    const auto Init=UWorld::InitializationValues().AllowAudioPlayback(false).RequiresHitProxies(false)
+        .CreatePhysicsScene(false).CreateNavigation(false).CreateAISystem(false).ShouldSimulatePhysics(false).SetTransactional(false);
+    UWorld* World=UWorld::CreateWorld(EWorldType::Game,false,NAME_None,nullptr,true,ERHIFeatureLevel::Num,&Init);
+    if(!TestNotNull(TEXT("National chart test world"),World))return false;
+    auto* Probe=PlainActor(World,nullptr);TSet<uint32> Shapes;
+    const FString Ink=TEXT("#42a58d");const FColor Expected=FColor::FromHex(Ink),Backing=FColor::FromHex(String(Spec,TEXT("backingColor")));
+    for(const TCHAR* Variant:{TEXT("carrier"),TEXT("capital"),TEXT("cruiser"),TEXT("escort"),TEXT("submarine"),TEXT("support")})
+    {
+        auto* Glyph=ChartSymbol(Probe,Spec,TEXT("fleet"),nullptr,Variant,Ink);
+        const auto* Section=Glyph?Glyph->GetProcMeshSection(0):nullptr;
+        if(!TestNotNull(TEXT("Every fleet role has actual geometry"),Section))continue;
+        bool HasInk=false,HasBacking=false,OnlySpecifiedColors=true;
+        for(const auto& Vertex:Section->ProcVertexBuffer)
+        {
+            HasInk|=Vertex.Color==Expected;HasBacking|=Vertex.Color==Backing;
+            OnlySpecifiedColors&=Vertex.Color==Expected||Vertex.Color==Backing;
+        }
+        TestTrue(TEXT("Country ink matches exact SVG sRGB bytes without recoloring the silhouette/casing"),HasInk&&HasBacking&&OnlySpecifiedColors);
+        TestEqual(TEXT("Canvas linear decoding round-trips to the original national palette"),FLinearColor(Expected).ToFColor(true),Expected);
+        Shapes.Add(FCrc::MemCrc32(Section->ProcVertexBuffer.GetData(),Section->ProcVertexBuffer.Num()*sizeof(FProcMeshVertex)));
+    }
+    TestEqual(TEXT("Six fleet classes have distinct vertex geometry"),Shapes.Num(),6);
+    auto* Scene=World->SpawnActor<AWNTWorldActor>();TSharedPtr<FJsonObject> Packet;
+    const FString Json=TEXT(R"({"format":1,"campaign":"test","player":"USA","paused":true,"forces":[{"id":"navy","symbolVariant":"carrier","nation":"USA","color":"#42a58d","position":[0,0],"hulls":[{"key":"war","groupId":"war","hullIndex":0,"stationMeters":[0,0]}]},{"id":"trade","merchant":true,"nation":"USA","color":"#42a58d","position":[20,10],"hulls":[{"key":"cargo0","hullIndex":0,"stationMeters":[-600,0]},{"key":"cargo1","hullIndex":1,"stationMeters":[600,0]}]}],"ports":[{"id":"harbor","name":"Harbor","position":[5,20],"owner":"USA","color":"#42a58d"}]})");
+    if(Scene&&FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Json),Packet))
+    {
+        Packet->SetObjectField(TEXT("chartSymbols"),Spec);Scene->ApplyWorldPacket(Packet);
+        auto FindPort=[&]()->AActor*{for(TActorIterator<AActor> It(World);It;++It){const auto Pick=Scene->GetSelection(*It);
+            if(String(Pick,TEXT("kind"))==TEXT("port")&&Number(Pick,TEXT("worldCopy"))==0)return *It;}return nullptr;};
+        auto* Before=FindPort();Scene->ApplyWorldPacket(Packet);
+        TestTrue(TEXT("Unchanged campaign packets retain existing icon geometry and actor"),Before&&FindPort()==Before);
+        const FBox MerchantBounds=Scene->GetForceBounds(TEXT("trade")),WarshipBounds=Scene->GetForceBounds(TEXT("navy"));
+        TestTrue(TEXT("Merchant formation fit includes both actual hull stations"),MerchantBounds.IsValid&&MerchantBounds.GetSize().GetMax()>100000);
+        TestTrue(TEXT("Merchant fit never incorporates a distant navy"),WarshipBounds.IsValid&&FVector::Distance(MerchantBounds.GetCenter(),WarshipBounds.GetCenter())>10000000);
+        FBox ExpectedMerchantBounds(ForceInit);
+        for(int32 HullIndex=0;HullIndex<2;++HullIndex)
+        {
+            const auto Hull=Scene->GetSelectedPosition(TEXT("merchant"),TEXT("trade"),HullIndex);
+            const FVector ExpectedPosition=WNTProjection::Forward(Offset(FVector2D(20,10),HullIndex?600.:-600.,0),0);
+            TestTrue(TEXT("Each merchant occupies its real projected station rather than the spawn origin"),Hull.IsSet()&&Hull.GetValue().Equals(ExpectedPosition,.01));
+            ExpectedMerchantBounds+=ExpectedPosition-FVector(18000,18000,0);
+            ExpectedMerchantBounds+=ExpectedPosition+FVector(18000,18000,5000);
+            TestTrue(TEXT("Exact merchant hull index resolves inside its fitted formation"),Hull.IsSet()&&MerchantBounds.IsInsideOrOn(Hull.GetValue()));
+        }
+        TestTrue(TEXT("Merchant fit is exactly the two hull envelopes without fleet or marker pollution"),
+            MerchantBounds.Min.Equals(ExpectedMerchantBounds.Min,.01)&&MerchantBounds.Max.Equals(ExpectedMerchantBounds.Max,.01));
+        const auto Port=Array(Packet,TEXT("ports"))[0]->AsObject();Port->SetStringField(TEXT("owner"),TEXT("JPN"));Port->SetStringField(TEXT("color"),TEXT("#bd5b51"));
+        Scene->ApplyWorldPacket(Packet);auto* After=FindPort();
+        TestTrue(TEXT("An ownership change replaces only stale icon ink"),After&&After!=Before);
+        const auto Pick=Scene->GetSelection(After);
+        TestTrue(TEXT("Captured port selection reports its new national style"),String(Pick,TEXT("nation"))==TEXT("JPN")&&String(Pick,TEXT("color"))==TEXT("#bd5b51"));
+        TestEqual(TEXT("Style updates do not grow the nine world-copy markers"),Number(Scene->GetChartDiagnostics(),TEXT("markerCount")),9.);
+    }
+    else AddError(TEXT("National chart packet fixture could not initialize"));
     World->DestroyWorld(false);return true;
 }
 

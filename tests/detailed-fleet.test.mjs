@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 import {CATALOG} from '../worker/catalog-loader.mjs';
+import {assetReference,referencedAsset} from '../mechanics/asset-references.mjs';
 import {DEMO_BATTLES} from '../ui/start-battle-data.mjs';
 const root='assets/models/ships/';
 const index=JSON.parse(await fs.readFile(root+'index.json','utf8'));
@@ -13,7 +14,7 @@ function glb(buffer){
   return {json,attribute};
 }
 test('every campaign class, title ship and custom-design type resolves to a detailed stored GLB',()=>{
-  for(const [campaign,c]of Object.entries(CATALOG.campaigns))for(const s of Object.values(c.classes)){const model=mappings.get(campaign+':'+s.id)||mappings.get(s.id);assert(model?.file.endsWith('.glb'),campaign+'/'+s.id+' needs its detailed class fit');assert(!model.id.startsWith('fallback-'),'Historical/campaign fit must not silently use a generic model');}
+  for(const [campaign,c]of Object.entries(CATALOG.campaigns))for(const s of Object.values(c.classes)){const model=referencedAsset(mappings,assetReference(s,c.scenario,campaign));assert(model?.file.endsWith('.glb'),campaign+'/'+s.id+' needs its detailed class fit');assert(!model.id.startsWith('fallback-'),'Historical/campaign fit must not silently use a generic model');}
   for(const battle of DEMO_BATTLES)for(const s of [...battle.shipsA,...battle.shipsB])assert(mappings.get(s.classId)?.file.endsWith('.glb'),'Opening demo needs explicit dated asset: '+s.classId);
   for(const id of Object.values(index.fallbacks))assert(index.models.find(m=>m.id===id)?.file.endsWith('.glb'),'Custom design category needs detailed stored artwork: '+id);
 });

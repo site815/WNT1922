@@ -17,6 +17,8 @@
 *.glb binary
 *.geojson binary
 *.gz binary
+# Raw signed-int16 elevation samples must never undergo newline conversion.
+assets/terrain/elevation.bin binary
 # Preserve the upstream compiler notice exactly, including its whitespace.
 assets/licenses/NSIS-LICENSE.txt -text -whitespace
 # Recognition source hashes cover the exact SVG bytes, including upstream line endings.

@@ -10,7 +10,7 @@ import { validateOpeningShipRecognition } from "../tools/check-recognition.mjs";
 const index = JSON.parse(await fs.readFile("assets/recognition/index.json", "utf8"));
 const registries = await Promise.all(index.registries.map(async file =>
   JSON.parse(await fs.readFile("assets/recognition/" + file, "utf8"))));
-const drawings = recognitionIndex(registries);
+const drawings = recognitionIndex(registries,CATALOG);
 const drawingFor = (campaign, id) => drawings.platforms.get(`${campaign}:ship:${id}`) || drawings.platforms.get(`ship:${id}`);
 const hullCounts = groups => {
   const counts = {};
@@ -20,7 +20,7 @@ const hullCounts = groups => {
   }
   return counts;
 };
-const loadLocalRecognition = () => loadRecognition({ refresh: true, fetcher: async url => ({
+const loadLocalRecognition = () => loadRecognition({ refresh: true, catalog:CATALOG, fetcher: async url => ({
   ok: true, json: async () => JSON.parse(await fs.readFile("." + url, "utf8")),
 }) });
 

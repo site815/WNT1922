@@ -34,7 +34,7 @@ await input('home');await delay(4500);
 if(workload==='zoom-coast'){await input('focus',{longitude:135,latitude:35,zoom:128});await delay(4500);}
 const point=await page.locator('.native-world-input').boundingBox();const cx=point.x+point.width*.6,cy=point.y+point.height*.5;
 await page.mouse.move(cx,cy);let pressed=false;
-if(workload==='pan-world'){await page.mouse.down({button:'right'});pressed=true;}
+if(workload==='pan-world'){await page.mouse.down({button:'middle'});pressed=true;}
 const started=performance.now();let n=0;const startCEF=await page.evaluate(()=>performance.now());
 while(performance.now()-started<12000){
 if(workload.startsWith('zoom'))await page.mouse.wheel(0,(n%24<12?-1:1)*45);
@@ -42,7 +42,7 @@ if(pressed)await page.mouse.move(cx+Math.sin(n*.14)*point.width*.24,cy+Math.sin(
 if(!uninterrupted){const d=await diag();result.samples.push({workload,elapsed:performance.now()-started,...Object.fromEntries(fields.filter(k=>d[k]!==undefined).map(k=>[k,d[k]]))});}
 n++;await delay(uninterrupted?150:75);
 }
-if(pressed)await page.mouse.up({button:'right'});
+if(pressed)await page.mouse.up({button:'middle'});
 if(uninterrupted){const d=await diag();result.samples.push({workload,elapsed:performance.now()-started,...Object.fromEntries(fields.filter(k=>d[k]!==undefined).map(k=>[k,d[k]]))});}
 const longTasks=await page.evaluate(start=>__renderProfile.longTasks.filter(v=>v.start>=start),startCEF);result.metrics.push({kind:'workload',workload,iterations:n,durationMs:performance.now()-started,longTasks});
 }

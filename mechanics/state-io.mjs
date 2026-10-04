@@ -116,6 +116,7 @@ export function validateSave(value, content) {
   if (value.musicVolume !== undefined && !finite(value.musicVolume, 0, 1))
     fail();
   const day = (v) => finite(v, minimumDay, 2000000) && Number.isInteger(v);
+  const warDay = v => finite(v, content.scenario.historyStart ? Date.parse(content.scenario.historyStart+'T00:00:00Z')/DAY : minimumDay, 2000000) && Number.isInteger(v);
   const price = (v) =>
     plain(v) && ["gold", "influence", "industry"].every((k) => amount(v[k]));
   if (
@@ -149,7 +150,7 @@ export function validateSave(value, content) {
     if (r.record !== undefined) {
       if (
         !plain(r.record) ||
-        !day(r.record.since) ||
+        !warDay(r.record.since) ||
         !plain(r.record.sides) ||
         Object.keys(r.record.sides).sort().join() !== [r.a, r.b].sort().join()
       )
@@ -171,7 +172,7 @@ export function validateSave(value, content) {
       typeof r.allied !== "boolean" ||
       !finite(r.truceUntil, minimumDay - 1, 2000000) ||
       !finite(r.lastBattle, -99999, 2000000) ||
-      (r.war && !day(r.warSince))
+      (r.war && !warDay(r.warSince))
     )
       fail();
   }
@@ -380,6 +381,9 @@ export function validateSave(value, content) {
         fail();
       if (g.service === "merchant" && !amount(g.merchantGRT)) fail();
       if (g.legacy !== undefined && typeof g.legacy !== "boolean") fail();
+      if (g.openingRepairPort !== undefined &&
+          (!PORTS[g.openingRepairPort] || !content.nations[id].hulls.some(h =>
+            'h-' + h.id === g.id && h.openingRepairPort === g.openingRepairPort))) fail();
       if (g.torpedoesPerHull !== undefined &&
           (!Number.isInteger(g.torpedoesPerHull) ||
            !finite(g.torpedoesPerHull, 0, content.classes[g.classId].torpedoCapacity ?? -1))) fail();
@@ -895,6 +899,14 @@ export function validateSave(value, content) {
       fail();
     for (const [territory, owner] of Object.entries(value.world.control))
       if (!identifier(territory) || !identifier(owner)) fail();
+    if (value.world.openingDay !== undefined &&
+        (!day(value.world.openingDay) || value.world.openingDay > value.day)) fail();
+    if (value.world.openingControl !== undefined &&
+        (!plain(value.world.openingControl) || Object.entries(value.world.openingControl)
+          .some(([territory, owner]) => !identifier(territory) || !identifier(owner)))) fail();
+    if (value.world.openingPortControl !== undefined &&
+        (!plain(value.world.openingPortControl) || Object.entries(value.world.openingPortControl)
+          .some(([port, owner]) => !PORTS[port] || !content.nations[owner]))) fail();
     for (const [port, owner] of Object.entries(value.world.portControl))
       if (!PORTS[port] || !identifier(owner)) fail();
     for (const [port, owner] of Object.entries(

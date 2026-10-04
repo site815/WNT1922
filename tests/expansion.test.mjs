@@ -49,14 +49,14 @@ const start = (id = "JPN", campaign = "in_good_faith_1936") => {
   return s;
 };
 
-test("both campaigns support seven navies with separate merchants and durable saves", () => {
-  assert.equal(campaignList(b).length, 2);
+test("all four campaigns support seven navies with separate merchants and durable saves", () => {
+  assert.equal(campaignList(b).length, 4);
   for (const campaign of Object.keys(b.campaigns))
     for (const id of Object.keys(b.nations)) {
       const s = start(id, campaign),
         c = contentFor(b, s);
       assert.equal(Object.keys(s.nations).length, 7);
-      assert.equal(sim.yearOf(s), campaign === "campaign_1922" ? 1922 : 1936);
+      assert.equal(sim.yearOf(s), Number(c.scenario.start.slice(0,4)));
       sim.advanceDays(s, b, 1);
       const loaded = validateSave(JSON.parse(exportSave(s)), b);
       assert.equal(loaded.campaignId, campaign);

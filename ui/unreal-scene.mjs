@@ -6,6 +6,8 @@ import { battleVisualEvents } from './battle-events.mjs';
 import { receiveNativePerformance } from './native-performance.mjs';
 import { unrealTacticalPacket, tacticalSceneSnapshot } from './tactical-scene-packet.mjs';
 import { BattleAudioController } from './battle-audio.mjs';
+import { CATALOG } from '../worker/catalog-loader.mjs';
+import { assetReference } from '../mechanics/asset-references.mjs';
 export { unrealTacticalPacket } from './tactical-scene-packet.mjs';
 
 export const UNREAL_MODE = globalThis.location?.search != null && new URLSearchParams(globalThis.location.search).get('unreal') === '1';
@@ -127,7 +129,7 @@ class NativeScene {
       this.dismissHover();
       this.activate(); canvas.focus({preventScroll:true}); canvas.setPointerCapture(event.pointerId);
       this.drag = {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false,
-        pick:event.button === 0, tilt:event.button === 1 || (this.mode === 'battle' && event.button === 2 && event.shiftKey)};
+        pick:event.button === 0, tilt:event.button === 2};
     }, options);
     canvas.addEventListener('pointermove', event => {
       if (this.drag) {
@@ -229,7 +231,14 @@ class NativeScene {
 export class UnrealWorldScene extends NativeScene {
   constructor(options) {
     super(options); Object.assign(this, {chart:options.chart, active:options.active, onCameraChange:options.onCameraChange});
-    this.mode = 'world'; this.rows = []; this.worldRevision = 0;
+    this.mode = 'world'; this.rows = []; this.worldRevision = 0; this.pendingCameraReset = true;
+  }
+  resetView() {
+    this.cancelWheel(); this.cancelHover(); clearTimeout(this.cameraTimer);
+    this.cameraKey = null; this.zoom = 1; this.rows = [];
+    // Hidden scenes reject native input. Consume this once after the new
+    // campaign has supplied its world packet and activated the map viewport.
+    this.pendingCameraReset = true;
   }
   get ready() {return Boolean(this.canvas?.isConnected);}
   selection() {
@@ -263,10 +272,11 @@ export class UnrealWorldScene extends NativeScene {
       surface.replaceChildren();
       const canvas = document.createElement('canvas'); canvas.className = 'native-world-input'; canvas.tabIndex = 0;
       canvas.setAttribute('role', 'application');
-      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. Left click selects a unit; left drag selects fleets in a box. Right drag pans. Wheel zooms. The map stays overhead until middle-button drag at close ship zoom adjusts the camera. Any zoom out immediately restores overhead north-up. Home fits the full world.');
+      canvas.setAttribute('aria-label', 'Native 3D terrain map with continuous horizontal wrapping. Left click selects a unit; left drag selects fleets in a box. Middle drag pans. Wheel zooms. Right drag orbits at close ship zoom. Any zoom out immediately restores overhead north-up. Double-click fleets or convoys to fit their ships, or ports to inspect their region. Home fits the full world.');
       surface.append(canvas); this.attach(canvas);
     }
     this.activate();
+    if(this.pendingCameraReset){this.pendingCameraReset=false;this.input('home');}
   }
   viewportRect() {
     const bounds = this.canvas.getBoundingClientRect(), sidebar = this.root.querySelector('.sidebar')?.getBoundingClientRect();
@@ -284,21 +294,35 @@ export class UnrealWorldScene extends NativeScene {
     // Camera movement is independent from DOM/simulation redraw rate.
     clearTimeout(this.cameraTimer); this.cameraTimer = setTimeout(() => this.onCameraChange?.(), 100);
   }
-  focus(kind, id, {zoom = false} = {}) {
-    const point = chartPosition(this.state, this.political, kind, id); if (!point) return;
-    this.activate(); this.input(zoom && kind === 'fleet' ? 'fit-force' : 'focus', {kind,id,longitude:point[0],latitude:point[1],zoom:Math.max(zoom&&kind==='port'?16:4, this.zoom)});
+  focus(kind, id, {zoom = false, hullIndex = -1} = {}) {
+    const point = chartPosition(this.state, this.political, kind === 'merchant' ? 'convoy' : kind, id); if (!point) return;
+    const fit = zoom && (kind === 'fleet' || kind === 'convoy');
+    const inspectionZoom = ['ship','merchant'].includes(kind) ? 65536 : kind === 'port' ? 16 : 4;
+    this.activate(); this.input(fit ? 'fit-force' : 'focus', {kind,id,hullIndex,longitude:point[0],latitude:point[1],zoom:zoom ? inspectionZoom : Math.max(4, this.zoom)});
   }
   reloadModels() { /* Native meshes reload from external files on subsequent scene packets. */ }
 }
 
 export function unrealBattlePacket(report, campaign, frameIndex, selected, animate = true, playback = null) {
+  const packet=battlePacket(report,campaign,frameIndex,selected,animate,playback);
+  // Old reports need no migration: resolve presentation from the selected
+  // campaign catalog. Explicit mixed-catalog references still take priority.
+  packet.units=packet.units.map(unit=>{
+    if(unit.modelClassId)return unit;
+    const source=unit.campaign||campaign,content=CATALOG.campaigns[source],definition=content?.classes[unit.classId];
+    return definition?{...unit,...assetReference(definition,content.scenario,source)}:unit;
+  });
+  return packet;
+}
+function battlePacket(report, campaign, frameIndex, selected, animate, playback) {
   if(playback?.plan){
     const {plan,key,elapsedSeconds,paused}=playback;
     return {format:1,campaign,id:plan.reportId,at:plan.recordedUntil,index:0,animate,movie:true,
       cameraDirector:!!plan.tactical,tactical:!!plan.tactical,airstrikes:plan.airstrikes||[],shoreBatteries:plan.shoreBatteries||[],
       eventKey:key,durationSeconds:plan.durationSeconds,elapsedSeconds,playbackPaused:paused,
       events:plan.events,units:plan.units.map(unit=>({key:unit.key,id:unit.id,side:unit.side,hullIndex:unit.hullIndex,
-        classId:unit.classId,campaign:unit.campaign||campaign,type:unit.type,label:unit.name,positionMetres:unit.positionMetres,headingDegrees:unit.headingDegrees,
+        classId:unit.classId,campaign:unit.campaign||campaign,modelClassId:unit.modelClassId,modelCampaign:unit.modelCampaign,representativeModel:unit.representativeModel,
+        type:unit.type,label:unit.name,positionMetres:unit.positionMetres,headingDegrees:unit.headingDegrees,
         health:unit.health,sunk:unit.sunkHull,trajectory:unit.trajectory,appearsAt:unit.appearsAt,lostAtSeconds:unit.lostAtSeconds,disappearsAt:unit.disappearsAt,
         selected:selected?.side===unit.side&&selected.id===unit.id&&(selected.hullIndex||0)===unit.hullIndex}))};
   }

@@ -117,5 +117,5 @@ await fs.writeFile(
   JSON.stringify(result, null, 2),
 );
 console.log(
-  `Validated ${documents.length} live documentation catalogs, all 14 starts, research levels, maps and module boundaries.`,
+  `Validated ${documents.length} live documentation catalogs, all ${openings.length} starts, research levels, maps and module boundaries.`,
 );

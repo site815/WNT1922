@@ -1,31 +1,17 @@
 import { campaignMinutes } from '../mechanics/campaign-clock.mjs';
 import { fleetPosition, visibleContacts } from '../mechanics/task-forces.mjs';
 import { NODES, PORTS, PORT_LOCATIONS, MAP_CAPITALS, distanceNm, wrapLon } from '../mechanics/world.mjs';
-import { frontPosition, POWERS } from '../mechanics/land-war.mjs';
+import { POWERS } from '../mechanics/land-war.mjs';
+import { campaignMapFronts, campaignMapOccupations } from './campaign-map-fronts.mjs';
+export { campaignMapFronts } from './campaign-map-fronts.mjs';
 import { fleetCourse, formationAt, ownFormationScene } from './fleet-formation.mjs';
 import { ongoingMapBattles } from './battle-map.mjs';
-import { MAP_SYMBOLS } from './map-symbols.mjs';
+import { MAP_SYMBOLS, fleetSymbolVariant } from './map-symbols.mjs';
 import { portSpec } from '../mechanics/port-catalog.mjs';
+import { assetReference } from '../mechanics/asset-references.mjs';
 
 const finitePoint = point => Array.isArray(point) && point.length === 2 && point.every(Number.isFinite);
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
-
-// The simulation records strategic campaign corridors and progress, not troop
-// positions. Native terrain clips this progress cross-section to the listed
-// territories; island assaults outline only their actual campaign territory.
-export function campaignMapFronts(state) {
-  return (state.world?.fronts || []).filter(front => Number.isFinite(front.progress)
-    && front.progress > 0 && front.progress < 1 && front.status !== 'Ceasefire'
-    && finitePoint(front.from) && finitePoint(front.to)).map(front => ({
-      id: front.id, name: front.name, position: frontPosition(front),
-      from: [...front.from], to: [...front.to], progress: front.progress,
-      territories: [...new Set((front.territories || []).filter(id => typeof id === 'string'))],
-      attacker: front.attacker, defender: front.defender, island: !!front.island,
-      status: front.status || 'Contested',
-      representation: front.island ? 'campaign-assault-outline' : 'campaign-progress-line',
-      accuracy: 'Strategic campaign progress within the recorded territories; not individual troop positions.',
-  }));
-}
 
 function remainingOwnRoute(state, fleet) {
   const now = campaignMinutes(state);
@@ -125,20 +111,26 @@ export function buildUnrealScenePacket(state, content, previousRows = [], option
   const rows = options.rows || ownFormationScene(state, content, previousRows, options);
   const previous = new Map(previousRows.map(row => [row.fleet.id, row]));
   const classes = content?.campaigns?.[state.campaignId]?.classes || content?.classes || {};
+  const scenario = content?.campaigns?.[state.campaignId]?.scenario || content?.scenario || {};
   const forces = rows.map(row => {
     const frame = formationAt(state, row);
+    const hulls = frame.hulls.map(hull => ({ key: hull.key, id: hull.groupId, groupId: hull.groupId,
+      ...assetReference({id:hull.classId,...classes[hull.classId]},scenario,state.campaignId),
+      classId: hull.classId, type: hull.type || classes[hull.classId]?.type || (row.merchant ? 'AK' : 'DD'),
+      hullIndex: hull.hullIndex, label: hull.label, offsetMeters: [...hull.offsetMeters],
+      stationMeters: [...hull.stationMeters], heading: hull.heading, headingKnown: hull.headingKnown,
+      status: hull.group?.status || 'underway' }));
     return { id: row.fleet.id, name: row.fleet.name || row.fleet.id, merchant: !!row.merchant,
+      nation: state.player, color: POWERS[state.player]?.color || MAP_SYMBOLS.symbols.fleet.color,
+      symbolVariant: row.merchant ? 'convoy' : fleetSymbolVariant(hulls),
       docked: !!row.docked, unlocated: !!row.unlocated, positionSource: row.positionSource || 'convoy-route',
       position: frame.anchor && [...frame.anchor], heading: frame.heading, headingKnown: frame.headingKnown,
       moving: frame.moving, navigation: observedNavigation(state, row, previous.get(row.fleet.id)),
-      hulls: frame.hulls.map(hull => ({ key: hull.key, id: hull.groupId, groupId: hull.groupId,
-        classId: hull.classId, type: hull.type || classes[hull.classId]?.type || (row.merchant ? 'AK' : 'DD'),
-        hullIndex: hull.hullIndex, label: hull.label, offsetMeters: [...hull.offsetMeters],
-        stationMeters: [...hull.stationMeters], heading: hull.heading, headingKnown: hull.headingKnown,
-        status: hull.group?.status || 'underway' })) };
+      hulls };
   });
   const contacts = visibleContacts(state).filter(contact => finitePoint(contact.position)).map(contact => ({
     id: contact.id, nation: contact.nation, position: [...contact.position], seenAt: contact.seenAt,
+    color: POWERS[contact.nation]?.color || MAP_SYMBOLS.symbols.contact.color,
     source: contact.source, estimate: contact.estimate, kind: contact.kind, stage: contact.stage,
     confidence: contact.confidence, uncertainty: contact.uncertainty, hours: contact.hours,
   }));
@@ -146,14 +138,18 @@ export function buildUnrealScenePacket(state, content, previousRows = [], option
     const position = PORT_LOCATIONS[id] || NODES[id];
     if (!finitePoint(position)) return [];
     const infrastructure = portSpec(state, id);
-    return [{ id, name: port.name, position: [...position], owner: state.world?.portControl?.[id] || port.nation,
+    const owner = state.world?.portControl?.[id] || port.nation;
+    return [{ id, name: port.name, position: [...position], owner, color: POWERS[owner]?.color || MAP_SYMBOLS.symbols.port.color,
       tier: infrastructure.tier, major: infrastructure.tier === 'dock', capacity: infrastructure.capacity }];
   });
   const countries = Object.entries(MAP_CAPITALS).map(([id, capital]) => ({ id, name: capital.name,
     position: [...capital.point], color: POWERS[id]?.color || '#e5cf9d' }));
   const fronts = campaignMapFronts(state);
+  const baseMap = ['1922','1936hindsight'].includes(scenario.baseMap || scenario.folder)
+    ? (scenario.baseMap || scenario.folder) : state.campaignId === 'campaign_1922' ? '1922' : '1936hindsight';
   return { format: 1, campaign: state.campaignId, player: state.player, at: campaignMinutes(state), paused: !!state.paused, animate:options.animate !== false,
-    forces, contacts, ports, countries, fronts, ...sceneSelection(state, rows, options), chartSymbols: MAP_SYMBOLS,
+    baseMap,
+    forces, contacts, ports, countries, fronts, occupations: campaignMapOccupations(state), ...sceneSelection(state, rows, options), chartSymbols: MAP_SYMBOLS,
     battles:ongoingMapBattles(state),
     control: { ...(state.world?.control || {}) } };
 }

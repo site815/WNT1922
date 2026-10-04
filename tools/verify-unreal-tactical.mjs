@@ -13,7 +13,7 @@ import {createHash} from 'node:crypto';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2),option=name=>args.find(a=>a.startsWith(name+'='))?.slice(name.length+1);
 if(args.includes('--help')) {
-  console.log('Usage: node tools/verify-unreal-tactical.mjs --package-report=<passed Shipping package-test.json> --debug-port=9333 --confirm-isolated-session [--output=<within package run>]\nRequires exclusive access to an already-running owned, paused test campaign. Exercises the real Tactical Engagements UI, native models/picking/camera, live/quick/replay clocks and custom fleets; takes at most six native GPU scene captures plus separate CEF-only UI images. Compares the entire campaign save before/after. Never changes campaign time, replaces the save, launches, reloads or closes the process. Human review is required for appearance.');process.exit(0);
+  console.log('Usage: node tools/verify-unreal-tactical.mjs --package-report=<passed Shipping package-test.json> --debug-port=9333 --confirm-isolated-session [--output=<within package run>]\nRequires exclusive access to an already-running owned, paused test campaign. Exercises the real Tactical Engagements UI, native models/picking/camera, live/quick/replay clocks and custom fleets; takes at most eight native GPU scene captures plus separate CEF-only UI images. Compares the entire campaign save before/after. Never changes campaign time, replaces the save, launches, reloads or closes the process. Human review is required for appearance.');process.exit(0);
 }
 assert(args.includes('--confirm-isolated-session'),'Explicit isolated-session confirmation is required.');
 assert(option('--package-report'),'Supply a passed extracted Shipping package report.');
@@ -46,7 +46,7 @@ const result={format:1,kind:'native-tactical-engagements-verification',passed:fa
     'Native model counts, projected ray-tested targets and cinematic camera diagnostics verify the renderer contract. This is not an FPS benchmark.',
   ]};
 await fs.mkdir(output,{recursive:true});
-let page,browser,initial,before,openingAudio,hooked=false,phase='connect',deadline=Date.now()+240000;
+let page,browser,initial,before,openingAudio,hooked=false,phase='connect',deadline=Date.now()+360000;
 const host=()=>page.locator('.tactical-engagements'),control=action=>host().locator('[data-tactical="'+action+'"]');
 async function setSoundVolume(volume){
   const slider=host().locator('[data-tactical-volume]'),steps=Math.round(volume*20);
@@ -64,7 +64,7 @@ async function diagnostics(mode){
   assert.equal(d.renderer,'Unreal Engine native UWorld');assert.equal(d.modelLoadErrors,0);return d;
 }
 async function nativeCapture(name){
-  assert(result.captures.filter(c=>c.kind==='native-Unreal-GPU-no-UI').length<6);const nativeName='tactical-'+stamp+'-'+name,source=path.join(captureDir,nativeName+'.png');
+  assert(result.captures.filter(c=>c.kind==='native-Unreal-GPU-no-UI').length<8);const nativeName='tactical-'+stamp+'-'+name,source=path.join(captureDir,nativeName+'.png');
   await input('capture',{name:nativeName,includeUI:false});
   const bytes=await until(()=>fs.readFile(source).catch(()=>null),b=>b&&b.length>1000&&b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))&&b.subarray(-8,-4).toString()==='IEND','complete native GPU capture '+name,12000);
   const file=path.join(output,name+'.png');await fs.writeFile(file,bytes);
@@ -152,13 +152,13 @@ try {
   await page.locator('.tactical-inspection').waitFor();
   const afterPick=await observed();assert.equal(afterPick.combat.seconds,stable.combat.seconds);assert.equal(afterPick.combat.rng,stable.combat.rng);assert.equal(afterPick.packet.eventKey,stable.packet.eventKey);
   const selection=await page.evaluate(()=>__wntTacticalEvidence.events.at(-1)?.selection);assert(selection&&selection.id===target.id&&selection.side===target.side);assert.equal(selection.hullIndex,target.hullIndex);
-  const modelMatches=await page.evaluate(async target=>{const index=await(await fetch('/assets/models/ships/index.json')).json(),unit=__wntTacticalEvidence.scene.packet.units.find(u=>u.side===target.side&&u.id===target.id&&u.hullIndex===target.hullIndex);return index.models.some(model=>model.id===target.modelId&&model.platforms?.some(platform=>platform.id===unit?.classId));},target);
+  const modelMatches=await page.evaluate(async target=>{const index=await(await fetch('/assets/models/ships/index.json')).json(),unit=__wntTacticalEvidence.scene.packet.units.find(u=>u.side===target.side&&u.id===target.id&&u.hullIndex===target.hullIndex);return index.models.some(model=>model.id===target.modelId&&model.platforms?.some(platform=>platform.id===(unit?.modelClassId||unit?.classId)&&(!platform.campaign||platform.campaign===(unit?.modelCampaign||unit?.campaign))));},target);
   assert(modelMatches,'Ray-picked native model must match the selected tactical hull in the shipped asset manifest');
   result.metrics.push({kind:'actual-native-pick',selection,modelId:target.modelId});
   phase='cinematic and manual camera';await page.locator('[data-tactical-camera]').check();
   await until(()=>diagnostics('battle'),d=>d.cinematicEnabled,'cinematic enabled');
-  const rect=await page.locator('.tactical-stage canvas').boundingBox();await page.mouse.move(rect.x+rect.width*.5,rect.y+rect.height*.5);await page.mouse.down({button:'middle'});await page.mouse.move(rect.x+rect.width*.6,rect.y+rect.height*.56,{steps:6});await page.mouse.up({button:'middle'});
-  await until(()=>diagnostics('battle'),d=>!d.cinematicEnabled,'manual middle-button cancels cinematic');
+  const rect=await page.locator('.tactical-stage canvas').boundingBox();await page.mouse.move(rect.x+rect.width*.5,rect.y+rect.height*.5);await page.mouse.down({button:'right'});await page.mouse.move(rect.x+rect.width*.6,rect.y+rect.height*.56,{steps:6});await page.mouse.up({button:'right'});
+  await until(()=>diagnostics('battle'),d=>!d.cinematicEnabled,'manual right-button cancels cinematic');
   assert.equal(await page.locator('[data-tactical-camera]').isChecked(),false,'Checkbox follows actual manual camera takeover');
   await page.locator('[data-tactical-camera]').check();await control('play').click();
   await until(()=>host().getAttribute('data-tactical-seconds'),v=>Number(v)>=120,'live tactical combat progression');
@@ -231,6 +231,31 @@ try {
   phase='North Cape';await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption('north-cape');await control('prepare').click();await ready(4);await control('step').click();await nativeCapture('north-cape-prepared');
   await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),v=>v==='completed','North Cape historical result',30000);
   const northCape=await observed();assert.equal(northCape.combat.winner,'A');assert.deepEqual(northCape.combat.ships.filter(s=>s.status==='sunk').map(s=>s.name),['Scharnhorst']);
+  for(const preset of [{id:'bismarck-last-battle',count:5,seconds:1500,sunk:['Bismarck'],escaped:[]},
+    {id:'lofoten',count:3,seconds:1200,sunk:[],escaped:['Gneisenau','Scharnhorst']}]) {
+    phase='historical '+preset.id;
+    await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption(preset.id);
+    assert.equal(await page.locator('[data-setup="mode"]').inputValue(),'historical');
+    await control('prepare').click();await ready(preset.count);
+    const opening=await observed();assert.equal(opening.combat.seconds,0);
+    await verifyEveryNativeModel();await overviewTargets(['A','B'],preset.id+' initial fit');
+    await nativeCapture(preset.id+'-prepared');
+    await page.locator('[data-tactical-speed]').selectOption('120');await control('play').click();
+    await until(()=>host().getAttribute('data-tactical-seconds'),value=>Number(value)>=60,preset.id+' live progression');
+    await control('play').click();const pausedPreset=await observed();await delay(250);
+    assert.deepEqual((await observed()).combat,pausedPreset.combat,preset.id+' pause freezes combat and RNG');
+    await control('step').click();assert.equal((await observed()).combat.seconds,pausedPreset.combat.seconds+10);
+    await control('resolve').click();await until(()=>host().getAttribute('data-tactical-status'),value=>value==='completed',preset.id+' historical result',30000);
+    const finished=await observed();assert.equal(finished.combat.seconds,preset.seconds);
+    assert.deepEqual(finished.combat.ships.filter(ship=>ship.status==='sunk').map(ship=>ship.name).sort(),preset.sunk);
+    assert.deepEqual(finished.combat.ships.filter(ship=>ship.status==='escaped').map(ship=>ship.name).sort(),preset.escaped);
+    await control('replay').click();await overviewTargets(['A','B'],preset.id+' replay reset');
+    await control('step').click();assert.deepEqual((await observed()).combat,finished.combat,preset.id+' replay cannot change the result');
+    await control('replay').click();await control('restart').click();await ready(preset.count);
+    assert.deepEqual((await observed()).combat,opening.combat,preset.id+' reset restores exact initial ships, clock and RNG');
+    result.metrics.push({kind:'historical-preset-live-quick-replay-reset',preset:preset.id,hulls:preset.count,
+      seconds:finished.combat.seconds,winner:finished.combat.winner,sunk:preset.sunk,escaped:preset.escaped});
+  }
   phase='custom fleet match';await control('setup').click();await page.locator('[data-setup="presetId"]').selectOption('custom');
   const legacyClass=await page.evaluate(async()=>{const {CATALOG}=await import('/worker/catalog-loader.mjs');return Object.keys(CATALOG.campaigns.campaign_1922.classes).find(id=>!CATALOG.campaigns.in_good_faith_1936.classes[id]);});assert(legacyClass,'A campaign_1922-only catalog class must exist');
   await page.locator('[data-setup="class-A-0"]').selectOption('ecole_pt32');await page.locator('[data-setup="class-B-0"]').selectOption(legacyClass);
@@ -242,7 +267,7 @@ try {
   await host().locator('[data-tactical-sfx]').setChecked(openingAudio.enabled);await setSoundVolume(openingAudio.volume);
   await control('close').click();await page.locator('.start-screen [data-action="continue"]').click();await until(()=>diagnostics('world'),d=>d.mode==='world','campaign restoration');
   result.metrics.push({kind:'close-after-quick-resolve',statusBeforeClose:closingStatus});
-  result.checks.push('Packaged Denmark Strait, Midway, North Cape and custom fleets use real detailed hull models, actual simulator state and grouped airstrikes. Closing returns to the unchanged campaign.');
+  result.checks.push('Packaged Denmark Strait, Midway, North Cape, Bismarck’s last battle, Lofoten and custom fleets use stored detailed hull models and shared combat state. Both added historical presets pass exact model, live/pause/step, quick outcome, replay and reset checks; their disclosed sister-ship/fit substitutions remain representative. Closing returns to the unchanged campaign.');
   const after=await save();assert.deepEqual(payload(after),payload(before),'The complete campaign including random state must be unchanged');await fs.writeFile(path.join(output,'verified-campaign.json'),JSON.stringify(after,null,2));
   result.errors.push(...await page.evaluate(()=>__wntTacticalEvidence.errors));assert.deepEqual(result.errors,[]);result.passed=true;
 } catch(error){result.failure={phase,message:error.message,stack:error.stack};if(page)await page.screenshot({path:path.join(output,'failure-cef-html-only.png')}).catch(()=>{});}

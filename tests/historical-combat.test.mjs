@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { createCombat, buildScenario, buildCustomScenario, advanceCombat, resolveCombat, historicalClock, setCombatOrders } from '../combatmechanics/index.mjs';
 import { createCampaignCombat } from '../combatmechanics/campaign.mjs';
 import { validateCombatState } from '../combatmechanics/validation.mjs';
-const presets=['denmark-strait','midway','north-cape'];
+const presets=['denmark-strait','midway','north-cape','bismarck-last-battle','lofoten'];
 const setup=(presetId,options={})=>buildScenario(null,{presetId,...options});
 const hull=(state,id)=>state.ships.find(s=>s.classId===`demo-${id}`);
 const physical=state=>({seconds:state.seconds,status:state.status,winner:state.winner,ships:state.ships,airstrikes:state.airstrikes,
@@ -11,6 +12,16 @@ const physical=state=>({seconds:state.seconds,status:state.status,winner:state.w
 const advanceTo=(state,seconds)=>advanceCombat(state,seconds-state.seconds);
 const aircraft=state=>state.ships.reduce((n,s)=>n+s.aircraft.fighter+s.aircraft.strike+s.aircraftLost,0)
   +state.airstrikes.reduce((n,s)=>n+s.fighters+s.planes,0);
+
+test('additional historical hulls use the disclosed stored sister-class or earlier-fit models',()=>{
+ const index=JSON.parse(fs.readFileSync(new URL('../assets/models/ships/index.json',import.meta.url),'utf8'));
+ for(const [id,modelId] of Object.entries({'demo-rodney':'nelson','demo-king-george-v':'demo-prince-of-wales',
+   'demo-dorsetshire':'demo-norfolk','demo-renown1940':'renown','demo-gneisenau1940':'demo-scharnhorst'})){
+  const matches=index.models.filter(model=>model.platforms.some(platform=>platform.id===id));
+  assert.equal(matches.length,1,id+' has one explicit stored model');assert.equal(matches[0].id,modelId);
+  assert(fs.existsSync(new URL('../assets/models/ships/'+matches[0].file,import.meta.url)),'Referenced geometry is stored locally');
+ }
+});
 
 test('historical presets default to reconstruction; free/custom/campaign modes remain unforced',()=>{
   for(const presetId of presets){
@@ -96,4 +107,24 @@ test('historical saves reject timeline skipping and corrupted deterministic weap
   const damage=structuredClone(state);damage.projectiles.find(p=>p.scripted).scripted.healthAfter=NaN;assert.throws(()=>validateCombatState(damage),/Invalid tactical/);
   const missing=structuredClone(state);delete missing.historical;assert.throws(()=>validateCombatState(missing),/Invalid tactical/);
   const midway=createCombat(setup('midway'));advanceCombat(midway,20);midway.airstrikes[0].scripted.losses.planes=-1;assert.throws(()=>validateCombatState(midway),/Invalid tactical/);
+});
+
+test('Bismarck final action retains all principal hulls and finite travelling Dorsetshire torpedoes',()=>{
+ const state=createCombat(setup('bismarck-last-battle')),dorsetshire=hull(state,'dorsetshire');
+ assert.equal(state.ships.length,5);assert(state.metadata.approximation.includes('Sister-ship'));
+ const torpedoes=dorsetshire.torpedoes;advanceTo(state,1130);const ammunition=dorsetshire.ammunition;
+ advanceTo(state,1140);assert.equal(dorsetshire.torpedoes,torpedoes-2);assert.equal(dorsetshire.ammunition,ammunition);
+ const p=state.projectiles.find(p=>p.kind==='torpedo'&&p.scripted);assert(p&&p.arrivalAt===1200);
+ assert(Math.hypot(p.position[0]-p.targetPosition[0],p.position[1]-p.targetPosition[1])<=dorsetshire.stats.torpedoRangeKm);
+ advanceTo(state,1260);assert.equal(dorsetshire.torpedoes,torpedoes-3);
+ advanceTo(state,1430);assert.notEqual(hull(state,'bismarck').status,'sunk');advanceCombat(state,10);assert.equal(hull(state,'bismarck').sunkAt,1440);
+ resolveCombat(state);assert.equal(state.winner,'A');assert(state.ships.filter(x=>x.side==='A').every(x=>x.health===1));validateCombatState(state);
+});
+
+test('Lofoten preserves limited damage, interrupted fire and withdrawal without invented sinkings',()=>{
+ const state=createCombat(setup('lofoten'));advanceTo(state,200);
+ assert.equal(hull(state,'renown1940').health,.94);assert.equal(hull(state,'gneisenau1940').health,.88);assert.equal(hull(state,'scharnhorst').health,1);
+ advanceTo(state,500);assert.equal(state.historical.orders[hull(state,'renown1940').id].targetId,null);
+ resolveCombat(state);assert(state.ships.every(s=>s.health>0));assert(!state.history.events.some(e=>e.kind==='sink'));
+ assert(state.ships.filter(s=>s.side==='B').every(s=>s.status==='escaped'));assert.equal(state.seconds,1200);validateCombatState(state);
 });

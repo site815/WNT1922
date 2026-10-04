@@ -88,8 +88,8 @@ export function battleWatchView(report, campaign, { frameIndex = null, selected 
       <button data-action="battle-fit">Fit fleets</button>
       <span class="native-fps" data-native-fps aria-label="Rendered frames per second">${nativeFPSLabel()}</span>${battleAudioControls('report')}
     </div>
-    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Left-click a ship to inspect its recorded condition; wheel to zoom, right-drag to pan, middle-drag or Shift plus right-drag to orbit."></canvas></div>
-    <div class="battle-watch-legend"><span>Wheel: zoom · Right-drag: pan · Middle / Shift+right-drag: orbit · Left-click: inspect</span><span>${tactical?'Simulated courses, salvos and damage · 10-second combat steps':'Illustrated formations and salvos · recorded damage and losses'}</span></div>
+    <div class="battle-stage" data-key="battle-stage-${report.id}" data-preserve="true"><canvas class="battle-canvas" tabindex="0" role="img" aria-label="3D battle view. Left-click a ship to inspect its recorded condition; wheel to zoom, middle-drag to pan, right-drag to orbit."></canvas></div>
+    <div class="battle-watch-legend"><span>Wheel: zoom · Middle-drag: pan · Right-drag: orbit · Left-click: inspect</span><span>${tactical?'Simulated courses, salvos and damage · 10-second combat steps':'Illustrated formations and salvos · recorded damage and losses'}</span></div>
     </div>
     <aside class="battle-watch-information" data-scroll-key="battle-information" aria-label="Battle details, losses and ship roster">
     ${currentOnly?'<p class="battle-qualification">Detailed history exceeded the recording limit. The 3D scene and individual hull inspection show the latest tactical positions only; tick ledgers retain their dated totals.</p>':''}

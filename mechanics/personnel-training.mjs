@@ -1,4 +1,5 @@
 import { readDocument } from "../worker/documents.mjs";
+import { CATALOG } from '../worker/catalog-loader.mjs';
 const data = await readDocument("common/rules/personnel-training.md");
 const DAY = data.DAY;
 export function initializeTraining(s, n) {
@@ -26,7 +27,7 @@ export function graduationProgress(s, n, type) {
       ) / DAY;
   const opening =
       Date.parse(
-        s.campaignId === "campaign_1922" ? "1922-02-06" : "1936-01-01",
+        (CATALOG.campaigns[s.campaignId] || CATALOG).scenario.start,
       ) / DAY,
     end = nextGraduationDay(s, type),
     start = Math.max(opening, periodStart);

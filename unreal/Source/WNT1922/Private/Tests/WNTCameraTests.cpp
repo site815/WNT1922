@@ -7,6 +7,8 @@
 #include "WNTCameraActor.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Dom/JsonObject.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
@@ -24,7 +26,7 @@ bool FWNTTerrainPickReliefTest::RunTest(const FString& Parameters)
         for(FVector Direction:{FVector(0,0,-1),FVector(.2,.3,-1)})
         {
             Direction.Normalize();const double End=-Origin.Z/Direction.Z;
-            const double Height=7108.*100.*Relief;
+            const double Height=7712.*100.*Relief;
             const FVector Hit=WNTCameraMath::TerrainRayHit(Origin,Direction,End,(AWNTTerrainActor::LandBaseMetres+10000.)*100.*Relief,
                 [&](const FVector&){return Height;});
             TestTrue(TEXT("Ray starts above and selects even the highest visually emphasized terrain"),FMath::Abs(Hit.Z-Height)<.01);
@@ -403,6 +405,29 @@ bool FWNTCameraNotificationTest::RunTest(const FString& Parameters)
     Controller->UpdateCamera(false);Controller->Tick(1.f/60);
     TestFalse(TEXT("A no-op silent hover never creates a new pending update"),Controller->bCameraDirty);
     TestEqual(TEXT("Settled hover traffic cannot produce redundant camera events"),CameraZooms.Num(),1);
+    TSharedPtr<FJsonObject> WorldPacket;
+    const FString MerchantJson=TEXT(R"({"format":1,"campaign":"test","player":"USA","paused":true,"forces":[{"id":"cargo","merchant":true,"position":[20,10],"hulls":[{"key":"a","hullIndex":0,"offsetMeters":[-1200,0]},{"key":"b","hullIndex":1,"offsetMeters":[1200,0]}]}]})");
+    if(TestTrue(TEXT("Merchant focus fixture parses"),FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(MerchantJson),WorldPacket)))
+    {
+        Controller->WorldScene->ApplyWorldPacket(WorldPacket);
+        Focus->SetStringField(TEXT("action"),TEXT("fit-force"));Focus->SetStringField(TEXT("kind"),TEXT("convoy"));Focus->SetStringField(TEXT("id"),TEXT("cargo"));
+        Focus->SetNumberField(TEXT("longitude"),20);Focus->SetNumberField(TEXT("latitude"),10);Focus->SetNumberField(TEXT("zoom"),4);
+        Controller->Input(Focus);Controller->UpdateCamera();
+        const FBox Bounds=Controller->WorldScene->GetForceBounds(TEXT("cargo"));
+        TestTrue(TEXT("Convoy double-click computes a real formation fit instead of remaining at4x"),Bounds.IsValid&&Controller->Zoom>1000);
+        for(int32 HullIndex=0;HullIndex<2;++HullIndex)
+        {
+            const auto Hull=Controller->WorldScene->GetSelectedPosition(TEXT("merchant"),TEXT("cargo"),HullIndex);
+            const auto Screen=Hull.IsSet()?WNTCameraMath::Project(Controller->SceneCamera->View,Hull.GetValue()):TOptional<FVector2D>();
+            TestTrue(TEXT("Both convoy hulls fit inside the actual viewport"),Screen.IsSet()&&Screen->X>.05&&Screen->X<.95&&Screen->Y>.05&&Screen->Y<.95);
+        }
+        Focus->SetStringField(TEXT("action"),TEXT("focus"));Focus->SetStringField(TEXT("kind"),TEXT("merchant"));Focus->SetNumberField(TEXT("hullIndex"),1);
+        Focus->SetNumberField(TEXT("zoom"),WNTCameraMath::MaxWorldZoom);
+        Controller->Input(Focus);Controller->UpdateCamera();
+        const auto SelectedHull=Controller->WorldScene->GetSelectedPosition(TEXT("merchant"),TEXT("cargo"),1);
+        const auto SelectedScreen=SelectedHull.IsSet()?WNTCameraMath::Project(Controller->SceneCamera->View,SelectedHull.GetValue()):TOptional<FVector2D>();
+        TestTrue(TEXT("Hull focus centers the chosen station, not the convoy anchor"),SelectedScreen.IsSet()&&SelectedScreen->Equals(FVector2D(.5,.5),.001));
+    }
     Controller->AutomationEventObserver=nullptr;
     return true;
 }

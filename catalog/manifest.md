@@ -1,6 +1,6 @@
 # Catalog index
 
-Edit the JSON block directly. This document is read by the game; no export is required.
+Authored opening data. Read directly by the game; no export step is required.
 
 ```json game-data
 {
@@ -55,6 +55,56 @@ Edit the JSON block directly. This document is read by the game; no export is re
         "FRA": "1922/aircraft/FRA.md",
         "ITA": "1922/aircraft/ITA.md",
         "SOV": "1922/aircraft/SOV.md"
+      }
+    },
+    "eve_european_war_1939": {
+      "scenario": "historical1939/campaign.md",
+      "shipCatalogs": [
+        "1922/ships.md",
+        "common/historical/ships.md"
+      ],
+      "nations": {
+        "GBR": "historical1939/nations/GBR.md",
+        "USA": "historical1939/nations/USA.md",
+        "JPN": "historical1939/nations/JPN.md",
+        "DEU": "historical1939/nations/DEU.md",
+        "FRA": "historical1939/nations/FRA.md",
+        "ITA": "historical1939/nations/ITA.md",
+        "SOV": "historical1939/nations/SOV.md"
+      },
+      "aircraft": {
+        "GBR": "common/historical/aircraft/GBR.md",
+        "USA": "common/historical/aircraft/USA.md",
+        "JPN": "common/historical/aircraft/JPN.md",
+        "DEU": "common/historical/aircraft/DEU.md",
+        "FRA": "common/historical/aircraft/FRA.md",
+        "ITA": "common/historical/aircraft/ITA.md",
+        "SOV": "common/historical/aircraft/SOV.md"
+      }
+    },
+    "eve_pacific_war_1941": {
+      "scenario": "historical1941/campaign.md",
+      "shipCatalogs": [
+        "1922/ships.md",
+        "common/historical/ships.md"
+      ],
+      "nations": {
+        "GBR": "historical1941/nations/GBR.md",
+        "USA": "historical1941/nations/USA.md",
+        "JPN": "historical1941/nations/JPN.md",
+        "DEU": "historical1941/nations/DEU.md",
+        "FRA": "historical1941/nations/FRA.md",
+        "ITA": "historical1941/nations/ITA.md",
+        "SOV": "historical1941/nations/SOV.md"
+      },
+      "aircraft": {
+        "GBR": "common/historical/aircraft/GBR.md",
+        "USA": "common/historical/aircraft/USA.md",
+        "JPN": "common/historical/aircraft/JPN.md",
+        "DEU": "common/historical/aircraft/DEU.md",
+        "FRA": "common/historical/aircraft/FRA.md",
+        "ITA": "common/historical/aircraft/ITA.md",
+        "SOV": "common/historical/aircraft/SOV.md"
       }
     }
   }

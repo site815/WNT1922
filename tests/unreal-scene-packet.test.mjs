@@ -9,6 +9,7 @@ import { fleetCourse, ownFormationScene, geographicOffset, formationAt } from '.
 import { buildUnrealScenePacket, buildUnrealSelectionPacket, sampleObservedNavigation, campaignMapFronts } from '../ui/unreal-scene-packet.mjs';
 import { battleMapHover } from '../ui/battle-map.mjs';
 import { portSpec } from '../mechanics/port-catalog.mjs';
+import { POWERS } from '../mechanics/land-war.mjs';
 
 const classes = { bb: { type: 'BB', dimensions: { length_m: 200, beam_m: 30 } },
   dd: { type: 'DD', dimensions: { length_m: 100, beam_m: 12 } } };
@@ -36,7 +37,7 @@ test('port display priority follows public dated infrastructure without leaking 
       const spec = portSpec(state, port.id);
       assert.equal(port.major, spec.tier === 'dock'); assert.equal(port.capacity, spec.capacity);
       assert.equal(port.tier, spec.tier);
-      assert.deepEqual(Object.keys(port).sort(), ['capacity','id','major','name','owner','position','tier']);
+      assert.deepEqual(Object.keys(port).sort(), ['capacity','color','id','major','name','owner','position','tier']);
       nearPoint(port.position, PORT_LOCATIONS[port.id] || NODES[port.id]);
     }
     assert.equal(JSON.stringify(state), before);
@@ -109,11 +110,16 @@ test('native scene packet exposes compact own hulls, public ports and observed c
   const packet = buildUnrealScenePacket(s, { classes });
   assert.equal(packet.format, 1); assert.equal(packet.at, 100); assert.equal(packet.player, 'USA');
   assert.equal(packet.forces.length, 1); assert.equal(packet.forces[0].hulls.length, 5);
+  assert.equal(packet.forces[0].symbolVariant,'capital');assert.equal(packet.forces[0].color,POWERS.USA.color);
   assert.equal(packet.contacts.length, 1); assert.equal(packet.contacts[0].id, 'seen-fleet');
+  assert.equal(packet.contacts[0].color,POWERS.JPN.color);
+  assert.equal(packet.contacts[0].symbolVariant,undefined,'Observed contacts never borrow classes from hidden enemy ships');
   assert.deepEqual(packet.contacts[0].position, visibleContacts(s)[0].position);
   assert(!('hulls' in packet.contacts[0]) && !('heading' in packet.contacts[0]), 'an observation does not reveal classes or present course');
   assert.equal(packet.ports.length, Object.keys(PORTS).length);
   assert.equal(packet.ports.find(p => p.id === 'saigon').owner, 'USA');
+  assert.equal(packet.ports.find(p => p.id === 'saigon').color,POWERS.USA.color,'Captured port ink follows its current owner');
+  assert.equal(packet.countries.find(p => p.id === 'JPN').color,POWERS.JPN.color);
   assert.deepEqual(packet.ports.find(p => p.id === 'saigon').position, PORT_LOCATIONS.saigon || NODES.saigon);
   assert.deepEqual(packet.control, { TEST: 'USA' });
   const encoded = JSON.stringify(packet);

@@ -1,13 +1,17 @@
 // Standalone setup values never refer to campaign fleets or its random stream.
+import { campaignAssetReferences } from '../mechanics/asset-references.mjs';
+import { SCENARIOS } from '../combatmechanics/scenarios.mjs';
 export const TACTICAL_DOCTRINES = ['balanced', 'aggressive', 'cautious'];
 export const TACTICAL_FORMATIONS = ['line-ahead', 'line-abreast'];
 export const TACTICAL_MAX_SHIPS = 120;
 export const tacticalCatalog = (content, bundle = content) => ({...content,
   classes: Object.assign({}, ...Object.values(bundle.campaigns || {}).map(c => c.classes), content.classes)});
 export function tacticalModelCampaigns(content, bundle = content) {
+  return Object.fromEntries(Object.entries(tacticalModelReferences(content,bundle)).map(([id,ref])=>[id,ref.modelCampaign]));
+}
+export function tacticalModelReferences(content, bundle = content) {
   const campaigns=Object.values(bundle.campaigns || {});
-  return Object.assign({},...campaigns.map(c=>Object.fromEntries(Object.keys(c.classes).map(id=>[id,c.scenario.id]))),
-    Object.fromEntries(Object.keys(content.classes).map(id=>[id,content.scenario.id])));
+  return Object.assign({},...campaigns.map(c=>campaignAssetReferences(c)),campaignAssetReferences(content));
 }
 
 export function initialTacticalSetup(content) {
@@ -19,7 +23,7 @@ export function initialTacticalSetup(content) {
     separationKm:24, shipsA:[{classId:first?.id || '', count:1}], shipsB:[{classId:second?.id || '', count:1}]};
 }
 
-export function validateTacticalSetup(setup, content, scenarioIds = ['denmark-strait','midway','north-cape']) {
+export function validateTacticalSetup(setup, content, scenarioIds = SCENARIOS.map(scenario=>scenario.id)) {
   const errors = [];
   if (!['custom', ...scenarioIds].includes(setup.presetId)) errors.push('Choose a listed battle or Custom fleets.');
   if (setup.mode != null && !['historical','simulation'].includes(setup.mode)) errors.push('Choose Historical playback or Free simulation.');

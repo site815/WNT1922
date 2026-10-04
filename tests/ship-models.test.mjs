@@ -65,7 +65,7 @@ test('stored detailed hulls have their narrow bows at positive X',async()=>{
 test('prebuilt polygon collection retains every existing ship and campaign fit',async()=>{
   const summary=await validateShipModels({catalog:CATALOG});
   const registry=await read('index.json');
-  assert.equal(summary.models,registry.models.length);assert.equal(summary.campaignMappings,281);assert.equal(summary.fallbackTypes,14);
+  assert.equal(summary.models,registry.models.length);assert.equal(summary.campaignMappings,Object.values(CATALOG.campaigns).reduce((n,c)=>n+Object.keys(c.classes).length,0));assert.equal(summary.fallbackTypes,14);
   assert(summary.maxTriangles<5000000);assert(summary.bytes<5000000000);
 });
 

@@ -14,9 +14,11 @@ import {validateSave} from '../mechanics/state-io.mjs';
 import {contentFor} from '../mechanics/campaign-content.mjs';
 import {campaignMinutes} from '../mechanics/campaign-clock.mjs';
 import {newGame} from '../mechanics/engine.mjs';
+import {referencedAsset} from '../mechanics/asset-references.mjs';
 import {beginEngagement} from '../mechanics/engagements.mjs';
+import {SCENARIOS} from '../combatmechanics/scenarios.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
-import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldWheelResponse} from './native-camera-gesture-checks.mjs';
+import {nativeCameraFields,verifyStrategicRightNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldWheelResponse} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2);
@@ -154,6 +156,32 @@ async function focusOwnForce(force,zoom=12000) {
  await delay(250);
 }
 
+async function verifyChartForceFocus(force,forces) {
+ assert(force,'An active own force is required for the chart focus check');
+ const kind=force.merchant?'convoy':'fleet',hullKind=force.merchant?'merchant':'ship';
+ await focusOwnForce(force,16);
+ // True force anchors may coincide. Pick the actual top glyph rather than
+ // bypassing native selection to force an obscured marker.
+ const choices=await until(()=>targets(kind),rows=>rows.some(row=>forces.some(f=>f.id===row.id)),{label:'pickable '+kind+' chart glyph'});
+ const target=choices.find(row=>forces.some(f=>f.id===row.id)),before=await diagnostics('world');
+ await page.mouse.click(target.x,target.y);
+ const selected=await until(()=>diagnostics('world'),d=>d.chart?.selectedForceIds.includes(target.id),{label:'single-click '+kind+' highlight'});
+ assert.deepEqual(nativeCameraFields(selected),nativeCameraFields(before),'Single '+kind+' chart click selects without moving the map');
+ const again=(await targets(kind)).find(row=>row.id===target.id);assert(again,'Selected marker remains directly pickable');
+ const start=await cursor();await page.mouse.dblclick(again.x,again.y);
+ await until(()=>eventsSince(start),rows=>rows.some(row=>row.event.type==='select'&&row.event.zoom&&row.event.selection?.kind===kind&&row.event.selection.id===target.id),{label:'actual '+kind+' double-click event'});
+ const fitted=await until(()=>diagnostics('world'),d=>d.zoom>16&&Math.abs(d.zoom-d.targetZoom)<.001&&d.targets.some(t=>t.visible&&t.kind===hullKind&&t.forceId===target.id),{label:'double-click '+kind+' fits actual hulls'});
+ assert.equal(fitted.tilt,0);assert.equal(fitted.yaw,0);
+ assert(fitted.chart.selectedMarkers.some(m=>m.forceId===target.id&&m.highlightVisible),'Fitted force retains a visible selection bracket');
+ result.metrics.push({kind:'real-chart-'+kind+'-double-click',id:target.id,before:nativeCameraFields(before),after:nativeCameraFields(fitted)});
+}
+
+async function verifyNewCampaignCamera(campaignId) {
+ const camera=await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-1)<.0001&&Math.abs(d.targetZoom-1)<.0001&&d.tilt===0&&d.yaw===0&&Math.abs(d.longitude)<.0001&&Math.abs(d.latitude)<.0001,{label:'new campaign resets native strategic camera '+campaignId});
+ await page.waitForFunction(()=>document.querySelector('.map-zoom-level')?.textContent.includes('Zoom 1.0×'));
+ result.metrics.push({kind:'new-campaign-camera-reset',campaignId,...nativeCameraFields(camera),legend:await page.locator('.map-zoom-level').textContent()});
+}
+
 try {
  await until(async()=>{try{const r=await fetch(endpoint+'/json/version',{signal:AbortSignal.timeout(1500)});return r.ok?await r.json():null;}catch{return null;}},Boolean,{timeout:120000,label:'explicit local CEF debug endpoint'});
  browser=await playwright.chromium.connectOverCDP(endpoint,{timeout:30000});
@@ -178,7 +206,8 @@ try {
  phase='main menu tactical choices';
  assert.equal(await page.locator('.start-screen canvas').count(),0,'Main menu contains no old demo viewport');
  const presetIds=await page.locator('.start-battle-choice').evaluateAll(rows=>rows.map(row=>row.dataset.preset));
- assert.deepEqual(presetIds,['denmark-strait','midway','north-cape','custom']);
+ assert.deepEqual(presetIds,[...SCENARIOS.map(s=>s.id),'custom']);
+ assert.equal(await page.locator('[data-campaign-category]').count(),2,'Separate Historical Campaigns and Alternate History menus');
  for(const presetId of presetIds) {
   await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
   const tactical=page.locator('.tactical-engagements');await tactical.waitFor();
@@ -191,7 +220,7 @@ try {
  await page.screenshot({path:path.join(output,'main-menu-cef-html-only.png')});
  result.captures.push({kind:'CEF-HTML-only-not-native-render',name:'main-menu-cef-html-only',file:path.join(output,'main-menu-cef-html-only.png')});
  assert.equal((await page.evaluate(async()=>(await fetch('/api/save')).status)),existing.status,'Tactical setup choices do not create a campaign save');
- result.checks.push('The static main menu separates Campaign and Tactical Battles. All three presets and Custom open their matching actual setup and return without a demo canvas, active native viewport or campaign-save change.');
+ result.checks.push('The static main menu separates Historical Campaigns, Alternate History and Tactical Battles. All historical presets and Custom open their matching actual setup and return without a demo canvas, active native viewport or campaign-save change.');
 
  phase='detailed model gallery';
  const registry=JSON.parse(await fs.readFile(path.join(root,'assets/models/ships/index.json'),'utf8'));
@@ -224,6 +253,34 @@ try {
  assert.equal((await page.evaluate(async()=>(await fetch('/api/save')).status)),existing.status);
  result.checks.push('Every gallery entry loads its exact detailed model and responds to a real native surface click; closing restores the static main menu without creating or modifying a campaign.');
 
+ phase='historical campaign native openings';
+ const modelAliases=new Map(registry.models.flatMap(model=>model.platforms.map(alias=>[
+  (alias.campaign?alias.campaign+':':'')+alias.id,model])));
+ for(const [campaignId,date] of [['eve_european_war_1939','1939-08-01'],['eve_pacific_war_1941','1941-11-01']]) {
+  await page.locator('[data-action="select-campaign"][data-id="'+campaignId+'"]').click();
+  await page.locator('[data-action="select-nation"][data-id="USA"]').click();
+  await page.locator('[data-action="new"]').click();
+  if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
+  await surface().waitFor();await dismissDispatches();await worldReady();
+  await verifyNewCampaignCamera(campaignId);
+  const opening=await save(),content=contentFor(CATALOG,opening),scene=buildUnrealScenePacket(opening,content);
+  assert.equal(opening.campaignId,campaignId);assert(opening.paused);
+  assert.equal(new Date(opening.day*86400000).toISOString().slice(0,10),date);
+  assert.equal(scene.baseMap,'1936hindsight');
+  await nativeCapture('native-opening-'+date.slice(0,4));
+  const force=scene.forces.find(f=>!f.merchant&&f.hulls.some(h=>h.classId.startsWith('hist-')));
+  assert(force,'Historical opening contains an active historical class');
+  await page.locator('.fleet-command-row[data-id="'+force.id+'"]').dblclick();
+  const native=await until(()=>diagnostics('world'),d=>d.targets.some(t=>t.forceId===force.id&&t.visible&&t.detailedModel&&!t.modelPending&&force.hulls.some(h=>h.id===t.id&&h.classId.startsWith('hist-'))),{label:'historical campaign model aliases '+campaignId});
+  const target=native.targets.find(t=>t.forceId===force.id&&t.visible&&t.detailedModel&&!t.modelPending&&force.hulls.some(h=>h.id===t.id&&h.classId.startsWith('hist-')));
+  const hull=force.hulls.find(h=>h.id===target.id),model=referencedAsset(modelAliases,hull);
+  assert(model);assert.equal(target.modelId,path.basename(model.file,'.glb'));
+  result.metrics.push({kind:'historical-opening',campaignId,date,baseMap:scene.baseMap,classId:hull.classId,modelClassId:hull.modelClassId,modelCampaign:hull.modelCampaign,renderedModel:target.modelId,occupations:scene.occupations.length});
+  await page.locator('.sidebar [data-action="menu"]').click();
+  await page.locator('[data-action="title-screen"]').click();await page.locator('.start-screen').waitFor();
+ }
+ result.checks.push('Both new historical campaigns begin paused on their exact dates, render the real terrain, and fit an active historical class with its explicit stored native model alias.');
+
  phase='new campaign';
  await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();
  await page.locator('[data-action="select-nation"][data-id="USA"]').click();
@@ -231,9 +288,20 @@ try {
  if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();
  await surface().waitFor();await delay(150);
  await dismissDispatches();await worldReady();
+ await verifyNewCampaignCamera('in_good_faith_1936');
  const initial=await save();assert.equal(initial.player,'USA');assert.equal(initial.campaignId,'in_good_faith_1936');assert.equal(initial.paused,true);
  const packet=buildUnrealScenePacket(initial,contentFor(CATALOG,initial));
  const d=await diagnostics('world');assert(d.shipActorCount>=packet.forces.reduce((sum,f)=>sum+f.hulls.length,0));
+ const styles=d.chart.markerStyles;assert(Array.isArray(styles),'Native diagnostics expose the applied national marker styles');
+ for(const force of packet.forces.filter(f=>f.position)) {
+  const marker=styles.find(s=>s.kind===(force.merchant?'convoy':'fleet')&&s.id===force.id);assert(marker);
+  assert.equal(marker.color,force.color);assert.equal(marker.nation,force.nation);assert.equal(marker.symbolVariant,force.symbolVariant);
+ }
+ for(const port of packet.ports) {
+  const marker=styles.find(s=>s.kind==='port'&&s.id===port.id);assert(marker);assert.equal(marker.color,port.color);assert.equal(marker.nation,port.owner);
+ }
+ for(const country of packet.countries)assert.equal(styles.find(s=>s.kind==='country'&&s.id===country.id)?.color,country.color);
+ result.checks.push('Actual native fleet, convoy, port and capital styles use the shared national palette; fleet silhouettes match their known own composition.');
  result.metrics.push({kind:'native-world',...d,targets:undefined,ownForceCount:packet.forces.length,ownHullCount:packet.forces.reduce((sum,f)=>sum+f.hulls.length,0)});
  await nativeCapture('native-world');
  assert.equal(d.pendingModelCount,0,'Every starting campaign ship must have a registered detailed model');
@@ -259,6 +327,7 @@ try {
  result.checks.push('Menus 02–10 preserve the native world instance, camera, loaded terrain/ship actors and naval outliner; Escape restores the unobstructed command map.');
 
  phase='world camera and hull picking';
+ await verifyChartForceFocus(packet.forces.find(f=>!f.merchant&&!f.docked&&f.position&&f.hulls.length),packet.forces);
  const selectState=await save();
  const selectedBefore=await diagnostics('world');
  const fittedRow=page.locator('.fleet-command-row').first(),fittedId=await fittedRow.getAttribute('data-id');
@@ -330,7 +399,7 @@ try {
  await surface().focus();before=await diagnostics();await page.keyboard.press('PageUp');
  await until(()=>diagnostics(),after=>after.zoom>before.zoom,{label:'real keyboard zoom'});
  await page.keyboard.press('Home');await until(()=>diagnostics(),after=>after.zoom===1,{label:'strategic Home'});
- await verifyStrategicMiddleNoop({page,diagnostics,clearPoint,metrics:result.metrics});
+ await verifyStrategicRightNoop({page,diagnostics,clearPoint,metrics:result.metrics});
  const warshipForce=packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.some(h=>['BB','BC','CV'].includes(h.type)))||packet.forces.find(f=>!f.merchant&&f.position&&f.hulls.length);
  assert(warshipForce);await focusOwnForce(warshipForce);assert.equal((await diagnostics()).tilt,0,'Fleet view remains overhead');await nativeCapture('native-fleet');
  const hovered=await pick('ship',{hover:true});
@@ -346,18 +415,28 @@ try {
  await page.locator('[data-dialog-type="ship"]').waitFor();
  assert.equal(await page.locator('[data-dialog-type="ship"]').getAttribute('data-key'),'dialog-ship-'+selection.id);
  await page.locator('.modal [data-action="close"]').first().click();await worldReady();
+ const doubleHull=(await targets('ship'))[0];assert(doubleHull,'A real native hull must remain pickable after closing inspection');
+ const doubleStart=await cursor(),doubleBefore=await diagnostics('world');
+ await page.mouse.dblclick(doubleHull.x,doubleHull.y,{delay:70});
+ await until(()=>eventsSince(doubleStart),rows=>rows.some(row=>row.event.type==='select'&&row.event.zoom&&row.event.selection?.kind==='ship'&&row.event.selection.id===doubleHull.id&&row.event.selection.hullIndex===doubleHull.hullIndex),{label:'real native hull double-click preserves exact identity'});
+ const doubleAfter=await until(()=>diagnostics('world'),d=>Math.abs(d.zoom-65536)<.01&&Math.abs(d.targetZoom-65536)<.01&&d.targets.some(t=>t.kind==='ship'&&t.id===doubleHull.id&&t.hullIndex===doubleHull.hullIndex&&t.visible),{label:'native hull double-click focuses its exact ship'});
+ await delay(750);
+ assert.equal(await page.locator('[data-dialog-type="ship"],[data-dialog-type="recognition"]').count(),0,'Double click must not insert a ship modal or trigger its recognition button');
+ result.metrics.push({kind:'real-native-hull-double-click',id:doubleHull.id,hullIndex:doubleHull.hullIndex,before:nativeCameraFields(doubleBefore),after:nativeCameraFields(doubleAfter),strayInspectionDialog:false});
+ await nativeCapture('native-hull-double-click',true);
  await focusOwnForce(warshipForce,60000);await nativeCapture('native-ship');
  const beforeTilt=await diagnostics();
- assert.equal(beforeTilt.tilt,0,'Individual ship zoom remains overhead until a middle drag');
+ assert.equal(beforeTilt.tilt,0,'Individual ship zoom remains overhead until a right drag');
  await verifyCloseWorldOrbit({page,diagnostics,clearPoint,waitFor:(label,predicate)=>until(()=>diagnostics('world'),predicate,{label}),metrics:result.metrics});
  await nativeCapture('native-ship-tilted');
- result.checks.push('Real wheel/PageUp/Home input changes the native camera. Strategic middle drag is inert; close middle drag orbits without moving focus, right drag pans while retaining requested orientation, and wheel zoom out/in clears manual yaw and tilt. Native hull hover/click reach exact game inspections.');
+ result.checks.push('Real wheel/PageUp/Home input changes the native camera. Strategic right drag is inert; close right drag orbits without moving focus, middle drag pans while retaining requested orientation, and wheel zoom out/in clears manual yaw and tilt. Native hull single-click opens its exact inspection; real double-click focuses the exact hull without a stray ship/recognition dialog.');
  result.metrics.push({kind:'hovered-ship',selection:hovered});
 
  await verifyNativeFPS({page,metrics:result.metrics});
  phase='merchant hulls';
  const merchant=packet.forces.find(f=>f.merchant&&f.position&&f.hulls.length);
  if(merchant) {
+  await verifyChartForceFocus(merchant,packet.forces);
   await focusOwnForce(merchant);const selected=await pick('merchant');
   await page.waitForFunction(s=>{const n=document.querySelector('.merchant-inspection');return n?.dataset.convoyId===s.id&&n.dataset.hullIndex===String(s.hullIndex);},selected);
   assert.match(await page.locator('.merchant-inspection').innerText(),new RegExp('Merchant hull '+(selected.hullIndex+1)));

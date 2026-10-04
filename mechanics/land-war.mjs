@@ -293,9 +293,9 @@ export function dailyWorld(s, c, alert = () => {}) {
         f.lastOutcome === "Occupied" ? "Occupied" : "Awaiting naval support";
   }
   // Territory owners change at completed campaigns. A counteroffensive can restore them.
-  w.control = {};
+  w.control = { ...w.openingControl };
   for (const event of territoryEvents)
-    if (s.day >= event.day) w.control[event.territory] = event.owner;
+    if (s.day >= event.day && (!Number.isFinite(w.openingDay) || event.day > w.openingDay)) w.control[event.territory] = event.owner;
   for (const f of w.fronts) {
     if (f.lastOutcome === "Occupied" || f.progress >= 1)
       for (const t of f.territories) w.control[t] = f.attacker;
@@ -304,12 +304,19 @@ export function dailyWorld(s, c, alert = () => {}) {
         w.control[t] =
           campaignById.get(f.id)?.restoredOwner || data.ORIGINAL_CONTROL[t] || f.defender;
   }
+  // Historical snapshots retain specific occupied ports until a later live
+  // campaign actually resolves their territory. A liberation must not leave
+  // the opening snapshot's occupier permanently attached to the port.
+  for (const {territories} of resolved) for (const {territory} of territories)
+    for (const [port, linked] of Object.entries(data.PORT_TERRITORIES))
+      if (linked === territory && w.openingPortControl) delete w.openingPortControl[port];
   w.portControl = { ...w.stationControl };
   for (const [port, territory] of Object.entries(data.PORT_TERRITORIES))
     if (w.control[territory]) w.portControl[port] = w.control[territory];
   for (const island of ISLANDS)
     if (w.control["island-" + island.node])
       w.portControl[island.node] = w.control["island-" + island.node];
+  Object.assign(w.portControl, w.openingPortControl);
   for (const {change,territories} of resolved)
     change.moraleChanges = applyTerritoryMorale(s,territories.map(t=>({...t,owner:w.control[t.territory] || t.previous})));
   invalidatePorts(s);

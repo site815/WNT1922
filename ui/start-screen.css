@@ -56,7 +56,36 @@
 .start-screen-footer button { font-size:12px; padding:0; background:none; border:none; color:var(--muted); }
 .start-screen-footer a { color:var(--muted); font-size:12px; text-decoration:none; }
 .start-screen-footer button:hover,.start-screen-footer a:hover { color:var(--gold); }
+.start-screen { max-width:2600px; }
+.start-screen-layout { grid-template-columns:1fr 1fr .9fr; gap:18px; }
+.start-setup,.start-tactical { padding:18px; }
+.start-mode-heading { margin-bottom:14px; padding-bottom:14px; min-height:123px; }
+.start-mode-heading h1 { font-size:30px; }
+.start-campaigns { grid-template-columns:1fr; }
+.start-campaigns button { padding:11px 12px; }
+.start-campaign-description { margin:12px 0 18px; }
+.start-campaign-intro { margin:26px 0; color:var(--muted); font-size:13px; line-height:1.7; }
+.start-campaign-intro p+p { padding-top:16px; border-top:1px solid var(--line); }
+.start-nations button { padding:9px; font-size:12px; }
+.start-nation-details { margin:18px 0 10px; }
+.start-nation-details h2 { font-size:25px; }
+.start-nation-details > p { font-size:12px; line-height:1.5; }
+.start-nation-stats { gap:8px; }
+.start-nation-stats strong { font-size:23px; }
+.start-battle-options { display:flex; flex-direction:column; gap:9px; }
+.start-battle-choice { display:grid; position:relative; grid-template-columns:minmax(0,1fr) auto; gap:3px 8px; min-height:0; flex:none; padding:11px 40px 11px 15px; }
+.start-battle-choice > strong { font:500 20px/1.2 Georgia,serif; grid-column:1/-1; }
+.start-battle-date { font-size:11px; grid-column:1/-1; }
+.start-battle-sides { grid-column:1/-1; font-size:11px; }
+.start-battle-link { position:absolute; right:15px; top:50%; width:auto; padding:0; margin:0; transform:translateY(-50%); font-size:20px; }
+.start-screen-footer { min-height:46px; margin-top:16px; }
+.start-screen-footer .start-resume { margin:0; padding:0; border:0; gap:14px; }
+.start-screen-footer .start-resume button { border:1px solid var(--gold); padding:9px 18px; color:var(--gold); }
+.active-campaign-panel { border-color:#77673c; }
 @media(max-width:1300px) { .start-screen {padding:18px;} .start-screen-layout {gap:16px;} .start-setup,.start-tactical {padding:18px;} .start-subtitle {display:none;} .start-campaigns {grid-template-columns:1fr;} .start-battle-choice {padding:16px;min-height:220px;} .start-nation-stats {grid-template-columns:repeat(2,minmax(0,1fr));} .start-screen-footer > span {display:none;} }
 @media(max-width:1000px) { .start-battle-options {grid-template-columns:1fr;grid-template-rows:none;} .start-battle-choice {min-height:190px;gap:8px;} .start-mode-heading h1 {font-size:29px;} .start-nations button {padding:9px;font-size:12px;} }
 @media(max-width:680px) { .start-screen-layout {overflow:auto;grid-template-columns:1fr;grid-template-rows:minmax(550px,1fr) minmax(650px,1fr);} .start-screen-header {align-items:flex-start;} .start-version {white-space:normal;max-width:140px;font-size:10px;} .start-brand {font-size:27px;} .start-battle-options {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));} }
 @media(max-height:750px) { .start-screen {padding:12px 18px 10px;} .start-screen-header {margin-bottom:12px;} .start-screen-footer {margin-top:10px;padding-top:9px;} .start-mode-heading {margin-bottom:12px;padding-bottom:10px;} .start-mode-heading h1 {font-size:28px;} .start-mode-heading p {font-size:11px;} .start-battle-choice {min-height:175px;padding:12px;gap:7px;} .start-battle-choice > strong {font-size:23px;} .start-battle-description {font-size:11px;} .start-battle-link {padding-top:8px;font-size:11px;} .start-tactical-note {font-size:10px;margin-top:10px;} .start-setup,.start-tactical {padding:14px;} }
+@media(max-width:1600px) { .start-mode-heading h1 {font-size:25px;} .start-mode-heading {min-height:130px;} .start-nation-stats {grid-template-columns:repeat(2,minmax(0,1fr));} .start-campaigns button {flex-direction:column;align-items:flex-start;gap:4px;} }
+@media(max-width:1000px) { .start-screen-layout {grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;} .start-mode-heading h1 {font-size:22px;} .start-mode-heading {min-height:145px;} .start-battle-choice {padding:12px 24px 12px 10px;} .start-battle-choice>strong {font-size:18px;} .start-battle-link {right:8px;} .start-nations {grid-template-columns:1fr;} }
+@media(max-height:750px) { .start-mode-heading {min-height:110px;} .start-battle-choice {min-height:0;gap:4px;padding:10px 25px 10px 10px;} .start-battle-choice>strong {font-size:19px;} .start-battle-link {padding:0;font-size:18px;} }

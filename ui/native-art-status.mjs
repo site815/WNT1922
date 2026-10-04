@@ -13,7 +13,9 @@ export const NATIVE_ART_LEGEND = 'Amber ? diamonds mark ships with 3D artwork pe
 export function nativeArtNotice(selection) {
   const status = selection?.visualStatus;
   if (!Object.hasOwn(messages, status)) return '';
-  const message = selection.representativeDesign && status === 'detailed-model'
+  const message = selection.representativeModel && ['detailed-model','model-not-loaded'].includes(status)
+    ? 'Representative 3D model for this ship’s role or a related hull; not this exact class or dated fit.'
+    : selection.representativeDesign && status === 'detailed-model'
     ? 'Detailed original model for this ship type. Custom design equipment is represented by the type model.'
     : status === 'model-error' && selection.detailedModel
     ? 'The edited 3D model could not load. Its last valid version remains displayed.'

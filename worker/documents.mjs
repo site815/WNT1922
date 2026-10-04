@@ -38,7 +38,7 @@ export async function readText(url) {
 
 export function readDocument(relative) {
   if (
-    !/^(?:common|1922|1936hindsight)\/[\w/.-]+\.md$/.test(relative) &&
+    !/^(?:common|1922|1936hindsight|historical1939|historical1941)\/[\w/.-]+\.md$/.test(relative) &&
     relative !== "manifest.md"
   )
     throw Error(`Invalid catalog path: ${relative}`);

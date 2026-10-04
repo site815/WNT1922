@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+import {assetReference,referencedAsset} from '../mechanics/asset-references.mjs';
 const TYPES=['BB','BC','CV','CVL','CA','CL','DD','DL','SS','SM','AO','DE','TB','AK'];
 const validId=value=>typeof value==='string'&&/^[\w-]+$/.test(value);
 const modelPath=value=>typeof value==='string'&&/^[\w/.-]+\.(json|glb)$/.test(value)&&!value.split('/').includes('..');
@@ -87,9 +88,16 @@ export async function validateShipModels({root=process.cwd(),catalog}={}) {
   for(const type of TYPES){const model=models.get(index.fallbacks[type]);assert(model?.fallback&&model.type===type,'Missing generic '+type+' mesh');}
   // The stored assets and campaign catalog are authoritative. Validation must
   // never require the retired renderer's source geometry or asset directory.
-  let mappings=0,detailedCampaignMappings=0;
+  let mappings=0,detailedCampaignMappings=0,representativeCampaignMappings=0;
   const detailedIds=new Set(index.models.filter(entry=>entry.file.endsWith('.glb')).map(entry=>entry.id));
-  if(catalog)for(const [campaignId,campaign]of Object.entries(catalog.campaigns))for(const ship of Object.values(campaign.classes)){const model=platforms.get(campaignId+':'+ship.id)||platforms.get(ship.id);assert(model&&!model.fallback,'Missing class reference or detailed model: '+ship.id);assert.equal(model.type,ship.type);mappings++;if(detailedIds.has(model.id))detailedCampaignMappings++;}
-  return {models:models.size,detailedModels,referenceModels:models.size-detailedModels,campaignMappings:mappings,detailedCampaignMappings,pendingCampaignMappings:mappings-detailedCampaignMappings,fallbackTypes:TYPES.length,vertices,triangles,maxTriangles,bytes};
+  if(catalog)for(const [campaignId,campaign]of Object.entries(catalog.campaigns))for(const ship of Object.values(campaign.classes)){
+    const reference=assetReference(ship,campaign.scenario,campaignId),model=referencedAsset(platforms,reference);
+    assert(model&&!model.fallback,'Missing explicit class reference or detailed model: '+campaignId+'/'+ship.id);
+    assert(model.type===ship.type||['BB','BC'].includes(model.type)&&['BB','BC'].includes(ship.type),
+      'Referenced model must preserve ship role (BB/BC are both capital gunships): '+ship.id);mappings++;
+    if(reference.representativeModel)representativeCampaignMappings++;
+    if(detailedIds.has(model.id))detailedCampaignMappings++;
+  }
+  return {models:models.size,detailedModels,referenceModels:models.size-detailedModels,campaignMappings:mappings,detailedCampaignMappings,representativeCampaignMappings,pendingCampaignMappings:mappings-detailedCampaignMappings,fallbackTypes:TYPES.length,vertices,triangles,maxTriangles,bytes};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){const {CATALOG}=await import('../worker/catalog-loader.mjs');console.log(JSON.stringify(await validateShipModels({catalog:CATALOG})));}

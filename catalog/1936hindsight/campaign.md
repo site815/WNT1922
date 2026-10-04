@@ -1,6 +1,6 @@
 # In Good Faith
 
-Edit the JSON block directly. The game reads this document at startup; no export step is required.
+Authored opening data. Read directly by the game; no export step is required.
 
 ```json game-data
 {
@@ -38,7 +38,10 @@ Edit the JSON block directly. The game reads this document at startup; no export
         ],
         "kind": "consultation"
       }
-    ]
+    ],
+    "category": "alternate",
+    "baseMap": "1936hindsight",
+    "assetCampaign": "in_good_faith_1936"
   }
 }
 ```

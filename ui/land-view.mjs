@@ -18,7 +18,7 @@ export function landView(s, c, ui = {}, data = {}) {
   const panel =
     '<div class="panel-title"><h2>Land campaigns</h2><span>' +
     fronts.length +
-    ' fronts</span></div><p class="panel-note">Naval supply matters most for islands, moderately for overseas armies, and less in continental interiors.</p><div class="land-campaign-list">' +
+    ' fronts</span></div><p class="panel-note">Map occupation colors and battle lines follow each campaign’s saved advance or retreat. Whole-territory ownership and economic access change when a campaign resolves. These are strategic corridors, not individual army positions. Naval supply matters most for islands and overseas armies.</p><div class="land-campaign-list">' +
     fronts
       .map(
         (f) =>

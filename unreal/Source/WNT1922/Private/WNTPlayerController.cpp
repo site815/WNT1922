@@ -797,6 +797,15 @@ void AWNTPlayerController::Input(const TSharedPtr<FJsonObject>& Packet)
         {
             WorldOrbit.Reset();
             FocusGeo = FVector2D(WNTProjection::WrapLongitude(Number(Packet, TEXT("longitude"))), FMath::Clamp(Number(Packet, TEXT("latitude")), -89.9, 89.9));
+            const FString FocusKind=String(Packet,TEXT("kind"));
+            if(FocusKind==TEXT("ship")||FocusKind==TEXT("merchant"))
+            {
+                // Own hulls can be metres away from their strategic anchor.
+                // Focus their current native formation station, not the port
+                // node or the force's latest received endpoint.
+                const auto Hull=WorldScene->GetSelectedPosition(FocusKind,String(Packet,TEXT("id")),int32(Number(Packet,TEXT("hullIndex"),-1)));
+                if(Hull.IsSet())FocusGeo=WNTCameraMath::WrappedFocus(Hull.GetValue(),Meridian);
+            }
             Meridian = FocusGeo.X; WorldScene->SetCentralMeridian(Meridian);
             Zoom = FMath::Clamp(Number(Packet, TEXT("zoom"), 6000), 1., WNTCameraMath::MaxWorldZoom);
             if(Action==TEXT("fit-force"))

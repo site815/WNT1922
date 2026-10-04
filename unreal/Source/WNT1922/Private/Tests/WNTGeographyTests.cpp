@@ -377,6 +377,24 @@ bool FWNTPoliticalLineIntegrationTest::RunTest(const FString& Parameters)
     const TArray<TSharedPtr<FJsonValue>> Fronts{MakeShared<FJsonValueObject>(Front)};
     Terrain->ApplyCampaignFronts(Fronts);CheckLand();
     TestTrue(TEXT("Real France geometry clips an active progress line"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("campaignFrontSegments"))>0);
+    auto ColourHash=[&]()
+    {
+        uint32 Hash=0;for(auto* Tile:Tiles)if(const auto* Land=Tile->GetProcMeshSection(0))
+            for(const auto& Vertex:Land->ProcVertexBuffer)Hash=HashCombineFast(Hash,GetTypeHash(Vertex.Color));
+        return Hash;
+    };
+    const uint32 Unoccupied=ColourHash();Front->SetStringField(TEXT("color"),TEXT("#de805b"));
+    Terrain->ApplyCampaignOccupations(Fronts);CheckLand();const uint32 Partial=ColourHash();
+    TestTrue(TEXT("Saved partial advance changes real land colors before whole-country capture"),Partial!=Unoccupied);
+    TestEqual(TEXT("Only recorded front territories have occupation masks"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("partiallyOccupiedTerritories")),4.);
+    const double Updates=Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("occupationColourUpdates"));
+    Terrain->ApplyCampaignOccupations(Fronts);
+    TestEqual(TEXT("Identical camera/world packets never upload occupation colors"),Terrain->GetMapStyleDiagnostics()->GetNumberField(TEXT("occupationColourUpdates")),Updates);
+    Front->SetNumberField(TEXT("progress"),.8);Terrain->ApplyCampaignOccupations(Fronts);CheckLand();
+    TestTrue(TEXT("Further recorded progress moves occupation coloring"),ColourHash()!=Partial);
+    Terrain->ApplyCampaignOccupations({});CheckLand();
+    TestEqual(TEXT("Removing partial occupation restores previous political shading"),ColourHash(),Unoccupied);
+    Front->SetNumberField(TEXT("progress"),.5);
     TMap<UProceduralMeshComponent*,const FProcMeshVertex*> FrontBuffers;
     for(auto* Tile:Tiles)if(const auto* Line=Tile->GetProcMeshSection(4))if(!Line->ProcVertexBuffer.IsEmpty())FrontBuffers.Add(Tile,Line->ProcVertexBuffer.GetData());
     TestTrue(TEXT("Campaign lines have actual mesh sections"),!FrontBuffers.IsEmpty());
@@ -560,7 +578,7 @@ bool FWNTElevationDataTest::RunTest(const FString& Parameters)
     FWNTElevationGrid Grid;FString Error;const FString Root=DataRoot();
     const bool Loaded=Grid.Load(FPaths::Combine(Root,TEXT("assets/terrain/elevation.bin")),FPaths::Combine(Root,TEXT("assets/terrain/elevation.json")),Error);
     TestTrue(TEXT("Real NOAA raster loads from native data root: ")+Error,Loaded);if(!Loaded)return false;
-    TestEqual(TEXT("Width"),Grid.GetWidth(),1440);TestEqual(TEXT("Height"),Grid.GetHeight(),720);
+    TestEqual(TEXT("Width"),Grid.GetWidth(),4320);TestEqual(TEXT("Height"),Grid.GetHeight(),2160);
     TestTrue(TEXT("Signed deep Pacific sample"),FMath::Abs(Grid.SampleMetres(FVector2D(-139.875,-.125))+4318)<1e-8);
     TestTrue(TEXT("Tibetan plateau sample"),FMath::Abs(Grid.SampleMetres(FVector2D(87.125,31.875))-4640)<1e-8);
     TestTrue(TEXT("Andes sample"),FMath::Abs(Grid.SampleMetres(FVector2D(-67.875,-20.125))-3654)<1e-8);
@@ -569,8 +587,22 @@ bool FWNTElevationDataTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("Longitude wraps continuously"),FMath::Abs(Grid.SampleMetres(FVector2D(-180,Lat))-Grid.SampleMetres(FVector2D(180,Lat)))<1e-9);
         TestTrue(TEXT("Any number of complete turns leaves elevation unchanged"),FMath::Abs(Grid.SampleMetres(FVector2D(10,Lat))-Grid.SampleMetres(FVector2D(1090,Lat)))<1e-9);
     }
-    TestTrue(TEXT("Polar sampling clamps north"),FMath::Abs(Grid.SampleMetres(FVector2D(20,90))-Grid.SampleMetres(FVector2D(20,89.875)))<1e-9);
-    TestTrue(TEXT("Polar sampling clamps south"),FMath::Abs(Grid.SampleMetres(FVector2D(20,-90))-Grid.SampleMetres(FVector2D(20,-89.875)))<1e-9);
+    TestTrue(TEXT("Polar sampling clamps north"),FMath::Abs(Grid.SampleMetres(FVector2D(20,90))-Grid.SampleMetres(FVector2D(20,90.-1./24.)))<1e-9);
+    TestTrue(TEXT("Polar sampling clamps south"),FMath::Abs(Grid.SampleMetres(FVector2D(20,-90))-Grid.SampleMetres(FVector2D(20,-90.+1./24.)))<1e-9);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FWNTCampaignOccupationGeometryTest,"WNT.Geography.RecordedCampaignOccupation",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FWNTCampaignOccupationGeometryTest::RunTest(const FString& Parameters)
+{
+    for(double Shift:{-720.,0.,720.})
+    {
+        const FVector2D From(170.+Shift,10),To(-170.+Shift,10);
+        TestTrue(TEXT("Occupation follows advancing dateline corridor"),WNTTerrainGeometry::BehindCampaignFront(FVector2D(175,10),From,To,.5));
+        TestFalse(TEXT("Unreached ground retains defender color"),WNTTerrainGeometry::BehindCampaignFront(FVector2D(-175,10),From,To,.5));
+        TestFalse(TEXT("Retreat restores lost ground"),WNTTerrainGeometry::BehindCampaignFront(FVector2D(175,10),From,To,.1));
+    }
+    TestFalse(TEXT("A repulsed front has no partial occupation"),WNTTerrainGeometry::BehindCampaignFront(FVector2D(2,0),FVector2D(0,0),FVector2D(10,0),0));
+    TestTrue(TEXT("Completed front occupies its whole listed territory"),WNTTerrainGeometry::BehindCampaignFront(FVector2D(20,0),FVector2D(0,0),FVector2D(10,0),1));
     return true;
 }
 #endif

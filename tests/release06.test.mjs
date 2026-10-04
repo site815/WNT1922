@@ -74,14 +74,14 @@ const bridge = () => {
   w.on("error", (error) => out.onerror?.(error));
   return out;
 };
-test("all fourteen opening ministries have levels 1–9, with period opening prices and a hard cap", () => {
+test("all opening ministries have levels 1–9, with authored opening prices and a hard cap", () => {
   for (const campaign of Object.keys(b.campaigns))
     for (const id of Object.keys(b.nations)) {
       const s = start(id, campaign),
         n = s.nations[id];
       for (const [key, p] of Object.entries(PROGRAMS)) {
         assert.equal(p.max, 9);
-        const initial = campaign === "campaign_1922" ? 1 : 5;
+        const initial = b.campaigns[campaign].nations[id].starting.level;
         assert.equal(n.tech[p.level], initial);
         const price = sim.projectPrice(s, key);
         assert.equal(price.level, initial);

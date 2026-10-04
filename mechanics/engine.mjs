@@ -137,6 +137,7 @@ import {
 } from "./naval-resources.mjs";
 import { supplyDetails } from "./logistics.mjs";
 import { contentFor, DEFAULT_CAMPAIGN } from "./campaign-content.mjs";
+import { applyHistoricalOpening } from './historical-starts.mjs';
 import { recordCasualties } from "./recovery.mjs";
 import {
   automaticDraft,
@@ -220,6 +221,7 @@ export function openingGroups(content, id) {
       rosterAdded: row.rosterAdded || 1,
       treatyFate: row.treaty_fate || null,
       ...(row.port ? { dockPort: row.port } : {}),
+      ...(row.openingRepairPort ? { openingRepairPort: row.openingRepairPort } : {}),
     };
   });
 }
@@ -326,6 +328,7 @@ export function newGame(
     }
 
   initializeDiplomacy(state);
+  applyHistoricalOpening(state, content);
   initializeCampaign(state, content);
   // The alternate programs open with their existing concealment arrangements.
   // This is an opening policy, not a charged policy change.
@@ -1168,6 +1171,13 @@ export function yardLoad(s, content, id = s.player) {
           : "",
   };
 }
+export function historicalRepairAccess(s, nation, group) {
+  const port = group.openingRepairPort, owner = PORTS[port]?.nation;
+  return !!(port && owner && group.status === 'repair' && group.health < 1 &&
+    group.count > 0 && group.dockPort === port && portOwner(s, port) === owner &&
+    (s.ports?.[port]?.health ?? 1) > 0 &&
+    !s.relations[pairKey(nation, owner)]?.war);
+}
 function daily(s, content) {
   if (new Date(s.day * DAY).getUTCDate() === 1) {
     monthly(s, content);
@@ -1178,6 +1188,10 @@ function daily(s, content) {
   for (const [id, n] of Object.entries(s.nations)) {
     const load = yardLoad(s, content, id);
     for (const g of n.groups) {
+      // A historical repair contract grants this hull only its original neutral
+      // yard. It never makes that country's ports available to fleet operations.
+      if (g.openingRepairPort && !historicalRepairAccess(s, id, g))
+        delete g.openingRepairPort;
       if (["building", "converting", "trials"].includes(g.status)) {
         g.progress = clamp(
           g.progress + (load.blocked ? 0 : 1 / (g.days * load.factor)),
@@ -1209,7 +1223,7 @@ function daily(s, content) {
       }
       if (
         g.status === "repair" && !g.battleId &&
-        usablePorts(s, id).includes(g.dockPort || HOME_PORT[id])
+        (usablePorts(s, id).includes(g.dockPort || HOME_PORT[id]) || historicalRepairAccess(s, id, g))
       ) {
         const cost = content.classes[g.classId].cost * g.count * 0.0001;
         if (n.gold >= cost) {
@@ -1225,6 +1239,7 @@ function daily(s, content) {
             1,
           );
           if (g.health >= 1) {
+            delete g.openingRepairPort;
             g.status = "active";
             commissionToFleet(s, content, id, g);
             if (id === s.player)

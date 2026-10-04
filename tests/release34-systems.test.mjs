@@ -42,7 +42,7 @@ test('every opening has complete finite resource and economy views with matching
     assert.doesNotMatch(topBars(s,c),invalid);
     openings++;
   }
-  assert.equal(openings,14);
+  assert.equal(openings,Object.values(CATALOG.campaigns).reduce((count,campaign)=>count+Object.keys(campaign.nations).length,0));
 });
 
 test('supply hover does not silently truncate the command list above twenty fleets',()=>{

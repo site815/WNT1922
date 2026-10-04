@@ -105,7 +105,7 @@ export function commandView(s, content, ui = {}) {
   const portPanel=PORTS[ui.portId]?`<section class="merchant-inspection port-inspection" data-port-id="${esc(ui.portId)}"><div class="panel-title"><h2>${esc(PORTS[ui.portId].name)}</h2><button data-action="map-overview" aria-label="Close port information">×</button></div>${portPopup(s,content,ui.portId)}</section>`:'';
   const panel = ui.sidePanel || portPanel + merchantPanel + fleetList;
   const legend =
-    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · right drag pans · left drag selects fleets · middle drag orbits at close ship zoom (32768× and above) · any zoom out immediately restores overhead north-up · double-click a force to fit its ships · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span>' + mapSymbolLegend() + '<span class="legend-powers" title="Country ownership colors">' +
+    '<div class="map-legend" aria-label="Map legend"><span class="map-zoom-level" title="Scroll to zoom · middle drag pans · left drag selects fleets · right drag orbits at close ship zoom (32768× and above) · any zoom out immediately restores overhead north-up · double-click a fleet or convoy to fit its ships; double-click a port to inspect its region · Home for the overhead strategic view · ship formations follow their recorded fleet position">Zoom ' + Number(zoom).toFixed(1) + '×</span>' + mapSymbolLegend({fleetColor:PROFILES[s.player]?.color}) + '<span class="legend-powers" title="Country ownership colors">' +
     NATION_ORDER.map(
       (id) =>
         '<span style="color:' +

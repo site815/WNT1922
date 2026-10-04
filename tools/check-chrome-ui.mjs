@@ -12,6 +12,7 @@ import {campaignMinutes} from '../mechanics/campaign-clock.mjs';
 import {createDiplomaticOffer} from '../mechanics/diplomatic-exchange.mjs';
 import {diplomaticTerms} from '../mechanics/diplomacy-rules.mjs';
 import {validateSave} from '../mechanics/state-io.mjs';
+import {SCENARIOS} from '../combatmechanics/scenarios.mjs';
 
 let playwright;
 try {playwright=createRequire(import.meta.url)('playwright');}
@@ -86,18 +87,29 @@ async function titleChecks() {
  const sizes=[[1800,1000],[1920,1080],[2560,1440],[3840,2160],[2560,1080],[3440,1440],[5120,2160]];
  for(const [i,[width,height]] of sizes.entries()) {
   await page.setViewportSize({width,height});
-  const campaign=i%2?'campaign_1922':'in_good_faith_1936',nation=['USA','GBR','DEU','FRA','JPN','ITA','SOV'][i];
+  const campaign=Object.keys(CATALOG.campaigns)[i%Object.keys(CATALOG.campaigns).length],nation=['USA','GBR','DEU','FRA','JPN','ITA','SOV'][i];
   await page.locator('[data-action="select-campaign"][data-id="'+campaign+'"]').click();
   await page.locator('[data-action="select-nation"][data-id="'+nation+'"]').click();
   assert.equal(await page.locator('[data-action="select-nation"][aria-pressed="true"]').getAttribute('data-id'),nation);
   assert.equal(await page.locator('[data-action="select-campaign"][aria-pressed="true"]').getAttribute('data-id'),campaign);
+  const previewState=newGame(CATALOG,nation,19221936,campaign),previewFleet=fleetSummary(previewState,contentFor(CATALOG,previewState),nation);
+  const shownFleet=await page.locator('.start-nation-stats strong').allTextContents();
+  assert.equal(Number(shownFleet[0].replaceAll(',','')),previewFleet.active,'Selected '+campaign+'/'+nation+' active opening fleet');
+  assert.equal(Number(shownFleet[1].replaceAll(',','')),previewFleet.building,'Selected '+campaign+'/'+nation+' construction');
+  assert.equal((await page.locator('.start-nation-details h2').innerText()),CATALOG.campaigns[campaign].nations[nation].name);
+  const scope=CATALOG.campaigns[campaign].scenario.scope;
+  if(scope){await page.locator('.start-campaign-description summary').click();assert((await page.locator('.start-campaign-description').innerText()).includes(scope));await page.locator('.start-campaign-description summary').click();}
   assert.equal(await page.locator('[data-action="select-nation"]').count(),7);
   assert.equal(await page.locator('.start-screen canvas').count(),0);
-  assert.equal(await page.locator('.start-battle-choice').count(),4);
+  assert.equal(await page.locator('.start-battle-choice').count(),SCENARIOS.length+1);
   await noOverflow(page,'Title '+width);
-  const geometry=await page.locator('.start-screen').evaluate(root=>({height:innerHeight,scrollHeight:document.documentElement.scrollHeight,campaign:root.querySelector('.start-setup').getBoundingClientRect().toJSON(),tactical:root.querySelector('.start-tactical').getBoundingClientRect().toJSON(),footer:root.querySelector('.start-screen-footer').getBoundingClientRect().toJSON()}));
+  const geometry=await page.locator('.start-screen').evaluate(root=>({height:innerHeight,scrollHeight:document.documentElement.scrollHeight,campaign:root.querySelector('[data-campaign-category="historical"]').getBoundingClientRect().toJSON(),alternate:root.querySelector('[data-campaign-category="alternate"]').getBoundingClientRect().toJSON(),tactical:root.querySelector('.start-tactical').getBoundingClientRect().toJSON(),footer:root.querySelector('.start-screen-footer').getBoundingClientRect().toJSON()}));
   assert(geometry.scrollHeight<=height+1&&geometry.footer.bottom<=height+1,'Main menu has no root scrollbar');
-  assert(geometry.campaign.right<geometry.tactical.left,'Main menu has two separate primary areas');
+  assert(geometry.campaign.right<geometry.alternate.left&&geometry.alternate.right<geometry.tactical.left,'Main menu has three separate primary areas');
+  const choices=await page.locator('.start-battle-options').evaluate(node=>({top:node.getBoundingClientRect().top,bottom:node.getBoundingClientRect().bottom,
+    buttons:[...node.children].map(button=>button.getBoundingClientRect().toJSON())}));
+  assert(choices.buttons.every(button=>button.top>=choices.top-1&&button.bottom<=choices.bottom+1),'All compact tactical buttons fit without an inner scroll at '+width+'×'+height);
+  for(const scenario of Object.values(CATALOG.campaigns).map(c=>c.scenario)) assert((await page.locator('[data-action="select-campaign"][data-id="'+scenario.id+'"]').innerText()).includes(scenario.start),'Full campaign date is visible');
   await page.locator('[data-action="new"]').click();await page.locator('[data-dialog-type="new"]').waitFor();
   await page.locator('.modal [data-action="close"]').first().click();
   metrics.push({kind:'title',width,height,campaign,nation,...geometry});
@@ -111,7 +123,7 @@ async function titleChecks() {
   const shown=Number((await page.locator('.start-nation-stats > span').filter({hasText:'warships building'}).locator('strong').innerText()).replaceAll(',',''));
   assert.equal(shown,expected,nation+' opening treaty choices');
  }
- for(const presetId of ['denmark-strait','midway','north-cape','custom']) {
+ for(const presetId of [...SCENARIOS.map(s=>s.id),'custom']) {
   await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
   await page.locator('.tactical-engagements').waitFor();
   assert.equal(await page.locator('[data-setup="presetId"]').inputValue(),presetId);
@@ -120,7 +132,7 @@ async function titleChecks() {
  assert.equal(await page.locator('.start-screen canvas').count(),0);
  assert.equal(await page.evaluate(()=>__chromeNativeCalls.filter(c=>c.method==='battle').length),0,'Static title and setup send no old demo battle packets');
  assert.equal(record.posts,0);assert.equal(await fs.readFile(record.savePath,'utf8'),originalFile);assert.deepEqual(await storage(page),originalStorage);
- checks.push('Main menu separates Campaign and Tactical Battles at seven supported sizes, has no outer scrollbar or demo viewport, opens all four matching tactical setups, preserves campaign/navy previews, and changes neither saved campaign nor recovery journal.');
+ checks.push('Main menu separates Historical Campaigns, Alternate History and compact Tactical Battles at seven supported sizes, has no outer scrollbar or demo viewport, opens every matching tactical setup, shows full campaign dates, preserves campaign/navy previews, and changes neither saved campaign nor recovery journal.');
  await page.locator('[data-action="continue"]').click();await page.locator('.workspace.view-command').waitFor();
  assert.deepEqual(clockState(await saveSnapshot(record)),clockState(original));
  checks.push('Continue preserves saved country, campaign, clock, RNG and pause state.');
@@ -188,6 +200,16 @@ async function campaignChecks(war) {
  assert.equal(views.length,9);
  assert.equal(await page.locator('.sidebar .nav-item').count(),10,'Campaign has only menus 01–10; battles are in reports');
  const before=clockState(await saveSnapshot(record));
+ await viewport(page,1800);
+ const legend=await page.locator('.map-legend').evaluate(node=>{
+  const bounds=node.getBoundingClientRect(),items=[...node.children].map(child=>({text:child.textContent,rect:child.getBoundingClientRect().toJSON()}));
+  return {bounds:bounds.toJSON(),items,fleetSymbols:node.querySelectorAll('[data-chart-symbol="fleet"]').length,viewport:{width:innerWidth,height:innerHeight}};
+ });
+ assert.equal(legend.fleetSymbols,6,'All six fleet-role glyphs remain visible in the lower legend');
+ assert(legend.bounds.left>=0&&legend.bounds.right<=1801&&legend.bounds.bottom<=1001,'Legend fits the minimum window');
+ for(const item of legend.items)assert(item.rect.left>=legend.bounds.left-1&&item.rect.right<=legend.bounds.right+1&&item.rect.top>=legend.bounds.top-1&&item.rect.bottom<=legend.bounds.bottom+1,'Legend item fits without clipping: '+item.text);
+ metrics.push({kind:'minimum-window-legend',case:name,width:1800,...legend});
+ await page.screenshot({path:path.join(output,name+'-legend-1800.png')});
  if(!war) {
   // Exercise this before the layout sweep: unattended news deliberately records
   // itself as read once its scrolling animation completes.

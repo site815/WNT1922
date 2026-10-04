@@ -10,10 +10,11 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 import {CATALOG} from '../worker/catalog-loader.mjs';
+import {SCENARIOS} from '../combatmechanics/scenarios.mjs';
 import {contentFor} from '../mechanics/campaign-content.mjs';
 import {validateSave} from '../mechanics/state-io.mjs';
 import {buildUnrealScenePacket} from '../ui/unreal-scene-packet.mjs';
-import {nativeCameraFields,verifyStrategicMiddleNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldExtentFit} from './native-camera-gesture-checks.mjs';
+import {nativeCameraFields,verifyStrategicRightNoop,verifyCloseWorldOrbit,verifyNativeFPS,verifyWorldExtentFit} from './native-camera-gesture-checks.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const args=process.argv.slice(2),option=name=>args.find(a=>a.startsWith(name+'='))?.slice(name.length+1);
@@ -120,11 +121,11 @@ async function ministryMenus(size){
 async function gestureCycle(){
  const surface=page.locator('.native-world-input');await surface.focus();await page.keyboard.press('Home');verifyWorldExtentFit(await until(()=>diagnostics(),d=>d.zoom===1,'Home'));
  const limitPoint=await clearPoint();
- await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'right'});await page.mouse.move(limitPoint.x,limitPoint.y+60);await page.mouse.up({button:'right'});
+ await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'middle'});await page.mouse.move(limitPoint.x,limitPoint.y+60);await page.mouse.up({button:'middle'});
  const constrained=await diagnostics();verifyWorldExtentFit(constrained);
  assert(constrained.lastAnchorConstrained&&constrained.lastAnchorIterations<=3,'A vertical drag at full-world fit stops when the latitude clamp prevents further progress');
- await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'right'});await page.mouse.move(limitPoint.x+100,limitPoint.y);await page.mouse.up({button:'right'});
- const horizontal=await diagnostics();assert(Math.abs(horizontal.longitude-constrained.longitude)>.01,'Horizontal right-drag still moves the map at full-world fit');
+ await page.mouse.move(limitPoint.x,limitPoint.y);await page.mouse.down({button:'middle'});await page.mouse.move(limitPoint.x+100,limitPoint.y);await page.mouse.up({button:'middle'});
+ const horizontal=await diagnostics();assert(Math.abs(horizontal.longitude-constrained.longitude)>.01,'Horizontal middle-drag still moves the map at full-world fit');
  result.metrics.push({kind:'constrained-pan',verticalIterations:constrained.lastAnchorIterations,longitudeBefore:constrained.longitude,longitudeAfter:horizontal.longitude});
  const expectedZoom=Math.exp(horizontal.wheelZoomPerPixel*450);
  const p=await clearPoint(),before=await cursor();await page.mouse.move(p.x,p.y);await page.mouse.wheel(0,-450);const zoomed=await until(()=>diagnostics(),d=>d.zoom>1&&Math.abs(d.zoom-d.targetZoom)<.00001,'smooth wheel zoom reaches its target');
@@ -132,10 +133,10 @@ async function gestureCycle(){
  const zoomFrames=(await events(before)).filter(e=>e.event.type==='camera').map(e=>e.event.zoom);
  assert(zoomFrames.some(z=>z>1&&z<expectedZoom-.001),'Wheel zoom renders intermediate camera positions');
  result.metrics.push({kind:'smooth-wheel',target:expectedZoom,intermediate:zoomFrames.filter(z=>z>1&&z<expectedZoom-.001)});
- await verifyStrategicMiddleNoop({page,diagnostics,clearPoint,metrics:result.metrics});
+ await verifyStrategicRightNoop({page,diagnostics,clearPoint,metrics:result.metrics});
  await page.mouse.move(p.x,p.y);
- await page.mouse.down({button:'right'});await page.mouse.move(p.x+205,p.y+85,{steps:6});await page.mouse.up({button:'right'});
- assert(Math.abs((await diagnostics()).tilt)<.001,'Strategic right-drag remains overhead');
+ await page.mouse.down({button:'middle'});await page.mouse.move(p.x+205,p.y+85,{steps:6});await page.mouse.up({button:'middle'});
+ assert(Math.abs((await diagnostics()).tilt)<.001,'Strategic middle-drag remains overhead');
  await surface.focus();await page.keyboard.press('Home');await until(()=>diagnostics(),d=>d.zoom===1,'Home after pan');await delay(150);return diagnostics('world');
 }
 try{
@@ -159,14 +160,14 @@ try{
  for(const size of resolutions){
   await resize(size,'hidden');
   const layout=await page.locator('.start-screen').evaluate(root=>{
-   const campaign=root.querySelector('.start-setup').getBoundingClientRect(),tactical=root.querySelector('.start-tactical').getBoundingClientRect(),footer=root.querySelector('.start-screen-footer').getBoundingClientRect();
-   return {campaign:campaign.toJSON(),tactical:tactical.toJSON(),footer:footer.toJSON(),width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight};
+   const campaign=root.querySelector('[data-campaign-category="historical"]').getBoundingClientRect(),alternate=root.querySelector('[data-campaign-category="alternate"]').getBoundingClientRect(),tactical=root.querySelector('.start-tactical').getBoundingClientRect(),footer=root.querySelector('.start-screen-footer').getBoundingClientRect();
+   return {campaign:campaign.toJSON(),alternate:alternate.toJSON(),tactical:tactical.toJSON(),footer:footer.toJSON(),width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight};
   });
-  assert(layout.campaign.right<layout.tactical.left,'Campaign is a separate left panel');
+  assert(layout.campaign.right<layout.alternate.left&&layout.alternate.right<layout.tactical.left,'Historical, alternate and tactical menus occupy separate panels');
   assert(layout.footer.bottom<=layout.height+1&&layout.scrollHeight<=layout.height+1&&layout.scrollWidth<=layout.width+1,'Static title has no outer scrollbar');
   assert.equal(await page.locator('.start-screen canvas').count(),0,'Title has no demonstration renderer');
-  assert.equal(await page.locator('.start-battle-choice').count(),4);
-  const presetId=['denmark-strait','midway','north-cape','custom'][resolutions.indexOf(size)%4];
+  assert.equal(await page.locator('.start-battle-choice').count(),SCENARIOS.length+1);
+  const choices=[...SCENARIOS.map(s=>s.id),'custom'],presetId=choices[resolutions.indexOf(size)%choices.length];
   await page.locator('[data-action="tactical"][data-preset="'+presetId+'"]').click();
   await page.locator('.tactical-engagements').waitFor();
   assert.equal(await page.locator('[data-setup="presetId"]').inputValue(),presetId);
@@ -176,7 +177,7 @@ try{
   await page.screenshot({path:file});result.captures.push({name,file,kind:'CEF-HTML-only-not-native-render'});
   result.metrics.push({kind:'main-menu-layout',...size,presetId,layout});
  }
- result.checks.push('At every actual native resolution, the static title keeps separate Campaign and Tactical Battles panels without an outer scrollbar; direct preset/custom setup choices return without an old demo viewport. Title screenshots are explicitly HTML-only.');
+ result.checks.push('At every actual native resolution, the static title keeps separate Historical Campaigns, Alternate History and compact Tactical Battles panels without an outer scrollbar; direct preset/custom setup choices return without an old demo viewport. Title screenshots are explicitly HTML-only.');
  phase='campaign resolutions';
  if(existing===200){await page.locator('[data-action="continue"]').click();}
  else{await page.locator('[data-action="select-campaign"][data-id="in_good_faith_1936"]').click();await page.locator('[data-action="select-nation"][data-id="USA"]').click();await page.locator('[data-action="new"]').click();if(await page.locator('[data-action="begin"]').count())await page.locator('[data-action="begin"]').click();}
@@ -204,14 +205,14 @@ try{
  result.checks.push('World camera input, exact hull hover/click, component-count stability and true GPU output dimensions pass at all seven requested display sizes.');
  for(const a of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'))for(const b of result.metrics.filter(row=>row.kind==='persistent-ministry-popup'&&row.menu==='yards'&&row.width>a.width&&row.height===a.height))assert(Math.abs(a.layout.popup.width-b.layout.popup.width)<2,'At the same height, ultrawide retains the 16:9 menu width');
  result.checks.push('All nine ministry menus stay left-aligned beside the sidebar and retain the native map and naval outliner at every size; wider screens preserve their 16:9-derived popup width and expose the world beside it.');
- result.checks.push('Every tested size rejects strategic middle dragging, permits close middle orbit without moving geographic focus, preserves requested orientation during right pan, and resets yaw/tilt on even a small outward wheel step while still close, and stays overhead when zooming back in.');
+ result.checks.push('Every tested size rejects strategic right dragging, permits close right orbit without moving geographic focus, preserves requested orientation during middle pan, and resets yaw/tilt on even a small outward wheel step while still close, and stays overhead when zooming back in.');
  phase='continuous map wrapping';
  const widest=resolutions.reduce((a,b)=>b.width/b.height>a.width/a.height?b:a);await resize(widest,'world');
  for(const direction of [-1,1]){
   await input('home');let previous=(await diagnostics()).longitude,total=0;
   const samples=[];
   for(let i=0;i<16;i++){
-   const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'right'});await page.mouse.move(p.x+direction*widest.width*.2,p.y,{steps:8});await page.mouse.up({button:'right'});
+   const p=await clearPoint();await page.mouse.move(p.x,p.y);await page.mouse.down({button:'middle'});await page.mouse.move(p.x+direction*widest.width*.2,p.y,{steps:8});await page.mouse.up({button:'middle'});
    const d=await diagnostics('world'),delta=((d.longitude-previous+540)%360)-180;total+=delta;previous=d.longitude;samples.push({longitude:d.longitude,latitude:d.latitude,...counts(d)});
    assert(Math.abs(d.tilt)<.001,'World wrapping never tilts the strategic camera');
   }

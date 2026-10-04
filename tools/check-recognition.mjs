@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { recognitionIndex } from "../ui/recognition.mjs";
+import { assetReference, referencedAsset } from '../mechanics/asset-references.mjs';
 
 function jpegDimensions(bytes) {
   let offset = 2;
@@ -46,7 +47,8 @@ export function validateOpeningShipRecognition(catalog, resolved) {
         const label = `${campaignId}/${nationId}/${group.id || group.name || group.class_id}`;
         assert(campaign.classes[group.class_id], "Unknown opening ship class: " + label);
         const key = "ship:" + group.class_id;
-        assert(resolved.platforms.get(campaignId + ":" + key) || resolved.platforms.get(key),
+        assert(resolved.platforms.get(campaignId + ":" + key) || resolved.platforms.get(key)
+          || referencedAsset(resolved.platforms,assetReference(campaign.classes[group.class_id],campaign.scenario,campaignId,{drawing:true}),'ship'),
           "Missing opening ship recognition: " + label);
         groups++;
         hulls += group.count;
@@ -79,7 +81,7 @@ export async function validateRecognition({ root = process.cwd(), catalog } = {}
     assert(file.endsWith(".json"), "Registry must be JSON");
     return JSON.parse(await read(file));
   }));
-  const resolved = recognitionIndex(registries);
+  const resolved = recognitionIndex(registries,catalog);
   // Opening fleets include retained and unfinished classes outside procurement.
   // Validate their actual references rather than assuming the design list covers them.
   validateOpeningShipRecognition(catalog, resolved);

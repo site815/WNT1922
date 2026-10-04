@@ -27,14 +27,16 @@ const start=(id="JPN",camp="in_good_faith_1936")=>{
   return [s,contentFor(CATALOG,s),s.nations[id]];
 };
 const war=(s,a="JPN",b="USA")=>{ const r=s.relations[[a,b].sort().join("-")];r.war=true;r.allied=false;r.warSince=s.day; };
-test("all fourteen product bases, allocations, modifiers and opening budgets agree with their live documents",()=>{
+test("all product bases, allocations, modifiers and opening budgets agree with their live documents",()=>{
   for(const camp of Object.keys(CATALOG.campaigns)) for(const id of Object.keys(CATALOG.campaigns[camp].nations)){
     const [s,c,n]=start(id,camp), e=economyFor(s,id), m=merchantEconomy(s,c), i=monthlyIncome(s,c);
     near(n.gdp,c.nations[id].economy.gdp);near(m.gtp,c.nations[id].economy.gtp);
     near(e.goldYear,.2*n.gdp+.8*m.gtp);near(e.industryYear,.8*n.gdp+.2*m.gtp);
     near(e.strategicYear,.05*(n.gdp*e.strategicModifier+m.gtp*Math.min(1,m.gtp/n.gdp)));
     assert.ok(i.netGold>0 && i.netIndustry>0 && i.netStrategic>0,id+" opening operating budget");
-    assert.equal(m.logistics,50);assert.ok(n.convoys.length>0);
+    const occupiedFrance=camp==='eve_pacific_war_1941'&&id==='FRA';
+    assert.equal(m.ports.coverage,occupiedFrance?.48:1);
+    assert.equal(m.logistics,occupiedFrance?24:50);assert.ok(n.convoys.length>0);
     assert.equal("logistics" in n,false);assert.equal("commerce" in n,false);
     assert.equal("trade" in c.nations[id],false);
     for(const b of Object.values(n.airBases))assert.equal("supplies" in b,false);

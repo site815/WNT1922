@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MAP_SYMBOLS, mapSymbolSvg, mapSymbolLegend } from '../ui/map-symbols.mjs';
+import { MAP_SYMBOLS, mapSymbolSvg, mapSymbolLegend, fleetSymbolVariant } from '../ui/map-symbols.mjs';
 
 test('map roles have distinct accessible legend glyphs and one bounded geometry/palette contract', () => {
   const symbols = MAP_SYMBOLS.symbols, legend = mapSymbolLegend();
@@ -21,4 +21,20 @@ test('map roles have distinct accessible legend glyphs and one bounded geometry/
   }
   assert.equal(new Set(Object.keys(symbols).map(mapSymbolSvg)).size,7);
   assert.throws(() => mapSymbolSvg('unknown'));
+});
+
+test('own fleet type symbols distinguish carriers, battle fleets, cruisers, escorts, submarines and support', () => {
+  for (const [types, expected] of [[['CV','BB','DD'],'carrier'],[['BC','CL'],'capital'],[['CA','DD'],'cruiser'],
+    [['DD','SS'],'escort'],[['SS','SM'],'submarine'],[['AO','AK'],'support'],[[],'escort']]) {
+    const variant=fleetSymbolVariant(types.map(type=>({type})));assert.equal(variant,expected);
+    assert(mapSymbolLegend().includes(MAP_SYMBOLS.fleetVariants[variant].label));
+    const colored=mapSymbolSvg('fleet',19,{variant,color:'#42a58d'});
+    assert(colored.includes('fill="#42a58d"'));
+    assert(colored.includes(MAP_SYMBOLS.backingColor),'Contrast casing and internal silhouette retain their own dark ink');
+  }
+  const glyphs=Object.keys(MAP_SYMBOLS.fleetVariants).map(variant=>mapSymbolSvg('fleet',19,{variant}));
+  assert.equal(new Set(glyphs).size,6,'Every composition class has genuinely different vector geometry');
+  assert.doesNotMatch(mapSymbolSvg('contact',19,{variant:'carrier'}),/fill="#/,'Uncertain contacts retain their unfilled question-mark badge');
+  assert(mapSymbolSvg('contact',19,{color:'#42a58d'}).includes('stroke="#42a58d"'));
+  assert(!mapSymbolSvg('port',19,{color:'red\" onload=\"bad'}).includes('onload'),'Only bounded RGB ink can reach markup');
 });

@@ -21,6 +21,7 @@ import { diplomacyView as governmentView } from "../ui/diplomacy-view.mjs";
 import { distanceNm } from "../mechanics/world.mjs";
 import { resourceHover } from "../ui/resource-breakdown.mjs";
 import { validateSave } from "../mechanics/state-io.mjs";
+import { setCampaignMinutes } from '../mechanics/campaign-clock.mjs';
 const bundle = structuredClone(CATALOG);
 const start = (id = "JPN", campaign = "in_good_faith_1936") => {
   const s = newGame(bundle, id, 713, campaign);
@@ -72,11 +73,17 @@ test("civilian hull growth conserves integer hulls and can recover a destroyed m
     for (const id of Object.keys(bundle.nations)) {
       const [s, c, n] = start(id, campaign);
       const before = merchantEconomy(s, c, id).current;
+      const nextMonth=()=>{const date=new Date(s.day*86400000);setCampaignMinutes(s,Date.UTC(date.getUTCFullYear(),date.getUTCMonth()+1,1)/60000);};
+      nextMonth();
       closeEconomicMonth(s, c, id);
       assert.ok(Number.isInteger(n.merchant.hulls));
       assert.ok(merchantEconomy(s, c, id).current >= before);
-      sinkMerchants(s, id, 1e6);
-      for (let month = 0; month < 60; month++) closeEconomicMonth(s, c, id);
+      const relation=Object.values(s.relations).find(r=>r.a===id||r.b===id);
+      Object.assign(relation,{war:true,allied:false,warSince:s.day});
+      const doomed=n.merchant.hulls;
+      assert.equal(sinkMerchants(s,id,1e6),doomed,'the entire register really sinks');
+      assert.equal(n.merchant.hulls,0);
+      for (let month = 0; month < 60; month++) {nextMonth();closeEconomicMonth(s, c, id);}
       assert.ok(n.merchant.hulls > 0, id + " can recover using civilian yards");
       validateSave(s, bundle);
     }

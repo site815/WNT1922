@@ -17,10 +17,11 @@ export const aiRole = (type) =>
   type;
 export function aiDoctrine(s, id) {
   const base = DOCTRINES[id];
-  if (s.campaignId !== "campaign_1922") return base;
+  const opening = startingNation(s.campaignId, id).ai;
+  if (s.campaignId !== "campaign_1922") return opening ? {...base,...opening} : base;
   const year = new Date(s.day * 86400000).getUTCFullYear();
   // The historical opening does not silently inherit the 1936 alternate programs.
-  const historical = startingNation(s.campaignId, id).ai?.roles;
+  const historical = opening?.roles;
   const early = treatyRules.earlyCarrierPreference;
   return {
     ...base,
@@ -182,7 +183,7 @@ export function aiMission(s, id, f) {
   if (f.role === "submarine") return wars.length ? "raid" : "presence";
   if (f.role === "escort") return "guard";
   if (!wars.length) return "presence";
-  const doctrine = DOCTRINES[id];
+  const doctrine = aiDoctrine(s, id);
   if (doctrine.surfaceMission && s.campaignId !== doctrine.surfaceMissionExceptCampaign)
     return doctrine.surfaceMission;
   if (f.role === "cruiser")

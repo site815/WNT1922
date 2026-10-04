@@ -39,6 +39,8 @@ namespace WNTTerrainGeometry
     WNT1922_API FVector RibbonDisplacement(const FVector2D& Extrusion, const FVector2D& CentreMetadata, double WidthMetres, double LongitudeShift);
     /** Display-only relief, real height at ship range and smoothly emphasized at map range. */
     WNT1922_API double ReliefScaleForDistance(double Centimetres);
+    /** Recorded advance half-plane; longitude wraps through the shortest corridor. */
+    WNT1922_API bool BehindCampaignFront(const FVector2D& Point,const FVector2D& From,const FVector2D& To,double Progress);
 }
 
 /** Runtime geographic terrain; local tile vertices retain precision under UE large-world coordinates. */
@@ -57,6 +59,7 @@ public:
     FString TerritoryAt(const FVector2D& LongitudeLatitude) const;
     void SetControl(const TMap<FString, FLinearColor>& TerritoryColours);
     void ApplyCampaignFronts(const TArray<TSharedPtr<FJsonValue>>& Fronts);
+    void ApplyCampaignOccupations(const TArray<TSharedPtr<FJsonValue>>& Occupations);
     TSharedPtr<FJsonObject> GetMapStyleDiagnostics() const;
     void SetGraticuleVisible(bool Visible);
     void SetGraticulePixelSize(double CentimetresPerPixel);
@@ -66,7 +69,7 @@ public:
     const FString& GetLoadError() const { return LoadError; }
 
     UPROPERTY(EditAnywhere, Category="WNT|Terrain") FString CampaignId = TEXT("1936hindsight");
-    UPROPERTY(EditAnywhere, Category="WNT|Terrain", meta=(ClampMin="0.25",ClampMax="2.0")) double SurfaceSampleDegrees = 0.5;
+    UPROPERTY(EditAnywhere, Category="WNT|Terrain", meta=(ClampMin="0.25",ClampMax="2.0")) double SurfaceSampleDegrees = 0.25;
     // Source elevation is rendered in real metres. Only a 5 cm numerical
     // separation avoids coincident flat land/water, never a raised map plateau.
     static constexpr double LandBaseMetres = .05;
@@ -80,6 +83,7 @@ public:
     UPROPERTY(Transient) TObjectPtr<UMaterialInterface> FrontMaterial;
 
 private:
+    void RefreshLandColours(const TSet<FString>& ChangedTerritories);
     void RebuildProjectedMeshes();
     void RebuildMapOverlays(bool Borders,bool Fronts);
     void UpdateTilePlacement(int32 Index, int32 Copy);

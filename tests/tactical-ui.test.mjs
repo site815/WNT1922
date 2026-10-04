@@ -3,12 +3,21 @@ import assert from 'node:assert/strict';
 import {CATALOG} from '../worker/catalog-loader.mjs';
 import {createCombat, resolveCombat, buildScenario, buildCustomScenario, SCENARIOS} from '../combatmechanics/index.mjs';
 import {TacticalSession} from '../ui/tactical-session.mjs';
-import {initialTacticalSetup, tacticalCatalog, tacticalModelCampaigns, tacticalSetupConfig, validateTacticalSetup} from '../ui/tactical-setup.mjs';
+import {initialTacticalSetup, tacticalCatalog, tacticalModelCampaigns, tacticalModelReferences, tacticalSetupConfig, validateTacticalSetup} from '../ui/tactical-setup.mjs';
+import {assetReference,referencedAsset} from '../mechanics/asset-references.mjs';
 import fs from 'node:fs';
-import {tacticalSetupView, tacticalEventText} from '../ui/tactical-engagements.mjs';
+import {tacticalSetupView, tacticalEventText, tacticalShipArtNotice} from '../ui/tactical-engagements.mjs';
 import {battleProgress} from '../ui/battle-progress.mjs';
 
 const content = tacticalCatalog(CATALOG,CATALOG);
+test('tactical inspection discloses representative references without claiming an unobserved native load',()=>{
+ const roster=tacticalShipArtNotice(null,{representativeModel:true});
+ assert.match(roster,/Representative 3D asset assigned/);assert.doesNotMatch(roster,/displayed/);
+ const picked=tacticalShipArtNotice({visualStatus:'detailed-model'},{representativeModel:true});
+ assert.match(picked,/not this exact class or dated fit/);
+ const missing=tacticalShipArtNotice({visualStatus:'model-error'},{representativeModel:true});assert.match(missing,/could not load/);
+ assert.equal(tacticalShipArtNotice(null,{representativeModel:false}),'');
+});
 test('campaign tactical progress reports actual elapsed combat time and individual hull losses',()=>{
   const tactical=createCombat(buildScenario(content,{presetId:'denmark-strait',mode:'simulation'}));
   tactical.seconds=70;tactical.ships[0].status='sunk';tactical.ships[1].status='escaped';
@@ -60,13 +69,15 @@ test('mixed-campaign custom hulls retain the matching native model campaign for 
   const index=JSON.parse(fs.readFileSync(new URL('../assets/models/ships/index.json',import.meta.url),'utf8'));
   const models=new Map(index.models.flatMap(model=>model.platforms.map(p=>[(p.campaign?p.campaign+':':'')+p.id,model.id])));
   for(const preferred of Object.values(CATALOG.campaigns)) {
-    const combined=tacticalCatalog(preferred,CATALOG),mapping=tacticalModelCampaigns(preferred,CATALOG);
-    for(const id of Object.keys(combined.classes))assert(models.has(mapping[id]+':'+id)||models.has(id),mapping[id]+':'+id);
-    for(const id of Object.keys(preferred.classes))assert.equal(mapping[id],preferred.scenario.id,'The current catalog fit wins shared IDs');
+    const combined=tacticalCatalog(preferred,CATALOG),mapping=tacticalModelCampaigns(preferred,CATALOG),references=tacticalModelReferences(preferred,CATALOG);
+    for(const id of Object.keys(combined.classes))assert(referencedAsset(models,references[id]),mapping[id]+':'+id);
+    for(const definition of Object.values(preferred.classes))assert.deepEqual(references[definition.id],assetReference(definition,preferred.scenario),'The current catalog explicit asset provenance wins shared IDs');
     assert.equal(mapping.ecole_pt32,'in_good_faith_1936');assert.equal(mapping.ocean_bb28,'in_good_faith_1936');
     const config=buildCustomScenario(combined,{shipsA:[{classId:'ecole_pt32',count:1}],shipsB:[{classId:'ocean_bb28',count:1}]});
     config.metadata.modelCampaigns=mapping;
+    config.metadata.modelReferences=references;
     assert.deepEqual(createCombat(config).metadata.modelCampaigns,mapping,'Rendering metadata survives the isolated engine constructor');
+    assert.deepEqual(createCombat(config).metadata.modelReferences,references,'Explicit model IDs survive the isolated engine constructor');
   }
 });
 

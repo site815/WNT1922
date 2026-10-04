@@ -123,7 +123,7 @@ async function fleetRow(id){
 async function clearPoint(){
  return page.evaluate(()=>{
   const d=__wntEqualEarthEvidence.latest,r=d.viewRect,x=(r.x+r.width*.5)*innerWidth,y=(r.y+r.height*.5)*innerHeight;
-  if(![-30,0,30].every(dx=>document.elementFromPoint(x+dx,y)?.matches('.native-world-input')))throw Error('A clear native map area is required for the right-drag check');
+  if(![-30,0,30].every(dx=>document.elementFromPoint(x+dx,y)?.matches('.native-world-input')))throw Error('A clear native map area is required for the middle-drag check');
   return{x,y};
  });
 }
@@ -188,12 +188,12 @@ try{
   await capture('antarctica-dateline-'+name,{group:'antarctica-dateline',requestedFocus:{longitude,latitude:-58,zoom:2.5},review:'Inspect the southern ocean and Antarctic coast across the ±180° seam; compare neighboring tile/shoreline continuity and repeated-map copies.'});
  }
 
- phase='continuous small right-drag pans';
+ phase='continuous small middle-drag pans';
  const baseline=await diagnostics();let previous=baseline;
  for(let step=1;step<=3;step++){
-  const point=await clearPoint();await page.mouse.move(point.x,point.y);await page.mouse.down({button:'right'});
-  await page.mouse.move(point.x+18,point.y,{steps:8});await page.mouse.up({button:'right'});
-  const d=await until(diagnostics,d=>Math.abs(longitudeDelta(d.longitude,previous.longitude))>.0001,'right-drag geographic movement');
+  const point=await clearPoint();await page.mouse.move(point.x,point.y);await page.mouse.down({button:'middle'});
+  await page.mouse.move(point.x+18,point.y,{steps:8});await page.mouse.up({button:'middle'});
+  const d=await until(diagnostics,d=>Math.abs(longitudeDelta(d.longitude,previous.longitude))>.0001,'middle-drag geographic movement');
   assert(Math.abs(longitudeDelta(d.longitude,previous.longitude))<20,'A short pan must not jump to another map copy');
   assert(Math.abs(longitudeDelta(d.centralMeridian,d.longitude))<.0001,'Equal Earth central meridian must follow the camera continuously');
   assert.equal(d.zoom,baseline.zoom);assert.equal(d.yaw,0);assert.equal(d.tilt,0);
@@ -204,7 +204,7 @@ try{
  }
  assert(baseline.longitude<0&&previous.longitude>0,'The three small pans must actually cross the longitude seam');
  result.metrics.push({kind:'stable-native-pan-components',baseline:counts(baseline),final:counts(previous),startCamera:camera(baseline),endCamera:camera(previous),steps:3});
- result.checks.push('Three real right-drag pans cross the dateline with the central meridian following focus, no strategic tilt/yaw, no actor/component growth and zero native model load errors.');
+ result.checks.push('Three real middle-drag pans cross the dateline with the central meridian following focus, no strategic tilt/yaw, no actor/component growth and zero native model load errors.');
  assert.equal(await pausedClock(),initialClock);
  result.errors.push(...await page.evaluate(()=>__wntEqualEarthEvidence.errors));assert.deepEqual(result.errors,[]);
  result.captureChecksPassed=true;
@@ -212,7 +212,7 @@ try{
 finally{
  deadline=Date.now()+18000;phase='restore';
  if(page&&initial)try{
-  await page.mouse.up({button:'right'});
+  await page.mouse.up({button:'middle'});
   if(selectionChanged){
    if(initial.chart.selectedForceIds.length)await (await fleetRow(initial.chart.selectedForceIds[0])).click();
    else await input('selectBox',{x0:0,y0:0,x:0,y:0}); // Degenerate box outside the command-map viewport emits the supported empty selection.

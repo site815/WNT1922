@@ -1,6 +1,6 @@
 # WNT1922
 
-A naval strategy sandbox with The Treaty System (1922) and In Good Faith (1936), each with seven playable nations.
+A naval strategy sandbox with four campaigns, each with seven playable nations. Historical starts are The Treaty System (1922-02-06), Eve of European War (1939-08-01), and Eve of Pacific War (1941-11-01). The alternate-history menu begins with In Good Faith (1936-01-01).
 
 ## Native Unreal development
 
@@ -8,7 +8,7 @@ The current working tree uses **Unreal Engine 5.8** for the world, water, ships,
 
 The voxel renderer, cuboid ship renderer and Three.js globe have been retired. Ships use detailed stored GLBs with curved full hulls, equipment, deck fittings, physical materials and embedded textures. Historical exteriors use referenced recognition drawings and photographs; undocumented hull sections and small fittings remain inferred artwork, as disclosed in each source file. Fictional classes and player-designed ship types use original designs. The earlier JSON recognition meshes remain reference data and are **not used as live 3D ship assets**. Missing or damaged external files remain visible as explicit status symbols. Ports use navigation symbols while their scenery is unfinished.
 
-The stable release remains [v0.38.0](https://github.com/site815/WNT1922/releases/tag/v0.38.0). The native development version is `0.45.0-dev`; verified native previews are available under [Releases](https://github.com/site815/WNT1922/releases). Build and verification evidence is recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md). Native previews are labeled prereleases and do not replace the stable download.
+The stable release remains [v0.38.0](https://github.com/site815/WNT1922/releases/tag/v0.38.0). The native development version is `0.48.0-dev`; verified native previews are available under [Releases](https://github.com/site815/WNT1922/releases). Build and verification evidence is recorded in [SYSTEMS-CHECK.md](SYSTEMS-CHECK.md). Native previews are labeled prereleases and do not replace the stable download.
 
 ## Play and test locally
 
@@ -25,11 +25,11 @@ Single-player runs offline. Chromium device discovery and external requests, Unr
 
 The game opens in a decorated **1800×1000 window**. Resize or maximize it; the minimum client area is 1800×1000 and fullscreen is disabled. A display smaller than that client area plus its Windows frame cannot show the whole window.
 
-Scroll to zoom from the wrapping Equal Earth world to individual hulls. Right drag pans; left click selects and left drag selects owned fleets in a box. The world stays overhead until you use middle-button drag at close ship zoom (32,768× and above). Any zoom out immediately restores north-up. Map zoom stops at 65,536×; Home fits both polar ends inside the visible map, and Page Up / Page Down zoom. Native FPS appears beside the speed selector. Country borders and land-front progress lines follow campaign geography. Fleets stay at campaign route positions with stable metre-based formation stations. Outside engagements, fleet formations and land-front lines show strategic information rather than exact harbor berths. Tactical encounters retain their own individual hull tracks. Own naval hulls and active merchant convoys are selectable; unseen enemy ships are not exposed.
+Scroll to zoom from the wrapping Equal Earth world to individual hulls. Middle drag pans; left click selects and left drag selects owned fleets in a box. The world stays overhead until you use right-button drag at close ship zoom (32,768× and above). Any zoom out immediately restores north-up. Map zoom stops at 65,536×; Home fits both polar ends inside the visible map, and Page Up / Page Down zoom. Double-click fleets or merchant convoys to fit their formations; double-click ports to inspect their area. Native FPS appears beside the speed selector. Six fleet silhouettes identify the dominant visible ship role and use the owning nation's color. Country borders, land-front lines and partial occupation coloring follow saved campaign progress. Fleets stay at campaign route positions with stable metre-based formation stations. Outside engagements, fleet formations and land-front lines show strategic information rather than exact harbor berths. Tactical encounters retain their own individual hull tracks. Own naval hulls and active merchant convoys are selectable; unseen enemy ships are not exposed.
 
 Decisive actions raise an optional **Watch battle** alert. Ongoing battles involving your navy also have animated, clickable map markers. Watching pauses the campaign. New naval encounters record individual hull positions, attacks, damage and losses through the shared tactical engine. **Play recorded movie** follows those observations with a cinematic camera without advancing the campaign. Older aggregate reports retain explicitly illustrative courses; missing observations remain gaps. **Next tick** advances the entire simulation by 15 minutes and pauses again. Minor encounters retain their effects in background attrition. [Battle rules](combatmechanics/campaign-rules.mjs) define the thresholds.
 
-The opening screen has separate **Campaign** and **Tactical Battles** sections; the old automatic demo is removed. Campaign navigation ends at Battle reports (10), where each report contains its after-action ledger and 3D viewer. Standalone Tactical Battles opens from the main menu and runs independently of campaign saves. Denmark Strait, Midway and North Cape default to **Historical playback**, with sourced key events and outcomes scripted through the shared combat engine. Historical timestamps identify the milestones; quiet intervals are compressed, and intermediate salvos, ship courses and numerical damage remain approximations. Choose **Free simulation** to vary doctrine, formation, conditions and seed without enforcing history, or create custom fleets of up to 120 catalog hulls per side. Campaign encounters always use free simulation.
+The opening screen has separate **Historical Campaigns**, **Alternate History** and **Tactical Battles** sections, with exact campaign dates and compact preset buttons. The new 1939 and 1941 starts have authored major-ship inventories, active wars, territorial control and aircraft fits. Escorts, auxiliaries, economic quantities and fleet deployment remain strategic estimates; some historical classes use explicitly disclosed representative models. See the [historical-start sources and scope](catalog/common/historical/README.md). Campaign navigation ends at Battle reports (10), where each report contains its after-action ledger and 3D viewer. Standalone Tactical Battles runs independently of campaign saves. Denmark Strait, Midway, North Cape, Bismarck's last battle and the Battle off Lofoten default to **Historical playback**, with sourced key events and outcomes scripted through the shared combat engine. Historical timestamps identify the milestones; quiet intervals are compressed, and intermediate salvos, ship courses and numerical damage remain approximations. Choose **Free simulation** to vary doctrine, formation, conditions and seed without enforcing history, or create custom fleets of up to 120 catalog hulls per side. Campaign encounters always use free simulation.
 
 Run/pause, single-step 10 seconds, quick resolve, replay and restart use the same combat state. Carrier strikes move as aggregate air groups. Tactical watching and recorded campaign movies play event-timed firing, impact, splash and sinking sounds. **SFX** and volume control the shared sound output; pausing, closing or quick resolution cancels battle sounds. Audio is generated locally and requires no downloads.
 
@@ -40,7 +40,7 @@ The optional **Tactical 60×** speed gives more time to watch fleet movement. Si
 ## Assets and authoring
 
 - [Ship models](assets/models/README.md) live in `assets/models/ships`. Detailed GLB files retain scene geometry, UVs and physically based materials and are loaded directly at runtime. Replacing a model does not require compiling the game.
-- [Terrain data](assets/terrain/README.md) supplies geographical relief.
+- [Terrain data](assets/terrain/README.md) supplies real geometric relief from a 5-arcminute ETOPO grid, with nine times the elevation samples of the previous release. Terrain remains regional rather than harbor-scale. Partial occupation colors follow recorded advance and retreat; economic ownership still changes when a strategic front resolves.
 - [Surface materials and lighting](assets/materials/README.md) include the live CC0 HDR environment and archived photographic terrain references. The current map uses geometric relief, vertex colors and normals rather than a photographic land texture; sources, licenses and hashes remain beside the files.
 - [Recognition artwork](assets/recognition/README.md) remains available for the historical catalog, panels and hovers. These reference drawings are distinct from the full 3D game models.
 
@@ -58,11 +58,11 @@ node --test --test-isolation=none --test-skip-pattern="all selectable countries|
 .\tools\Build-Unreal.ps1
 ```
 
-Native GPU and interaction checks use `tools/verify-unreal-runtime.mjs` against an explicitly launched Unreal automation instance. The HUD-only smoke test does not verify Unreal rendering. Long campaign checks are available through `tools/playthrough.mjs` for both campaigns.
+Native GPU and interaction checks use `tools/verify-unreal-runtime.mjs` against an explicitly launched Unreal automation instance. The HUD-only smoke test does not verify Unreal rendering. Long campaign checks are available through `tools/playthrough.mjs`.
 
-Native portable archive filenames retain their version, for example `WNT1922-v0.45.0-dev-Unreal-Windows.zip`. A release requires cooking, package testing and visual verification. Building never pushes source or publishes a release. `.build/`, `test-output/`, Unreal binaries and caches are disposable local output excluded from Git.
+Native portable archive filenames retain their version, for example `WNT1922-v0.48.0-dev-Unreal-Windows.zip`. A release requires cooking, package testing and visual verification. Building never pushes source or publishes a release. `.build/`, `test-output/`, Unreal binaries and caches are disposable local output excluded from Git.
 
-**0.45.0-dev checkpoint:** final native build, extracted-package, on-screen interaction and visual verification are recorded in SYSTEMS-CHECK.md. Earlier release results do not certify a later working tree.
+Final native build, extracted-package, on-screen interaction and visual verification are recorded in SYSTEMS-CHECK.md. Earlier release results do not certify a later working tree.
 
 ## Source layout
 

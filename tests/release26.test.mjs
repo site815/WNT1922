@@ -5,7 +5,7 @@ import { CATALOG } from '../worker/catalog-loader.mjs';
 import { newGame, monthlyIncome, yardLoad } from '../mechanics/engine.mjs';
 import { contentFor } from '../mechanics/campaign-content.mjs';
 import { growthOutlook, closeEconomicMonth } from '../mechanics/economic-growth.mjs';
-import { recordConvoy, gdpGrowthRate, requiredShipping } from '../mechanics/economy-rules.mjs';
+import { recordConvoy, gdpGrowthRate, requiredShipping, nationAtWar } from '../mechanics/economy-rules.mjs';
 import { merchantEconomy } from '../mechanics/merchant-economy.mjs';
 import { industryExpansion } from '../mechanics/levels.mjs';
 import { navalAircraftInventory } from '../mechanics/aircraft-inventory.mjs';
@@ -34,12 +34,14 @@ test('bombing growth has exact neutral and contraction points, including 100% di
   n.industrialDamage.industry=damage;const before=n.gdp;close(s,c,'JPN');near(n.gdp,before*(1+rate));validateSave(s,CATALOG);
  }
 });
-test('all 14 starts store authored GTP; monthly trade and hull-size growth are independent and prorated',()=>{
+test('all starts store authored GTP; peace/war trade and hull-size growth are independent and prorated',()=>{
  for(const campaign of Object.keys(CATALOG.campaigns))for(const id of Object.keys(CATALOG.campaigns[campaign].nations)) {
   const [s,c,n]=start(id,campaign),gtp=n.gtp,size=n.merchant.averageGRT;
   const fraction=campaign==='campaign_1922'?23/28:1;
-  near(n.gtp,c.nations[id].economy.gtp);near(merchantEconomy(s,c).logistics,50);
-  close(s,c,id);near(n.gtp,gtp*1.0005**fraction);near(n.merchant.averageGRT,size*1.001**fraction);
+  const occupiedFrance=campaign==='eve_pacific_war_1941'&&id==='FRA';
+  near(n.gtp,c.nations[id].economy.gtp);near(merchantEconomy(s,c).logistics,occupiedFrance?24:50);
+  const expectedFullDeliveryRate=(nationAtWar(s,id)?.02:.0005)*(occupiedFrance?.48:1);
+  close(s,c,id);near(n.gtp,gtp*(1+expectedFullDeliveryRate)**fraction);near(n.merchant.averageGRT,size*1.001**fraction);
   const grown=n.gtp;n.merchant.hulls=Math.max(1,n.merchant.hulls-1);near(merchantEconomy(s,c).gtp,grown);
   for(const p of Object.values(s.ports))p.health=0;
   n.convoyRecord=[];close(s,c,id,false);near(n.gtp,grown*.98);

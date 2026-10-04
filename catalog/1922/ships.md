@@ -288,7 +288,9 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "complement": 828,
       "design_year": 1915,
       "notes": "Fisher's freaks — fast, huge, unarmored. Ideal carrier-conversion hulls under the 33,000-ton clause."
-    }
+    },
+    "modelId": "courageous_llc",
+    "modelCampaign": "campaign_1922"
   },
   "courageous_1922_cv": {
     "id": "courageous_1922_cv",
@@ -357,7 +359,9 @@ Edit the JSON block directly. The game reads this document at startup; no export
       "treaty_category": "aircraft_carrier",
       "sensors": []
     },
-    "notes": "Historical conversion option; provisional fit and timing."
+    "notes": "Historical conversion option; provisional fit and timing.",
+    "modelId": "courageous_1922_cv",
+    "modelCampaign": "campaign_1922"
   },
   "new_mexico": {
     "id": "new_mexico",

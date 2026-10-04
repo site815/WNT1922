@@ -9,7 +9,7 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 | Change | Source |
 | --- | --- |
 | Shared national identities and colors | [common/nations.md](common/nations.md) |
-| Initial budgets, industry, yards, staffing, funding, levels, GDP, GTP and strategic resource modifiers | `1922/nations/COUNTRY.md` or `1936hindsight/nations/COUNTRY.md` |
+| Initial budgets, industry, yards, staffing, funding, levels, GDP, GTP and strategic resource modifiers | The selected campaign's `nations/COUNTRY.md`: `1922/`, `1936hindsight/`, `historical1939/` or `historical1941/` |
 | Opening fleets and ship-name pools | The same national opening document |
 | Ship specifications and blurbs | [common/ships.md](common/ships.md), [1922/ships.md](1922/ships.md), [1936hindsight/ships.md](1936hindsight/ships.md) |
 | Naval aircraft | The selected campaign's `aircraft/COUNTRY.md` |
@@ -34,6 +34,7 @@ Use `name`, `description`, `notes`, `body`, `detail` and the other existing text
 | Map names and territorial ownership | Each campaign's `map.md`; geometry is in `assets/maps/geometry.json` |
 | Design features and limits | `common/rules/designer.md` and `aircraft-designer.md` |
 | Music, national peace/war playlists, attribution and audio hashes | [common/music.md](common/music.md) |
+| Historical 1939/1941 opening snapshots, class fits, source evidence and limitations | [common/historical/README.md](common/historical/README.md) |
 
 The [manifest](manifest.md) lists campaign inputs. Shared ships have one definition. Campaign-specific ships must not duplicate shared IDs. References use stable ship, aircraft, nation and port IDs; changing an ID requires changing references to it.
 

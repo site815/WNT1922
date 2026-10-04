@@ -1,7 +1,8 @@
 // Presentation-only artwork. No catalog, simulation, or save dependency.
+import { assetReference, referencedAsset } from '../mechanics/asset-references.mjs';
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 const relativePath = (value, extension) => typeof value === "string" && /^[\w/-]+\.[\w]+$/.test(value) && !value.split("/").includes("..") && extension.test(value);
-export function recognitionIndex(registries) {
+export function recognitionIndex(registries, catalog = null) {
   const entries = new Map(), platforms = new Map();
   for (const registry of registries) {
     if (registry.format !== 1 || !Array.isArray(registry.entries)) throw Error("Unsupported recognition registry.");
@@ -22,10 +23,31 @@ export function recognitionIndex(registries) {
       }
     }
   }
-  return { entries, platforms };
+  const index={entries,platforms,sourcePlatforms:new Map(platforms)};
+  if(catalog)applyRecognitionCatalog(index,catalog);
+  return index;
 }
-let current = null, pending = null, failure = "";
-export async function loadRecognition({ refresh = false, fetcher = globalThis.fetch } = {}) {
+function applyRecognitionCatalog(index,catalog) {
+  const sources=index.sourcePlatforms;index.platforms=new Map(sources);
+  for(const [campaignId,campaign] of Object.entries(catalog?.campaigns || {})) {
+    const definitions=[...Object.values(campaign.classes||{}).map(row=>['ship',row]),
+      ...Object.values(campaign.nations||{}).flatMap(nation=>[...(nation.aircraft||[]),...(nation.armyAircraft||[])].map(row=>['aircraft',row]))];
+    for(const [kind,definition] of definitions) {
+      const key=campaignId+':'+kind+':'+definition.id;if(sources.has(key))continue;
+      const reference=assetReference(definition,campaign.scenario,campaignId,{drawing:true});
+      const source=referencedAsset(sources,reference,kind);if(!source)continue;
+      const note=[source.note,definition.recognitionNote,reference.representativeModel
+        ? `Representative artwork for ${definition.name || definition.id}; it does not depict this exact class or fit.` : ''].filter(Boolean).join(' ');
+      index.platforms.set(key,{...source,note,representative:reference.representativeModel,reference});
+    }
+  }
+}
+let current = null, pending = null, failure = "", configuredCatalog = null;
+export function setRecognitionCatalog(catalog) {
+  configuredCatalog=catalog;
+  if(current)applyRecognitionCatalog(current,catalog);
+}
+export async function loadRecognition({ refresh = false, fetcher = globalThis.fetch, catalog = configuredCatalog } = {}) {
   if (pending) return pending;
   if (current && !refresh) return current;
   pending = (async () => {
@@ -38,7 +60,7 @@ export async function loadRecognition({ refresh = false, fetcher = globalThis.fe
     if (index.format !== 1 || !Array.isArray(index.registries) || !index.registries.length ||
         !index.registries.every(file => relativePath(file, /\.json$/)))
       throw Error("Unsupported recognition index.");
-    current = recognitionIndex(await Promise.all(index.registries.map(read)));
+    current = recognitionIndex(await Promise.all(index.registries.map(read)),catalog);
     failure = "";
     return current;
   })().catch(error => {
@@ -64,14 +86,14 @@ export function recognitionCard(kind, id, { compact = false, campaign = "" } = {
   if (!current) return `<p class="recognition-status">${esc(failure || "Loading recognition drawings…")}</p>`;
   const match = platformDrawing(kind, id, campaign);
   if (!match) return '<p class="recognition-status">No recognition drawing is assigned to this custom design.</p>';
-  const { entry, note } = match;
-  return `<figure class="recognition-card${compact ? " compact" : ""}${entry.display?.monochrome ? " monochrome" : ""}" data-recognition="${esc(entry.id)}"><button class="recognition-image" data-action="recognition" data-id="${esc(entry.id)}" aria-label="Expand recognition drawing: ${esc(entry.title)}">${artworkImage(entry)}</button>${caption(entry, note)}</figure>`;
+  const { entry, note, representative } = match;
+  return `<figure class="recognition-card${compact ? " compact" : ""}${entry.display?.monochrome ? " monochrome" : ""}" data-recognition="${esc(entry.id)}"><button class="recognition-image" data-action="recognition" data-id="${esc(entry.id)}" aria-label="Expand recognition drawing: ${esc(entry.title)}">${artworkImage(entry)}</button>${representative?'<small class="recognition-status">Representative drawing · not this exact class</small>':''}${caption(entry, note)}</figure>`;
 }
 export function recognitionThumbnail(kind, id, { campaign = "" } = {}) {
   const match = platformDrawing(kind, id, campaign);
   if (!match) return "";
-  const { entry } = match;
-  return `<figure class="recognition-card recognition-thumbnail${entry.display?.monochrome ? " monochrome" : ""}" data-recognition="${esc(entry.id)}"><div class="recognition-image">${artworkImage(entry)}</div></figure>`;
+  const { entry, representative } = match;
+  return `<figure class="recognition-card recognition-thumbnail${entry.display?.monochrome ? " monochrome" : ""}" data-recognition="${esc(entry.id)}"><div class="recognition-image">${artworkImage(entry)}</div>${representative?'<small class="recognition-status">Representative drawing · not this exact class</small>':''}</figure>`;
 }
 export function recognitionExpanded(id, { actualSize = false } = {}) {
   const entry = current?.entries.get(id);

@@ -17,7 +17,14 @@ export async function loadCatalog(read = readDocument) {
     Object.entries(index.campaigns).map(async ([id, refs]) => {
       const [metadata, ships, nationRows] = await Promise.all([
         read(refs.scenario),
-        read(refs.ships),
+        Promise.all((refs.shipCatalogs || [refs.ships]).map(read)).then(rows => {
+          const combined={};
+          for(const row of rows)for(const [key,value]of Object.entries(row)){
+            if(Object.hasOwn(combined,key))throw Error(`Duplicate ship definition: ${key}`);
+            combined[key]=value;
+          }
+          return combined;
+        }),
         Promise.all(
           Object.entries(refs.nations).map(async ([nation, file]) => {
             const [opening, aircraft] = await Promise.all([
@@ -41,9 +48,15 @@ export async function loadCatalog(read = readDocument) {
           throw Error(`Duplicate ship definition: ${key}`);
       if (metadata.scenario.id !== id)
         throw Error(`Campaign ID mismatch: ${id}`);
+      const classes={...sharedShips,...ships};
+      for(const [classId,fit]of Object.entries(metadata.classOverrides||{})){
+        if(!classes[classId] || Object.keys(fit).some(key=>!['radar','sonar'].includes(key)) ||
+          Object.values(fit).some(value=>typeof value!=='boolean'))throw Error(`Invalid opening class fit: ${classId}`);
+        classes[classId]={...classes[classId],...fit};
+      }
       campaigns[id] = {
         ...metadata,
-        classes: { ...sharedShips, ...ships },
+        classes,
         equipment,
         nations: Object.fromEntries(nationRows),
       };

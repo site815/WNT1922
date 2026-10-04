@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { UnrealWorldScene, UnrealBattleScene } from '../ui/unreal-scene.mjs';
+import { PORTS } from '../mechanics/world.mjs';
 
 // Exercise the actual input listeners without a browser or native renderer.
 class Surface {
@@ -53,7 +54,7 @@ function fixture(t, mode = 'world') {
   return {scene, canvas, inputs,flushFrame(){const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn());}};
 }
 
-for (const [label, button, shiftKey, action] of [['middle',1,false,'tilt'],['right',2,false,'pan'],['Shift-right',2,true,'pan']]) {
+for (const [label, button, shiftKey, action] of [['middle',1,false,'pan'],['right',2,false,'tilt'],['Shift-right',2,true,'tilt']]) {
   test('world '+label+' drag sends '+action+' without selecting (native zoom gate controls orbit)', t => {
     const {canvas, inputs} = fixture(t);
     assert(canvas.emit('pointerdown',{button,shiftKey}).defaultPrevented,'Drag cannot start browser middle-button autoscroll');
@@ -88,7 +89,7 @@ for (const [label, button, expected] of [['left',0,['pick']],['middle',1,[]],['r
   });
 }
 
-for (const [label, button, shiftKey, action] of [['middle',1,false,'tilt'],['right',2,false,'pan'],['Shift-right',2,true,'tilt']]) {
+for (const [label, button, shiftKey, action] of [['middle',1,false,'pan'],['right',2,false,'tilt'],['Shift-right',2,true,'tilt']]) {
   test('battle '+label+' drag retains '+action+' inspection control without selecting', t => {
     const {canvas, inputs} = fixture(t,'battle');
     canvas.emit('pointerdown',{button,shiftKey});
@@ -209,4 +210,40 @@ test('a native selection change sends one revision-bound patch and preserves the
   chart={};scene.refresh();await Promise.resolve();
   assert.deepEqual(messages[1].selectedForceIds,[]);assert.equal(messages[1].revision,7);
   assert.equal(scene.packet,full);
+});
+
+test('map double-click focuses the picked target and fits fleets and merchant convoys instead of using a strategic fixed zoom', t => {
+  const {scene,canvas,inputs}=fixture(t);
+  canvas.emit('dblclick');
+  assert.deepEqual(inputs.shift(),{action:'pick',x:.1,y:.2,radiusX:.01,radiusY:.02,zoom:true});
+  const force={id:'own',position:[4,5],route:[[4,5],[4,5]],speed:0,departAt:0,arriveAt:0};
+  scene.state={player:'USA',day:0,fraction:0,nations:{USA:{fleets:[force],convoys:[{...force,id:'cargo'}],groups:[]}}};
+  scene.zoom=65536;
+  scene.focus('fleet','own',{zoom:true});scene.focus('convoy','cargo',{zoom:true});
+  assert.deepEqual(inputs.map(input=>[input.action,input.kind,input.id]),[['fit-force','fleet','own'],['fit-force','convoy','cargo']]);
+  inputs.length=0;
+  scene.focus('port',Object.keys(PORTS)[0],{zoom:true});
+  assert.equal(inputs.length,1);assert.equal(inputs[0].action,'focus');assert.equal(inputs[0].zoom,16,'Port double-click returns from hull range to a meaningful harbor-region view');
+  inputs.length=0;scene.focus('merchant','cargo',{zoom:true,hullIndex:2});
+  assert.equal(inputs[0].kind,'merchant');assert.equal(inputs[0].hullIndex,2);assert.equal(inputs[0].zoom,65536);
+});
+
+test('a new campaign resets the native camera once after viewport activation while same-game menus preserve it',t=>{
+  const {scene,canvas,inputs,flushFrame}=fixture(t);const surface={};let visible=false;
+  const chart={zoom:1,rotation:0};scene.chart=()=>chart;scene.zoom=65536;
+  scene.rows=[{fleet:{id:'old-fleet'}}];scene.cameraKey='old-camera';
+  scene.root.querySelector=selector=>selector==='.native-world-surface'?surface:null;
+  canvas.parentElement=surface;scene.active=()=>visible;
+  scene.queueWheel({delta:-800});scene.resetView();flushFrame();
+  assert.deepEqual(inputs,[],'Old queued wheel input must not leak into the new campaign');
+  assert.equal(scene.zoom,1);assert.equal(scene.cameraKey,null);assert.deepEqual(scene.rows,[]);
+  scene.refresh();assert.deepEqual(inputs,[],'Hidden native scenes reject inputs, so reset remains pending');
+  visible=true;scene.refresh();assert.deepEqual(inputs,[{action:'home'}]);
+  scene.cameraChanged({zoom:1,longitude:0,latitude:0,tilt:0,yaw:0});
+  assert.equal(chart.zoom,1);assert.equal(chart.rotation,0);assert.equal(chart.nativeLatitude,0);
+  inputs.length=0;scene.zoom=16;chart.zoom=16;
+  visible=false;scene.refresh();visible=true;scene.refresh();scene.refresh();
+  assert.deepEqual(inputs,[],'Ministry/title resume transitions do not replay the new-campaign reset');
+  assert.equal(scene.zoom,16);assert.equal(chart.zoom,16);
+  scene.resetView();scene.refresh();assert.deepEqual(inputs,[{action:'home'}],'Another start with the same campaign/nation still resets');
 });

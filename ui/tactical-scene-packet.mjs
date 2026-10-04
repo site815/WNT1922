@@ -80,8 +80,10 @@ export function unrealTacticalPacket(state, options={}) {
     const lost=Number.isFinite(loss)&&loss<=end;
     const escaped=now.status==='escaped';
     const escapedAt=ship.escapedAt??departures.get(key)??frames.find(f=>frameUnit(f,key,'ships')?.status==='escaped')?.seconds??end;
+    const reference=state.metadata?.modelReferences?.[ship.classId];
     const row={key,id:String(groupId),side:ship.side,hullIndex,classId:ship.classId,type:ship.type,label:ship.name,
-      campaign:state.metadata?.modelCampaigns?.[ship.classId]||packet.campaign,
+      ...(reference || {}),
+      campaign:reference?.modelCampaign||state.metadata?.modelCampaigns?.[ship.classId]||packet.campaign,
       positionMetres:position([now.x,now.y]),headingDegrees:yaw(now),health:now.health,sunk:lost,
       trajectory:points.slice(-128),appearsAt:0,...(lost?{lostAtSeconds:Math.max(0,time(loss))}:{}),
       ...(escaped?{disappearsAt:Math.max(0,time(escapedAt))}:{}),
@@ -140,7 +142,8 @@ export function buildTacticalMovie(report){
     frameTimes:frames.map(frame=>Math.min(duration-6,(frame.tacticalSeconds??Math.max(0,(frame.at-report.startedAt)*60))/speed)),
     frameCount:frames.length,recordedUntil:frames.at(-1)?.at??report.completedAt??report.minute,
     partial:report.status==='ongoing',gapCount:combat.history.truncated?1:0,tactical:true,
-    units:packet.units.map(unit=>({...unit,campaign:combat.metadata?.modelCampaigns?.[unit.classId]||combat.metadata?.campaign,
+    units:packet.units.map(unit=>({...unit,
+      campaign:unit.modelCampaign||combat.metadata?.modelCampaigns?.[unit.classId]||combat.metadata?.campaign,
       name:unit.label,sunkHull:unit.sunk})),airstrikes:packet.airstrikes,shoreBatteries:packet.shoreBatteries,events:packet.events,
     omittedVisualEvents:combat.history.omittedEvents||0};
 }

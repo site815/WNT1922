@@ -67,21 +67,29 @@ const start = (id = "USA", campaign = "in_good_faith_1936") => {
   s.decisions = [];
   return [s, contentFor(b, s), s.nations[id]];
 };
-test("all fourteen starts have period levels, named inherited hulls and an abstract merchant register", () => {
+test("all starts have authored period levels, named inherited hulls and an abstract merchant register", () => {
   for (const campaign of Object.keys(b.campaigns))
     for (const id of Object.keys(b.nations)) {
       const [s, c, n] = start(id, campaign),
-        level = campaign === "campaign_1922" ? 1 : 5;
+        level = c.nations[id].starting.level;
       for (const key of Object.keys(PROGRAMS)) {
         assert.equal(n.tech[key], level);
         assert.equal(projectPrice(s, key).days, 180);
       }
       assert.ok(n.groups.every((g) => g.service !== "merchant"));
+      for(const authored of c.nations[id].hulls) {
+        const group=n.groups.find(g=>g.id===`h-${authored.id}`);
+        assert.ok(group,authored.name+' remains an individual opening hull');
+        assert.equal(group.name,authored.name);
+        assert.equal(group.count,1);
+        assert.doesNotMatch(group.name,/Hull \d|type hull/i);
+      }
       for (const g of n.groups.filter(
         (g) =>
           g.service === "warship" &&
           g.count === 1 &&
-          (id !== "JPN" || g.legacy),
+          (id !== "JPN" || g.legacy) &&
+          !(c.scenario.historicalOpening && g.representative),
       ))
         assert.doesNotMatch(g.name, /Hull \d|type hull/i, g.name);
       const names = n.groups
@@ -93,7 +101,7 @@ test("all fourteen starts have period levels, named inherited hulls and an abstr
         Math.abs(economy.current - n.merchant.hulls * n.merchant.averageGRT) <
           1e-5,
       );
-      assert.equal(economy.logistics, 50);
+      assert.equal(economy.logistics, campaign==='eve_pacific_war_1941'&&id==='FRA'?24:50);
       validateSave(s, b);
     }
 });

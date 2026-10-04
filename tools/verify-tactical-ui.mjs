@@ -8,6 +8,7 @@ import {createRequire} from 'node:module';
 import {createGameServer} from '../worker/desktop/server.mjs';
 import {CATALOG} from '../worker/catalog-loader.mjs';
 import {newGame} from '../mechanics/engine.mjs';
+import {SCENARIOS} from '../combatmechanics/index.mjs';
 let playwright;
 try {playwright=createRequire(import.meta.url)('playwright');}
 catch {playwright=createRequire(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/'))('playwright');}
@@ -30,7 +31,7 @@ try {
   await page.goto('http://127.0.0.1:'+server.address().port+'/?unreal=1');
   await page.locator('.start-screen').waitFor();
   assert.equal(await page.locator('.start-demo,.start-demo-host,.start-screen canvas').count(),0,'The old opening demonstration is removed');
-  assert.equal(await page.locator('[data-action="tactical"][data-preset]').count(),4,'Tactical battles is a primary menu section with all presets and custom');
+  assert.equal(await page.locator('[data-action="tactical"][data-preset]').count(),SCENARIOS.length+1,'Tactical battles is a primary menu section with all presets and custom');
   await page.locator('[data-action="tactical"][data-preset="denmark-strait"]').click();
   assert.equal(await page.locator('[data-setup="mode"]').inputValue(),'historical');
   assert(await page.locator('[data-setup="seed"]').isDisabled());
@@ -117,10 +118,14 @@ try {
   assert.equal(await page.locator('[data-tactical-camera]').isChecked(),true,'Returning to result preserves cinematic camera preference');
   const resultCamera=await page.evaluate(()=>window.__nativeCalls.filter(c=>c.method==='sceneinput').at(-1).packet);
   assert.equal(resultCamera.action,'cinematic');assert.equal(resultCamera.enabled,true);
-  for(const preset of ['midway','north-cape']) {
+  for(const preset of ['midway','north-cape','bismarck-last-battle','lofoten']) {
     await page.locator('[data-tactical="setup"]').click();
     await page.locator('[data-setup="presetId"]').selectOption(preset);
+    assert.equal(Number(await page.locator('[data-setup="seed"]').inputValue()),SCENARIOS.find(s=>s.id===preset).seed,'Each listed preset supplies a valid authored default seed');
+    if(['bismarck-last-battle','lofoten'].includes(preset))assert.match(await page.locator('.tactical-scenario').innerText(),/stored|sister-class/,'Historical setup discloses the model fit');
     await page.locator('[data-tactical="prepare"]').click();
+    assert.deepEqual(await page.locator('.tactical-error').allTextContents(),[],'Prepare '+preset);
+    await page.locator('.tactical-engagements[data-tactical-page="watch"]').waitFor();
     await page.locator('[data-tactical="resolve"]').click();
     await page.locator('.tactical-engagements[data-tactical-status="completed"]').waitFor();
     metrics.push({kind:'preset-result',preset,seconds:await seconds(),result:await page.locator('.tactical-result').innerText()});
